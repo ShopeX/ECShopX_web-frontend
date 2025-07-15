@@ -1,0 +1,33 @@
+// Colors
+$primary: #007AFF;
+$secondary: #666666;
+$dark: #333333;
+$light: #f7f7fa;
+
+// Typography
+$font-family-base: 'Noto Sans SC', sans-serif;
+
+// Spacing
+$spacing-base: 1rem;
+$spacing-xs: $spacing-base * 0.25;
+$spacing-sm: $spacing-base * 0.5;
+$spacing-md: $spacing-base;
+$spacing-lg: $spacing-base * 1.5;
+$spacing-xl: $spacing-base * 2;
+
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Border radius
+$radius-sm: 0.25rem;
+$radius-md: 0.375rem;
+$radius-lg: 0.5rem;
+
+// Transitions
+$transition-base: all 0.2s ease-in-out;
+$transition-fast: all 0.15s ease-in-out;
+$transition-slow: all 0.3s ease-in-out;

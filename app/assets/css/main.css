@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 自定义样式 */
+@layer base {
+  html {
+    padding: 0;
+    margin: 0;
+  }
+
+  body {
+    font-family:
+      PingFang SC,
+      -apple-system,
+      blinkmacsystemfont,
+      Segoe UI,
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      Fira Sans,
+      Droid Sans,
+      Helvetica Neue,
+      sans-serif;
+    background-color: #f5f6fa;
+  }
+}
+
+@layer components {
+  /* 自定义组件样式 */
+  .btn-primary {
+    @apply bg-primary-500 text-white px-4 py-2 rounded hover:bg-primary-600 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors;
+  }
+}
+
+@layer utilities {
+  /* 自定义工具类 */
+  .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}

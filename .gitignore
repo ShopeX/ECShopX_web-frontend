@@ -17,9 +17,13 @@ logs
 .DS_Store
 .fleet
 .idea
-.vscode
 
 # Local env files
 .env
 .env.*
-!.env.example 
+!.env.example
+
+# Lock files
+package-lock.json
+yarn.lock
+# Keep pnpm-lock.yaml 

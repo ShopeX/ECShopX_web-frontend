@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   
   // Nitro 配置
   nitro: {
-    compatibilityDate: '2025-07-27'
+    compatibilityDate: '2025-09-04'
   },
 
   // 应用配置
@@ -87,7 +87,19 @@ export default defineNuxtConfig({
 
   // 模块配置
   modules: [
-    '@nuxtjs/tailwindcss'
+    '@nuxt/ui'
+  ],
+
+  // 字体配置 - 完全禁用 Google Fonts
+  fonts: {
+    google: false,
+    googleicons: false
+  },
+
+  // CSS 配置
+  css: [
+    '~/assets/css/main.css',
+    '~/assets/css/sp-theme.css'
   ],
 
   // 运行时配置
@@ -104,8 +116,6 @@ export default defineNuxtConfig({
       'composables',
       'utils'
     ]
-    // 这里无需手动指定 imports，Nuxt3 会自动扫描 dirs 目录下的可导入内容
-    // 如需全局导入 nuxt/app 的组合式 API，建议直接在需要的文件中引入，避免配置冗余和类型报错
   },
 
   // 组件配置
@@ -115,4 +125,4 @@ export default defineNuxtConfig({
       '~/components/business'
     ]
   }
-}) 
+})

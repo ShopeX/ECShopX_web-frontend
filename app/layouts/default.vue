@@ -1,46 +1,52 @@
-<template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- 头部 -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <!-- Logo -->
-          <div class="flex items-center">
-            <NuxtLink to="/" class="text-xl font-bold text-gray-900">
-              ECSHOPX
-            </NuxtLink>
-          </div>
-
-          <!-- 导航菜单 -->
-          <nav class="flex items-center space-x-8">
-            <NuxtLink 
-              to="/item/list" 
-              class="text-gray-500 hover:text-gray-900"
-            >
-              商品列表
-            </NuxtLink>
-            <!-- 其他导航项 -->
-          </nav>
-        </div>
-      </div>
-    </header>
-
-    <!-- 主内容区 -->
-    <main class="py-6">
-      <slot />
-    </main>
-
-    <!-- 页脚 -->
-    <footer class="bg-white border-t">
-      <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <p class="text-center text-gray-500">
-          © 2024 ECSHOPX. All rights reserved.
-        </p>
-      </div>
-    </footer>
-  </div>
-</template>
-
 <script setup lang="ts">
-// 布局组件不需要额外的逻辑
+import type { NavigationMenuItem } from '@nuxt/ui'
+
+const route = useRoute()
+
+const items = computed<NavigationMenuItem[]>(() => [
+  {
+    label: 'Docs',
+    to: '/docs/getting-started',
+    active: route.path.startsWith('/docs/getting-started')
+  },
+  {
+    label: 'Components',
+    to: '/docs/components',
+    active: route.path.startsWith('/docs/components')
+  },
+  {
+    label: 'Figma',
+    to: 'https://go.nuxt.com/figma-ui',
+    target: '_blank'
+  },
+  {
+    label: 'Releases',
+    to: 'https://github.com/nuxt/ui/releases',
+    target: '_blank'
+  }
+])
 </script>
+
+<template>
+  <UHeader>
+    <template #title>
+    </template>
+
+    <UNavigationMenu :items="items" />
+
+    <template #right>
+      <UColorModeButton />
+
+      <UTooltip text="Open on GitHub" :kbds="['meta', 'G']">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          to="https://github.com/nuxt/ui"
+          target="_blank"
+          icon="i-simple-icons-github"
+          aria-label="GitHub"
+        />
+      </UTooltip>
+    </template>
+  </UHeader>
+</template>

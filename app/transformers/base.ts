@@ -20,6 +20,8 @@ export function transformPagination<T, R>(
   data: IPaginationResponse<T>,
   transformer: ITransformer<T, R>
 ): { list: R[]; total: number } {
+  console.log('transform-------data',data)
+  console.log('transform-------response',data.list.map(item => transformer.transform(item)))
   return {
     list: data.list.map(item => transformer.transform(item)),
     total: data.total_count

@@ -15,11 +15,11 @@
         全部
       </div>
       <div v-for="brand in brands" 
-           :key="brand.id" 
+           :key="brand.attribute_id" 
            class="brand-item"
-           :class="{ active: modelValue === brand.id }"
-           @click="handleSelect(brand.id)">
-        {{ brand.name }}
+           :class="{ active: modelValue === brand.attribute_id }"
+           @click="handleSelect(brand.attribute_id)">
+        {{ brand.attribute_name }}
       </div>
     </div>
   </div>
@@ -84,7 +84,7 @@ const toggleExpand = () => {
       cursor: pointer;
 
       &:hover {
-        color: var(--primary-color);
+        color: #dc2626;
       }
     }
   }
@@ -111,13 +111,13 @@ const toggleExpand = () => {
       transition: all 0.3s;
 
       &:hover {
-        color: var(--primary-color);
+        color: #dc2626;
         background: #f0f0f0;
       }
 
       &.active {
         color: #fff;
-        background: var(--primary-color);
+        background: #dc2626;
       }
     }
   }

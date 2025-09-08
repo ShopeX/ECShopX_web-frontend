@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app'
+import { defineNuxtPlugin } from 'nuxt/app'
 import axios from 'axios'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -7,7 +7,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   // 创建axios实例
   const request = axios.create({
     baseURL: config.public.apiBase || '/api',
-    timeout: config.public.apiTimeout || 10000,
+    timeout: config.public.apiTimeout as number || 10000,
     headers: {
       'Content-Type': 'application/json'
     }

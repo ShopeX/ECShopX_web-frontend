@@ -59,7 +59,7 @@ function createOptions<T>(options: IHttpOptions<T> = {}): UseFetchOptions<T> {
     query,
     ...fetchOptions,
     // 请求拦截
-    onRequest({ options }: { options: IExtendedFetchOptions }) {
+    onRequest({ options }: { options: any }) {
       // 请求开始时间
       const startTime = Date.now()
       // 保存到 options 中，供 onResponse 使用
@@ -80,7 +80,7 @@ function createOptions<T>(options: IHttpOptions<T> = {}): UseFetchOptions<T> {
     onResponse({ request, response, options }: { 
       request: Request
       response: Response & { _data?: any }
-      options: IExtendedFetchOptions 
+      options: any
     }) {
       // 计算请求耗时
       const endTime = Date.now()
@@ -186,34 +186,38 @@ export const http = {
   // GET 请求
   get<T>(url: string, options: IHttpOptions<T> = {}) {
     return useFetch<T>(url, {
-      method: 'get' as HttpMethod,
-      ...createOptions(options)
-    })
+      method: 'get',
+      ...createOptions(options),
+      headers:{
+        'Content-Type': 'application/x-www-form-urlencoded'
+     
+      }
+    } as any)
   },
 
   // POST 请求
   post<T>(url: string, data?: any, options: IHttpOptions<T> = {}) {
     return useFetch<T>(url, {
-      method: 'post' as HttpMethod,
+      method: 'post' ,
       body: data,
       ...createOptions(options)
-    })
+    } as any)
   },
 
   // PUT 请求
   put<T>(url: string, data?: any, options: IHttpOptions<T> = {}) {
     return useFetch<T>(url, {
-      method: 'put' as HttpMethod,
+      method: 'put' ,
       body: data,
       ...createOptions(options)
-    })
+    } as any)
   },
 
   // DELETE 请求
   delete<T>(url: string, options: IHttpOptions<T> = {}) {
     return useFetch<T>(url, {
-      method: 'delete' as HttpMethod,
+      method: 'delete',
       ...createOptions(options)
-    })
+    } as any)
   }
 } 

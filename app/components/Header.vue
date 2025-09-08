@@ -8,13 +8,13 @@
 
       <!-- 导航菜单 -->
       <nav class="flex items-center space-x-8 ml-16">
-        <NuxtLink to="/" class="text-dark text-base hover:text-primary">首页</NuxtLink>
-        <NuxtLink to="/category/1" class="text-dark text-base hover:text-primary">十三香</NuxtLink>
-        <NuxtLink to="/category/2" class="text-dark text-base hover:text-primary">麻辣鲜</NuxtLink>
-        <NuxtLink to="/category/3" class="text-dark text-base hover:text-primary"
+        <NuxtLink to="/" class="text-dark text-base hover:text-red-500">首页</NuxtLink>
+        <NuxtLink to="/category/1" class="text-dark text-base hover:text-red-500">十三香</NuxtLink>
+        <NuxtLink to="/category/2" class="text-dark text-base hover:text-red-500">麻辣鲜</NuxtLink>
+        <NuxtLink to="/category/3" class="text-dark text-base hover:text-red-500"
           >烧烤系列</NuxtLink
         >
-        <NuxtLink to="/category/4" class="text-dark text-base hover:text-primary">炖料</NuxtLink>
+        <NuxtLink to="/category/4" class="text-dark text-base hover:text-red-500">炖料</NuxtLink>
       </nav>
 
       <!-- 搜索框 -->

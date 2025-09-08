@@ -1,6 +1,66 @@
 import type { PaginationParams, PaginationResponse } from './common'
 
-// 请求参数接口
+// 商品源数据接口 - 基于 ItemDetailTransformer 的字段映射
+export interface IItem {
+  // 基础标识信息
+  item_id: string
+  item_bn: string
+  itemName: string
+  brief: string
+  
+  // 图片信息
+  pics: string[]
+  
+  // 价格信息（后端返回的是分，需要转换）
+  price: number
+  activity_price: number
+  market_price: number
+  member_price: number
+  vip_price: number
+  svip_price: number
+  package_price: number
+  
+  // 销售信息
+  sales: number
+  sales_setting: any
+  
+  // 库存和限制信息
+  limit_num: number
+  purchase_limit_num_by_cart: number
+  purchase_limit_num_by_fastbuy: number
+  start_num: number
+  
+  // 商品状态和类型
+  is_gift: boolean
+  is_point: boolean
+  nospec: boolean
+  item_type: string
+  approve_status: string
+  
+  // 商品规格和参数
+  item_spec_desc: string
+  item_params: any[]
+  item_unit: string
+  
+  // 促销活动信息
+  promotion_activity: any
+  activity_info: any
+  activity_type: string
+  
+  // 店铺信息
+  store: any
+  store_setting: any
+  company_id: string
+  
+  // 其他信息
+  point: number
+  vipgrade_guide_title: string
+  kaquan_list: any[]
+  groups_list: any[]
+  regions: any[]
+}
+
+// 商品列表请求参数接口
 export interface IItemListParams extends PaginationParams {
   item_type?: string
   brand_id?: string | number
@@ -11,50 +71,29 @@ export interface IItemListParams extends PaginationParams {
   end_price?: number
 }
 
-// 商品信息接口
-export interface IItem {
-  id: number | string
-  title: string
-  sub_title?: string
-  price: number // 单位：分
-  market_price: number // 单位：分
-  member_price?: number // 单位：分
-  pics: string[]
-  stock: number
-  sales: number
-  is_new?: boolean
-  category_id?: number | string
-  brand_id?: number | string
-  status: number
-  created_at: string
-  updated_at: string
-}
-
-// 品牌信息接口
-export interface IBrand {
-  id: number | string
-  name: string
-  logo?: string
-  desc?: string
-}
-
-// 列表响应数据接口
+// 商品列表响应接口
 export interface IItemListResponse {
   list: IItem[]
   total_count: number
-  brand_list?: {
-    list: IBrand[]
-  }
+  brand_list: IBrand[]
 }
 
-// 详情请求参数
+// 商品详情请求参数接口
 export interface IItemDetailParams {
   id: string | number
 }
 
-// 详情响应数据
+// 商品详情响应接口
 export interface IItemDetailResponse {
   item: IItem
+}
+
+// 品牌信息接口
+export interface IBrand {
+  attribute_id: number | string
+  attribute_name: string
+  logo?: string
+  desc?: string
 }
 
 // 商品评价列表请求参数
@@ -118,3 +157,4 @@ export interface ItemGetNearbyShopResponse extends PaginationResponse<{
   latitude: number
   longitude: number
 }> {} 
+

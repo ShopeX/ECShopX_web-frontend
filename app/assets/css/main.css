@@ -1,46 +1,164 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "@nuxt/ui";
 
-/* 自定义样式 */
-@layer base {
-  html {
-    padding: 0;
-    margin: 0;
-  }
+/* 京东风格主题色配置 - 使用 sp 前缀 */
+:root {
+  /* 京东红 - 主色调 */
+  --ui-primary: #e53e3e;
+  --ui-color-primary-50: #fef2f2;
+  --ui-color-primary-100: #fee2e2;
+  --ui-color-primary-200: #fecaca;
+  --ui-color-primary-300: #fca5a5;
+  --ui-color-primary-400: #f87171;
+  --ui-color-primary-500: #e53e3e;  /* 京东红主色 */
+  --ui-color-primary-600: #dc2626;  /* hover 状态 */
+  --ui-color-primary-700: #b91c1c;  /* active 状态 */
+  --ui-color-primary-800: #991b1b;
+  --ui-color-primary-900: #7f1d1d;
+  --ui-color-primary-950: #450a0a;
 
-  body {
-    font-family:
-      PingFang SC,
-      -apple-system,
-      blinkmacsystemfont,
-      Segoe UI,
-      Roboto,
-      Oxygen,
-      Ubuntu,
-      Cantarell,
-      Fira Sans,
-      Droid Sans,
-      Helvetica Neue,
-      sans-serif;
-    background-color: #f5f6fa;
-  }
+  /* 京东蓝 - 辅助色 */
+  --ui-secondary: #1890ff;
+  --ui-color-secondary-50: #e6f7ff;
+  --ui-color-secondary-100: #bae7ff;
+  --ui-color-secondary-200: #91d5ff;
+  --ui-color-secondary-300: #69c0ff;
+  --ui-color-secondary-400: #40a9ff;
+  --ui-color-secondary-500: #1890ff;
+  --ui-color-secondary-600: #096dd9;
+  --ui-color-secondary-700: #0050b3;
+  --ui-color-secondary-800: #003a8c;
+  --ui-color-secondary-900: #002766;
+  --ui-color-secondary-950: #001529;
+
+  /* 成功色 - 绿色 */
+  --ui-success: #52c41a;
+  --ui-color-success-50: #f6ffed;
+  --ui-color-success-100: #d9f7be;
+  --ui-color-success-200: #b7eb8f;
+  --ui-color-success-300: #95de64;
+  --ui-color-success-400: #73d13d;
+  --ui-color-success-500: #52c41a;
+  --ui-color-success-600: #389e0d;
+  --ui-color-success-700: #237804;
+  --ui-color-success-800: #135200;
+  --ui-color-success-900: #092b00;
+  --ui-color-success-950: #031300;
+
+  /* 警告色 - 橙色 */
+  --ui-warning: #fa8c16;
+  --ui-color-warning-50: #fff7e6;
+  --ui-color-warning-100: #ffd591;
+  --ui-color-warning-200: #ffb84d;
+  --ui-color-warning-300: #ff9c6e;
+  --ui-color-warning-400: #ff7a45;
+  --ui-color-warning-500: #fa8c16;
+  --ui-color-warning-600: #d46b08;
+  --ui-color-warning-700: #ad4e00;
+  --ui-color-warning-800: #873800;
+  --ui-color-warning-900: #612500;
+  --ui-color-warning-950: #3d1a00;
+
+  /* 错误色 - 红色 */
+  --ui-error: #ff4d4f;
+  --ui-color-error-50: #fff1f0;
+  --ui-color-error-100: #ffccc7;
+  --ui-color-error-200: #ffa39e;
+  --ui-color-error-300: #ff7875;
+  --ui-color-error-400: #ff4d4f;
+  --ui-color-error-500: #f5222d;
+  --ui-color-error-600: #cf1322;
+  --ui-color-error-700: #a8071a;
+  --ui-color-error-800: #820014;
+  --ui-color-error-900: #5c0011;
+  --ui-color-error-950: #33000a;
+
+  /* 信息色 - 蓝色 */
+  --ui-info: #1890ff;
+  --ui-color-info-50: #e6f7ff;
+  --ui-color-info-100: #bae7ff;
+  --ui-color-info-200: #91d5ff;
+  --ui-color-info-300: #69c0ff;
+  --ui-color-info-400: #40a9ff;
+  --ui-color-info-500: #1890ff;
+  --ui-color-info-600: #096dd9;
+  --ui-color-info-700: #0050b3;
+  --ui-color-info-800: #003a8c;
+  --ui-color-info-900: #002766;
+  --ui-color-info-950: #001529;
+
+  /* 中性色 - 灰色系 */
+  --ui-neutral: #6b7280;
+  --ui-color-neutral-50: #f9fafb;
+  --ui-color-neutral-100: #f3f4f6;
+  --ui-color-neutral-200: #e5e7eb;
+  --ui-color-neutral-300: #d1d5db;
+  --ui-color-neutral-400: #9ca3af;
+  --ui-color-neutral-500: #6b7280;
+  --ui-color-neutral-600: #4b5563;
+  --ui-color-neutral-700: #374151;
+  --ui-color-neutral-800: #1f2937;
+  --ui-color-neutral-900: #111827;
+  --ui-color-neutral-950: #030712;
+
+  /* 京东特有的设计令牌 - 通过主题系统设置 */
+  --ui-bg: #ffffff;
+  --ui-bg-muted: #f5f5f5;
+  --ui-bg-elevated: #ffffff;
+  --ui-bg-accented: #f0f0f0;
+  --ui-bg-inverted: #1f2937;
+
+  --ui-text: #333333;
+  --ui-text-dimmed: #999999;
+  --ui-text-muted: #666666;
+  --ui-text-toned: #444444;
+  --ui-text-highlighted: #000000;
+  --ui-text-inverted: #ffffff;
+
+  --ui-border: #e5e5e5;
+  --ui-border-muted: #f0f0f0;
+  --ui-border-accented: #d9d9d9;
+  --ui-border-inverted: #333333;
+
+  /* 京东特有的圆角 */
+  --ui-radius: 4px;
 }
 
-@layer components {
-  /* 自定义组件样式 */
-  .btn-primary {
-    @apply bg-primary-500 text-white px-4 py-2 rounded hover:bg-primary-600 transition-colors;
-  }
 
-  .btn-secondary {
-    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors;
-  }
+
+/* 京东风格的按钮 hover 效果 */
+[data-variant="solid"][data-color="primary"]:hover {
+  background-color: var(--ui-color-primary-600) !important;
+  color: white !important;
+  box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
 }
 
-@layer utilities {
-  /* 自定义工具类 */
-  .text-shadow {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
+[data-variant="ghost"][data-color="primary"]:hover {
+  background-color: var(--ui-color-primary-50) !important;
+  color: var(--ui-color-primary-700) !important;
 }
+
+[data-variant="outline"][data-color="primary"]:hover {
+  background-color: var(--ui-color-primary-500) !important;
+  color: white !important;
+  border-color: var(--ui-color-primary-500) !important;
+}
+
+/* 中性色按钮 */
+[data-variant="solid"][data-color="neutral"]:hover {
+  background-color: var(--ui-color-neutral-600) !important;
+  color: white !important;
+}
+
+[data-variant="ghost"][data-color="neutral"]:hover {
+  background-color: var(--ui-color-neutral-100) !important;
+  color: var(--ui-color-neutral-700) !important;
+}
+
+[data-variant="outline"][data-color="neutral"]:hover {
+  background-color: var(--ui-color-neutral-500) !important;
+  color: white !important;
+  border-color: var(--ui-color-neutral-500) !important;
+}
+
+

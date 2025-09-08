@@ -44,7 +44,8 @@ export interface IItem {
 
 // 响应数据接口
 export interface IItemListResponse {
-  list: IItem[]
+  data:{ 
+    list: IItem[]
   total_count: number
   brand_list?: {
     list: Array<{
@@ -52,6 +53,8 @@ export interface IItemListResponse {
       name: string
     }>
   }
+  }
+
 }
 ```
 

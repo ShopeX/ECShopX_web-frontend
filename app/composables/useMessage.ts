@@ -1,35 +1,33 @@
-import { useToast } from '@/composables/useToast'
-
 export function useMessage() {
   const toast = useToast()
 
   return {
     success(message: string) {
-      toast.show({
-        type: 'success',
+      toast.add({
         title: '成功',
-        description: message
+        description: message,
+        color: 'green'
       })
     },
     error(message: string) {
-      toast.show({
-        type: 'error',
+      toast.add({
         title: '错误',
-        description: message
+        description: message,
+        color: 'red'
       })
     },
     warning(message: string) {
-      toast.show({
-        type: 'warning',
+      toast.add({
         title: '警告',
-        description: message
+        description: message,
+        color: 'orange'
       })
     },
     info(message: string) {
-      toast.show({
-        type: 'info',
+      toast.add({
         title: '提示',
-        description: message
+        description: message,
+        color: 'blue'
       })
     }
   }

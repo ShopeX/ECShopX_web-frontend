@@ -1,2 +1,3 @@
 export * from './base'
-export * from './product' 
+export * from './list'
+export * from './decorators' 

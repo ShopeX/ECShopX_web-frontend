@@ -1,12 +1,13 @@
 <template>
-  <div>
-    <NuxtLayout>
+  <UApp>
+    <!-- <NuxtLayout> -->
       <NuxtPage />
-    </NuxtLayout>
-  </div>
+    <!-- </NuxtLayout> -->
+  </UApp>
 </template>
 
 <script setup lang="ts">
+
 </script>
 
 <style>

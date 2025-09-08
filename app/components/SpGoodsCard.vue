@@ -19,7 +19,7 @@
       </h3>
       
       <div class="flex items-baseline gap-2 mb-2">
-        <div class="text-primary">
+        <div class="text-red-500">
           <span class="text-xs">¥</span>
           <span class="text-lg font-medium">{{ formatPrice(info.price) }}</span>
         </div>
@@ -35,7 +35,7 @@
         <span>销量 {{ info.sales }}</span>
         <span 
           v-if="info.stock <= 10" 
-          class="text-primary"
+          class="text-red-500"
         >
           库存 {{ info.stock }}
         </span>

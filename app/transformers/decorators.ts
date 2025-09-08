@@ -10,6 +10,7 @@ interface IFieldMapping {
   propertyKey: string | symbol  // 目标属性名
   sourceKey: string            // 源数据属性名
   transform?: (value: any) => any  // 可选的转换函数
+  isComputed?: boolean         // 是否为计算字段（getter）
 }
 
 /**
@@ -36,13 +37,27 @@ export function Field(sourceKey: string, transform?: (value: any) => any): Prope
     addFieldMapping(target.constructor, {
       propertyKey,
       sourceKey,
-      transform
+      transform,
+      isComputed: false
     })
   }
 }
 
 /**
- * 自动映射装饰器
+ * 计算字段装饰器 - 用于标记 getter 方法
+ */
+export function ComputedField(propertyKey: string | symbol): PropertyDecorator {
+  return (target: any, _propertyKey: string | symbol) => {
+    addFieldMapping(target.constructor, {
+      propertyKey,
+      sourceKey: '', // 计算字段不需要源字段
+      isComputed: true
+    })
+  }
+}
+
+/**
+ * 自动映射装饰器 - 通用性实现
  */
 export function AutoMap<T extends { new (...args: any[]): {} }>(constructor: T) {
   return class extends constructor {
@@ -51,20 +66,22 @@ export function AutoMap<T extends { new (...args: any[]): {} }>(constructor: T) 
       const mappings = getFieldMappings(constructor)
       
       // 创建 getter 和 setter
-      mappings.forEach(({ propertyKey, sourceKey, transform }) => {
-        let value: any
-        
-        Object.defineProperty(this, propertyKey, {
-          get() {
-            // 如果有转换函数，应用转换
-            return transform ? transform(value) : value
-          },
-          set(newValue: any) {
-            value = newValue
-          },
-          enumerable: true,
-          configurable: true
-        })
+      mappings.forEach(({ propertyKey, sourceKey, transform, isComputed }) => {
+        if (!isComputed) {
+          let value: any
+          
+          Object.defineProperty(this, propertyKey, {
+            get() {
+              // 如果有转换函数，应用转换
+              return transform ? transform(value) : value
+            },
+            set(newValue: any) {
+              value = newValue
+            },
+            enumerable: true,
+            configurable: true
+          })
+        }
       })
     }
 
@@ -73,22 +90,35 @@ export function AutoMap<T extends { new (...args: any[]): {} }>(constructor: T) 
      */
     fromSource(source: any) {
       const mappings = getFieldMappings(constructor)
-      mappings.forEach(({ propertyKey, sourceKey, transform }) => {
-        const value = source[sourceKey]
-        ;(this as any)[propertyKey] = value
+      mappings.forEach(({ propertyKey, sourceKey, transform, isComputed }) => {
+        if (!isComputed) {
+          const value = source[sourceKey]
+          ;(this as any)[propertyKey] = value
+        }
       })
       return this
     }
 
     /**
-     * 转换为目标数据
+     * 转换为目标数据 - 通用性实现，自动处理所有属性
      */
     toTarget() {
-      const mappings = getFieldMappings(constructor)
       const result: any = {}
       
-      mappings.forEach(({ propertyKey, sourceKey }) => {
-        result[sourceKey] = (this as any)[propertyKey]
+      // 处理所有映射的字段
+      const mappings = getFieldMappings(constructor)
+      mappings.forEach(({ propertyKey, sourceKey, isComputed }) => {
+        if (isComputed) {
+          // 计算字段（getter 方法）
+          try {
+            result[propertyKey] = (this as any)[propertyKey]
+          } catch (error) {
+            console.warn(`Error accessing computed field ${String(propertyKey)}:`, error)
+          }
+        } else {
+          // 普通字段
+          result[propertyKey] = (this as any)[propertyKey]
+        }
       })
       
       return result

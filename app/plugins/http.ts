@@ -1,12 +1,12 @@
-import { defineNuxtPlugin } from '#app'
-import type { UseFetchOptions } from '#app'
+import { defineNuxtPlugin } from 'nuxt/app'
+import type { UseFetchOptions } from 'nuxt/app'
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
   
   const defaultOptions: UseFetchOptions<any> = {
     baseURL: config.public.apiBase || '/api',
-    timeout: config.public.apiTimeout || 10000,
+    timeout: config.public.apiTimeout as number || 10000,
     headers: {
       'Content-Type': 'application/json'
     },

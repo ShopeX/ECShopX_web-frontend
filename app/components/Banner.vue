@@ -34,7 +34,7 @@
         :key="index"
         @click="setCurrentIndex(index)"
         class="w-2 h-2 rounded-full transition-colors duration-200"
-        :class="index === currentIndex ? 'bg-primary' : 'bg-white/50'"
+        :class="index === currentIndex ? 'bg-red-500' : 'bg-white/50'"
         :aria-label="`切换到第${index + 1}张轮播图`"
       />
     </div>

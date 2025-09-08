@@ -1,7 +1,7 @@
 import type { IItemListParams, IItemListResponse, IItemDetailParams, IItemDetailResponse } from '~/types/api/item'
-import type { IProduct } from '~/types/product'
+
 import { http } from '~/utils/http'
-import { productTransformer, transformPagination } from '~/transformers'
+import { itemDetailTransformer, transformPagination } from '~/transformers'
 
 export function useItemApi() {
   return {
@@ -14,17 +14,18 @@ export function useItemApi() {
         // 缓存配置
         cache: 'no-cache',
         // 转换响应数据
-        transform: (response: IItemListResponse) => {
+        transform: (response: any) => {
+          console.log('transform-------response',response)
           // 使用转换器处理数据
           const { list, total } = transformPagination({
-            list: response.list,
-            total_count: response.total_count
-          }, productTransformer)
-
+            list: response.data.list,
+            total_count: response.data.total_count
+          }, itemDetailTransformer)
+          console.log('transform-------list',list)
           return {
             list,
             total_count: total,
-            brand_list: response.brand_list
+            brand_list: response.data.brand_list
           }
         }
       })
@@ -40,7 +41,7 @@ export function useItemApi() {
         // 转换响应数据
         transform: (response: IItemDetailResponse) => {
           return {
-            item: productTransformer.transform(response.item)
+            item: itemDetailTransformer.transform(response.item)
           }
         }
       })

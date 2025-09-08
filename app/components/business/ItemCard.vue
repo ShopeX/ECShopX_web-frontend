@@ -3,15 +3,15 @@
     <!-- 商品图片 -->
     <div class="item-image">
       <img 
-        :src="info.pics[0]" 
-        :alt="info.title"
+        :src="info.img" 
+        :alt="info.itemName"
         loading="lazy"
       >
     </div>
 
     <!-- 商品信息 -->
     <div class="item-info">
-      <h3 class="title">{{ info.title }}</h3>
+      <h3 class="title">{{ info.itemName }}</h3>
       
       <!-- 价格区域 -->
       <div class="price-row">
@@ -19,16 +19,16 @@
           <span class="symbol">¥</span>
           <span class="amount">{{ formatPrice(info.price) }}</span>
         </div>
-        <div v-if="info.market_price" class="market-price">
-          ¥{{ formatPrice(info.market_price) }}
+        <div v-if="info.marketPrice" class="market-price">
+          ¥{{ formatPrice(info.marketPrice) }}
         </div>
       </div>
 
       <!-- 销量库存 -->
       <div class="stats-row">
         <span class="sales">销量 {{ info.sales }}</span>
-        <span v-if="info.stock <= 10" class="stock">
-          仅剩 {{ info.stock }} 件
+        <span v-if="info.limitNum <= 10" class="stock">
+          仅剩 {{ info.limitNum }} 件
         </span>
       </div>
     </div>
@@ -37,11 +37,11 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import type { IItem } from '@/types/api/item'
+import type { IProduct } from '@/types/product'
 
 // Props
 const props = defineProps<{
-  info: IItem
+  info: IProduct
 }>()
 
 // 路由
@@ -54,7 +54,7 @@ const formatPrice = (price: number) => {
 
 // 跳转到详情页
 const navigateToDetail = () => {
-  router.push(`/item/${props.info.id}`)
+  router.push(`/item/${props.info.itemId}`)
 }
 </script>
 

@@ -1,0 +1,438 @@
+# ECSHOPX Web 项目开发规范
+
+## 项目概述
+- **项目名称**: ECSHOPX Web
+- **技术栈**: Nuxt 4 + Vue 3 + TypeScript + Tailwind CSS + Nuxt UI 3.3
+- **包管理器**: pnpm
+- **Node.js 版本**: ^20.18.0
+
+## 技术栈规范
+
+### 核心框架
+- **Nuxt 4**: 使用最新的 Nuxt 4 框架
+- **Vue 3**: 使用 Composition API 和 `<script setup>` 语法
+- **TypeScript**: 严格类型检查，启用 `strict: true`
+- **Tailwind CSS**: 使用 Tailwind CSS 进行样式设计，不使用自定义 CSS
+
+### UI 组件库
+- **Nuxt UI 3.3**: 主要 UI 组件库
+- **Radix Vue**: 无障碍组件基础
+- **自定义组件**: 使用 `sp-` 前缀命名（如 `sp-btn`, `sp-card` 等）
+
+## 代码规范
+
+### Vue 组件规范
+1. **使用 Composition API**: 所有组件必须使用 `<script setup>` 语法
+2. **TypeScript 类型**: 所有 props、emits、refs 必须定义类型
+3. **组件命名**: 使用 PascalCase，文件名使用 kebab-case
+4. **样式规范**: 
+   - 禁止使用 `<style>` 标签写自定义 CSS
+   - 必须使用 Tailwind CSS 类名
+   - 自定义样式通过 `sp-` 前缀类名在 `sp-theme.css` 中定义
+
+### 文件结构规范
+```
+app/
+├── components/           # 组件目录
+│   ├── business/        # 业务组件
+│   └── ui/             # UI 组件
+├── pages/              # 页面目录
+├── layouts/            # 布局组件
+├── composables/        # 组合式函数
+├── stores/             # Pinia 状态管理
+├── types/              # TypeScript 类型定义
+├── utils/              # 工具函数
+├── plugins/            # Nuxt 插件
+├── transformers/       # 数据转换器
+├── assets/             # 静态资源
+│   └── css/           # 样式文件
+│       ├── main.css   # 主样式（主题变量）
+│       └── sp-theme.css # 京东风格主题类
+└── api/               # API 接口
+```
+
+### 样式规范
+1. **主题系统**: 使用 Nuxt UI 的主题系统，通过 `app.config.ts` 配置
+2. **颜色变量**: 使用 `--ui-*` CSS 变量定义主题色
+3. **京东风格**: 使用 `sp-` 前缀的 Tailwind 类名
+4. **响应式**: 使用 Tailwind 的响应式前缀（`sm:`, `md:`, `lg:` 等）
+
+### TypeScript 规范
+1. **严格模式**: 启用所有严格类型检查
+2. **接口定义**: 所有 API 响应和组件 props 必须定义接口
+3. **类型导入**: 使用 `import type` 导入类型
+4. **泛型使用**: 合理使用泛型提高代码复用性
+
+### API 规范
+1. **接口定义**: 在 `types/api/` 目录下定义 API 接口类型
+2. **数据转换**: 使用 `transformers/` 目录下的转换器处理 API 数据
+3. **错误处理**: 统一的错误处理机制
+4. **类型安全**: API 调用必须类型安全
+
+## 组件开发规范
+
+### 业务组件 (components/business/)
+- 使用 `sp-` 前缀的 Tailwind 类名
+- 遵循京东 PC 商城的设计风格
+- 支持深色模式
+- 响应式设计
+
+### UI 组件 (components/ui/)
+- 基于 Nuxt UI 扩展
+- 可复用性强
+- 完整的 TypeScript 类型定义
+
+### 页面组件 (pages/)
+- 使用 Nuxt 4 的文件路由
+- 支持 SEO 优化
+- 服务端渲染友好
+
+## 状态管理规范
+
+### Pinia Store
+- 使用 Composition API 风格的 store
+- 类型安全的 state 和 actions
+- 模块化管理
+
+### 数据流
+1. API 调用 → 数据转换器 → Store → 组件
+2. 组件事件 → Store Actions → API 调用
+
+## 开发工具规范
+
+### 代码质量
+- **ESLint**: 使用 `@nuxtjs/eslint-config-typescript`
+- **Prettier**: 代码格式化
+- **TypeScript**: 类型检查
+
+### 提交规范
+- 使用语义化提交信息
+- 提交前运行 `pnpm lint:fix` 和 `pnpm format`
+
+## 性能优化规范
+
+### 构建优化
+- 使用 Nuxt 4 的自动优化
+- 代码分割和懒加载
+- 图片优化
+
+### 运行时优化
+- 合理使用 `computed` 和 `watch`
+- 避免不必要的响应式数据
+- 使用 `shallowRef` 和 `shallowReactive` 优化性能
+
+## 无障碍性规范
+
+### 组件无障碍
+- 使用 Radix Vue 提供的无障碍组件
+- 正确的 ARIA 属性
+- 键盘导航支持
+
+### 语义化 HTML
+- 使用语义化的 HTML 标签
+- 正确的 heading 层级
+- 有意义的 alt 文本
+
+## 测试规范
+
+### 单元测试
+- 组件测试使用 Vue Test Utils
+- 工具函数测试
+- Store 测试
+
+### 集成测试
+- 页面级测试
+- API 集成测试
+
+## 部署规范
+
+### 环境配置
+- 使用环境变量管理配置
+- 区分开发、测试、生产环境
+
+### 构建优化
+- 生产环境代码压缩
+- 静态资源优化
+- CDN 配置
+
+## 代码示例
+
+### Vue 组件示例
+```vue
+<template>
+  <div class="sp-card bg-white border border-gray-200 rounded-lg shadow-sm">
+    <h3 class="sp-card-title text-lg font-semibold text-gray-900">
+      {{ title }}
+    </h3>
+    <p class="sp-card-content text-gray-600">
+      {{ content }}
+    </p>
+  </div>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  title: string
+  content: string
+}
+
+const props = defineProps<Props>()
+</script>
+```
+
+### API 类型定义示例
+```typescript
+// types/api/item.ts
+export interface IItem {
+  id: string
+  name: string
+  price: number
+  brand: IBrand
+}
+
+export interface IBrand {
+  id: string
+  name: string
+}
+```
+
+### Store 示例
+```typescript
+// stores/item.ts
+export const useItemStore = defineStore('item', () => {
+  const items = ref<IItem[]>([])
+  
+  const fetchItems = async () => {
+    // API 调用逻辑
+  }
+  
+  return {
+    items,
+    fetchItems
+  }
+})
+```
+
+## 样式开发规范
+
+### 京东风格主题色
+```css
+/* 主题色变量定义 */
+:root {
+  --ui-primary: #e53e3e;        /* 京东红 */
+  --ui-secondary: #1890ff;      /* 京东蓝 */
+  --ui-success: #52c41a;        /* 成功绿 */
+  --ui-warning: #fa8c16;        /* 警告橙 */
+  --ui-error: #ff4d4f;          /* 错误红 */
+  --ui-neutral: #6b7280;        /* 中性灰 */
+}
+```
+
+### sp- 前缀组件样式
+```html
+<!-- 京东风格按钮 -->
+<button class="sp-btn sp-btn-primary">主要按钮</button>
+<button class="sp-btn sp-btn-ghost">幽灵按钮</button>
+
+<!-- 京东风格卡片 -->
+<div class="sp-product-card">
+  <img class="sp-product-card-image" src="product.jpg">
+  <div class="sp-product-card-content">
+    <h3 class="sp-product-card-title">商品标题</h3>
+    <div class="sp-product-card-price">¥299.00</div>
+  </div>
+</div>
+
+<!-- 京东风格筛选器 -->
+<div class="sp-filter-container">
+  <div class="sp-filter-main">
+    <button class="sp-filter-btn sp-filter-btn-active">综合</button>
+  </div>
+</div>
+```
+
+### 响应式设计规范
+```html
+<!-- 移动端优先的响应式设计 -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  <div class="p-4 sm:p-6 lg:p-8">
+    <!-- 内容 -->
+  </div>
+</div>
+
+<!-- 深色模式适配 -->
+<div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+    标题
+  </h1>
+</div>
+```
+
+## 组件开发最佳实践
+
+### 组件结构规范
+```vue
+<template>
+  <!-- 1. 根容器 -->
+  <div class="sp-component">
+    <!-- 2. 头部区域 -->
+    <header v-if="$slots.header" class="sp-component-header">
+      <slot name="header" />
+    </header>
+    
+    <!-- 3. 主体内容 -->
+    <main class="sp-component-body">
+      <slot />
+    </main>
+    
+    <!-- 4. 底部区域 -->
+    <footer v-if="$slots.footer" class="sp-component-footer">
+      <slot name="footer" />
+    </footer>
+  </div>
+</template>
+
+<script setup lang="ts">
+// 1. 导入
+import { ref, computed, watch } from 'vue'
+import type { ComponentProps } from '~/types'
+
+// 2. 接口定义
+interface Props {
+  // props 定义
+}
+
+interface Emits {
+  // emits 定义
+}
+
+// 3. Props 和 Emits
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+// 4. 响应式数据
+const data = ref<string>('')
+
+// 5. 计算属性
+const computedValue = computed(() => {
+  // 计算逻辑
+})
+
+// 6. 监听器
+watch(() => props.value, (newValue) => {
+  // 监听逻辑
+})
+
+// 7. 方法
+const handleMethod = () => {
+  // 方法实现
+}
+
+// 8. 生命周期
+onMounted(() => {
+  // 挂载逻辑
+})
+</script>
+```
+
+### 性能优化规范
+```vue
+<script setup lang="ts">
+// 使用 shallowRef 优化大对象
+const largeData = shallowRef<LargeObject>({})
+
+// 使用 computed 缓存计算结果
+const expensiveValue = computed(() => {
+  return heavyCalculation(props.data)
+})
+
+// 组件懒加载
+const LazyComponent = defineAsyncComponent(() => 
+  import('~/components/business/HeavyComponent.vue')
+)
+</script>
+
+<template>
+  <Suspense>
+    <LazyComponent />
+    <template #fallback>
+      <div class="sp-loading">加载中...</div>
+    </template>
+  </Suspense>
+</template>
+```
+
+## 错误处理规范
+
+### 组件错误处理
+```vue
+<script setup lang="ts">
+// 错误处理
+const handleError = (error: Error) => {
+  console.error('组件错误:', error)
+  // 显示用户友好的错误信息
+  showToast('操作失败，请重试')
+}
+
+// 异步操作错误处理
+const fetchData = async () => {
+  try {
+    const data = await apiCall()
+    return data
+  } catch (error) {
+    handleError(error as Error)
+    throw error
+  }
+}
+</script>
+```
+
+### API 错误处理
+```typescript
+// utils/http.ts
+export const handleApiError = (error: any) => {
+  if (error.response) {
+    // 服务器响应错误
+    const status = error.response.status
+    const message = error.response.data?.message || '请求失败'
+    
+    switch (status) {
+      case 400:
+        return '请求参数错误'
+      case 401:
+        return '未授权，请重新登录'
+      case 403:
+        return '权限不足'
+      case 404:
+        return '资源不存在'
+      case 500:
+        return '服务器内部错误'
+      default:
+        return message
+    }
+  } else if (error.request) {
+    // 网络错误
+    return '网络连接失败，请检查网络'
+  } else {
+    // 其他错误
+    return '未知错误，请重试'
+  }
+}
+```
+
+## 注意事项
+
+1. **禁止使用**: 自定义 CSS 样式（除了主题变量）
+2. **必须使用**: Tailwind CSS 类名和 `sp-` 前缀组件
+3. **类型安全**: 所有代码必须通过 TypeScript 类型检查
+4. **性能优先**: 考虑组件渲染性能和用户体验
+5. **可维护性**: 代码结构清晰，注释完整
+6. **一致性**: 遵循项目既定的代码风格和架构模式
+7. **无障碍性**: 确保组件支持键盘导航和屏幕阅读器
+8. **响应式**: 所有组件必须支持移动端和桌面端
+
+## 更新日志
+- 2025-01-09: 初始版本，基于 Nuxt 4 + Vue 3 + TypeScript + Tailwind CSS
+- 2025-01-09: 添加京东风格主题色和 sp- 前缀组件规范
+- 2025-01-09: 完善组件开发最佳实践和性能优化规范
+- 2025-01-09: 添加错误处理规范和响应式设计规范

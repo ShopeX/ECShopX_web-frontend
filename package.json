@@ -19,16 +19,17 @@
     "clean": "rm -rf node_modules .nuxt"
   },
   "dependencies": {
+    "@nuxt/ui": "3.3.3",
     "@pinia/nuxt": "^0.5.1",
     "axios": "^1.11.0",
     "pinia": "^2.1.7",
     "radix-vue": "^1.9.0",
+    "reflect-metadata": "^0.2.2",
     "vue": "^3.4.19"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
-    "@nuxtjs/tailwindcss": "^6.10.0",
     "@tailwindcss/forms": "^0.5.7",
     "@types/node": "^20.11.24",
     "eslint": "^8.56.0",

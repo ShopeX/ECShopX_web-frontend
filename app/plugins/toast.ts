@@ -1,4 +1,5 @@
-import { defineNuxtPlugin } from '#app'
+import { defineNuxtPlugin } from 'nuxt/app'
+
 import Toast from '@/components/ui/Toast.vue'
 
 export default defineNuxtPlugin((nuxtApp) => {

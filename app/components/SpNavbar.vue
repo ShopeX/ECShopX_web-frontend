@@ -9,14 +9,14 @@
           <NuxtLink 
             v-if="!isLoggedIn" 
             to="/auth/login"
-            class="hover:text-primary-500"
+            class="hover:text-red-500"
           >
             请登录
           </NuxtLink>
           <template v-else>
             <span>{{ userInfo.username }}</span>
             <button 
-              class="hover:text-primary-500"
+              class="hover:text-red-500"
               @click="handleLogout"
             >
               退出
@@ -28,7 +28,7 @@
             v-for="item in topMenus" 
             :key="item.key"
             :to="item.path"
-            class="hover:text-primary-500"
+            class="hover:text-red-500"
           >
             {{ item.label }}
           </NuxtLink>
@@ -53,11 +53,11 @@
               v-model="searchKeyword"
               type="text"
               placeholder="搜索商品"
-              class="w-full h-10 pl-4 pr-12 rounded-sm border border-primary-500 focus:outline-none"
+              class="w-full h-10 pl-4 pr-12 rounded-sm border border-red-500 focus:outline-none"
               @keyup.enter="handleSearch"
             />
             <button
-              class="absolute right-0 top-0 h-10 w-16 bg-primary-500 text-white rounded-r-sm hover:bg-primary-600"
+              class="absolute right-0 top-0 h-10 w-16 bg-red-500 text-white rounded-r-sm hover:bg-red-600"
               @click="handleSearch"
             >
               搜索
@@ -70,7 +70,7 @@
               v-for="(keyword, index) in hotKeywords"
               :key="keyword"
               href="#"
-              class="hover:text-primary-500 ml-2"
+              class="hover:text-red-500 ml-2"
               @click.prevent="searchKeyword = keyword; handleSearch()"
             >
               {{ keyword }}
@@ -84,7 +84,7 @@
             v-for="item in userActions" 
             :key="item.key"
             :to="item.path"
-            class="flex flex-col items-center hover:text-primary-500"
+            class="flex flex-col items-center hover:text-red-500"
           >
             <span class="text-2xl">
               <Icon :name="item.icon" />
@@ -97,7 +97,7 @@
       <!-- 分类导航 -->
       <div class="h-10 flex items-center space-x-8">
         <div class="relative group">
-          <button class="flex items-center space-x-2 h-10 px-6 bg-primary-500 text-white">
+          <button class="flex items-center space-x-2 h-10 px-6 bg-red-500 text-white">
             <span>全部商品分类</span>
             <Icon name="heroicons:chevron-down" />
           </button>
@@ -140,7 +140,7 @@
           v-for="nav in mainNavs"
           :key="nav.key"
           :to="nav.path"
-          class="text-gray-700 hover:text-primary-500"
+          class="text-gray-700 hover:text-red-500"
         >
           {{ nav.label }}
         </NuxtLink>

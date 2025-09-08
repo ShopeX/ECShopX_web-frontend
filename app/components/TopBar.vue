@@ -16,7 +16,7 @@
         <NuxtLink to="/coupons" class="text-sm">领券中心</NuxtLink>
         <NuxtLink to="/member" class="text-sm">会员中心</NuxtLink>
         <NuxtLink to="/merchant" class="text-sm">商家入驻</NuxtLink>
-        <div class="flex items-center bg-primary px-4 h-full">
+        <div class="flex items-center bg-red-500 px-4 h-full">
           <img src="/icons/cart.svg" alt="购物车" class="w-5 h-5 mr-2" />
           <span class="text-sm">我的购物车</span>
         </div>

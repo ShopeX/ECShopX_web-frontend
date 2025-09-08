@@ -180,7 +180,7 @@ watchEffect(() => {
     items.value = data.value.list
     total.value = data.value.total_count
     if (data.value.brand_list) {
-      brands.value = data.value.brand_list.list
+      brands.value = data.value.brand_list
     }
   }
 })

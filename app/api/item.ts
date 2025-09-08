@@ -25,7 +25,7 @@ export function useItemApi() {
           return {
             list,
             total_count: total,
-            brand_list: response.data.brand_list
+            brand_list: response.data.brand_list.list
           }
         }
       })

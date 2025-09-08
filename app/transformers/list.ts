@@ -225,6 +225,9 @@ export class ItemDetailTransformer {
 }
 
 export const itemDetailTransformer = {
-  transform: (source: any) => ItemDetailTransformer.fromSource(source).toTarget()
+  transform: (source: any) => {
+    const transformer = ItemDetailTransformer.fromSource(source)
+    return (transformer as any).toTarget()
+  }
 }
 

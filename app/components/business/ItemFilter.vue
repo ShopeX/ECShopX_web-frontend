@@ -421,4 +421,28 @@ const clearBrands = () => {
   selectedBrands.value = []
   updateBrandFilter()
 }
-</script> 
+</script>
+
+<style scoped>
+/* 确保组件样式立即生效，防止 FOUC */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb !important;
+}
+
+.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.text-red-500 {
+  color: #ef4444 !important;
+}
+
+/* 确保按钮过渡效果 */
+button {
+  transition: all 0.2s ease-in-out;
+}
+</style>

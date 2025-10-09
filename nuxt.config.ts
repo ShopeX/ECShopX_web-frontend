@@ -89,11 +89,19 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui'
   ],
-
-  // 字体配置 - 完全禁用 Google Fonts
-  fonts: {
-    google: false,
-    googleicons: false
+  ui: {
+    fonts: false,
+    theme: {
+      colors: [
+        'primary',
+        'secondary',
+        'success',
+        'info',
+        'warning',
+        'error',
+        'neutral'
+      ]
+    }
   },
 
   // CSS 配置

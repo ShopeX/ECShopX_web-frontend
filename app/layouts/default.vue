@@ -4,33 +4,32 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const route = useRoute()
 
 const items = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'Docs',
-    to: '/docs/getting-started',
-    active: route.path.startsWith('/docs/getting-started')
-  },
-  {
-    label: 'Components',
-    to: '/docs/components',
-    active: route.path.startsWith('/docs/components')
-  },
+  // {
+  //   label: 'Docs',
+  //   to: '/docs/getting-started',
+  //   active: route.path.startsWith('/docs/getting-started'),
+  // },
+  // {
+  //   label: 'Components',
+  //   to: '/docs/components',
+  //   active: route.path.startsWith('/docs/components'),
+  // },
   {
     label: 'Figma',
     to: 'https://go.nuxt.com/figma-ui',
-    target: '_blank'
+    target: '_blank',
   },
   {
     label: 'Releases',
     to: 'https://github.com/nuxt/ui/releases',
-    target: '_blank'
-  }
+    target: '_blank',
+  },
 ])
 </script>
 
 <template>
   <UHeader>
-    <template #title>
-    </template>
+    <template #title> ECSHOPX </template>
 
     <UNavigationMenu :items="items" />
 
@@ -49,4 +48,9 @@ const items = computed<NavigationMenuItem[]>(() => [
       </UTooltip>
     </template>
   </UHeader>
+
+  <!-- 页面内容插槽 -->
+  <main class="container mx-auto px-4 py-8">
+    <slot />
+  </main>
 </template>

@@ -5,10 +5,10 @@ import { defineNuxtConfig } from 'nuxt/config'
 export default defineNuxtConfig({
   // 开发模式配置
   devtools: { enabled: true },
-  
+
   // Nitro 配置
   nitro: {
-    compatibilityDate: '2025-09-04'
+    compatibilityDate: '2025-10-23'
   },
 
   // 应用配置
@@ -19,38 +19,6 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ]
-    },
-    // Payload 配置
-    payload: {
-      reviver: (key: string, value: any) => {
-        // 处理日期
-        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
-          return new Date(value)
-        }
-        return value
-      },
-      reducer: (value: any) => {
-        // 处理日期
-        if (value instanceof Date) {
-          return value.toISOString()
-        }
-        // 处理函数
-        if (typeof value === 'function') {
-          return undefined
-        }
-        // 处理 undefined
-        if (value === undefined) {
-          return null
-        }
-        // 处理 Error
-        if (value instanceof Error) {
-          return {
-            message: value.message,
-            stack: value.stack
-          }
-        }
-        return value
-      }
     }
   },
 
@@ -82,6 +50,14 @@ export default defineNuxtConfig({
         'form-data': 'form-data',
         'node-fetch': 'node-fetch'
       }
+    },
+    css: {
+      // 确保CSS被正确处理
+      devSourcemap: true,
+    },
+    build: {
+      // 优化 CSS 代码分割以减少FOUC
+      cssCodeSplit: false
     }
   },
 
@@ -89,26 +65,17 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui'
   ],
-  ui: {
-    fonts: false,
-    theme: {
-      colors: [
-        'primary',
-        'secondary',
-        'success',
-        'info',
-        'warning',
-        'error',
-        'neutral'
-      ]
-    }
-  },
 
   // CSS 配置
   css: [
     '~/assets/css/main.css',
-    '~/assets/css/sp-theme.css'
   ],
+
+  // 优化 CSS 以防止 FOUC
+  features: {
+    // 内联关键 CSS
+    inlineStyles: true
+  },
 
   // 运行时配置
   runtimeConfig: {

@@ -16,10 +16,10 @@
           <span :class="modelValue.sort === sort.value ? 'text-red-500' : 'text-gray-500'">
             {{ sort.label }}
           </span>
-          <UIcon 
-            name="i-lucide-arrow-down" 
-            :class="modelValue.sort === sort.value ? 'text-red-500' : 'text-gray-500'" 
-            class="ml-1" 
+          <UIcon
+            name="i-lucide-arrow-down"
+            :class="modelValue.sort === sort.value ? 'text-red-500' : 'text-gray-500'"
+            class="ml-1"
           />
         </UButton>
       </div>
@@ -27,26 +27,32 @@
       <!-- 价格排序（切换选项） -->
       <div class="flex items-center gap-2">
         <div class="flex items-center">
-          <UButton 
+          <UButton
             variant="ghost"
             color="neutral"
             size="sm"
             class="px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-sm"
             @click="togglePriceSort"
           >
-            <span :class="isPriceSortActive ? 'text-red-500' : 'text-gray-500'">
-              价格
-            </span>
+            <span :class="isPriceSortActive ? 'text-red-500' : 'text-gray-500'"> 价格 </span>
             <div class="ml-1 flex flex-col">
-              <UIcon 
-                name="heroicons:chevron-up" 
-                :class="isPriceSortActive && priceSortDirection === 'asc' ? 'text-red-500' : 'text-gray-500'"
-                class="h-2 w-2 -mb-1" 
+              <UIcon
+                name="heroicons:chevron-up"
+                :class="
+                  isPriceSortActive && priceSortDirection === 'asc'
+                    ? 'text-red-500'
+                    : 'text-gray-500'
+                "
+                class="h-2 w-2 -mb-1"
               />
-              <UIcon 
-                name="heroicons:chevron-down" 
-                :class="isPriceSortActive && priceSortDirection === 'desc' ? 'text-red-500' : 'text-gray-500'"
-                class="h-2 w-2" 
+              <UIcon
+                name="heroicons:chevron-down"
+                :class="
+                  isPriceSortActive && priceSortDirection === 'desc'
+                    ? 'text-red-500'
+                    : 'text-gray-500'
+                "
+                class="h-2 w-2"
               />
             </div>
           </UButton>
@@ -62,34 +68,37 @@
             size="sm"
             class="px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-sm"
           >
-            <span :class="showPriceInputs ? 'text-red-500' : 'text-gray-500'">
-              价格区间
-            </span>
-            <UIcon 
-              name="i-lucide-chevron-down" 
-              :class="showPriceInputs ? 'text-red-500' : 'text-gray-500'" 
-              class="ml-1 h-3 w-3" 
+            <span :class="showPriceInputs ? 'text-red-500' : 'text-gray-500'"> 价格区间 </span>
+            <UIcon
+              name="i-lucide-chevron-down"
+              :class="showPriceInputs ? 'text-red-500' : 'text-gray-500'"
+              class="ml-1 h-3 w-3"
             />
           </UButton>
-          
+
           <template #content>
             <div class="w-80 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
               <!-- 标题和关闭按钮 -->
               <div class="flex items-center justify-between mb-4">
                 <h4 class="m-0 text-base font-semibold text-gray-900">请输入价格区间</h4>
-                <button 
+                <button
                   @click="showPriceInputs = false"
                   class="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <UIcon name="i-lucide-x" class="h-4 w-4" />
                 </button>
               </div>
-              
+
               <!-- 自定义价格输入 -->
               <div class="mb-4">
                 <div class="flex items-center gap-3">
-                  <div class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
-                    <span class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300">¥</span>
+                  <div
+                    class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white"
+                  >
+                    <span
+                      class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300"
+                      >¥</span
+                    >
                     <UInput
                       v-model="priceRange.start"
                       type="number"
@@ -100,8 +109,13 @@
                     />
                   </div>
                   <span class="text-gray-500 font-medium">-</span>
-                  <div class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
-                    <span class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300">¥</span>
+                  <div
+                    class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white"
+                  >
+                    <span
+                      class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300"
+                      >¥</span
+                    >
                     <UInput
                       v-model="priceRange.end"
                       type="number"
@@ -113,7 +127,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- 快捷价格区间选项 -->
               <div class="mb-4">
                 <div class="grid grid-cols-2 gap-2">
@@ -122,9 +136,9 @@
                     :key="option.label"
                     :class="[
                       'p-3 rounded-md border text-left transition-colors duration-200',
-                      isPriceRangeSelected(option) 
-                        ? 'border-red-500 bg-red-50 text-red-700' 
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      isPriceRangeSelected(option)
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
                     ]"
                     @click="selectPriceRange(option)"
                   >
@@ -133,23 +147,11 @@
                   </button>
                 </div>
               </div>
-              
+
               <!-- 操作按钮 -->
               <div class="flex justify-end gap-2">
-                <UButton
-                  variant="outline"
-                  size="sm"
-                  @click="resetPriceRange"
-                >
-                  重置
-                </UButton>
-                <UButton
-                  color="primary"
-                  size="sm"
-                  @click="confirmPriceRange"
-                >
-                  确定
-                </UButton>
+                <UButton variant="outline" size="sm" @click="resetPriceRange"> 重置 </UButton>
+                <UButton color="primary" size="sm" @click="confirmPriceRange"> 确定 </UButton>
               </div>
             </div>
           </template>
@@ -165,16 +167,14 @@
             size="sm"
             class="px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-sm"
           >
-            <span :class="showBrandList ? 'text-red-500' : 'text-gray-500'">
-              品牌
-            </span>
-            <UIcon 
-              name="i-lucide-chevron-down" 
-              :class="showBrandList ? 'text-red-500' : 'text-gray-500'" 
-              class="ml-1 h-3 w-3" 
+            <span :class="showBrandList ? 'text-red-500' : 'text-gray-500'"> 品牌 </span>
+            <UIcon
+              name="i-lucide-chevron-down"
+              :class="showBrandList ? 'text-red-500' : 'text-gray-500'"
+              class="ml-1 h-3 w-3"
             />
           </UButton>
-          
+
           <template #content>
             <div class="w-72 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
               <div class="mb-4">
@@ -182,6 +182,7 @@
               </div>
               <div class="mb-4 max-h-72 overflow-y-auto">
                 <div class="flex flex-col gap-2">
+                  <!-- 
                   <UCheckbox
                     v-for="brand in brands" 
                     :key="brand.attribute_id"
@@ -189,25 +190,13 @@
                     :value="brand.attribute_id"
                     :label="brand.attribute_name"
                     class="px-3 py-2 rounded-md transition-colors duration-200 hover:bg-gray-50"
-               
                   />
+                  -->
                 </div>
               </div>
               <div class="flex justify-end gap-2">
-                <UButton
-                  variant="outline"
-                  size="sm"
-                  @click="clearBrands"
-                >
-                  清空
-                </UButton>
-                <UButton
-                  color="primary"
-                  size="sm"
-                  @click="confirmBrands"
-                >
-                  确定
-                </UButton>
+                <UButton variant="outline" size="sm" @click="clearBrands"> 清空 </UButton>
+                <UButton color="primary" size="sm" @click="confirmBrands"> 确定 </UButton>
               </div>
             </div>
           </template>
@@ -244,7 +233,7 @@ const emit = defineEmits<{
 const selectedBrands = ref<(string | number)[]>([])
 const priceRange = ref({
   start: '',
-  end: ''
+  end: '',
 })
 
 // 显示状态
@@ -276,23 +265,24 @@ const priceRangeOptions = [
 
 // 检查价格区间是否被选中
 const isPriceRangeSelected = (option: any) => {
-  const isSelected = priceRange.value.start === option.min.toString() && 
-                     priceRange.value.end === option.max.toString()
-  
+  const isSelected =
+    priceRange.value.start === option.min.toString() &&
+    priceRange.value.end === option.max.toString()
+
   return isSelected
 }
 
 // 选择价格区间
 const selectPriceRange = (option: any) => {
   console.log('选择价格区间:', option)
-  
+
   priceRange.value = {
     start: option.min.toString(),
-    end: option.max.toString()
+    end: option.max.toString(),
   }
-  
+
   console.log('设置后的价格区间:', priceRange.value)
-  
+
   updatePriceFilter()
 }
 
@@ -303,10 +293,10 @@ const initDataSync = () => {
   } else if (props.modelValue.brandId) {
     selectedBrands.value = [props.modelValue.brandId]
   }
-  
+
   priceRange.value = {
     start: props.modelValue.startPrice?.toString() || '',
-    end: props.modelValue.endPrice?.toString() || ''
+    end: props.modelValue.endPrice?.toString() || '',
   }
 
   // 同步价格排序方向
@@ -318,25 +308,29 @@ const initDataSync = () => {
 }
 
 // 监听props变化，同步到本地状态
-watch(() => props.modelValue, (newValue) => {
-  if (Array.isArray(newValue.brandId)) {
-    selectedBrands.value = newValue.brandId
-  } else if (newValue.brandId) {
-    selectedBrands.value = [newValue.brandId]
-  }
-  
-  priceRange.value = {
-    start: newValue.startPrice?.toString() || '',
-    end: newValue.endPrice?.toString() || ''
-  }
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (Array.isArray(newValue.brandId)) {
+      selectedBrands.value = newValue.brandId
+    } else if (newValue.brandId) {
+      selectedBrands.value = [newValue.brandId]
+    }
 
-  // 同步价格排序方向
-  if (newValue.sort === 'price_asc') {
-    priceSortDirection.value = 'asc'
-  } else if (newValue.sort === 'price_desc') {
-    priceSortDirection.value = 'desc'
-  }
-}, { immediate: true, deep: true })
+    priceRange.value = {
+      start: newValue.startPrice?.toString() || '',
+      end: newValue.endPrice?.toString() || '',
+    }
+
+    // 同步价格排序方向
+    if (newValue.sort === 'price_asc') {
+      priceSortDirection.value = 'asc'
+    } else if (newValue.sort === 'price_desc') {
+      priceSortDirection.value = 'desc'
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 // 组件挂载后初始化
 onMounted(() => {
@@ -347,7 +341,7 @@ onMounted(() => {
 const updateFilter = (key: keyof IFilterValue, value: any) => {
   const newValue = {
     ...props.modelValue,
-    [key]: value
+    [key]: value,
   }
   emit('update:modelValue', newValue)
   emit('change')
@@ -362,7 +356,7 @@ const togglePriceSort = () => {
     // 如果当前不是价格排序，设置为升序
     priceSortDirection.value = 'asc'
   }
-  
+
   const sortValue = priceSortDirection.value === 'asc' ? 'price_asc' : 'price_desc'
   updateFilter('sort', sortValue)
 }
@@ -376,17 +370,17 @@ const handlePriceInputBlur = () => {
 // 更新价格筛选
 const updatePriceFilter = () => {
   console.log('更新价格筛选:', priceRange.value)
-  
+
   const startPrice = priceRange.value.start ? Number(priceRange.value.start) : undefined
   const endPrice = priceRange.value.end ? Number(priceRange.value.end) : undefined
-  
+
   console.log('解析后的价格:', { startPrice, endPrice })
-  
+
   // 一次性更新所有价格相关的筛选条件
   const newValue = {
     ...props.modelValue,
     startPrice,
-    endPrice
+    endPrice,
   }
   emit('update:modelValue', newValue)
   emit('change')

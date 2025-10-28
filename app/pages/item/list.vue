@@ -68,13 +68,13 @@
         <div
           class="grid gap-3 sm:gap-4 mb-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7"
         >
-          <SpProductCard
+          <!-- <SpProductCard
             v-for="product in products"
             :key="product.itemId"
             :product="product"
             loading="lazy"
             class="w-full"
-          />
+          /> -->
         </div>
 
         <!-- 加载更多按钮 - 移动端优化 -->
@@ -102,8 +102,8 @@
 <script setup lang="ts">
 import type { IProduct } from '~/components/SpProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
-import { useItemApi } from '~/api/item'
-import { itemDetailTransformer } from '~/transformers'
+import { api } from '~/api'
+// 不再需要手动转换器，class-transformer自动处理
 import { useDebounceFn } from '@vueuse/core'
 
 // SEO 元数据配置
@@ -188,28 +188,33 @@ const pending = ref(false)
 const loadingMore = ref(false)
 const error = ref<Error | null>(null)
 
+// 避免重复请求的标志
+const isInternalUrlUpdate = ref(false)
+
 // 计算属性
 const hasMore = computed(() => pagination.value.hasMore)
 
 // 防抖处理筛选变化
 const debouncedFilterChange = useDebounceFn(() => {
+  debugger
   currentPage.value = 1
+  // 标记为内部URL更新，避免路由监听器重复触发请求
+  isInternalUrlUpdate.value = true
   updateUrlParams()
   loadProducts()
 }, 300)
 
-// API 实例
-const itemApi = useItemApi()
+// 注释：现在直接使用 api.item 调用API
 
 // 构建 API 参数
 const buildApiParams = (): IItemListParams => {
   return {
     page: currentPage.value.toString(),
     pageSize: pageSize.toString(),
-    item_type: 'goods',
+    item_type: 'normal',
     main_category: '',
     is_tdk: '1',
-    type: 'list',
+    type: '0',
     company_id: '1', // 从环境变量获取
     ...(filterParams.value.brandId && { brand_id: filterParams.value.brandId }),
     ...(filterParams.value.sort !== 'default' && { sort: filterParams.value.sort }),
@@ -229,24 +234,13 @@ const loadProducts = async (append = false) => {
     }
 
     const params = buildApiParams()
-    const response = await itemApi.getList(params)
-
+    const response = await api.item.getProductList(params)
+    debugger
     if (response.data.value?.data) {
       const apiData = response.data.value.data
-      const newProducts = apiData.list.map((item: any) => {
-        const transformedItem = itemDetailTransformer.transform(item)
-        return {
-          itemId: transformedItem.item_id,
-          itemName: transformedItem.itemName,
-          img: transformedItem.pics[0] || '',
-          imgs: transformedItem.pics,
-          price: transformedItem.price / 100, // 转换分为元
-          activityPrice: transformedItem.activity_price ? transformedItem.activity_price / 100 : 0,
-          memberPrice: transformedItem.member_price ? transformedItem.member_price / 100 : 0,
-          sales: transformedItem.sales || 0,
-        }
-      })
-
+      // 直接使用class-transformer处理后的数据，已经是IProductListItem格式
+      const newProducts = apiData.list
+      debugger
       if (append) {
         products.value.push(...newProducts)
       } else {
@@ -265,6 +259,8 @@ const loadProducts = async (append = false) => {
   } finally {
     pending.value = false
     loadingMore.value = false
+    // 重置内部URL更新标志
+    isInternalUrlUpdate.value = false
   }
 }
 
@@ -375,23 +371,12 @@ const {
       ...(urlParams.endPrice && { end_price: urlParams.endPrice }),
     }
 
-    const response = await itemApi.getList(params)
+    const response = await api.item.getProductList(params)
 
     if (response.data.value?.data) {
       const apiData = response.data.value.data
-      const productList = apiData.list.map((item: any) => {
-        const transformedItem = itemDetailTransformer.transform(item)
-        return {
-          itemId: transformedItem.item_id,
-          itemName: transformedItem.itemName,
-          img: transformedItem.pics[0] || '',
-          imgs: transformedItem.pics,
-          price: transformedItem.price / 100,
-          activityPrice: transformedItem.activity_price ? transformedItem.activity_price / 100 : 0,
-          memberPrice: transformedItem.member_price ? transformedItem.member_price / 100 : 0,
-          sales: transformedItem.sales || 0,
-        }
-      })
+      // 直接使用class-transformer处理后的数据
+      const productList = apiData.list
 
       return {
         products: productList,
@@ -528,6 +513,12 @@ onMounted(async () => {
 watch(
   () => route.query,
   () => {
+    // 如果是内部更新URL，跳过处理避免重复请求
+    if (isInternalUrlUpdate.value) {
+      isInternalUrlUpdate.value = false
+      return
+    }
+
     restoreFromUrl()
     currentPage.value = 1
     loadProducts()

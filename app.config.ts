@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'red',      // 京东红
+      primary: 'red',      // 红
       secondary: 'blue',   // 辅助色
       success: 'green',    // 成功色
       warning: 'orange',   // 警告色

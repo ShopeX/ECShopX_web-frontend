@@ -1,8 +1,8 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'red',      // 使用自定义的京东红
-      secondary: 'blue',   // 使用自定义的京东蓝
+      primary: 'red',      // 使用自定义的红
+      secondary: 'blue',   // 使用自定义的蓝
       success: 'green',    // 成功色
       info: 'blue',        // 信息色
       warning: 'orange',   // 警告色

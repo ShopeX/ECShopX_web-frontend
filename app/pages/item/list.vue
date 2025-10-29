@@ -3,7 +3,7 @@
     <!-- 页面标题 - 移动端优化 -->
     <div class="bg-white border-b border-gray-200">
       <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">商品列表</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">全部商品</h1>
         <p class="mt-1 text-sm text-gray-600">发现您喜欢的商品</p>
       </div>
     </div>
@@ -12,7 +12,7 @@
     <ItemFilter v-model="filterParams" :brands="brands" @change="handleFilterChange" />
 
     <!-- 主内容区域 - 响应式容器 -->
-    <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+    <div class="container bg-white mx-auto px-4 sm:px-6 py-4 sm:py-6">
       <!-- 加载状态 -->
       <div v-if="pending && !products.length" class="flex justify-center py-12">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
@@ -68,13 +68,13 @@
         <div
           class="grid gap-3 sm:gap-4 mb-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7"
         >
-          <!-- <SpProductCard
+          <SpProductCard
             v-for="product in products"
             :key="product.itemId"
             :product="product"
             loading="lazy"
             class="w-full"
-          /> -->
+          />
         </div>
 
         <!-- 加载更多按钮 - 移动端优化 -->
@@ -196,7 +196,6 @@ const hasMore = computed(() => pagination.value.hasMore)
 
 // 防抖处理筛选变化
 const debouncedFilterChange = useDebounceFn(() => {
-  debugger
   currentPage.value = 1
   // 标记为内部URL更新，避免路由监听器重复触发请求
   isInternalUrlUpdate.value = true
@@ -235,7 +234,6 @@ const loadProducts = async (append = false) => {
 
     const params = buildApiParams()
     const response = await api.item.getProductList(params)
-    debugger
     if (response.data.value?.data) {
       const apiData = response.data.value.data
       // 直接使用class-transformer处理后的数据，已经是IProductListItem格式

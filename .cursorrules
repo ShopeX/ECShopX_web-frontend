@@ -47,14 +47,14 @@ app/
 ├── assets/             # 静态资源
 │   └── css/           # 样式文件
 │       ├── main.css   # 主样式（主题变量）
-│       └── sp-theme.css # 京东风格主题类
+│       └── sp-theme.css # 风格主题类
 └── api/               # API 接口
 ```
 
 ### 样式规范
 1. **主题系统**: 使用 Nuxt UI 的主题系统，通过 `app.config.ts` 配置
 2. **颜色变量**: 使用 `--ui-*` CSS 变量定义主题色
-3. **京东风格**: 使用 `sp-` 前缀的 Tailwind 类名
+3. **风格**: 使用 `sp-` 前缀的 Tailwind 类名
 4. **响应式**: 使用 Tailwind 的响应式前缀（`sm:`, `md:`, `lg:` 等）
 
 ### TypeScript 规范
@@ -73,7 +73,7 @@ app/
 
 ### 业务组件 (components/business/)
 - 使用 `sp-` 前缀的 Tailwind 类名
-- 遵循京东 PC 商城的设计风格
+- 遵循 PC 商城的设计风格
 - 支持深色模式
 - 响应式设计
 

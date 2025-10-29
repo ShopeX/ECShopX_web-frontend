@@ -14,10 +14,11 @@ export enum StockStatus {
  * 价格信息类 - 演示嵌套对象转换
  */
 export class PriceInfo {
+  @Type(() => Number)
+  @Expose({ name: 'price' })
+  @Transform(({ value }) => Math.round((value || 0) / 100 * 100) / 100)
   @IsNumber()
   @Min(0)
-  @Transform(({ value }) => Math.round((value || 0) / 100 * 100) / 100)
-  @Expose({ name: 'price' })
   current!: number
 
   @IsNumber()
@@ -161,32 +162,46 @@ export class ProductEntity {
   description!: string
 
   // 🎯 嵌套对象转换 - class-transformer 的强大功能
+  @Expose()
   @Type(() => PriceInfo)
   @Transform(({ obj }) => {
-    const priceInfo = new PriceInfo()
-    priceInfo.current = obj.price || 0
-    priceInfo.activity = obj.activity_price || 0
-    priceInfo.member = obj.member_price || 0
-    priceInfo.market = obj.market_price || 0
-    return priceInfo
+    // 🎯 使用 plainToClass 确保装饰器生效
+    return plainToClass(PriceInfo, {
+      price: obj.price || 0,
+      activity_price: obj.activity_price || 0,
+      member_price: obj.member_price || 0,
+      market_price: obj.market_price || 0
+    }, {
+      enableImplicitConversion: true,
+      excludeExtraneousValues: true
+    })
   })
   price!: PriceInfo
 
+  @Expose()
   @Type(() => ImageInfo)
   @Transform(({ obj }) => {
-    const imageInfo = new ImageInfo()
-    imageInfo.main = obj.pics
-    imageInfo.list = obj.pics
-    return imageInfo
+    // 🎯 使用 plainToClass 确保装饰器生效
+    return plainToClass(ImageInfo, {
+      pics: obj.pics || []
+    }, {
+      enableImplicitConversion: true,
+      excludeExtraneousValues: true
+    })
   })
   images!: ImageInfo
 
+  @Expose()
   @Type(() => StockInfo)
   @Transform(({ obj }) => {
-    const stockInfo = new StockInfo()
-    stockInfo.quantity = obj.stock || 0
-    stockInfo.sold = obj.sales || 0
-    return stockInfo
+    // 🎯 使用 plainToClass 确保装饰器生效
+    return plainToClass(StockInfo, {
+      stock: obj.stock || 0,
+      sales: obj.sales || 0
+    }, {
+      enableImplicitConversion: true,
+      excludeExtraneousValues: true
+    })
   })
   stock!: StockInfo
 
@@ -240,6 +255,7 @@ export class ProductEntity {
       itemName: this.itemName,
       description: this.description,
 
+      img: this.images.main,
       imgs: this.images.list,      // 新字段
 
       // 价格相关（双重兼容）
@@ -273,6 +289,7 @@ export interface IProductListItem {
   itemId: string
   itemName: string
   description?: string
+  img: string
   imgs: string[]   // 商品图片列表，主图一般为第一个
   price: number
   displayPrice?: number

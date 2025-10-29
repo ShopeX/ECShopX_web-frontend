@@ -3,14 +3,14 @@
 
 /* Tailwind CSS v4 主题配置 */
 @theme {
-  /* 京东风格自定义颜色 */
+  /* 风格自定义颜色 */
   --color-jd-red-50: #fef2f2;
   --color-jd-red-100: #fee2e2;
   --color-jd-red-200: #fecaca;
   --color-jd-red-300: #fca5a5;
   --color-jd-red-400: #f87171;
   --color-jd-red-500: #e53e3e;
-  /* 京东主红色 */
+  /* 主红色 */
   --color-jd-red-600: #dc2626;
   --color-jd-red-700: #b91c1c;
   --color-jd-red-800: #991b1b;
@@ -29,18 +29,18 @@
   --color-jd-blue-900: #002766;
   --color-jd-blue-950: #001529;
 
-  /* 京东风格的圆角 */
+  /* 风格的圆角 */
   --radius-jd: 4px;
   --radius-jd-lg: 8px;
   --radius-jd-xl: 12px;
 
-  /* 京东风格的阴影 */
+  /* 风格的阴影 */
   --shadow-jd: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-jd-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-jd-xl: 0 8px 16px rgba(0, 0, 0, 0.1);
   --shadow-jd-red: 0 2px 4px rgba(229, 62, 62, 0.3);
 
-  /* 京东风格的字体大小 */
+  /* 风格的字体大小 */
   --font-size-jd-xs: 12px;
   --font-size-jd-sm: 14px;
   --font-size-jd-base: 16px;
@@ -70,9 +70,9 @@
   overflow: hidden;
 }
 
-/* 京东风格主题色配置 - 用于 Nuxt UI */
+/* 风格主题色配置 - 用于 Nuxt UI */
 :root {
-  /* 京东红 - 主色调 */
+  /* 红 - 主色调 */
   --ui-primary: #e53e3e;
   --ui-color-primary-50: #fef2f2;
   --ui-color-primary-100: #fee2e2;
@@ -86,7 +86,7 @@
   --ui-color-primary-900: #7f1d1d;
   --ui-color-primary-950: #450a0a;
 
-  /* 京东特有的设计令牌 */
+  /* 特有的设计令牌 */
   --ui-bg: #ffffff;
   --ui-bg-muted: #f5f5f5;
   --ui-text: #333333;
@@ -95,7 +95,7 @@
   --ui-radius: 4px;
 }
 
-/* 京东风格的按钮 hover 效果 */
+/* 风格的按钮 hover 效果 */
 [data-variant='solid'][data-color='primary']:hover {
   background-color: var(--ui-color-primary-600) !important;
   color: white !important;

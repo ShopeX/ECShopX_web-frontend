@@ -53,7 +53,7 @@ app/
 ├── assets/             # 静态资源
 │   └── css/           # 样式文件
 │       ├── main.css   # 主样式（主题变量）
-│       └── sp-theme.css # 京东风格主题类
+│       └── sp-theme.css # 风格主题类
 └── api/               # API 接口
 ```
 
@@ -61,7 +61,7 @@ app/
 
 1. **主题系统**: 使用 Nuxt UI 的主题系统，通过 `app.config.ts` 配置
 2. **颜色变量**: 使用 `--ui-*` CSS 变量定义主题色
-3. **京东风格**: 使用 `sp-` 前缀的 Tailwind 类名
+3. **风格**: 使用 `sp-` 前缀的 Tailwind 类名
 4. **响应式**: 使用 Tailwind 的响应式前缀（`sm:`, `md:`, `lg:` 等）
 
 ### TypeScript 规范
@@ -83,7 +83,7 @@ app/
 ### 业务组件 (components/business/)
 
 - 使用 `sp-` 前缀的 Tailwind 类名
-- 遵循京东 PC 商城的设计风格
+- 遵循 PC 商城的设计风格
 - 支持深色模式
 - 响应式设计
 
@@ -242,13 +242,13 @@ export const useItemStore = defineStore('item', () => {
 
 ## 样式开发规范
 
-### 京东风格主题色
+### 风格主题色
 
 ```css
 /* 主题色变量定义 */
 :root {
-  --ui-primary: #e53e3e; /* 京东红 */
-  --ui-secondary: #1890ff; /* 京东蓝 */
+  --ui-primary: #e53e3e; /* 红 */
+  --ui-secondary: #1890ff; /* 蓝 */
   --ui-success: #52c41a; /* 成功绿 */
   --ui-warning: #fa8c16; /* 警告橙 */
   --ui-error: #ff4d4f; /* 错误红 */
@@ -259,11 +259,11 @@ export const useItemStore = defineStore('item', () => {
 ### sp- 前缀组件样式
 
 ```html
-<!-- 京东风格按钮 -->
+<!-- 风格按钮 -->
 <button class="sp-btn sp-btn-primary">主要按钮</button>
 <button class="sp-btn sp-btn-ghost">幽灵按钮</button>
 
-<!-- 京东风格卡片 -->
+<!-- 风格卡片 -->
 <div class="sp-product-card">
   <img class="sp-product-card-image" src="product.jpg" />
   <div class="sp-product-card-content">
@@ -272,7 +272,7 @@ export const useItemStore = defineStore('item', () => {
   </div>
 </div>
 
-<!-- 京东风格筛选器 -->
+<!-- 风格筛选器 -->
 <div class="sp-filter-container">
   <div class="sp-filter-main">
     <button class="sp-filter-btn sp-filter-btn-active">综合</button>
@@ -467,6 +467,6 @@ export const handleApiError = (error: any) => {
 ## 更新日志
 
 - 2025-01-09: 初始版本，基于 Nuxt 4 + Vue 3 + TypeScript + Tailwind CSS
-- 2025-01-09: 添加京东风格主题色和 sp- 前缀组件规范
+- 2025-01-09: 添加风格主题色和 sp- 前缀组件规范
 - 2025-01-09: 完善组件开发最佳实践和性能优化规范
 - 2025-01-09: 添加错误处理规范和响应式设计规范

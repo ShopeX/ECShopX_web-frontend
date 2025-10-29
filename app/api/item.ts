@@ -31,10 +31,12 @@ class ItemApiWithTransformer {
     }
 
     return this.http.get<{
-      list: IProductListItem[]
-      total_count: number
-      brand_list?: { list: any[] }
-      entities?: ProductEntity[]  // 可选：返回完整实体用于调试
+      data: {
+        list: IProductListItem[]
+        total_count: number
+        brand_list?: { list: any[] }
+        entities?: ProductEntity[]  // 可选：返回完整实体用于调试
+      }
     }>('/goods/items', {
       query: apiParams,
       server: true,
@@ -47,22 +49,23 @@ class ItemApiWithTransformer {
           try {
             // 1. 转换为实体
             const entities = ProductEntity.fromList(response.data.list)
-
             // 2. 转换为UI数据
             const uiList = entities.map(entity => entity.toUIModel())
 
             return {
-              list: uiList,
-              total_count: response.data.total_count,
-              brand_list: response.data.brand_list || { list: [] }, // 添加品牌列表支持
-              entities: entities  // 调试用
+              data: {
+                list: uiList,
+                total_count: response.data.total_count,
+                brand_list: response.data.brand_list || { list: [] }, // 添加品牌列表支持
+                entities: entities  // 调试用
+              }
             }
           } catch (error) {
             console.error('Transform error:', error)
-            return { list: [], total_count: 0, brand_list: { list: [] } }
+            return { data: { list: [], total_count: 0, brand_list: { list: [] } } }
           }
         }
-        return { list: [], total_count: 0, brand_list: { list: [] } }
+        return { data: { list: [], total_count: 0, brand_list: { list: [] } } }
       }
     })
   }

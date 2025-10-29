@@ -1,8 +1,11 @@
 # item-display Specification
 
 ## Purpose
+
 TBD - created by archiving change add-item-listing. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Apifox MCP API 集成
 
 系统 SHALL 集成 Apifox MCP 提供的 `/goods/items` API，实现完整的数据获取和处理流程。
@@ -42,7 +45,7 @@ TBD - created by archiving change add-item-listing. Update Purpose after archive
 - **THEN** 系统按 ECshopx PC 端 Figma 设计规范显示商品网格布局
 - **AND** 每个商品卡片显示：商品图片、标题、现价、原价、会员价、VIP价、SVIP价、销量数据
 - **AND** 支持 Tailwind CSS 响应式布局（桌面端 4-5 列，平板端 3 列，手机端 2 列）
-- **AND** 商品卡片使用 sp-card 类名实现京东风格设计
+- **AND** 商品卡片使用 sp-card 类名实现风格设计
 - **AND** 支持 hover 效果和动画过渡
 
 #### Scenario: 空状态处理
@@ -166,6 +169,5 @@ TBD - created by archiving change add-item-listing. Update Purpose after archive
 - **WHEN** 用户在桌面端访问商品列表（屏幕宽度 ≥ 1024px）
 - **THEN** 使用 Tailwind `grid-cols-4 lg:grid-cols-5` 实现 4-5 列商品网格布局
 - **AND** 筛选器使用侧边栏布局，固定在左侧便于操作
-- **AND** 商品卡片使用 sp-card 和 sp-btn 类名实现京东风格
+- **AND** 商品卡片使用 sp-card 和 sp-btn 类名实现风格
 - **AND** 支持 hover 效果和卡片阴影效果
-

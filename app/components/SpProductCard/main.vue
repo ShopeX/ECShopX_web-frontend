@@ -16,9 +16,9 @@
       />
 
       <!-- 图片遮罩效果 -->
-      <div
+      <!-- <div
         class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300"
-      ></div>
+      ></div> -->
     </div>
 
     <!-- 商品信息区域 -->
@@ -102,10 +102,10 @@ const handleImageError = (event: Event) => {
 
 .sp-product-card:hover {
   /* 3D 卡片效果 */
-  box-shadow:
+  /* box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04),
-    0 0 0 1px rgba(239, 68, 68, 0.1);
+    0 0 0 1px rgba(239, 68, 68, 0.1); */
 }
 
 .sp-product-card__image {

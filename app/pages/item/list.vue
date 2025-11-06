@@ -102,8 +102,8 @@
 <script setup lang="ts">
 import type { IProduct } from '~/components/SpProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
-import { api } from '~/api'
-// 不再需要手动转换器，class-transformer自动处理
+import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
+import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
 import { useDebounceFn } from '@vueuse/core'
 
 // SEO 元数据配置
@@ -203,7 +203,7 @@ const debouncedFilterChange = useDebounceFn(() => {
   loadProducts()
 }, 300)
 
-// 注释：现在直接使用 api.item 调用API
+// 注释：现在直接使用 itemApiClient + ProductTransformer
 
 // 构建 API 参数
 const buildApiParams = (): IItemListParams => {
@@ -233,12 +233,14 @@ const loadProducts = async (append = false) => {
     }
 
     const params = buildApiParams()
-    const response = await api.item.getProductList(params)
-    if (response.data.value?.data) {
-      const apiData = response.data.value.data
-      // 直接使用class-transformer处理后的数据，已经是IProductListItem格式
-      const newProducts = apiData.list
-      debugger
+    
+    // 使用 HTTP Client 获取数据
+    const response = await itemApiClient.getItemList(params)
+    
+    if (response?.data?.list) {
+      // 使用 Transformer 转换为 UI 数据
+      const newProducts = ProductTransformer.toModelList(response.data.list)
+      
       if (append) {
         products.value.push(...newProducts)
       } else {
@@ -246,9 +248,14 @@ const loadProducts = async (append = false) => {
       }
 
       pagination.value = {
-        total: apiData.total_count,
+        total: response.data.total_count || 0,
         current: currentPage.value,
-        hasMore: currentPage.value * pageSize < apiData.total_count,
+        hasMore: currentPage.value * pageSize < (response.data.total_count || 0),
+      }
+      
+      // 更新品牌列表（如果有）
+      if (response.data.brand_list?.list) {
+        brands.value = response.data.brand_list.list
       }
     }
   } catch (err) {
@@ -369,19 +376,19 @@ const {
       ...(urlParams.endPrice && { end_price: urlParams.endPrice }),
     }
 
-    const response = await api.item.getProductList(params)
+    // 使用 HTTP Client 获取数据
+    const response = await itemApiClient.getItemList(params)
 
-    if (response.data.value?.data) {
-      const apiData = response.data.value.data
-      // 直接使用class-transformer处理后的数据
-      const productList = apiData.list
+    if (response?.data?.list) {
+      // 使用 Transformer 转换为 UI 数据
+      const productList = ProductTransformer.toModelList(response.data.list)
 
       return {
         products: productList,
         pagination: {
-          total: apiData.total_count,
+          total: response.data.total_count || 0,
           current: 1,
-          hasMore: pageSize < apiData.total_count,
+          hasMore: pageSize < (response.data.total_count || 0),
         },
         urlParams, // 返回URL参数用于初始化状态
       }

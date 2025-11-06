@@ -6,29 +6,31 @@ export function useMessage() {
       toast.add({
         title: '成功',
         description: message,
-        color: 'green'
+        color: 'success'
       })
     },
     error(message: string) {
       toast.add({
         title: '错误',
         description: message,
-        color: 'red'
+        color: 'error'
       })
     },
     warning(message: string) {
       toast.add({
         title: '警告',
         description: message,
-        color: 'orange'
+        color: 'warning'
       })
     },
     info(message: string) {
       toast.add({
         title: '提示',
         description: message,
-        color: 'blue'
+        color: 'info'
       })
     }
   }
-} 
+}
+
+export default {}

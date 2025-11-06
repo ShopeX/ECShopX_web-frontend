@@ -17,7 +17,7 @@ export interface PaginationResponse<T> {
 /**
  * API 响应数据
  */
-export interface ApiResponse<T = any> {
+export interface IApiResponse<T = any> {
   status_code: number
   data: T
   message?: string

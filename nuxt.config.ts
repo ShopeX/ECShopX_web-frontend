@@ -63,7 +63,8 @@ export default defineNuxtConfig({
 
   // 模块配置
   modules: [
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@pinia/nuxt'  // ✅ 添加 Pinia 模块
   ],
 
   // CSS 配置

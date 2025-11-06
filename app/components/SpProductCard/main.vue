@@ -1,54 +1,71 @@
 <template>
-  <NuxtLink
-    :to="`/item/${product.itemId}`"
-    class="sp-product-card sp-hover-lift sp-card--hover block group"
+  <div
+    class="sp-product-card sp-hover-lift sp-card--hover block group relative"
     style="height: 400px; width: 194px"
   >
-    <!-- 商品图片容器 -->
-    <div class="sp-product-card__image relative overflow-hidden rounded-2xl" style="height: 299px">
-      <!-- 商品图片 -->
-      <img
-        :src="product.img || product.imgs?.[0] || '/images/placeholder-product.png'"
-        :alt="product.itemName"
-        class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
-        loading="lazy"
-        @error="handleImageError"
-      />
+    <NuxtLink :to="`/item/${product.itemId}`" class="block">
+      <!-- 商品图片容器 -->
+      <div
+        class="sp-product-card__image relative overflow-hidden rounded-2xl"
+        style="height: 299px"
+      >
+        <!-- 商品图片 -->
+        <img
+          :src="product.img || product.imgs?.[0] || '/images/placeholder-product.png'"
+          :alt="product.itemName"
+          class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+          loading="lazy"
+          @error="handleImageError"
+        />
 
-      <!-- 图片遮罩效果 -->
-      <!-- <div
-        class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300"
-      ></div> -->
-    </div>
-
-    <!-- 商品信息区域 -->
-    <div class="sp-product-card__info px-1 pt-3 space-y-1" style="height: 101px">
-      <!-- 商品标题 -->
-      <h3 class="sp-product-card__title group-hover:text-red-600 transition-colors duration-200">
-        {{ product.itemName }}
-      </h3>
-
-      <!-- 价格区域 -->
-      <div class="sp-product-card__price pt-2">
-        <span class="sp-price--medium group-hover:text-red-700 transition-colors duration-200">
-          ${{ formatPrice(getCurrentPrice()) }} USD
-        </span>
-        <span v-if="showOriginalPrice" class="sp-price--original text-xs ml-2">
-          ${{ formatPrice(product.price) }}
-        </span>
+        <!-- 加入购物车按钮 (悬浮在图片上) -->
+        <!-- <button
+          type="button"
+          :disabled="isAdding"
+          class="absolute bottom-2 right-2 px-3 py-1.5 bg-primary text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 hover:bg-primary-dark disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-300 transform translate-y-2 group-hover:translate-y-0"
+          @click.prevent="handleAddToCart"
+        >
+          {{ isAdding ? '添加中...' : '加入购物车' }}
+        </button> -->
       </div>
-    </div>
-  </NuxtLink>
+
+      <!-- 商品信息区域 -->
+      <div class="sp-product-card__info px-1 pt-3 space-y-1" style="height: 101px">
+        <!-- 商品标题 -->
+        <h3 class="sp-product-card__title group-hover:text-red-600 transition-colors duration-200">
+          {{ product.itemName }}
+        </h3>
+
+        <!-- 价格区域 -->
+        <div class="sp-product-card__price pt-2">
+          <span class="sp-price--medium group-hover:text-red-700 transition-colors duration-200">
+            ${{ formatPrice(getCurrentPrice()) }} USD
+          </span>
+          <span v-if="showOriginalPrice" class="sp-price--original text-xs ml-2">
+            ${{ formatPrice(product.price) }}
+          </span>
+        </div>
+      </div>
+    </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
 import type { IProduct } from './types'
+import { useMessage } from '~/composables/useMessage'
+import { useCart } from '~/composables/useCart'
 
 interface Props {
   product: IProduct
 }
 
 const props = defineProps<Props>()
+
+// 购物车功能
+const { addToCart, isItemLoading } = useCart()
+
+// Toast 消息
+const message = useMessage()
 
 // 获取当前有效价格（优先级：活动价 > 会员价 > 原价）
 const getCurrentPrice = (): number => {
@@ -83,6 +100,32 @@ const formatPrice = (price: number): string => {
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = '/images/placeholder-product.png'
+}
+
+/**
+ * 处理加入购物车
+ */
+async function handleAddToCart(event: Event) {
+  // 阻止链接跳转
+  event.preventDefault()
+  event.stopPropagation()
+
+  try {
+    // 添加到购物车
+    await addToCart({
+      productId: props.product.itemId,
+      specId: props.product.specId || 'default',
+      quantity: 1,
+      productName: props.product.itemName,
+      productImage: props.product.img || props.product.imgs?.[0],
+      specName: props.product.specName || '默认规格',
+      price: getCurrentPrice(),
+      marketPrice: props.product.price,
+      stock: props.product.stock || 999,
+    })
+  } catch (error: any) {
+    message.error(error.message || '添加失败，请重试')
+  }
 }
 </script>
 

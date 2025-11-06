@@ -4,11 +4,11 @@
     <!-- 左侧排序选项 -->
     <div class="flex items-center gap-6">
       <span class="text-base text-[#333333]">排序：</span>
-      
+
       <!-- 排序选项列表 -->
       <div class="flex items-center gap-5">
         <!-- 综合 -->
-        <Button 
+        <Button
           variant="ghost"
           size="sm"
           :class="sortClass(EFilterSort.COMPREHENSIVE)"
@@ -18,7 +18,7 @@
         </Button>
 
         <!-- 销量 -->
-        <Button 
+        <Button
           variant="ghost"
           size="sm"
           :class="sortClass(EFilterSort.SALES)"
@@ -28,7 +28,7 @@
         </Button>
 
         <!-- 上新 -->
-        <Button 
+        <Button
           variant="ghost"
           size="sm"
           :class="sortClass(EFilterSort.NEW)"
@@ -38,22 +38,19 @@
         </Button>
 
         <!-- 价格排序 -->
-        <Button 
+        <Button
           variant="ghost"
           size="sm"
-          :class="[
-            sortClass(EFilterSort.PRICE),
-            'flex items-center gap-1'
-          ]"
+          :class="[sortClass(EFilterSort.PRICE), 'flex items-center gap-1']"
           @click="handlePriceSortChange"
         >
           价格
           <div class="flex flex-col gap-[2px]">
-            <div 
+            <div
               class="w-0 h-0 border-4 border-transparent border-b-current transition-colors"
               :class="priceArrowClass('up')"
             />
-            <div 
+            <div
               class="w-0 h-0 border-4 border-transparent border-t-current transition-colors"
               :class="priceArrowClass('down')"
             />
@@ -86,14 +83,7 @@
           />
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[#999]">¥</span>
         </div>
-        <Button 
-          variant="solid"
-          size="sm"
-          class="px-4"
-          @click="handlePriceConfirm"
-        >
-          确定
-        </Button>
+        <Button variant="solid" size="sm" class="px-4" @click="handlePriceConfirm"> 确定 </Button>
       </div>
     </div>
 
@@ -108,8 +98,8 @@
 import { ref } from 'vue'
 import type { IFilterParams, IFilterProps } from '~/types/filter'
 import { EFilterSort, EFilterOrder } from '~/types/filter'
-import Button from '~/components/ui/Button.vue'
-import Input from '~/components/ui/Input.vue'
+
+// Button 和 Input 组件由 Nuxt 自动导入，无需手动 import
 
 const props = defineProps<IFilterProps>()
 const emit = defineEmits<{
@@ -124,7 +114,7 @@ const maxPrice = ref<string>('')
 // 排序按钮样式
 const sortClass = (sort: EFilterSort) => ({
   'text-[#b22420]': props.params.sort === sort,
-  'text-[#333333] hover:text-[#b22420]': props.params.sort !== sort
+  'text-[#333333] hover:text-[#b22420]': props.params.sort !== sort,
 })
 
 // 价格排序箭头样式
@@ -133,12 +123,12 @@ const priceArrowClass = (direction: 'up' | 'down') => {
     return 'border-[#333333] opacity-50'
   }
   if (direction === 'up') {
-    return props.params.order === EFilterOrder.ASC 
-      ? 'border-[#b22420]' 
+    return props.params.order === EFilterOrder.ASC
+      ? 'border-[#b22420]'
       : 'border-[#333333] opacity-50'
   }
-  return props.params.order === EFilterOrder.DESC 
-    ? 'border-[#b22420]' 
+  return props.params.order === EFilterOrder.DESC
+    ? 'border-[#b22420]'
     : 'border-[#333333] opacity-50'
 }
 
@@ -148,7 +138,7 @@ const handleSortChange = (sort: EFilterSort) => {
   const newParams = {
     ...props.params,
     sort,
-    order: undefined
+    order: undefined,
   }
   emit('update:params', newParams)
   emit('change', newParams)
@@ -172,7 +162,7 @@ const handlePriceSortChange = () => {
   const newParams = {
     ...props.params,
     sort: order ? sort : EFilterSort.COMPREHENSIVE,
-    order
+    order,
   }
   emit('update:params', newParams)
   emit('change', newParams)
@@ -187,7 +177,7 @@ const handlePriceInput = () => {
 const handlePriceConfirm = () => {
   const min = Number(minPrice.value)
   const max = Number(maxPrice.value)
-  
+
   // 验证价格区间
   if (min && max && min > max) {
     // 这里可以添加错误提示
@@ -197,9 +187,9 @@ const handlePriceConfirm = () => {
   const newParams = {
     ...props.params,
     minPrice: min || undefined,
-    maxPrice: max || undefined
+    maxPrice: max || undefined,
   }
   emit('update:params', newParams)
   emit('change', newParams)
 }
-</script> 
+</script>

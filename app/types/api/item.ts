@@ -60,6 +60,9 @@ export interface IItem {
   regions: any[]
 }
 
+// 商品列表项类型别名（与 IItem 相同）
+export type IProductListItem = IItem
+
 // 商品列表请求参数接口 - 基于实际API文档
 export interface IItemListParams {
   // 必需参数

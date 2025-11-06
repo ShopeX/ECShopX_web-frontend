@@ -652,7 +652,6 @@ export function useGlobalLoading() {
  * 集成了常用的响应处理配置
  */
 export function useSimpleApi() {
-  const message = useMessage()
 
   return {
     /**

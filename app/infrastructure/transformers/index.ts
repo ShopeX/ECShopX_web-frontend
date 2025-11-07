@@ -15,4 +15,5 @@
 
 export { CartTransformer } from './cartTransformer'
 export { ProductTransformer } from './productTransformer'
+export { AuthTransformer } from './authTransformer'
 

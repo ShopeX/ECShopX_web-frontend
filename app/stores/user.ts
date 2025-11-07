@@ -1,14 +1,12 @@
 import { defineStore } from 'pinia'
+import { authApiClient } from '~/infrastructure/http/clients'
+import { AuthTransformer } from '~/infrastructure/transformers'
+import type { IUserInfo, ILoginRequest, IPhoneLoginRequest } from '~/types/api/auth'
 
 /**
- * 用户信息接口
+ * 用户信息接口（扩展 API 类型）
  */
-export interface UserInfo {
-  id: string
-  username: string
-  email?: string
-  phone?: string
-  avatar?: string
+export type UserInfo = IUserInfo & {
   isPlusVip?: boolean
 }
 
@@ -19,6 +17,7 @@ interface UserState {
   isLoggedIn: boolean
   userInfo: UserInfo | null
   token: string | null
+  refreshToken: string | null
 }
 
 /**
@@ -28,7 +27,8 @@ export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     isLoggedIn: false,
     userInfo: null,
-    token: null
+    token: null,
+    refreshToken: null
   }),
 
   getters: {
@@ -65,34 +65,73 @@ export const useUserStore = defineStore('user', {
     /**
      * 设置令牌
      */
-    setToken(token: string | null) {
+    setToken(token: string | null, refreshToken: string | null = null) {
       this.token = token
+      this.refreshToken = refreshToken
+
+      // 持久化到本地存储
+      if (import.meta.client) {
+        if (token) {
+          localStorage.setItem('token', token)
+          if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken)
+          }
+        } else {
+          localStorage.removeItem('token')
+          localStorage.removeItem('refreshToken')
+        }
+      }
     },
 
     /**
-     * 登录
+     * 账号密码登录
      */
-    async login(username: string, password: string) {
+    async login(params: ILoginRequest) {
       try {
-        // TODO: 实现实际的登录 API 调用
-        // const response = await $fetch('/api/auth/login', {
-        //   method: 'POST',
-        //   body: { username, password }
-        // })
+        // 调用登录 API
+        const response = await authApiClient.login(params)
+        
+        // 转换数据
+        const loginData = AuthTransformer.toLoginModel(response)
 
-        // 模拟登录成功
+        // 更新状态
         this.isLoggedIn = true
-        this.userInfo = {
-          id: '1',
-          username: username,
-          isPlusVip: true
-        }
-        this.token = 'mock-token'
+        this.userInfo = loginData.userInfo
+        this.setToken(loginData.token, loginData.refreshToken)
 
-        return { success: true }
-      } catch (error) {
+        return { success: true, data: loginData }
+      } catch (error: any) {
         console.error('Login error:', error)
-        return { success: false, error }
+        return { 
+          success: false, 
+          error: error.message || '登录失败，请稍后重试' 
+        }
+      }
+    },
+
+    /**
+     * 手机验证码登录
+     */
+    async loginWithPhone(params: IPhoneLoginRequest) {
+      try {
+        // 调用手机登录 API
+        const response = await authApiClient.loginWithPhone(params)
+        
+        // 转换数据
+        const loginData = AuthTransformer.toLoginModel(response)
+
+        // 更新状态
+        this.isLoggedIn = true
+        this.userInfo = loginData.userInfo
+        this.setToken(loginData.token, loginData.refreshToken)
+
+        return { success: true, data: loginData }
+      } catch (error: any) {
+        console.error('Phone login error:', error)
+        return { 
+          success: false, 
+          error: error.message || '登录失败，请稍后重试' 
+        }
       }
     },
 
@@ -101,36 +140,53 @@ export const useUserStore = defineStore('user', {
      */
     async logout() {
       try {
-        // TODO: 实现实际的登出 API 调用
-        // await $fetch('/api/auth/logout', { method: 'POST' })
+        // 调用登出 API
+        await authApiClient.logout()
 
+        // 清除状态
         this.isLoggedIn = false
         this.userInfo = null
-        this.token = null
+        this.setToken(null, null)
 
         return { success: true }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Logout error:', error)
-        return { success: false, error }
+        
+        // 即使登出接口失败，也清除本地状态
+        this.isLoggedIn = false
+        this.userInfo = null
+        this.setToken(null, null)
+
+        return { 
+          success: false, 
+          error: error.message || '登出失败' 
+        }
       }
     },
 
     /**
-     * 初始化用户状态（从本地存储或 cookie 恢复）
+     * 初始化用户状态（从本地存储恢复）
      */
     async initUserState() {
-      // 在浏览器环境中才执行
-      if (import.meta.client) {
-        try {
-          // TODO: 从本地存储或 cookie 恢复用户状态
-          // const token = localStorage.getItem('token')
-          // if (token) {
-          //   this.token = token
-          //   await this.fetchUserInfo()
-          // }
-        } catch (error) {
-          console.error('Init user state error:', error)
+      // 只在客户端执行
+      if (!import.meta.client) return
+
+      try {
+        // 从本地存储恢复 Token
+        const token = localStorage.getItem('token')
+        const refreshToken = localStorage.getItem('refreshToken')
+
+        if (token) {
+          this.token = token
+          this.refreshToken = refreshToken
+
+          // 获取用户信息
+          await this.fetchUserInfo()
         }
+      } catch (error) {
+        console.error('Init user state error:', error)
+        // 初始化失败，清除 Token
+        this.setToken(null, null)
       }
     },
 
@@ -139,12 +195,67 @@ export const useUserStore = defineStore('user', {
      */
     async fetchUserInfo() {
       try {
-        // TODO: 实现实际的获取用户信息 API 调用
-        // const userInfo = await $fetch('/api/user/info')
-        // this.userInfo = userInfo
-        // this.isLoggedIn = true
-      } catch (error) {
+        if (!this.token) {
+          throw new Error('未登录')
+        }
+
+        // 调用获取用户信息 API
+        const response = await authApiClient.getUserInfo()
+        
+        // 转换数据
+        const userInfo = AuthTransformer.toUserInfoModel(response)
+
+        // 更新状态
+        this.userInfo = userInfo
+        this.isLoggedIn = true
+
+        return { success: true, data: userInfo }
+      } catch (error: any) {
         console.error('Fetch user info error:', error)
+        
+        // 获取用户信息失败，可能 Token 失效
+        this.isLoggedIn = false
+        this.userInfo = null
+        this.setToken(null, null)
+
+        return { 
+          success: false, 
+          error: error.message || '获取用户信息失败' 
+        }
+      }
+    },
+
+    /**
+     * 刷新 Token
+     */
+    async refreshAuthToken() {
+      try {
+        if (!this.refreshToken) {
+          throw new Error('无刷新令牌')
+        }
+
+        // 调用刷新 Token API
+        const response = await authApiClient.refreshToken(this.refreshToken)
+        
+        // 转换数据
+        const loginData = AuthTransformer.toLoginModel(response)
+
+        // 更新 Token
+        this.setToken(loginData.token, loginData.refreshToken)
+
+        return { success: true }
+      } catch (error: any) {
+        console.error('Refresh token error:', error)
+        
+        // 刷新失败，清除登录状态
+        this.isLoggedIn = false
+        this.userInfo = null
+        this.setToken(null, null)
+
+        return { 
+          success: false, 
+          error: error.message || '刷新令牌失败' 
+        }
       }
     }
   }

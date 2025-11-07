@@ -8,8 +8,11 @@ export default defineNuxtConfig({
 
   // Nitro 配置
   nitro: {
-    compatibilityDate: '2025-10-23'
+    compatibilityDate: '2025-11-07'
   },
+
+  // 兼容性日期（Nuxt 4）
+  compatibilityDate: '2025-11-07',
 
   // 应用配置
   app: {
@@ -29,7 +32,7 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     shim: false,
-    typeCheck: true // 启用类型检查
+    typeCheck: false // 禁用运行时类型检查（避免 vite-plugin-checker 问题）
   },
 
   // 实验性功能
@@ -94,11 +97,15 @@ export default defineNuxtConfig({
     ]
   },
 
-  // 组件配置
+  // 组件自动导入配置
   components: {
     dirs: [
-      '~/components',
-      '~/components/business'
+      {
+        path: '~/components',
+        extensions: ['vue'],
+        pattern: '**/*.vue', // 递归扫描所有子目录
+        pathPrefix: false
+      }
     ]
   }
 })

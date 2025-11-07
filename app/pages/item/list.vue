@@ -68,7 +68,7 @@
         <div
           class="grid gap-3 sm:gap-4 mb-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7"
         >
-          <SpProductCard
+          <ProductCard
             v-for="product in products"
             :key="product.itemId"
             :product="product"
@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import type { IProduct } from '~/components/SpProductCard/types'
+import type { IProduct } from '~/components/business/product/ProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
@@ -124,12 +124,69 @@ useSeoMeta({
   twitterImage: '/images/twitter-product-list.jpg',
 })
 
+// 品牌列表状态
+const brands = ref<IBrand[]>([])
+
 // 筛选参数状态
 const filterParams = ref({
   brandId: '',
   sort: 'default',
   startPrice: undefined as number | undefined,
   endPrice: undefined as number | undefined,
+})
+
+// 构建 API 参数
+const buildApiParams = (page: number, pageSize: number): IItemListParams => {
+  return {
+    page: page.toString(),
+    pageSize: pageSize.toString(),
+    item_type: 'normal',
+    main_category: '',
+    is_tdk: '1',
+    type: '0',
+    company_id: '1',
+    ...(filterParams.value.brandId && { brand_id: filterParams.value.brandId }),
+    ...(filterParams.value.sort !== 'default' && { sort: filterParams.value.sort }),
+    ...(filterParams.value.startPrice && { start_price: filterParams.value.startPrice }),
+    ...(filterParams.value.endPrice && { end_price: filterParams.value.endPrice }),
+  }
+}
+
+// 使用分页 Composable
+const {
+  items: products,
+  pagination,
+  pending,
+  error,
+  loadingMore,
+  hasMore,
+  loadMore,
+  refresh,
+  loadPage,
+} = usePagination<IProduct>({
+  pageSize: 20,
+  fetchFn: async (page, pageSize) => {
+    const params = buildApiParams(page, pageSize)
+    const data = await itemApiClient.getItemList(params)
+
+    // 更新品牌列表（如果有）
+    if (data?.brand_list?.list) {
+      brands.value = data.brand_list.list
+    }
+
+    if (data?.list) {
+      const productList = ProductTransformer.toModelList(data.list)
+      return {
+        items: productList,
+        total: data.total_count || 0,
+      }
+    }
+
+    return {
+      items: [],
+      total: 0,
+    }
+  },
 })
 
 // 动态更新页面标题（基于筛选条件）
@@ -170,129 +227,20 @@ watch(
 const route = useRoute()
 const router = useRouter()
 
-// 分页状态
-const currentPage = ref(1)
-const pageSize = 20
-
-// 数据状态
-const products = ref<IProduct[]>([])
-const brands = ref<IBrand[]>([])
-const pagination = ref({
-  total: 0,
-  current: 1,
-  hasMore: false,
-})
-
-// 加载状态
-const pending = ref(false)
-const loadingMore = ref(false)
-const error = ref<Error | null>(null)
-
 // 避免重复请求的标志
 const isInternalUrlUpdate = ref(false)
 
-// 计算属性
-const hasMore = computed(() => pagination.value.hasMore)
-
-// 防抖处理筛选变化
+// 处理筛选变化（防抖函数）
 const debouncedFilterChange = useDebounceFn(() => {
-  currentPage.value = 1
-  // 标记为内部URL更新，避免路由监听器重复触发请求
   isInternalUrlUpdate.value = true
   updateUrlParams()
-  loadProducts()
+  refresh()
 }, 300)
-
-// 注释：现在直接使用 itemApiClient + ProductTransformer
-
-// 构建 API 参数
-const buildApiParams = (): IItemListParams => {
-  return {
-    page: currentPage.value.toString(),
-    pageSize: pageSize.toString(),
-    item_type: 'normal',
-    main_category: '',
-    is_tdk: '1',
-    type: '0',
-    company_id: '1', // 从环境变量获取
-    ...(filterParams.value.brandId && { brand_id: filterParams.value.brandId }),
-    ...(filterParams.value.sort !== 'default' && { sort: filterParams.value.sort }),
-    ...(filterParams.value.startPrice && { start_price: filterParams.value.startPrice }),
-    ...(filterParams.value.endPrice && { end_price: filterParams.value.endPrice }),
-  }
-}
-
-// 加载商品数据
-const loadProducts = async (append = false) => {
-  try {
-    if (append) {
-      loadingMore.value = true
-    } else {
-      pending.value = true
-      error.value = null
-    }
-
-    const params = buildApiParams()
-    
-    // 使用 HTTP Client 获取数据
-    const response = await itemApiClient.getItemList(params)
-    
-    if (response?.data?.list) {
-      // 使用 Transformer 转换为 UI 数据
-      const newProducts = ProductTransformer.toModelList(response.data.list)
-      
-      if (append) {
-        products.value.push(...newProducts)
-      } else {
-        products.value = newProducts
-      }
-
-      pagination.value = {
-        total: response.data.total_count || 0,
-        current: currentPage.value,
-        hasMore: currentPage.value * pageSize < (response.data.total_count || 0),
-      }
-      
-      // 更新品牌列表（如果有）
-      if (response.data.brand_list?.list) {
-        brands.value = response.data.brand_list.list
-      }
-    }
-  } catch (err) {
-    error.value = err as Error
-    console.error('加载商品失败:', err)
-  } finally {
-    pending.value = false
-    loadingMore.value = false
-    // 重置内部URL更新标志
-    isInternalUrlUpdate.value = false
-  }
-}
-
-// 加载更多
-const loadMore = async () => {
-  if (hasMore.value && !loadingMore.value) {
-    currentPage.value++
-    await loadProducts(true)
-  }
-}
-
-// 刷新数据
-const refresh = () => {
-  currentPage.value = 1
-  loadProducts()
-}
 
 // 处理筛选变化
 const handleFilterChange = () => {
   // 使用防抖处理筛选变化，避免频繁请求
   debouncedFilterChange()
-}
-
-// 生成缓存键
-const getCacheKey = () => {
-  const params = buildApiParams()
-  return `item-list-${JSON.stringify(params)}`
 }
 
 // 更新 URL 参数
@@ -361,34 +309,27 @@ const {
     // 从 URL 恢复筛选状态（使用独立函数）
     const urlParams = getFilterParamsFromUrl()
 
-    // 构建 API 参数（内联版本，避免依赖外部变量）
-    const params: IItemListParams = {
-      page: '1',
-      pageSize: pageSize.toString(),
-      item_type: 'goods',
-      main_category: '',
-      is_tdk: '1',
-      type: 'list',
-      company_id: '1',
-      ...(urlParams.brandId && { brand_id: urlParams.brandId }),
-      ...(urlParams.sort !== 'default' && { sort: urlParams.sort }),
-      ...(urlParams.startPrice && { start_price: urlParams.startPrice }),
-      ...(urlParams.endPrice && { end_price: urlParams.endPrice }),
-    }
+    // 构建 API 参数
+    const params = buildApiParams(1, 20)
 
     // 使用 HTTP Client 获取数据
-    const response = await itemApiClient.getItemList(params)
+    const data = await itemApiClient.getItemList(params)
 
-    if (response?.data?.list) {
+    if (data?.list) {
       // 使用 Transformer 转换为 UI 数据
-      const productList = ProductTransformer.toModelList(response.data.list)
+      const productList = ProductTransformer.toModelList(data.list)
+
+      // 更新品牌列表
+      if (data.brand_list?.list) {
+        brands.value = data.brand_list.list
+      }
 
       return {
         products: productList,
         pagination: {
-          total: response.data.total_count || 0,
+          total: data.total_count || 0,
           current: 1,
-          hasMore: pageSize < (response.data.total_count || 0),
+          hasMore: 20 < (data.total_count || 0),
         },
         urlParams, // 返回URL参数用于初始化状态
       }
@@ -438,80 +379,82 @@ onMounted(async () => {
     ) {
       restoreFromUrl()
     }
-    await loadProducts()
+    await loadPage(1)
   }
 
   // 模拟品牌数据（实际应该从 API 获取）
-  brands.value = [
-    {
-      attribute_id: '1',
-      attribute_name: 'Apple',
-      company_id: '1',
-      shop_id: '1',
-      attribute_type: 'brand',
-      attribute_memo: '',
-      attribute_sort: '1',
-      distributor_id: '1',
-      is_show: '1',
-      is_image: '0',
-      image_url: '',
-      created: Date.now(),
-      updated: Date.now(),
-      attribute_code: null,
-      attribute_show: null,
-    },
-    {
-      attribute_id: '2',
-      attribute_name: 'Samsung',
-      company_id: '1',
-      shop_id: '1',
-      attribute_type: 'brand',
-      attribute_memo: '',
-      attribute_sort: '2',
-      distributor_id: '1',
-      is_show: '1',
-      is_image: '0',
-      image_url: '',
-      created: Date.now(),
-      updated: Date.now(),
-      attribute_code: null,
-      attribute_show: null,
-    },
-    {
-      attribute_id: '3',
-      attribute_name: 'Huawei',
-      company_id: '1',
-      shop_id: '1',
-      attribute_type: 'brand',
-      attribute_memo: '',
-      attribute_sort: '3',
-      distributor_id: '1',
-      is_show: '1',
-      is_image: '0',
-      image_url: '',
-      created: Date.now(),
-      updated: Date.now(),
-      attribute_code: null,
-      attribute_show: null,
-    },
-    {
-      attribute_id: '4',
-      attribute_name: 'Xiaomi',
-      company_id: '1',
-      shop_id: '1',
-      attribute_type: 'brand',
-      attribute_memo: '',
-      attribute_sort: '4',
-      distributor_id: '1',
-      is_show: '1',
-      is_image: '0',
-      image_url: '',
-      created: Date.now(),
-      updated: Date.now(),
-      attribute_code: null,
-      attribute_show: null,
-    },
-  ]
+  if (brands.value.length === 0) {
+    brands.value = [
+      {
+        attribute_id: '1',
+        attribute_name: 'Apple',
+        company_id: '1',
+        shop_id: '1',
+        attribute_type: 'brand',
+        attribute_memo: '',
+        attribute_sort: '1',
+        distributor_id: '1',
+        is_show: '1',
+        is_image: '0',
+        image_url: '',
+        created: Date.now(),
+        updated: Date.now(),
+        attribute_code: null,
+        attribute_show: null,
+      },
+      {
+        attribute_id: '2',
+        attribute_name: 'Samsung',
+        company_id: '1',
+        shop_id: '1',
+        attribute_type: 'brand',
+        attribute_memo: '',
+        attribute_sort: '2',
+        distributor_id: '1',
+        is_show: '1',
+        is_image: '0',
+        image_url: '',
+        created: Date.now(),
+        updated: Date.now(),
+        attribute_code: null,
+        attribute_show: null,
+      },
+      {
+        attribute_id: '3',
+        attribute_name: 'Huawei',
+        company_id: '1',
+        shop_id: '1',
+        attribute_type: 'brand',
+        attribute_memo: '',
+        attribute_sort: '3',
+        distributor_id: '1',
+        is_show: '1',
+        is_image: '0',
+        image_url: '',
+        created: Date.now(),
+        updated: Date.now(),
+        attribute_code: null,
+        attribute_show: null,
+      },
+      {
+        attribute_id: '4',
+        attribute_name: 'Xiaomi',
+        company_id: '1',
+        shop_id: '1',
+        attribute_type: 'brand',
+        attribute_memo: '',
+        attribute_sort: '4',
+        distributor_id: '1',
+        is_show: '1',
+        is_image: '0',
+        image_url: '',
+        created: Date.now(),
+        updated: Date.now(),
+        attribute_code: null,
+        attribute_show: null,
+      },
+    ]
+  }
 })
 
 // 监听路由变化
@@ -525,8 +468,7 @@ watch(
     }
 
     restoreFromUrl()
-    currentPage.value = 1
-    loadProducts()
+    refresh()
   },
   { deep: true }
 )

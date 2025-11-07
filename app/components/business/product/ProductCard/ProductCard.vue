@@ -130,8 +130,6 @@ async function handleAddToCart(event: Event) {
 </script>
 
 <style scoped>
-@reference "../../assets/css/main.css";
-
 /* 组件特定样式 - 基于主题类扩展 */
 .sp-product-card {
   /* 固定卡片尺寸匹配Figma设计 */
@@ -155,26 +153,34 @@ async function handleAddToCart(event: Event) {
   /* 图片容器固定尺寸 */
   height: 299px;
   position: relative;
-  @apply overflow-hidden rounded-t-2xl;
+  overflow: hidden;
+  border-radius: 1rem;
 }
 
 .sp-product-card__title {
   /* 标题文本样式 - 匹配Figma设计 */
   word-break: break-word;
   hyphens: auto;
-  @apply text-base font-normal text-gray-900 leading-6 line-clamp-2;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #111827;
+  line-height: 1.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   min-height: 3rem;
 }
 
 .sp-product-card__price {
   /* 价格样式 - 增强显示效果 */
-  @apply font-semibold;
+  font-weight: 600;
 }
 
 .sp-product-card__info {
   /* 信息区域固定高度 */
   height: 101px;
-  @apply relative;
+  position: relative;
 }
 
 .sp-product-card__info::after {
@@ -209,15 +215,27 @@ async function handleAddToCart(event: Event) {
 
 /* 加载状态样式 */
 .sp-product-card[data-loading='true'] {
-  @apply animate-pulse;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .sp-product-card[data-loading='true'] .sp-product-card__image {
-  @apply bg-gray-200;
+  background-color: #e5e7eb;
 }
 
 .sp-product-card[data-loading='true'] .sp-product-card__title,
 .sp-product-card[data-loading='true'] .sp-product-card__price {
-  @apply bg-gray-200 text-transparent rounded;
+  background-color: #e5e7eb;
+  color: transparent;
+  border-radius: 0.25rem;
 }
 </style>

@@ -122,9 +122,3 @@ const categories = ref<Category[]>([
   },
 ])
 </script>
-
-<style scoped>
-.category-nav {
-  @apply z-10;
-}
-</style>

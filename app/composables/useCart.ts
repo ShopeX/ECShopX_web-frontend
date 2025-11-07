@@ -31,7 +31,7 @@
 import { MoneyValueObject, QuantityValueObject, DiscountValueObject } from '~/shared/value-objects'
 import { BusinessError } from '~/shared/errors'
 import { useCartUIStore } from '~/stores/cartUI'
-import { cartApiClient } from '~/infrastructure/http/clients/CartApiClient'
+import { cartApiClient } from '~/infrastructure/http/clients'
 import { CartTransformer } from '~/infrastructure/transformers/cartTransformer'
 import type { IAddCartRequest, IUpdateCartRequest } from '~/types/api/cart'
 import { useMessage } from '~/composables/useMessage'
@@ -115,20 +115,11 @@ export interface ICartUI {
  * 购物车业务组合式函数
  */
 export function useCart() {
+  // ✅ 现在 useMessage 已经是 SSR 安全的，可以直接调用
   const message = useMessage()
 
-  // 延迟初始化 store（SSR 兼容）
-  let _uiStore: ReturnType<typeof useCartUIStore> | null = null
-  const getUIStore = () => {
-    // SSR 期间不初始化 store，返回 null
-    if (import.meta.server) {
-      return null
-    }
-    if (!_uiStore) {
-      _uiStore = useCartUIStore()
-    }
-    return _uiStore
-  }
+  // ✅ Pinia Store 完全支持 SSR，可以直接调用（@pinia/nuxt 已处理）
+  const cartUIStore = useCartUIStore()
 
   // 购物车状态
   const cart = ref<ICartModel>({
@@ -137,7 +128,7 @@ export function useCart() {
     totalQuantity: 0
   })
   const error = ref<string | null>(null)
-  const loading = computed(() => getUIStore()?.loading ?? false)
+  const loading = computed(() => cartUIStore.loading)
 
   /**
    * 获取用户 ID（临时实现）
@@ -306,13 +297,14 @@ export function useCart() {
    * 加载购物车
    */
   const loadCart = async () => {
-    getUIStore()?.setLoading(true)
+    cartUIStore.setLoading(true)
     error.value = null
     try {
-      const response = await cartApiClient.getCartList()
+      // ✅ plugin 已自动解包 data，直接获得数据
+      const data = await cartApiClient.getCartList()
 
       // ✅ 使用 Transformer 转换 API 数据为应用模型
-      const items = CartTransformer.toModelList(response.data.items)
+      const items = CartTransformer.toModelList(data.items)
 
       cart.value = {
         items,
@@ -320,14 +312,14 @@ export function useCart() {
         totalQuantity: items.reduce((sum, item) => sum + item.quantity.value, 0),
       }
 
-      getUIStore()?.updateLastUpdateTime()
-      getUIStore()?.markAsInitialized()
+      cartUIStore.updateLastUpdateTime()
+      cartUIStore.markAsInitialized()
     } catch (err: any) {
       error.value = err.message || '加载购物车失败'
       console.error('Failed to load cart:', err)
       throw err
     } finally {
-      getUIStore()?.setLoading(false)
+      cartUIStore.setLoading(false)
     }
   }
 
@@ -546,7 +538,7 @@ export function useCart() {
    */
   const isItemLoading = (itemId: string, action: 'update' | 'remove'): boolean => {
     const key = `${action}-${itemId}`
-    return getUIStore()?.isActionLoading(key) ?? false
+    return cartUIStore.isActionLoading(key)
   }
 
   return {

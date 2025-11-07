@@ -34,7 +34,7 @@
  * ```
  */
 
-import type { IProduct } from '~/components/SpProductCard/types'
+import type { IProduct } from '~/components/business/product/ProductCard/types'
 import type { IItemListParams, IItemDetailParams, IProductListItem, IBrand } from '~/types/api/item'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
@@ -80,17 +80,17 @@ export function useProduct() {
     listError.value = null
 
     try {
-      // 1. 使用 HTTP Client 获取原始数据
-      const response = await itemApiClient.getItemList(params)
+      // 1. 使用 HTTP Client 获取数据（plugin 已自动解包）
+      const data = await itemApiClient.getItemList(params)
 
-      if (response?.data?.list) {
+      if (data?.list) {
         // 2. 使用 Transformer 转换为 UI 数据
-        const uiList = ProductTransformer.toModelList(response.data.list)
+        const uiList = ProductTransformer.toModelList(data.list)
 
         // 3. 更新状态
         products.value = uiList
-        totalCount.value = response.data.total_count || 0
-        brands.value = response.data.brand_list?.list || []
+        totalCount.value = data.total_count || 0
+        brands.value = data.brand_list?.list || []
 
         return { success: true }
       }
@@ -133,14 +133,14 @@ export function useProduct() {
     listError.value = null
 
     try {
-      const response = await itemApiClient.getItemList(params)
+      const data = await itemApiClient.getItemList(params)
 
-      if (response?.data?.list) {
-        const uiList = ProductTransformer.toModelList(response.data.list)
+      if (data?.list) {
+        const uiList = ProductTransformer.toModelList(data.list)
 
         // 追加到现有列表
         products.value = [...products.value, ...uiList]
-        totalCount.value = response.data.total_count || 0
+        totalCount.value = data.total_count || 0
 
         return { success: true }
       }
@@ -182,12 +182,12 @@ export function useProduct() {
     detailError.value = null
 
     try {
-      // 1. 使用 HTTP Client 获取原始数据
-      const response: any = await itemApiClient.getItemDetail(params)
+      // 1. 使用 HTTP Client 获取数据（plugin 已自动解包）
+      const data = await itemApiClient.getItemDetail(params)
 
-      if (response?.data) {
+      if (data) {
         // 2. 使用 Transformer 转换为 UI 数据
-        const uiProduct = ProductTransformer.toModel(response.data as IProductListItem)
+        const uiProduct = ProductTransformer.toModel(data as IProductListItem)
 
         // 3. 更新状态
         product.value = uiProduct

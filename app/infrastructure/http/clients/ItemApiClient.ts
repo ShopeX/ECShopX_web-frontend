@@ -1,4 +1,3 @@
-import { useHttpMethods } from '~/composables/useHttp'
 import type { IItemListParams, IItemDetailParams } from '~/types/api/item'
 
 /**
@@ -23,8 +22,21 @@ import type { IItemListParams, IItemDetailParams } from '~/types/api/item'
  * ```
  */
 export class ItemApiClient {
+  private $api: any
+
+  constructor() {
+    // 不在构造函数中初始化，延迟到第一次使用时
+  }
+
+  /**
+   * 获取 HTTP 实例（延迟初始化，SSR 安全）
+   */
   private get http() {
-    return useHttpMethods()
+    if (!this.$api) {
+      const nuxtApp = useNuxtApp()
+      this.$api = nuxtApp.$api
+    }
+    return this.$api
   }
 
   /**
@@ -59,11 +71,10 @@ export class ItemApiClient {
       ...(params.keywords && { keywords: params.keywords }),
     }
 
-    return this.http.get('/goods/items', {
+    return this.http('/goods/items', {
+      method: 'GET',
       query: apiParams,
-      server: true,
       cache: 'default',
-      key: `items-list-${JSON.stringify(apiParams)}`,
     })
   }
 
@@ -79,10 +90,9 @@ export class ItemApiClient {
    * ```
    */
   async getItemDetail(params: IItemDetailParams): Promise<any> {
-    return this.http.get(`/goods/items/${params.id}`, {
-      server: true,
+    return this.http(`/goods/items/${params.id}`, {
+      method: 'GET',
       cache: 'default',
-      key: `item-detail-${params.id}`,
     })
   }
 
@@ -94,12 +104,11 @@ export class ItemApiClient {
    * @param pageSize - 每页数量
    * @returns 原始 API 响应
    */
-  async searchItems(keyword: string, page: string = '1', pageSize: string = '20') {
-    return this.http.get('/goods/items/search', {
+  async searchItems(keyword: string, page: string = '1', pageSize: string = '20'): Promise<any> {
+    return this.http('/goods/items/search', {
+      method: 'GET',
       query: { keyword, page, pageSize },
-      server: true,
       cache: 'default',
-      key: `items-search-${keyword}-${page}-${pageSize}`,
     })
   }
 
@@ -111,12 +120,11 @@ export class ItemApiClient {
    * @param pageSize - 每页数量
    * @returns 原始 API 响应
    */
-  async getItemReviews(itemId: string, page: string = '1', pageSize: string = '20') {
-    return this.http.get(`/goods/items/${itemId}/reviews`, {
+  async getItemReviews(itemId: string, page: string = '1', pageSize: string = '20'): Promise<any> {
+    return this.http(`/goods/items/${itemId}/reviews`, {
+      method: 'GET',
       query: { page, pageSize },
-      server: true,
       cache: 'default',
-      key: `item-reviews-${itemId}-${page}`,
     })
   }
 
@@ -127,12 +135,11 @@ export class ItemApiClient {
    * @param limit - 推荐数量
    * @returns 原始 API 响应
    */
-  async getRecommendedItems(itemId?: string, limit: number = 10) {
-    return this.http.get('/goods/items/recommended', {
+  async getRecommendedItems(itemId?: string, limit: number = 10): Promise<any> {
+    return this.http('/goods/items/recommended', {
+      method: 'GET',
       query: { item_id: itemId, limit },
-      server: true,
       cache: 'default',
-      key: `items-recommended-${itemId}-${limit}`,
     })
   }
 }

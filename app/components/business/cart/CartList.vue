@@ -127,3 +127,4 @@ function handleFavorite(itemId: string) {
   emit('favorite', itemId)
 }
 </script>
+

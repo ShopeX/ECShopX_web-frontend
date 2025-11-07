@@ -1,5 +1,5 @@
 import type { IProductListItem } from '~/types/api/item'
-import type { IProduct } from '~/components/SpProductCard/types'
+import type { IProduct } from '~/components/business/product/ProductCard/types'
 import { MoneyValueObject, DiscountValueObject } from '~/shared/value-objects'
 
 /**

@@ -1,4 +1,3 @@
-import { useHttpMethods } from '~/composables/useHttp'
 import type {
   IAddCartRequest,
   IUpdateCartRequest,
@@ -27,8 +26,21 @@ import type {
  * ```
  */
 export class CartApiClient {
+  private $api: any
+
+  constructor() {
+    // 不在构造函数中初始化，延迟到第一次使用时
+  }
+
+  /**
+   * 获取 HTTP 实例（延迟初始化，SSR 安全）
+   */
   private get http() {
-    return useHttpMethods()
+    if (!this.$api) {
+      const nuxtApp = useNuxtApp()
+      this.$api = nuxtApp.$api
+    }
+    return this.$api
   }
 
   /**
@@ -37,10 +49,9 @@ export class CartApiClient {
    * @returns 原始 API 响应
    */
   async getCartList(): Promise<any> {
-    return this.http.get('/cart/list', {
-      server: false,  // 购物车数据通常是客户端渲染
+    return this.http('/cart/list', {
+      method: 'GET',
       cache: 'default',
-      key: 'cart-list',
     })
   }
 
@@ -59,13 +70,13 @@ export class CartApiClient {
    * })
    * ```
    */
-  async addToCart(params: IAddCartRequest) {
-    return this.http.post<{
-      id: string
-      cart_count: number
-    }>('/cart', {
+  async addToCart(params: IAddCartRequest): Promise<{
+    id: string
+    cart_count: number
+  }> {
+    return this.http('/cart', {
+      method: 'POST',
       body: params,
-      server: false,
     })
   }
 
@@ -84,10 +95,10 @@ export class CartApiClient {
    * })
    * ```
    */
-  async updateCartItem(itemId: string, params: IUpdateCartRequest) {
-    return this.http.put<void>(`/api/cart/items/${itemId}`, {
+  async updateCartItem(itemId: string, params: IUpdateCartRequest): Promise<void> {
+    return this.http(`/api/cart/items/${itemId}`, {
+      method: 'PUT',
       body: params,
-      server: false,
     })
   }
 
@@ -102,9 +113,9 @@ export class CartApiClient {
    * await client.removeCartItem('cart-item-123')
    * ```
    */
-  async removeCartItem(itemId: string) {
-    return this.http.delete<void>(`/api/cart/items/${itemId}`, {
-      server: false,
+  async removeCartItem(itemId: string): Promise<void> {
+    return this.http(`/api/cart/items/${itemId}`, {
+      method: 'DELETE',
     })
   }
 
@@ -121,10 +132,10 @@ export class CartApiClient {
    * })
    * ```
    */
-  async batchRemoveItems(params: IBatchRemoveCartRequest) {
-    return this.http.post<void>('/api/cart/batch-remove', {
+  async batchRemoveItems(params: IBatchRemoveCartRequest): Promise<void> {
+    return this.http('/api/cart/batch-remove', {
+      method: 'POST',
       body: params,
-      server: false,
     })
   }
 
@@ -133,9 +144,9 @@ export class CartApiClient {
    * 
    * @returns 删除结果
    */
-  async removeSelectedItems() {
-    return this.http.delete<void>('/api/cart/selected', {
-      server: false,
+  async removeSelectedItems(): Promise<void> {
+    return this.http('/api/cart/selected', {
+      method: 'DELETE',
     })
   }
 
@@ -145,9 +156,9 @@ export class CartApiClient {
    * @param itemId - 购物车项 ID
    * @returns 更新结果
    */
-  async toggleItemSelection(itemId: string) {
-    return this.http.put<void>(`/api/cart/items/${itemId}/toggle`, {
-      server: false,
+  async toggleItemSelection(itemId: string): Promise<void> {
+    return this.http(`/api/cart/items/${itemId}/toggle`, {
+      method: 'PUT',
     })
   }
 
@@ -157,10 +168,10 @@ export class CartApiClient {
    * @param selected - 是否全选
    * @returns 更新结果
    */
-  async toggleAllSelection(selected: boolean) {
-    return this.http.put<void>('/api/cart/toggle-all', {
+  async toggleAllSelection(selected: boolean): Promise<void> {
+    return this.http('/api/cart/toggle-all', {
+      method: 'PUT',
       body: { selected },
-      server: false,
     })
   }
 
@@ -174,9 +185,9 @@ export class CartApiClient {
    * await client.clearCart()
    * ```
    */
-  async clearCart() {
-    return this.http.delete<void>('/api/cart/clear', {
-      server: false,
+  async clearCart(): Promise<void> {
+    return this.http('/api/cart/clear', {
+      method: 'DELETE',
     })
   }
 
@@ -185,12 +196,12 @@ export class CartApiClient {
    * 
    * @returns 验证结果
    */
-  async validateCheckout() {
-    return this.http.post<{
-      valid: boolean
-      errors: string[]
-    }>('/api/cart/validate', {
-      server: false,
+  async validateCheckout(): Promise<{
+    valid: boolean
+    errors: string[]
+  }> {
+    return this.http('/api/cart/validate', {
+      method: 'POST',
     })
   }
 }

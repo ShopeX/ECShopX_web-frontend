@@ -66,7 +66,10 @@ export default defineNuxtConfig({
 
   // 模块配置
   modules: [
-    '@nuxt/ui',
+    ['@nuxt/ui', {
+      // 禁用 Google Fonts 的预获取
+      fonts: false
+    }],
     '@pinia/nuxt'  // ✅ 添加 Pinia 模块
   ],
 

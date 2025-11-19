@@ -76,6 +76,7 @@ function togglePasswordVisibility() {
  */
 function handleInput(event: Event) {
   const target = event.target as HTMLInputElement
+  console.log('FormInput handleInput:', target.value)
   emit('update:modelValue', target.value)
 }
 </script>

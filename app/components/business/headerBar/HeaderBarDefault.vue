@@ -12,7 +12,7 @@
             <span class="text-gray-300">上海</span>
           </div>
           <div v-if="!isLoggedIn" class="flex items-center space-x-2">
-            <NuxtLink to="/auth/login" class="hover:text-gray-300 transition-colors">
+            <NuxtLink to="/account/login" class="hover:text-gray-300 transition-colors">
               请登录
             </NuxtLink>
           </div>
@@ -213,7 +213,11 @@
           <!-- 菜单头部 -->
           <div class="p-4 border-b border-gray-200 flex items-center justify-between">
             <div v-if="!isLoggedIn">
-              <NuxtLink to="/auth/login" class="text-red-500 font-medium" @click="closeMobileMenu">
+              <NuxtLink
+                to="/account/login"
+                class="text-red-500 font-medium"
+                @click="closeMobileMenu"
+              >
                 请登录
               </NuxtLink>
             </div>

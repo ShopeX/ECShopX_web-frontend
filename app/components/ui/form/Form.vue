@@ -96,6 +96,7 @@ function isRequired(item: IFormSchema): boolean {
  * 更新字段值
  */
 function updateField(name: string, value: any) {
+  console.log('Form updateField:', name, '=', value)
   const newValue = { ...props.modelValue, [name]: value }
   emit('update:modelValue', newValue)
 
@@ -172,9 +173,16 @@ function clearValidate(name?: string) {
  * 处理表单提交
  */
 async function handleSubmit() {
+  console.log('Form handleSubmit 被调用')
+  console.log('表单数据:', props.modelValue)
   const valid = await validate()
+  console.log('表单验证结果:', valid)
+  console.log('验证错误:', errors)
   if (valid) {
+    console.log('表单验证通过，触发 submit 事件')
     emit('submit', props.modelValue)
+  } else {
+    console.log('表单验证失败，不触发 submit 事件')
   }
 }
 

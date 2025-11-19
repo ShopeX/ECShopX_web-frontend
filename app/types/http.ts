@@ -31,7 +31,7 @@ export interface UseHttpReturn<T> {
 
 // 标准 API 响应格式（业务层）
 export interface ApiResponse<T = any> {
-  code: number | string    // 业务状态码（0 表示成功）
+  status_code: number | string    // 业务状态码（0 表示成功）
   message: string          // 响应消息
   data: T                  // 响应数据
   timestamp?: number       // 时间戳

@@ -7,7 +7,7 @@ import type {
   ISmsCodeResponse,
   ICaptchaResponse,
   ILogoutResponse,
-  IUserInfo,
+  IGetUserInfoResponse,
 } from '~/types/api/auth'
 
 /**
@@ -66,7 +66,7 @@ export class AuthApiClient {
    * ```
    */
   async login(params: ILoginRequest): Promise<ILoginResponse> {
-    return this.http('/auth/login', {
+    return this.http('/login', {
       method: 'POST',
       body: params,
     })
@@ -160,8 +160,8 @@ export class AuthApiClient {
    * const userInfo = await client.getUserInfo()
    * ```
    */
-  async getUserInfo(): Promise<IUserInfo> {
-    return this.http('/auth/user/info', {
+  async getUserInfo(): Promise<IGetUserInfoResponse> {
+    return this.http('/member', {
       method: 'GET',
       cache: 'default',
     })

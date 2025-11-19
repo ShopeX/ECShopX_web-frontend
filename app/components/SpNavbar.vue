@@ -6,26 +6,17 @@
       <div class="h-9 flex items-center justify-between text-sm text-gray-600">
         <div class="flex items-center space-x-6">
           <span>欢迎来到ECshopX商城！</span>
-          <NuxtLink 
-            v-if="!isLoggedIn" 
-            to="/auth/login"
-            class="hover:text-red-500"
-          >
+          <NuxtLink v-if="!isLoggedIn" to="/account/login" class="hover:text-red-500">
             请登录
           </NuxtLink>
           <template v-else>
             <span>{{ userInfo.username }}</span>
-            <button 
-              class="hover:text-red-500"
-              @click="handleLogout"
-            >
-              退出
-            </button>
+            <button class="hover:text-red-500" @click="handleLogout">退出</button>
           </template>
         </div>
         <div class="flex items-center space-x-6">
-          <NuxtLink 
-            v-for="item in topMenus" 
+          <NuxtLink
+            v-for="item in topMenus"
             :key="item.key"
             :to="item.path"
             class="hover:text-red-500"
@@ -39,11 +30,7 @@
       <div class="h-20 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center">
-          <img 
-            src="/images/logo/logo.png" 
-            alt="ECshopX Logo" 
-            class="h-10"
-          />
+          <img src="/images/logo/logo.png" alt="ECshopX Logo" class="h-10" />
         </NuxtLink>
 
         <!-- 搜索框 -->
@@ -71,7 +58,10 @@
               :key="keyword"
               href="#"
               class="hover:text-red-500 ml-2"
-              @click.prevent="searchKeyword = keyword; handleSearch()"
+              @click.prevent="
+                searchKeyword = keyword
+                handleSearch()
+              "
             >
               {{ keyword }}
             </a>
@@ -80,8 +70,8 @@
 
         <!-- 用户操作区 -->
         <div class="flex items-center space-x-8">
-          <NuxtLink 
-            v-for="item in userActions" 
+          <NuxtLink
+            v-for="item in userActions"
             :key="item.key"
             :to="item.path"
             class="flex flex-col items-center hover:text-red-500"
@@ -102,18 +92,16 @@
             <Icon name="heroicons:chevron-down" />
           </button>
           <!-- 分类下拉菜单 -->
-          <div class="absolute left-0 top-full w-60 bg-white shadow-lg hidden group-hover:block z-50">
-            <div
-              v-for="category in categories"
-              :key="category.id"
-              class="relative group/item"
-            >
+          <div
+            class="absolute left-0 top-full w-60 bg-white shadow-lg hidden group-hover:block z-50"
+          >
+            <div v-for="category in categories" :key="category.id" class="relative group/item">
               <NuxtLink
                 :to="`/category/${category.id}`"
                 class="flex items-center justify-between px-4 h-10 hover:bg-gray-50"
               >
                 <span>{{ category.name }}</span>
-                <Icon 
+                <Icon
                   v-if="category.children?.length"
                   name="heroicons:chevron-right"
                   class="text-gray-400"
@@ -155,7 +143,7 @@ import { ref } from 'vue'
 // 用户登录状态
 const isLoggedIn = ref(false)
 const userInfo = ref({
-  username: '张三'
+  username: '张三',
 })
 
 // 搜索相关
@@ -167,14 +155,14 @@ const topMenus = [
   { key: 'member', label: '会员中心', path: '/member' },
   { key: 'order', label: '我的订单', path: '/member/orders' },
   { key: 'favorite', label: '我的收藏', path: '/member/favorites' },
-  { key: 'help', label: '帮助中心', path: '/help' }
+  { key: 'help', label: '帮助中心', path: '/help' },
 ]
 
 // 用户操作区
 const userActions = [
   { key: 'message', label: '消息', path: '/member/messages', icon: 'heroicons:bell' },
   { key: 'cart', label: '购物车', path: '/cart', icon: 'heroicons:shopping-cart' },
-  { key: 'user', label: '我的', path: '/member', icon: 'heroicons:user' }
+  { key: 'user', label: '我的', path: '/member', icon: 'heroicons:user' },
 ]
 
 // 主导航
@@ -182,7 +170,7 @@ const mainNavs = [
   { key: 'home', label: '首页', path: '/' },
   { key: 'new', label: '新品', path: '/new' },
   { key: 'hot', label: '热卖', path: '/hot' },
-  { key: 'promotion', label: '促销', path: '/promotion' }
+  { key: 'promotion', label: '促销', path: '/promotion' },
 ]
 
 // 分类数据
@@ -193,8 +181,8 @@ const categories = [
     children: [
       { id: '1-1', name: '手机' },
       { id: '1-2', name: '平板' },
-      { id: '1-3', name: '笔记本' }
-    ]
+      { id: '1-3', name: '笔记本' },
+    ],
   },
   {
     id: '2',
@@ -202,8 +190,8 @@ const categories = [
     children: [
       { id: '2-1', name: '男装' },
       { id: '2-2', name: '女装' },
-      { id: '2-3', name: '童装' }
-    ]
+      { id: '2-3', name: '童装' },
+    ],
   },
   {
     id: '3',
@@ -211,9 +199,9 @@ const categories = [
     children: [
       { id: '3-1', name: '电视' },
       { id: '3-2', name: '空调' },
-      { id: '3-3', name: '洗衣机' }
-    ]
-  }
+      { id: '3-3', name: '洗衣机' },
+    ],
+  },
 ]
 
 // 处理搜索
@@ -227,4 +215,4 @@ const handleLogout = () => {
   // TODO: 实现退出登录逻辑
   isLoggedIn.value = false
 }
-</script> 
+</script>

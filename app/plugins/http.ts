@@ -11,10 +11,10 @@ export default defineNuxtPlugin(() => {
    * 判断是否为业务成功响应
    */
   const isBusinessSuccess = (data: any): boolean => {
-    if (!data || typeof data !== 'object' || !('code' in data)) {
+    if (!data || typeof data !== 'object' || ('status_code' in data)) {
       return false
     }
-    return data.code === 0 || data.code === '0'
+    return true
   }
 
   /**
@@ -23,7 +23,7 @@ export default defineNuxtPlugin(() => {
   const createBusinessError = (response: ApiResponse): HttpError => {
     const error = new Error(response.message || '业务处理失败') as HttpError
     error.type = ErrorType.BUSINESS_ERROR
-    error.code = response.code
+    error.code = response.status_code
     error.details = response
     error.retry = false
     return error
@@ -148,8 +148,8 @@ export default defineNuxtPlugin(() => {
       }
 
       // ✅ 业务状态码检查
-      const data = response._data
-      if (data && typeof data === 'object' && 'code' in data) {
+      const data = response._data?.data
+      if (data && typeof data === 'object' && !('status_code' in data)) {
         const apiResponse = data as ApiResponse
 
         if (!isBusinessSuccess(apiResponse)) {
@@ -158,10 +158,9 @@ export default defineNuxtPlugin(() => {
           await showErrorMessage(error)
           throw error
         }
-
         // ✅ 业务成功：自动解包 data 字段
         // 直接修改 response._data，让后续代码自动获得解包后的数据
-        response._data = apiResponse.data
+        response._data = apiResponse
       }
     },
 

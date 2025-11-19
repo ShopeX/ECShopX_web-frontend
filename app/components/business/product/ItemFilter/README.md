@@ -1,237 +1,144 @@
-# ItemFilter 组件
+# ItemFilter 商品筛选组件
 
-商品筛选组件，提供排序、价格区间、品牌筛选等功能。
+## 概述
 
-## 📁 目录结构
+`ItemFilter` 是一个综合性的商品筛选组件，提供分类、品牌、排序、价格区间等多维度筛选功能。
 
+## 功能特性
+
+### 主筛选区域
+- **分类筛选**：横向布局，支持单选，点击已选分类可取消选择
+- **品牌筛选**：横向布局，支持多选，带"更多"弹窗，显示选中状态（✓）
+
+### 次筛选区域
+- **排序选项**：默认排序、销量、价格等
+- **价格区间**：支持自定义价格范围筛选
+- **品牌下拉**：备用的品牌下拉选择器
+
+## 使用方法
+
+### 基本用法
+
+```vue
+<template>
+  <ItemFilter
+    v-model="filterParams"
+    :categories="categories"
+    :brands="brands"
+    @change="handleFilterChange"
+  />
+</template>
+
+<script setup lang="ts">
+import type { ICategory } from '~/components/business/product/ItemFilter/ItemFilter.vue'
+import type { IBrand } from '~/types/api/item'
+
+// 定义筛选参数
+const filterParams = ref({
+  categoryId: undefined as string | number | undefined,
+  brandId: '',
+  sort: 'default',
+  startPrice: undefined as number | undefined,
+  endPrice: undefined as number | undefined,
+})
+
+// 分类列表
+const categories = ref<ICategory[]>([
+  { id: '1', name: '笔记本' },
+  { id: '2', name: '游戏本' },
+  { id: '3', name: '工作站' },
+  // ...
+])
+
+// 品牌列表
+const brands = ref<IBrand[]>([])
+
+// 处理筛选变化
+function handleFilterChange() {
+  // 重新加载数据
+  refresh()
+}
+</script>
 ```
-ItemFilter/
-├── ItemFilter.vue                 # 主容器组件
-├── components/
-│   ├── FilterSortSection.vue      # 排序区域
-│   ├── FilterPriceRange.vue       # 价格区间筛选
-│   └── FilterBrandSelect.vue      # 品牌筛选
-└── README.md                      # 组件文档
-```
 
-## 🎯 重构说明
+## Props
 
-**原文件**: `ItemFilter.vue` (443行) ❌  
-**重构后**: 4个模块化组件，总计 ~350 行 ✅
+| 属性 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| modelValue | IFilterValue | 是 | - | 筛选参数对象 |
+| categories | ICategory[] | 否 | [] | 分类列表 |
+| brands | IBrand[] | 是 | - | 品牌列表 |
 
-### 重构收益
-- ✅ **代码可读性提升**: 每个子组件职责单一，易于理解
-- ✅ **可维护性增强**: 独立开发和测试各个筛选功能
-- ✅ **复用性提高**: 排序、价格、品牌组件可独立复用
-- ✅ **协作效率**: 多人可并行开发不同筛选模块
+### IFilterValue 接口
 
----
-
-## 📦 组件说明
-
-### ItemFilter.vue（主容器）
-**行数**: ~130 行  
-**职责**: 协调子组件，管理整体筛选状态
-
-**Props**:
 ```typescript
 interface IFilterValue {
+  categoryId?: string | number
   brandId: string | number | (string | number)[]
   sort: string
   startPrice?: number
   endPrice?: number
 }
-
-{
-  modelValue: IFilterValue
-  brands: IBrand[]
-}
 ```
 
-**Events**:
+### ICategory 接口
+
 ```typescript
-{
-  'update:modelValue': [value: IFilterValue]
-  'change': []
+interface ICategory {
+  id: string | number
+  name: string
 }
 ```
 
-**使用示例**:
-```vue
-<template>
-  <ItemFilter
-    v-model="filterValue"
-    :brands="brandList"
-    @change="handleFilterChange"
-  />
-</template>
+## Events
 
-<script setup>
-const filterValue = ref({
-  brandId: [],
-  sort: 'default',
-  startPrice: undefined,
-  endPrice: undefined
-})
-</script>
-```
+| 事件名 | 参数 | 说明 |
+|--------|------|------|
+| update:modelValue | IFilterValue | 筛选参数更新时触发 |
+| change | - | 筛选条件变化时触发（需要重新加载数据） |
 
----
+## 子组件
 
-### FilterSortSection.vue（排序区域）
-**行数**: ~110 行  
-**职责**: 提供综合、销量、评论数、价格排序功能
+### FilterCategorySection
+- 分类筛选组件（横向布局）
+- 支持单选
+- 选中状态高亮显示
 
-**Props**:
-```typescript
-{
-  currentSort: string
-}
-```
+### FilterBrandSection
+- 品牌筛选组件（横向布局）
+- 支持多选
+- 默认显示前 8 个品牌
+- 提供"更多"弹窗显示所有品牌
+- 选中品牌带 ✓ 标记
 
-**Events**:
-```typescript
-{
-  'update:sort': [value: string]
-}
-```
+### FilterSortSection
+- 排序选项组件
+- 支持默认、销量、价格等排序方式
 
-**支持的排序值**:
-- `default` - 综合排序
-- `sales_desc` - 销量降序
-- `rating_desc` - 评论数降序
-- `price_asc` - 价格升序
-- `price_desc` - 价格降序
+### FilterPriceRange
+- 价格区间筛选组件
+- 支持自定义起始和结束价格
 
----
+### FilterBrandSelect
+- 品牌下拉选择器（备用）
+- 弹窗式多选
 
-### FilterPriceRange.vue（价格区间）
-**行数**: ~180 行  
-**职责**: 提供自定义价格输入和快捷价格区间选择
+## 样式说明
 
-**Props**:
-```typescript
-{
-  startPrice?: number
-  endPrice?: number
-}
-```
+- 使用 Tailwind CSS 进行样式设计
+- 支持响应式布局
+- 主筛选区域和次筛选区域用边框分隔
+- 选中状态使用红色主题色（bg-red-50, text-red-600）
+- 鼠标悬停时显示灰色背景（hover:bg-gray-50）
 
-**Events**:
-```typescript
-{
-  'update:startPrice': [value: number | undefined]
-  'update:endPrice': [value: number | undefined]
-  'change': []
-}
-```
+## 示例页面
 
-**快捷价格区间**:
-- 0 - 128 (9%的选择)
-- 128 - 258 (32%的选择)
-- 258 - 3898 (40%的选择)
-- 3898 - 5198 (14%的选择)
+参考 `app/pages/collections/[id].vue` 查看完整的使用示例。
 
----
+## 注意事项
 
-### FilterBrandSelect.vue（品牌筛选）
-**行数**: ~90 行  
-**职责**: 提供品牌多选功能
-
-**Props**:
-```typescript
-{
-  brands: IBrand[]
-  selectedBrandIds: (string | number)[]
-}
-```
-
-**Events**:
-```typescript
-{
-  'update:selectedBrandIds': [value: (string | number)[]]
-  'change': []
-}
-```
-
-**注意**: 品牌多选功能需要集成 `UCheckbox` 组件（待完善）
-
----
-
-## 🔄 数据流
-
-```
-用户操作
-  ↓
-子组件事件（update:xxx）
-  ↓
-主容器处理（handleXxxUpdate）
-  ↓
-更新 modelValue
-  ↓
-触发 change 事件
-  ↓
-父组件响应（如：重新加载商品列表）
-```
-
----
-
-## 💡 设计原则
-
-### 1. 单一职责
-每个子组件只负责一个筛选维度：
-- `FilterSortSection` → 排序
-- `FilterPriceRange` → 价格
-- `FilterBrandSelect` → 品牌
-
-### 2. 双向绑定
-使用 `v-model` + 自定义事件实现双向绑定：
-```vue
-<!-- 主容器 -->
-<FilterPriceRange
-  :start-price="modelValue.startPrice"
-  :end-price="modelValue.endPrice"
-  @update:start-price="handleStartPriceUpdate"
-  @update:end-price="handleEndPriceUpdate"
-/>
-```
-
-### 3. 状态提升
-筛选状态统一由主容器管理，子组件无状态（或仅有临时状态）
-
-### 4. 事件聚合
-子组件只负责更新自己的数据，主容器负责触发 `change` 事件
-
----
-
-## 🧪 测试建议
-
-### 单元测试
-1. 测试每个子组件的独立功能
-2. 测试主容器的事件协调逻辑
-3. 测试边界情况（空品牌、无效价格等）
-
-### 集成测试
-1. 测试多个筛选条件组合
-2. 测试快速切换筛选条件
-3. 测试重置功能
-
----
-
-## 📝 待办事项
-
-- [ ] 完善品牌筛选的 Checkbox 集成
-- [ ] 添加更多快捷价格区间选项（动态生成）
-- [ ] 支持分类筛选
-- [ ] 支持属性筛选（如：颜色、尺寸等）
-- [ ] 添加筛选条件清除功能
-- [ ] 添加筛选历史记录
-
----
-
-**重构日期**: 2025-11-06  
-**重构人员**: AI Assistant  
-**原组件行数**: 443 行  
-**重构后总行数**: ~350 行（4个文件）  
-**文档版本**: 1.0
-
+1. **URL 同步**：建议将筛选参数同步到 URL 查询参数，便于分享和 SEO
+2. **防抖处理**：筛选条件变化时建议使用防抖（300ms）避免频繁请求
+3. **SSR 支持**：确保筛选参数可以从 URL 恢复，支持服务端渲染
+4. **动态标题**：建议根据筛选条件动态更新页面标题
+5. **品牌数量**：`FilterBrandSection` 默认显示前 8 个品牌，可通过 `maxDisplay` prop 调整

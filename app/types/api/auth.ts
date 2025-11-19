@@ -12,9 +12,9 @@ export interface ILoginRequest {
   /** 密码 */
   password: string
   /** 图形验证码 */
-  captcha: string
+  captcha?: string
   /** 图形验证码 key */
-  captchaKey: string
+  captchaKey?: string
 }
 
 /**
@@ -68,25 +68,13 @@ export interface ICaptchaResponse {
  */
 export interface IUserInfo {
   /** 用户 ID */
-  id: string | number
+  user_id: string | number
   /** 用户名 */
-  username: string
-  /** 昵称 */
-  nickname?: string
+  username?: string
   /** 手机号 */
-  phone?: string
-  /** 邮箱 */
-  email?: string
+  mobile: string
   /** 头像 */
   avatar?: string
-  /** 性别 */
-  gender?: 'male' | 'female' | 'unknown'
-  /** 状态 */
-  status?: 'active' | 'inactive' | 'banned'
-  /** 创建时间 */
-  createdAt?: string
-  /** 更新时间 */
-  updatedAt?: string
 }
 
 /**
@@ -95,8 +83,6 @@ export interface IUserInfo {
 export interface ILoginResponse {
   /** JWT Token */
   token: string
-  /** 用户信息 */
-  userInfo: IUserInfo
   /** Token 过期时间（秒） */
   expiresIn?: number
   /** Refresh Token（可选） */
@@ -121,31 +107,13 @@ export interface ILogoutResponse {
   message?: string
 }
 
-/**
- * 通用 API 响应包装
- */
-export interface IApiResponse<T = any> {
-  /** 状态码 */
-  code: number
-  /** 提示信息 */
-  message: string
-  /** 响应数据 */
-  data: T
-  /** 是否成功 */
-  success?: boolean
-}
 
 /**
- * API 错误响应
+ * 获取用户信息响应
  */
-export interface IApiError {
-  /** 错误码 */
-  code: number
-  /** 错误信息 */
-  message: string
-  /** 详细错误信息（开发环境） */
-  details?: any
-  /** 错误堆栈（开发环境） */
-  stack?: string
+export interface IGetUserInfoResponse {
+  /** 用户信息 */
+  memberInfo: IUserInfo
 }
+
 

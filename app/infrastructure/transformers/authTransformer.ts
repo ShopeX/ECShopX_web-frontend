@@ -1,6 +1,7 @@
 import type {
   ILoginResponse,
   IUserInfo,
+  IGetUserInfoResponse,
   ISmsCodeResponse,
   ICaptchaResponse,
 } from '~/types/api/auth'
@@ -42,13 +43,17 @@ export class AuthTransformer {
     if (!apiResponse.token) {
       throw new Error('Invalid login response: missing token')
     }
-    if (!apiResponse.userInfo) {
-      throw new Error('Invalid login response: missing userInfo')
-    }
+
+    console.log('apiResponse',)
+
+
+    // if (!apiResponse?.userInfo) {
+    //   throw new Error('Invalid login response: missing userInfo')
+    // }
 
     return {
       token: apiResponse.token,
-      userInfo: this.toUserInfoModel(apiResponse.userInfo),
+      // userInfo: this.toUserInfoModel(apiResponse.userInfo),
       expiresIn: apiResponse.expiresIn || 7200,  // 默认 2 小时
       refreshToken: apiResponse.refreshToken || '',
     }
@@ -60,23 +65,17 @@ export class AuthTransformer {
    * @param apiUser - API 返回的用户信息
    * @returns 用户信息模型
    */
-  static toUserInfoModel(apiUser: IUserInfo): IUserInfo {
+  static toUserInfoModel(apiUser: IGetUserInfoResponse): IUserInfo {
     // 验证必需字段
-    if (!apiUser.id) {
+    if (!apiUser.memberInfo.user_id) {
       throw new Error('Invalid user info: missing id')
     }
 
     return {
-      id: apiUser.id,
-      username: apiUser.username || '',
-      nickname: apiUser.nickname || apiUser.username || '',
-      phone: apiUser.phone || '',
-      email: apiUser.email || '',
-      avatar: apiUser.avatar || this.getDefaultAvatar(),
-      gender: apiUser.gender || 'unknown',
-      status: apiUser.status || 'active',
-      createdAt: apiUser.createdAt || '',
-      updatedAt: apiUser.updatedAt || '',
+      user_id: apiUser.memberInfo.user_id,
+      username: apiUser.memberInfo.username || '',
+      mobile: apiUser.memberInfo.mobile || '',
+      avatar: apiUser.memberInfo.avatar || this.getDefaultAvatar(),
     }
   }
 
@@ -164,10 +163,10 @@ export class AuthTransformer {
   static sanitizeUserInfo(userInfo: IUserInfo): IUserInfo {
     // 移除可能的敏感信息（如果有）
     const sanitized = { ...userInfo }
-    
+
     // 这里可以根据实际需求移除敏感字段
     // 例如：delete sanitized.password
-    
+
     return sanitized
   }
 

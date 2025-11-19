@@ -90,21 +90,21 @@ export const useUserStore = defineStore('user', {
       try {
         // 调用登录 API
         const response = await authApiClient.login(params)
-        
+
         // 转换数据
         const loginData = AuthTransformer.toLoginModel(response)
 
         // 更新状态
         this.isLoggedIn = true
-        this.userInfo = loginData.userInfo
+        // this.userInfo = loginData.userInfo
         this.setToken(loginData.token, loginData.refreshToken)
 
         return { success: true, data: loginData }
       } catch (error: any) {
         console.error('Login error:', error)
-        return { 
-          success: false, 
-          error: error.message || '登录失败，请稍后重试' 
+        return {
+          success: false,
+          error: error.message || '登录失败，请稍后重试'
         }
       }
     },
@@ -116,7 +116,7 @@ export const useUserStore = defineStore('user', {
       try {
         // 调用手机登录 API
         const response = await authApiClient.loginWithPhone(params)
-        
+
         // 转换数据
         const loginData = AuthTransformer.toLoginModel(response)
 
@@ -128,9 +128,9 @@ export const useUserStore = defineStore('user', {
         return { success: true, data: loginData }
       } catch (error: any) {
         console.error('Phone login error:', error)
-        return { 
-          success: false, 
-          error: error.message || '登录失败，请稍后重试' 
+        return {
+          success: false,
+          error: error.message || '登录失败，请稍后重试'
         }
       }
     },
@@ -151,15 +151,15 @@ export const useUserStore = defineStore('user', {
         return { success: true }
       } catch (error: any) {
         console.error('Logout error:', error)
-        
+
         // 即使登出接口失败，也清除本地状态
         this.isLoggedIn = false
         this.userInfo = null
         this.setToken(null, null)
 
-        return { 
-          success: false, 
-          error: error.message || '登出失败' 
+        return {
+          success: false,
+          error: error.message || '登出失败'
         }
       }
     },
@@ -201,7 +201,7 @@ export const useUserStore = defineStore('user', {
 
         // 调用获取用户信息 API
         const response = await authApiClient.getUserInfo()
-        
+
         // 转换数据
         const userInfo = AuthTransformer.toUserInfoModel(response)
 
@@ -212,15 +212,15 @@ export const useUserStore = defineStore('user', {
         return { success: true, data: userInfo }
       } catch (error: any) {
         console.error('Fetch user info error:', error)
-        
+
         // 获取用户信息失败，可能 Token 失效
         this.isLoggedIn = false
         this.userInfo = null
         this.setToken(null, null)
 
-        return { 
-          success: false, 
-          error: error.message || '获取用户信息失败' 
+        return {
+          success: false,
+          error: error.message || '获取用户信息失败'
         }
       }
     },
@@ -236,7 +236,7 @@ export const useUserStore = defineStore('user', {
 
         // 调用刷新 Token API
         const response = await authApiClient.refreshToken(this.refreshToken)
-        
+
         // 转换数据
         const loginData = AuthTransformer.toLoginModel(response)
 
@@ -246,15 +246,15 @@ export const useUserStore = defineStore('user', {
         return { success: true }
       } catch (error: any) {
         console.error('Refresh token error:', error)
-        
+
         // 刷新失败，清除登录状态
         this.isLoggedIn = false
         this.userInfo = null
         this.setToken(null, null)
 
-        return { 
-          success: false, 
-          error: error.message || '刷新令牌失败' 
+        return {
+          success: false,
+          error: error.message || '刷新令牌失败'
         }
       }
     }

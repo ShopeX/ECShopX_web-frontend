@@ -38,7 +38,9 @@
       <form @submit.prevent="handleAccountLogin" class="space-y-4">
         <!-- Email 输入框 -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">账号</label>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">{{
+            $t('logon.email')
+          }}</label>
           <input
             id="email"
             v-model="accountForm.username"
@@ -50,9 +52,9 @@
 
         <!-- Password 输入框 -->
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1"
-            >登录密码</label
-          >
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">{{
+            $t('logon.password')
+          }}</label>
           <div class="relative">
             <input
               id="password"
@@ -76,12 +78,12 @@
 
         <!-- 忘记密码 -->
         <div class="text-sm">
-          <span class="text-gray-600">Forgot password? </span>
+          <span class="text-gray-600">{{ $t('app.pages.account.login.forgetPassword') }} </span>
           <NuxtLink
             to="/forgot-password"
             class="text-blue-600 hover:text-blue-700 hover:underline font-medium"
           >
-            Reset password
+            {{ $t('app.pages.account.login.logonforgotpassword') }}
           </NuxtLink>
         </div>
 

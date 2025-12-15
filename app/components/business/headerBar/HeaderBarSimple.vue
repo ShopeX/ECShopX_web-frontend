@@ -1,5 +1,5 @@
 <template>
-  <header class="sp-header-bar-simple w-full border-b border-gray-200">
+  <header class="section-widget sp-header-bar-simple w-full border-b border-gray-200">
     <div class="sp-main-nav bg-white">
       <div class="container mx-auto h-16 lg:h-20 flex items-center justify-between px-4 lg:px-6">
         <!-- Logo -->
@@ -8,29 +8,46 @@
         </NuxtLink>
 
         <!-- 中间导航菜单 -->
+        <!-- 中间导航菜单 -->
         <nav class="hidden lg:flex items-center space-x-8 text-sm font-medium">
-          <NuxtLink to="/collections/276" class="hover:text-gray-600 transition-colors">
-            肌肤护理
-          </NuxtLink>
-          <NuxtLink to="/collections/275" class="hover:text-gray-600 transition-colors">
-            美妆香氛
-          </NuxtLink>
-          <div class="relative group">
-            <button class="flex items-center space-x-1 hover:text-gray-600 transition-colors">
-              <span>时尚美妆</span>
-              <Icon name="heroicons:chevron-down-20-solid" class="w-4 h-4" />
-            </button>
+          <div v-for="nav in mainNavs" :key="nav.key" class="relative group">
+            <NuxtLink
+              :to="nav.path"
+              class="relative py-2 text-gray-700 hover:text-primary-500 transition-colors duration-300 block"
+            >
+              <span class="flex items-center gap-1">
+                {{ nav.label }}
+                <Icon
+                  v-if="nav.children?.length"
+                  name="heroicons:chevron-down"
+                  class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180"
+                />
+              </span>
+              <!-- Hover Line Animation -->
+              <span
+                class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"
+              ></span>
+            </NuxtLink>
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="nav.children?.length"
+              class="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-40 hidden group-hover:block z-50"
+            >
+              <div
+                class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden py-2 animate-slide-up"
+              >
+                <NuxtLink
+                  v-for="child in nav.children"
+                  :key="child.key"
+                  :to="child.path"
+                  class="block px-4 py-2 text-sm text-gray-600 hover:bg-primary-50 hover:text-primary-500 transition-colors"
+                >
+                  {{ child.label }}
+                </NuxtLink>
+              </div>
+            </div>
           </div>
-          <NuxtLink to="/pajamas" class="hover:text-gray-600 transition-colors">
-            面部护理
-          </NuxtLink>
-          <NuxtLink to="/bags" class="hover:text-gray-600 transition-colors"> 防晒隔离 </NuxtLink>
-          <NuxtLink to="/shoes" class="hover:text-gray-600 transition-colors"> 香水 </NuxtLink>
-          <NuxtLink to="/accessories" class="hover:text-gray-600 transition-colors">
-            眼部护理
-          </NuxtLink>
-          <NuxtLink to="/jewelry" class="hover:text-gray-600 transition-colors"> 唇妆 </NuxtLink>
-          <NuxtLink to="/blog" class="hover:text-gray-600 transition-colors"> 积分商城 </NuxtLink>
         </nav>
 
         <!-- 右侧图标 -->
@@ -38,10 +55,18 @@
           <button class="hover:text-gray-600 transition-colors" aria-label="Search">
             <Icon name="heroicons:magnifying-glass" class="w-5 h-5" />
           </button>
-          <button class="hover:text-gray-600 transition-colors" aria-label="Shopping Cart">
+          <button
+            class="hover:text-gray-600 transition-colors"
+            aria-label="Shopping Cart"
+            @click="handleCartClick"
+          >
             <Icon name="heroicons:shopping-bag" class="w-5 h-5" />
           </button>
-          <button class="hover:text-gray-600 transition-colors" aria-label="User Account">
+          <button
+            class="hover:text-gray-600 transition-colors"
+            aria-label="User Account"
+            @click="handleUserClick"
+          >
             <Icon name="heroicons:user" class="w-5 h-5" />
           </button>
         </div>
@@ -56,4 +81,45 @@
  * 用于登录、注册等简单页面的头部
  * 包含 Logo、导航菜单和功能图标
  */
+import { useUserStore } from '~/stores/user'
+
+const router = useRouter()
+const userStore = useUserStore()
+
+// 主导航
+const mainNavs = [
+  { key: 'skin-care', label: '肌肤护理', path: '/collections/skin-care' },
+  { key: 'beauty-fragrance', label: '美妆香氛', path: '/collections/beauty-fragrance' },
+  {
+    key: 'fashion-beauty',
+    label: '时尚美妆',
+    path: '/collections/fashion-beauty',
+    children: [
+      { key: 'skincare', label: '面部护理', path: '/collections/fashion-beauty/skincare' },
+      { key: 'makeup', label: '彩妆香氛', path: '/collections/fashion-beauty/makeup' },
+      { key: 'perfume', label: '大牌香水', path: '/collections/fashion-beauty/perfume' },
+    ],
+  },
+  { key: 'face-care', label: '面部护理', path: '/collections/face-care' },
+  { key: 'sun-protection', label: '防晒隔离', path: '/collections/sun-protection' },
+  { key: 'perfume', label: '香水', path: '/collections/perfume' },
+  { key: 'eye-care', label: '眼部护理', path: '/collections/eye-care' },
+  { key: 'lip-makeup', label: '唇妆', path: '/collections/lip-makeup' },
+  { key: 'points-mall', label: '积分商城', path: '/points-mall' },
+]
+
+const handleCartClick = () => {
+  router.push('/cart')
+}
+
+const handleUserClick = () => {
+  if (userStore.isLoggedIn) {
+    router.push('/member')
+  } else {
+    router.push({
+      path: '/account/login',
+      query: { redirect: '/member' },
+    })
+  }
+}
 </script>

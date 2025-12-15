@@ -1,0 +1,8 @@
+{
+  "app.pages.cart.index.cart": "cart",
+  "app.pages.cart.index.ordertotal": "ordertotal",
+  "app.pages.cart.index.checkout": "checkout",
+  "app.pages.cart.index.buybuy": "buybuy",
+  "app.pages.cart.index.fastbuy": "fastbuy",
+  "app.pages.account.login.forgetPassword": "forget the password?"
+}

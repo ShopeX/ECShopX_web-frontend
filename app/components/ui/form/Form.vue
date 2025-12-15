@@ -32,6 +32,7 @@ import { ref, reactive, watch, provide } from 'vue'
 import type { IFormSchema, IFormValidation } from './types'
 import { useFormValidation } from './composables/useFormValidation'
 import FormItem from './FormItem.vue'
+import { logger } from '~/utils/log'
 
 interface Props {
   /** 表单配置 Schema */
@@ -49,13 +50,13 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   labelWidth: '100px',
-  labelPosition: 'left'
+  labelPosition: 'left',
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: Record<string, any>]
-  'validate': [result: IFormValidation]
-  'submit': [value: Record<string, any>]
+  validate: [result: IFormValidation]
+  submit: [value: Record<string, any>]
 }>()
 
 // 使用表单验证 composable
@@ -82,21 +83,21 @@ watch(
 provide('formContext', {
   labelWidth: props.labelWidth,
   labelPosition: props.labelPosition,
-  disabled: props.disabled
+  disabled: props.disabled,
 })
 
 /**
  * 判断字段是否必填
  */
 function isRequired(item: IFormSchema): boolean {
-  return item.rules?.some(rule => rule.required) ?? false
+  return item.rules?.some((rule) => rule.required) ?? false
 }
 
 /**
  * 更新字段值
  */
 function updateField(name: string, value: any) {
-  console.log('Form updateField:', name, '=', value)
+  logger.info(`Form updateField: ${name} = ${value}`)
   const newValue = { ...props.modelValue, [name]: value }
   emit('update:modelValue', newValue)
 
@@ -126,10 +127,7 @@ async function validate(): Promise<boolean> {
   for (const item of props.schema) {
     if (item.hidden) continue
 
-    const error = await validateField(
-      props.modelValue[item.name],
-      item.rules
-    )
+    const error = await validateField(props.modelValue[item.name], item.rules)
 
     if (error) {
       newErrors[item.name] = error
@@ -137,7 +135,7 @@ async function validate(): Promise<boolean> {
   }
 
   // 更新错误信息
-  Object.keys(errors).forEach(key => delete errors[key])
+  Object.keys(errors).forEach((key) => delete errors[key])
   Object.assign(errors, newErrors)
 
   const valid = Object.keys(newErrors).length === 0
@@ -155,7 +153,7 @@ function resetFields() {
   emit('update:modelValue', { ...initialValues.value })
 
   // 清除所有错误信息
-  Object.keys(errors).forEach(key => delete errors[key])
+  Object.keys(errors).forEach((key) => delete errors[key])
 }
 
 /**
@@ -165,7 +163,7 @@ function clearValidate(name?: string) {
   if (name) {
     delete errors[name]
   } else {
-    Object.keys(errors).forEach(key => delete errors[key])
+    Object.keys(errors).forEach((key) => delete errors[key])
   }
 }
 
@@ -173,16 +171,16 @@ function clearValidate(name?: string) {
  * 处理表单提交
  */
 async function handleSubmit() {
-  console.log('Form handleSubmit 被调用')
-  console.log('表单数据:', props.modelValue)
+  logger.info('Form handleSubmit 被调用')
+  logger.info(`表单数据: ${props.modelValue}`)
   const valid = await validate()
-  console.log('表单验证结果:', valid)
-  console.log('验证错误:', errors)
+  logger.info(`表单验证结果: ${valid}`)
+  logger.info(`验证错误: ${errors}`)
   if (valid) {
-    console.log('表单验证通过，触发 submit 事件')
+    logger.info('表单验证通过，触发 submit 事件')
     emit('submit', props.modelValue)
   } else {
-    console.log('表单验证失败，不触发 submit 事件')
+    logger.info('表单验证失败，不触发 submit 事件')
   }
 }
 
@@ -190,6 +188,6 @@ async function handleSubmit() {
 defineExpose({
   validate,
   resetFields,
-  clearValidate
+  clearValidate,
 })
 </script>

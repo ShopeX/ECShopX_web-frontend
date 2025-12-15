@@ -12,6 +12,8 @@ interface CartUIState {
   lastUpdateTime: number | null
   /** 是否已初始化 */
   initialized: boolean
+  /** 购物车抽屉是否打开 */
+  isOpen: boolean
 }
 
 /**
@@ -40,6 +42,7 @@ export const useCartUIStore = defineStore('cart-ui', {
     actionLoading: {},
     lastUpdateTime: null,
     initialized: false,
+    isOpen: false,
   }),
 
   getters: {
@@ -118,7 +121,20 @@ export const useCartUIStore = defineStore('cart-ui', {
       this.actionLoading = {}
       this.lastUpdateTime = null
       this.initialized = false
+      this.isOpen = false
     },
+
+    open() {
+      this.isOpen = true
+    },
+
+    close() {
+      this.isOpen = false
+    },
+
+    toggle() {
+      this.isOpen = !this.isOpen
+    }
   },
 })
 

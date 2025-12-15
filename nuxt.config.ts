@@ -70,8 +70,38 @@ export default defineNuxtConfig({
       // 禁用 Google Fonts 的预获取
       fonts: false
     }],
-    '@pinia/nuxt'  // ✅ 添加 Pinia 模块
+    '@pinia/nuxt',  // ✅ 添加 Pinia 模块
+    '@nuxtjs/i18n'
   ],
+
+  i18n: {
+    lazy: true,
+    langDir: '../app/locales',
+    locales: [
+      {
+        code: 'en',
+        file: 'en-US.json',
+        name: 'English'
+      },
+      {
+        code: 'zh',
+        file: 'zh-CN.json',
+        name: '简体中文'
+      },
+      {
+        code: 'ar',
+        file: 'ar.json',
+        name: 'العربية'
+      }
+    ],
+    defaultLocale: 'zh',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+    }
+  },
 
   // CSS 配置
   css: [
@@ -88,7 +118,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
-      companyId: process.env.NUXT_PUBLIC_COMPANY_ID
+      companyId: process.env.NUXT_PUBLIC_COMPANY_ID,
+      businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c' // b2b 或 b2c
     }
   },
 
@@ -108,7 +139,8 @@ export default defineNuxtConfig({
         extensions: ['vue'],
         pattern: '**/*.vue', // 递归扫描所有子目录
         pathPrefix: false
-      }
+      },
+      '~/templateEngines'
     ]
   }
 })

@@ -3,31 +3,25 @@
 
 /* Tailwind CSS v4 主题配置 */
 @theme {
-  /* 风格自定义颜色 */
-  --color-jd-red-50: #fef2f2;
-  --color-jd-red-100: #fee2e2;
-  --color-jd-red-200: #fecaca;
-  --color-jd-red-300: #fca5a5;
-  --color-jd-red-400: #f87171;
-  --color-jd-red-500: #e53e3e;
-  /* 主红色 */
-  --color-jd-red-600: #dc2626;
-  --color-jd-red-700: #b91c1c;
-  --color-jd-red-800: #991b1b;
-  --color-jd-red-900: #7f1d1d;
-  --color-jd-red-950: #450a0a;
+  /* 自定义断点 */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 
-  --color-jd-blue-50: #e6f7ff;
-  --color-jd-blue-100: #bae7ff;
-  --color-jd-blue-200: #91d5ff;
-  --color-jd-blue-300: #69c0ff;
-  --color-jd-blue-400: #40a9ff;
-  --color-jd-blue-500: #1890ff;
-  --color-jd-blue-600: #096dd9;
-  --color-jd-blue-700: #0050b3;
-  --color-jd-blue-800: #003a8c;
-  --color-jd-blue-900: #002766;
-  --color-jd-blue-950: #001529;
+  /* 风格自定义颜色 - Purple #8253E6 */
+  --color-brand-50: #f3f0fc;
+  --color-brand-100: #e9e2f9;
+  --color-brand-200: #d4c5f4;
+  --color-brand-300: #bfa8ef;
+  --color-brand-400: #a98be9;
+  --color-brand-500: #8253e6; /* Base Color */
+  --color-brand-600: #754bcf;
+  --color-brand-700: #6842b8;
+  --color-brand-800: #5b3a1;
+  --color-brand-900: #4e328a;
+  --color-brand-950: #2d1d50;
 
   /* 风格的圆角 */
   --radius-jd: 4px;
@@ -38,7 +32,7 @@
   --shadow-jd: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-jd-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-jd-xl: 0 8px 16px rgba(0, 0, 0, 0.1);
-  --shadow-jd-red: 0 2px 4px rgba(229, 62, 62, 0.3);
+  --shadow-jd-brand: 0 2px 4px rgba(130, 83, 230, 0.3);
 
   /* 风格的字体大小 */
   --font-size-jd-xs: 12px;
@@ -72,19 +66,19 @@
 
 /* 风格主题色配置 - 用于 Nuxt UI */
 :root {
-  /* 红 - 主色调 */
-  --ui-primary: #e53e3e;
-  --ui-color-primary-50: #fef2f2;
-  --ui-color-primary-100: #fee2e2;
-  --ui-color-primary-200: #fecaca;
-  --ui-color-primary-300: #fca5a5;
-  --ui-color-primary-400: #f87171;
-  --ui-color-primary-500: #e53e3e;
-  --ui-color-primary-600: #dc2626;
-  --ui-color-primary-700: #b91c1c;
-  --ui-color-primary-800: #991b1b;
-  --ui-color-primary-900: #7f1d1d;
-  --ui-color-primary-950: #450a0a;
+  /* Purple - 主色调 */
+  --ui-primary: #8253e6;
+  --ui-color-primary-50: #f3f0fc;
+  --ui-color-primary-100: #e9e2f9;
+  --ui-color-primary-200: #d4c5f4;
+  --ui-color-primary-300: #bfa8ef;
+  --ui-color-primary-400: #a98be9;
+  --ui-color-primary-500: #8253e6;
+  --ui-color-primary-600: #754bcf;
+  --ui-color-primary-700: #6842b8;
+  --ui-color-primary-800: #5b3a1;
+  --ui-color-primary-900: #4e328a;
+  --ui-color-primary-950: #2d1d50;
 
   /* 特有的设计令牌 */
   --ui-bg: #ffffff;
@@ -99,7 +93,7 @@
 [data-variant='solid'][data-color='primary']:hover {
   background-color: var(--ui-color-primary-600) !important;
   color: white !important;
-  box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
+  box-shadow: 0 2px 4px rgba(130, 83, 230, 0.3);
 }
 
 [data-variant='ghost'][data-color='primary']:hover {
@@ -128,4 +122,19 @@
   background-color: var(--ui-color-neutral-500) !important;
   color: white !important;
   border-color: var(--ui-color-neutral-500) !important;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out forwards;
 }

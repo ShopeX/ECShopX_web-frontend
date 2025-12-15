@@ -3,7 +3,7 @@
     <!-- 页面标题 - 移动端优化 -->
     <div class="bg-white border-b border-gray-200">
       <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">全部商品</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">{{ $t('allProducts') }}</h1>
         <p class="mt-1 text-sm text-gray-600">发现您喜欢的商品</p>
       </div>
     </div>

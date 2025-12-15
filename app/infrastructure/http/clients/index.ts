@@ -24,4 +24,5 @@
 export { CartApiClient, cartApiClient } from './CartApiClient'
 export { ItemApiClient, itemApiClient } from './ItemApiClient'
 export { AuthApiClient, authApiClient } from './AuthApiClient'
+export { TemplateApiClient, templateApiClient } from './TemplateApiClient'
 

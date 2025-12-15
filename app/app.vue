@@ -3,10 +3,18 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <!-- <CartDrawer /> -->
   </UApp>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { logger } from '~/utils/log'
+const router = useRouter()
+
+onMounted(() => {
+  logger.info(router)
+})
+</script>
 
 <style>
 /* 防止 FOUC 的基础样式 */
@@ -44,10 +52,6 @@ body {
 /* 容器基础样式 */
 .container {
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 
 @media (min-width: 640px) {

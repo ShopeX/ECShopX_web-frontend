@@ -71,6 +71,22 @@ app/
 3. **类型导入**: 使用 `import type` 导入类型
 4. **泛型使用**: 合理使用泛型提高代码复用性
 
+### 日志规范
+
+1. **禁止使用原生日志**: 禁止使用 `console.log`、`console.warn`、`console.error` 等原生方法
+2. **使用封装的 logger**: 必须使用 `~/utils/log` 中封装的 `logger` 工具
+3. **日志级别**: 根据场景使用合适的日志级别
+   - `logger.debug()` - 调试信息
+   - `logger.info()` - 一般信息
+   - `logger.warn()` - 警告信息
+   - `logger.error()` - 错误信息
+4. **日志格式**: 使用清晰的前缀标识模块，格式：`[模块名] 日志内容`
+   ```typescript
+   logger.info('[useTemplate] Using API template: header')
+   logger.warn('[ProductCard] Image loading failed:', error)
+   logger.error('[HttpClient] Request failed:', error)
+   ```
+
 ### API 规范
 
 1. **接口定义**: 在 `types/api/` 目录下定义 API 接口类型
@@ -399,9 +415,11 @@ const LazyComponent = defineAsyncComponent(() => import('~/components/business/H
 
 ```vue
 <script setup lang="ts">
+import { logger } from '~/utils/log'
+
 // 错误处理
 const handleError = (error: Error) => {
-  console.error('组件错误:', error)
+  logger.error('[Component] 组件错误:', error)
   // 显示用户友好的错误信息
   showToast('操作失败，请重试')
 }
@@ -470,3 +488,5 @@ export const handleApiError = (error: any) => {
 - 2025-01-09: 添加风格主题色和 sp- 前缀组件规范
 - 2025-01-09: 完善组件开发最佳实践和性能优化规范
 - 2025-01-09: 添加错误处理规范和响应式设计规范
+- 2025-12-15: 添加日志规范，强制使用 logger 工具
+- 2025-12-15: 从 .cursorrules 迁移到 .cursor/rules/web-rule.mdc

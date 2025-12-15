@@ -1,3 +1,4 @@
+import { logger } from '~/utils/log'
 // import '~/assets/css/tailwind.scss'
 
 // ECSHOPX 应用主入口文件
@@ -41,12 +42,12 @@ export interface AppError {
 
 // 导出应用初始化函数
 export const initializeEcshopx = async () => {
-  console.log('🚀 ECSHOPX 应用启动中...')
+  logger.info('🚀 ECSHOPX 应用启动中...')
 
   // 在这里可以进行应用级别的初始化
   // 例如：主题设置、全局配置等
 
-  console.log('✅ ECSHOPX 应用启动完成')
+  logger.info('✅ ECSHOPX 应用启动完成')
 }
 
 // 默认导出应用配置

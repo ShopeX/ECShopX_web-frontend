@@ -1,0 +1,8 @@
+{
+  "app.pages.cart.index.cart": "购物车",
+  "app.pages.cart.index.ordertotal": "订单总数",
+  "app.pages.cart.index.checkout": "查看",
+  "app.pages.cart.index.buybuy": "买买",
+  "app.pages.cart.index.fastbuy": "立即购买",
+  "app.pages.account.login.forgetPassword": "忘记密码?"
+}

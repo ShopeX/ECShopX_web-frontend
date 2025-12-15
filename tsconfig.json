@@ -14,23 +14,12 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
-      "~/*": [
-        "./app/*"
-      ],
-      "@/*": [
-        "./app/*"
-      ],
-      "#imports": [
-        "./.nuxt/types/imports"
-      ]
+      "~/*": ["./app/*"],
+      "@/*": ["./app/*"],
+      "#imports": ["./.nuxt/types/imports"]
     }
   },
-  "include": [
-    "./.nuxt/nuxt.d.ts",
-    "./app/**/*"
-  ]
+  "include": ["./.nuxt/nuxt.d.ts", "./app/**/*", "app/templateEngines/TemplateEngine.vue"]
 }

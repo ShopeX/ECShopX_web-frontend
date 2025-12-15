@@ -1,5 +1,6 @@
 // 应用启动插件 - 使用 app/index.ts 中的配置
 import { initializeEcshopx, APP_CONFIG, CONSTANTS } from '~/index'
+import { logger } from '~/utils/log'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   // 使用应用入口文件中的初始化函数
@@ -11,5 +12,5 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
   // 设置全局属性
 
-  console.log(`📱 ${APP_CONFIG.name} v${APP_CONFIG.version} 已启动`)
+  logger.info(`📱 ${APP_CONFIG.name} v${APP_CONFIG.version} 已启动`)
 })

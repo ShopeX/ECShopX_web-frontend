@@ -29,6 +29,7 @@
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@nuxtjs/i18n": "^10.2.1",
     "@tailwindcss/postcss": "^4.1.16",
     "@types/node": "^20.11.24",
     "autoprefixer": "^10.4.21",

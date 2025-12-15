@@ -1,103 +1,91 @@
 <template>
   <div class="min-h-screen bg-gray-50">
+    <!-- 集合封面头部 -->
+    <img src="~/assets/images/banners/banner.png" class="w-full object-cover" />
+
     <!-- 页面标题 - 移动端优化 -->
-    <div class="bg-white">
+    <!-- <div class="bg-white">
       <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <h1 class="text-xl sm:text-2xl font-bold text-gray-900">全部商品</h1>
         <p class="mt-1 text-sm text-gray-600">发现您喜欢的商品</p>
       </div>
-    </div>
+    </div> -->
 
     <!-- 筛选器 -->
-    <ItemFilter
-      v-model="filterParams"
-      :categories="categories"
-      :brands="brands"
+    <ProductFilter
+      v-model="productFilterValue"
+      :filter-groups="filterGroups"
+      :show-filter-panel="showFilterPanel"
+      @update:show-filter-panel="showFilterPanel = $event"
       @change="handleFilterChange"
     />
 
     <!-- 主内容区域 - 响应式容器 -->
-    <div class="container bg-white mx-auto px-4 sm:px-6 py-4 sm:py-6">
-      <!-- 加载状态 -->
-      <div v-if="pending && !products.length" class="flex justify-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-      </div>
-
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="text-center py-12">
-        <div class="text-gray-500 mb-4">
-          <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.694-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
+    <!-- 商品展示区域 -->
+    <div class="bg-white pb-8 flex justify-center">
+      <div class="w-full">
+        <!-- 加载状态 -->
+        <div v-if="pending && !products.length" class="flex justify-center py-12">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">加载失败</h3>
-        <p class="text-gray-600 mb-4">{{ error.message || '网络错误，请稍后重试' }}</p>
-        <UButton @click="refresh()">重新加载</UButton>
-      </div>
 
-      <!-- 空状态 -->
-      <div v-else-if="!products.length && !pending" class="text-center py-12">
-        <div class="text-gray-400 mb-4">
-          <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">暂无商品</h3>
-        <p class="text-gray-600">请尝试调整筛选条件</p>
-      </div>
-
-      <!-- 商品网格 -->
-      <div v-else>
-        <!-- 结果统计 - 移动端优化 -->
-        <div class="flex items-center justify-between mb-4 sm:mb-6">
-          <p class="text-xs sm:text-sm text-gray-600">
-            共找到 <span class="font-medium">{{ pagination.total }}</span> 件商品
-          </p>
-          <!-- 移动端视图切换按钮（未来扩展） -->
-          <div class="hidden sm:block text-xs text-gray-500">
-            {{ products.length }} / {{ pagination.total }}
+        <!-- 错误状态 -->
+        <div v-else-if="error" class="text-center py-12">
+          <div class="text-gray-500 mb-4">
+            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.694-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
           </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">加载失败</h3>
+          <p class="text-gray-600 mb-4">{{ error.message || '网络错误，请稍后重试' }}</p>
+          <UButton @click="refresh()">重新加载</UButton>
         </div>
 
-        <!-- 商品网格布局 - 响应式优化 -->
-        <div
-          class="grid gap-3 sm:gap-4 mb-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7"
-        >
-          <ProductCard
-            v-for="product in products"
-            :key="product.itemId"
-            :product="product"
-            loading="lazy"
-            class="w-full"
-          />
+        <!-- 空状态 -->
+        <div v-else-if="!products.length && !pending" class="text-center py-12">
+          <div class="text-gray-400 mb-4">
+            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+              />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">暂无商品</h3>
+          <p class="text-gray-600">请尝试调整筛选条件</p>
         </div>
 
-        <!-- 加载更多按钮 - 移动端优化 -->
-        <div v-if="hasMore" class="text-center px-4">
-          <UButton
-            :loading="loadingMore"
-            @click="loadMore"
-            variant="outline"
-            size="lg"
-            class="w-full sm:w-auto min-w-[200px]"
-          >
-            {{ loadingMore ? '加载中...' : '加载更多' }}
-          </UButton>
-        </div>
+        <!-- 商品展示 -->
+        <div v-else>
+          <!-- 商品网格布局 - 固定宽度居中布局 -->
+          <div class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5">
+            <LazyProductCard
+              v-for="product in products"
+              :key="product.itemId"
+              :product="product"
+              loading="lazy"
+            />
+          </div>
 
-        <!-- 没有更多数据提示 -->
-        <div v-else-if="products.length > 0" class="text-center py-4 sm:py-6">
-          <p class="text-gray-500 text-xs sm:text-sm">已显示全部商品</p>
+          <!-- 加载更多触发器（滚动到此处自动加载） -->
+          <div v-if="hasMore" ref="loadMoreTrigger" class="text-center pt-8 pb-4">
+            <div v-if="loadingMore" class="flex items-center justify-center gap-2">
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
+              <span class="text-gray-500 text-sm">加载中...</span>
+            </div>
+          </div>
+
+          <!-- 到底了提示 -->
+          <div v-else-if="products.length > 0" class="text-center pt-8 pb-4">
+            <p class="text-gray-400 text-sm">— 到底了 —</p>
+          </div>
         </div>
       </div>
     </div>
@@ -108,9 +96,11 @@
 import type { IProduct } from '~/components/business/product/ProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
 import type { ICategory } from '~/components/business/product/ItemFilter/ItemFilter.vue'
+import type { IProductFilterValue, IFilterGroup } from '~/components/business/product/ProductFilter'
+import { ESortOption } from '~/components/business/product/ProductFilter'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 
 // SEO 元数据配置
 useSeoMeta({
@@ -147,7 +137,7 @@ const categories = ref<ICategory[]>([
 // 品牌列表状态
 const brands = ref<IBrand[]>([])
 
-// 筛选参数状态
+// 原筛选参数状态 (保留用于 API 调用)
 const filterParams = ref({
   categoryId: undefined as string | number | undefined,
   brandId: '',
@@ -155,6 +145,109 @@ const filterParams = ref({
   startPrice: undefined as number | undefined,
   endPrice: undefined as number | undefined,
 })
+
+// ProductFilter 组件筛选值
+const productFilterValue = ref<IProductFilterValue>({
+  category: undefined,
+  series: [],
+  colors: [],
+  materials: [],
+  sizes: [],
+  priceRange: undefined,
+  sort: ESortOption.DEFAULT,
+})
+
+// 控制筛选面板显示
+const showFilterPanel = ref(false)
+
+// ProductFilter 筛选组配置
+const filterGroups = computed<IFilterGroup[]>(() => [
+  {
+    key: 'category',
+    label: '分类',
+    multiple: false,
+    options: categories.value.map((cat) => ({
+      id: cat.id,
+      label: cat.name,
+      value: cat.id,
+    })),
+  },
+  {
+    key: 'series',
+    label: '系列',
+    multiple: true,
+    options: [
+      { id: '1', label: '经典系列', value: '1' },
+      { id: '2', label: '时尚系列', value: '2' },
+      { id: '3', label: '运动系列', value: '3' },
+    ],
+  },
+  {
+    key: 'colors',
+    label: '颜色',
+    multiple: true,
+    options: [
+      { id: '1', label: '黑色', value: 'black' },
+      { id: '2', label: '白色', value: 'white' },
+      { id: '3', label: '灰色', value: 'gray' },
+      { id: '4', label: '棕色', value: 'brown' },
+    ],
+  },
+  {
+    key: 'materials',
+    label: '材质',
+    multiple: true,
+    options: [
+      { id: '1', label: '皮革', value: 'leather' },
+      { id: '2', label: '帆布', value: 'canvas' },
+      { id: '3', label: '尼龙', value: 'nylon' },
+    ],
+  },
+  {
+    key: 'sizes',
+    label: '尺寸',
+    multiple: true,
+    options: [
+      { id: '1', label: '小号', value: 'S' },
+      { id: '2', label: '中号', value: 'M' },
+      { id: '3', label: '大号', value: 'L' },
+    ],
+  },
+  {
+    key: 'priceRange',
+    label: '价格区间',
+    multiple: false,
+    options: [
+      { id: '1', label: '¥500及以下', value: '0-500' },
+      { id: '2', label: '¥500-¥1000', value: '500-1000' },
+      { id: '3', label: '¥1000-¥3000', value: '1000-3000' },
+      { id: '4', label: '¥3000-¥5000', value: '3000-5000' },
+      { id: '5', label: '¥5000-¥10000', value: '5000-10000' },
+      { id: '6', label: '¥10000以上', value: '10000-' },
+    ],
+  },
+])
+
+// 监听 ProductFilter 变化，同步到 filterParams
+watch(
+  productFilterValue,
+  (newValue) => {
+    filterParams.value.categoryId = newValue.category
+    filterParams.value.sort = newValue.sort || 'default'
+
+    // 处理价格区间
+    if (newValue.priceRange) {
+      const priceRange = newValue.priceRange.toString()
+      const [start, end] = priceRange.split('-')
+      filterParams.value.startPrice = start ? Number(start) : undefined
+      filterParams.value.endPrice = end ? Number(end) : undefined
+    } else {
+      filterParams.value.startPrice = undefined
+      filterParams.value.endPrice = undefined
+    }
+  },
+  { deep: true }
+)
 
 // 构建 API 参数
 const buildApiParams = (page: number, pageSize: number): IItemListParams => {
@@ -409,8 +502,28 @@ if (initialData.value) {
 pending.value = initialPending.value
 error.value = initialError.value as Error | null
 
-// 初始化数据
+// 滚动加载触发器
+const loadMoreTrigger = ref<HTMLElement | null>(null)
+
+// 初始化数据和无限滚动
 onMounted(async () => {
+  // 设置无限滚动
+  if (loadMoreTrigger.value) {
+    useIntersectionObserver(
+      loadMoreTrigger,
+      (entries) => {
+        const entry = entries[0]
+        // 当触发器进入视口且还有更多数据且未在加载中时，自动加载
+        if (entry?.isIntersecting && hasMore.value && !loadingMore.value && !pending.value) {
+          loadMore()
+        }
+      },
+      {
+        rootMargin: '100px', // 提前100px开始加载
+      }
+    )
+  }
+
   // 如果SSR没有数据，则在客户端加载
   if (!products.value.length && !error.value) {
     // 如果还没有从SSR初始化筛选参数，则从URL恢复

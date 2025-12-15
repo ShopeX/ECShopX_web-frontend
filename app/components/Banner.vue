@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, toRefs } from 'vue'
 
 interface Banner {
   image: string
@@ -67,23 +67,11 @@ interface Banner {
 }
 
 // 模拟轮播图数据
-const banners = ref<Banner[]>([
-  {
-    image: '/images/banners/main-banner.png',
-    title: '华为 Vision 智慧屏 4',
-    link: '/product/1',
-  },
-  {
-    image: '/images/products/phones/pure-phone.png',
-    title: '华为 Mate 60 Pro',
-    link: '/product/2',
-  },
-  {
-    image: '/images/products/tablets/matebook.png',
-    title: '华为 MatePad Pro',
-    link: '/product/3',
-  },
-])
+const props = defineProps<{
+  banners: Banner[]
+}>()
+
+const { banners } = toRefs(props)
 
 const currentIndex = ref(0)
 const timer = ref<NodeJS.Timeout>()

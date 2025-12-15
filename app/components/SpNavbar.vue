@@ -6,12 +6,12 @@
       <div class="h-9 flex items-center justify-between text-sm text-gray-600">
         <div class="flex items-center space-x-6">
           <span>欢迎来到ECshopX商城！</span>
-          <NuxtLink v-if="!isLoggedIn" to="/account/login" class="hover:text-red-500">
+          <NuxtLink v-if="!isLoggedIn" to="/account/login" class="hover:text-primary-500">
             请登录
           </NuxtLink>
           <template v-else>
             <span>{{ userInfo.username }}</span>
-            <button class="hover:text-red-500" @click="handleLogout">退出</button>
+            <button class="hover:text-primary-500" @click="handleLogout">退出</button>
           </template>
         </div>
         <div class="flex items-center space-x-6">
@@ -19,7 +19,7 @@
             v-for="item in topMenus"
             :key="item.key"
             :to="item.path"
-            class="hover:text-red-500"
+            class="hover:text-primary-500"
           >
             {{ item.label }}
           </NuxtLink>
@@ -40,11 +40,11 @@
               v-model="searchKeyword"
               type="text"
               placeholder="搜索商品"
-              class="w-full h-10 pl-4 pr-12 rounded-sm border border-red-500 focus:outline-none"
+              class="w-full h-10 pl-4 pr-12 rounded-sm border border-primary-500 focus:outline-none"
               @keyup.enter="handleSearch"
             />
             <button
-              class="absolute right-0 top-0 h-10 w-16 bg-red-500 text-white rounded-r-sm hover:bg-red-600"
+              class="absolute right-0 top-0 h-10 w-16 bg-primary-500 text-white rounded-r-sm hover:bg-primary-600"
               @click="handleSearch"
             >
               搜索
@@ -57,7 +57,7 @@
               v-for="(keyword, index) in hotKeywords"
               :key="keyword"
               href="#"
-              class="hover:text-red-500 ml-2"
+              class="hover:text-primary-500 ml-2"
               @click.prevent="
                 searchKeyword = keyword
                 handleSearch()
@@ -74,7 +74,7 @@
             v-for="item in userActions"
             :key="item.key"
             :to="item.path"
-            class="flex flex-col items-center hover:text-red-500"
+            class="flex flex-col items-center hover:text-primary-500"
           >
             <span class="text-2xl">
               <Icon :name="item.icon" />
@@ -87,7 +87,7 @@
       <!-- 分类导航 -->
       <div class="h-10 flex items-center space-x-8">
         <div class="relative group">
-          <button class="flex items-center space-x-2 h-10 px-6 bg-red-500 text-white">
+          <button class="flex items-center space-x-2 h-10 px-6 bg-primary-500 text-white">
             <span>全部商品分类</span>
             <Icon name="heroicons:chevron-down" />
           </button>
@@ -124,14 +124,46 @@
             </div>
           </div>
         </div>
-        <NuxtLink
-          v-for="nav in mainNavs"
-          :key="nav.key"
-          :to="nav.path"
-          class="text-gray-700 hover:text-red-500"
-        >
-          {{ nav.label }}
-        </NuxtLink>
+        <div class="flex items-center space-x-8">
+          <div
+            v-for="nav in mainNavs"
+            :key="nav.key"
+            class="relative group"
+          >
+            <NuxtLink
+              :to="nav.path"
+              class="relative py-2 text-gray-700 hover:text-primary-500 transition-colors duration-300"
+            >
+              <span class="flex items-center gap-1">
+                {{ nav.label }}
+                <Icon
+                  v-if="nav.children?.length"
+                  name="heroicons:chevron-down"
+                  class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180"
+                />
+              </span>
+              <!-- Hover Line Animation -->
+              <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"></span>
+            </NuxtLink>
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="nav.children?.length"
+              class="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-40 hidden group-hover:block z-50"
+            >
+              <div class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden py-2 animate-slide-up">
+                <NuxtLink
+                  v-for="child in nav.children"
+                  :key="child.key"
+                  :to="child.path"
+                  class="block px-4 py-2 text-sm text-gray-600 hover:bg-primary-50 hover:text-primary-500 transition-colors"
+                >
+                  {{ child.label }}
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -167,10 +199,24 @@ const userActions = [
 
 // 主导航
 const mainNavs = [
-  { key: 'home', label: '首页', path: '/' },
-  { key: 'new', label: '新品', path: '/new' },
-  { key: 'hot', label: '热卖', path: '/hot' },
-  { key: 'promotion', label: '促销', path: '/promotion' },
+  { key: 'skin-care', label: '肌肤护理', path: '/category/skin-care' },
+  { key: 'beauty-fragrance', label: '美妆香氛', path: '/category/beauty-fragrance' },
+  { 
+    key: 'fashion-beauty', 
+    label: '时尚美妆', 
+    path: '/category/fashion-beauty',
+    children: [
+      { key: 'skincare', label: '面部护理', path: '/category/fashion-beauty/skincare' },
+      { key: 'makeup', label: '彩妆香氛', path: '/category/fashion-beauty/makeup' },
+      { key: 'perfume', label: '大牌香水', path: '/category/fashion-beauty/perfume' },
+    ]
+  },
+  { key: 'face-care', label: '面部护理', path: '/category/face-care' },
+  { key: 'sun-protection', label: '防晒隔离', path: '/category/sun-protection' },
+  { key: 'perfume', label: '香水', path: '/category/perfume' },
+  { key: 'eye-care', label: '眼部护理', path: '/category/eye-care' },
+  { key: 'lip-makeup', label: '唇妆', path: '/category/lip-makeup' },
+  { key: 'points-mall', label: '积分商城', path: '/points-mall' },
 ]
 
 // 分类数据

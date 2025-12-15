@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'red',      // 红
+      primary: 'brand',      // 品牌色 (Purple)
       secondary: 'blue',   // 辅助色
       success: 'green',    // 成功色
       warning: 'orange',   // 警告色

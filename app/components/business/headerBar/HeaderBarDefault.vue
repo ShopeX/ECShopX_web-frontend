@@ -298,7 +298,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useUserStore } from '~/stores/user'
+import { useCartStore } from '~/stores/cart'
 
 /**
  * SpHeaderBar 组件 Props
@@ -312,20 +314,23 @@ const props = withDefaults(defineProps<Props>(), {
   showHotKeywords: true,
 })
 
+const userStore = useUserStore()
+const cartStore = useCartStore()
+
 /**
  * 用户登录状态
  */
-const isLoggedIn = ref(false)
+const isLoggedIn = computed(() => userStore.isLoggedIn)
 
 /**
  * 用户信息
  */
-const userInfo = ref<{ username: string; isPlusVip?: boolean } | null>(null)
+const userInfo = computed(() => userStore.userInfo)
 
 /**
  * 购物车商品数量
  */
-const cartCount = ref(0)
+const cartCount = computed(() => cartStore.totalItems)
 
 /**
  * 搜索关键词
@@ -412,58 +417,10 @@ const toggleSearch = () => {
 
 /**
  * 组件挂载时初始化
- *
- * 说明：
- * - onMounted 只在客户端执行（SSR 期间不执行）
- * - 但为了安全，仍然添加 import.meta.client 检查
- * - 动态导入确保不会在编译时引入 Pinia
  */
 onMounted(async () => {
-  // 双重保护：onMounted + import.meta.client
-  if (import.meta.client) {
-    try {
-      // 动态导入，避免 SSR 时的初始化问题
-      const { useUserStore } = await import('~/stores/user')
-      const { useCart } = await import('~/composables/useCart')
-
-      const userStore = useUserStore()
-      const cart = useCart()
-
-      // 初始化用户状态
-      await userStore.initUserState()
-      isLoggedIn.value = userStore.isLoggedIn
-      userInfo.value = userStore.userInfo
-
-      // 初始化购物车（使用轻量级 DDD 架构）
-      await cart.loadCart()
-      cartCount.value = cart.cartUI.value.itemCount
-
-      // 监听 store 变化，同步到本地 ref
-      watch(
-        () => userStore.isLoggedIn,
-        (val) => {
-          isLoggedIn.value = val
-        }
-      )
-
-      watch(
-        () => userStore.userInfo,
-        (val) => {
-          userInfo.value = val
-        }
-      )
-
-      // 监听购物车数量变化（使用 DDD 架构）
-      watch(
-        () => cart.cartUI.value.itemCount,
-        (val) => {
-          cartCount.value = val
-        }
-      )
-    } catch (error) {
-      console.error('初始化用户状态或购物车失败:', error)
-    }
-  }
+  // 注意：大部分初始化逻辑已移至 app/plugins/auth-init.ts
+  // 这里可以保留一些组件特有的加载逻辑，或者干脆留空
 })
 </script>
 

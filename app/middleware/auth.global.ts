@@ -1,13 +1,35 @@
 import { logger } from '~/utils/log'
+import { useUserStore } from '~/stores/user'
+
+// 需要登录才能访问的路由路径前缀
+const protectedRoutes = [
+  '/member',    // 个人中心
+  '/cart',      // 购物车（如果需要登录）
+  '/order',     // 订单
+  '/account/profile', // 个人信息
+]
+
 // 全局中间件 - 每个路由都会执行
 export default defineNuxtRouteMiddleware((to, from) => {
-  logger.info(`路由导航: ${from?.path || '/'} -> ${to.path}`)
+  logger.info(`[AuthMiddleware] 路由导航: ${from?.path || '/'} -> ${to.path}`)
 
-  // 在这里可以进行全局路由检查
-  // 例如：用户认证状态检查
+  // 检查是否是需要登录的路由
+  const requiresAuth = protectedRoutes.some(route => to.path.startsWith(route))
 
-  // 如果需要重定向，返回 navigateTo()
-  // if (!userAuthenticated && to.path !== '/login') {
-  //   return navigateTo('/login')
-  // }
+  if (requiresAuth) {
+    // 获取用户登录状态
+    const userStore = useUserStore()
+
+    // 如果未登录，重定向到登录页并携带当前路由
+    if (!userStore.isLoggedIn) {
+      logger.warn(`[AuthMiddleware] 未登录访问受保护路由: ${to.path}`)
+      
+      return navigateTo({
+        path: '/account/login',
+        query: {
+          redirect: to.fullPath
+        }
+      })
+    }
+  }
 })

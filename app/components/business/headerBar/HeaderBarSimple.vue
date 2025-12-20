@@ -19,7 +19,7 @@
                 {{ nav.label }}
                 <Icon
                   v-if="nav.children?.length"
-                  name="heroicons:chevron-down"
+                  name="i-heroicons-chevron-down"
                   class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180"
                 />
               </span>
@@ -53,21 +53,21 @@
         <!-- 右侧图标 -->
         <div class="flex items-center space-x-4 lg:space-x-6">
           <button class="hover:text-gray-600 transition-colors" aria-label="Search">
-            <Icon name="heroicons:magnifying-glass" class="w-5 h-5" />
+            <UIcon name="i-heroicons-magnifying-glass" class="w-5 h-5" />
           </button>
           <button
             class="hover:text-gray-600 transition-colors"
             aria-label="Shopping Cart"
             @click="handleCartClick"
           >
-            <Icon name="heroicons:shopping-bag" class="w-5 h-5" />
+            <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5" />
           </button>
           <button
             class="hover:text-gray-600 transition-colors"
             aria-label="User Account"
             @click="handleUserClick"
           >
-            <Icon name="heroicons:user" class="w-5 h-5" />
+            <UIcon name="i-heroicons-user" class="w-5 h-5" />
           </button>
         </div>
       </div>

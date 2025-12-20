@@ -4,7 +4,8 @@ import type {
   ISmsCodeRequest,
   ILogoutRequest,
   ILoginResponse,
-  ISmsCodeResponse,
+  ISmsCodeResponseData,
+  ICaptchaRequest,
   ICaptchaResponse,
   ILogoutResponse,
   IGetUserInfoResponse,
@@ -53,22 +54,23 @@ export class AuthApiClient {
    * 账号密码登录
    * 
    * @param params - 登录请求参数
-   * @returns 原始 API 响应
+   * @returns 登录响应数据（HTTP 插件已自动解包 data 字段）
    * 
    * @example
    * ```typescript
-   * await client.login({
-   *   username: 'admin',
-   *   password: '123456',
-   *   captcha: '1234',
-   *   captchaKey: 'xxx'
+   * const response = await client.login({
+   *   username: '13917609856',
+   *   password: '123456'
+   *   // company_id 由 HTTP 插件自动添加
    * })
+   * // response = { token: 'xxx' }，已自动解包
    * ```
    */
   async login(params: ILoginRequest): Promise<ILoginResponse> {
     return this.http('/login', {
       method: 'POST',
       body: params,
+      // ✅ company_id 和 Content-Type 由 HTTP 插件统一处理
     })
   }
 
@@ -76,14 +78,15 @@ export class AuthApiClient {
    * 手机验证码登录
    * 
    * @param params - 手机登录请求参数
-   * @returns 原始 API 响应
+   * @returns 登录响应数据（HTTP 插件已自动解包 data 字段）
    * 
    * @example
    * ```typescript
-   * await client.loginWithPhone({
+   * const response = await client.loginWithPhone({
    *   phone: '13800138000',
    *   smsCode: '123456'
    * })
+   * // response = { token: 'xxx' }，已自动解包
    * ```
    */
   async loginWithPhone(params: IPhoneLoginRequest): Promise<ILoginResponse> {
@@ -96,16 +99,20 @@ export class AuthApiClient {
   /**
    * 获取图形验证码
    * 
-   * @returns 验证码图片和 key
+   * @param params - 验证码请求参数
+   * @returns 验证码图片和 token
    * 
    * @example
    * ```typescript
-   * const { image, key } = await client.getCaptcha()
+   * const response = await client.getCaptcha({ type: 'login' })
+   * // company_id 由 HTTP 插件自动添加
+   * const { imageData, imageToken } = response.data
    * ```
    */
-  async getCaptcha(): Promise<ICaptchaResponse> {
-    return this.http('/captcha/get', {
+  async getCaptcha(params: ICaptchaRequest): Promise<{ data: ICaptchaResponse }> {
+    return this.http('/member/image/code', {
       method: 'GET',
+      params: params,
       cache: 'no-cache',  // 验证码不缓存
     })
   }
@@ -119,16 +126,18 @@ export class AuthApiClient {
    * @example
    * ```typescript
    * await client.sendSmsCode({
-   *   phone: '13800138000',
-   *   captcha: '1234',
-   *   captchaKey: 'xxx'
+   *   type: 'login',
+   *   mobile: '13917609856',
+   *   yzm: 'yGM6',
+   *   token: '7c4175f1cde1ac20703421ffd1c7cf6d'
+   *   // company_id 由 HTTP 插件自动添加
    * })
    * ```
    */
-  async sendSmsCode(params: ISmsCodeRequest): Promise<ISmsCodeResponse> {
-    return this.http('/sms/send', {
-      method: 'POST',
-      body: params,
+  async sendSmsCode(params: ISmsCodeRequest): Promise<{ data: ISmsCodeResponseData }> {
+    return this.http('/member/sms/code', {
+      method: 'GET',
+      params: params,
     })
   }
 
@@ -171,11 +180,12 @@ export class AuthApiClient {
    * 刷新 Token
    * 
    * @param refreshToken - Refresh Token
-   * @returns 新的 Token 信息
+   * @returns 新的 Token 信息（HTTP 插件已自动解包 data 字段）
    * 
    * @example
    * ```typescript
-   * const { token } = await client.refreshToken('refresh-token-xxx')
+   * const response = await client.refreshToken('refresh-token-xxx')
+   * const { token } = response  // 已自动解包
    * ```
    */
   async refreshToken(refreshToken: string): Promise<ILoginResponse> {

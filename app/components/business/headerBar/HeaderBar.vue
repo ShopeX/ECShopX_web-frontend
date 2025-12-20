@@ -1,6 +1,6 @@
 <template>
   <header class="sp-header-bar bg-white w-full">
-    <div class="flex items-center justify-between px-32 py-6">
+    <div class="flex items-center justify-between px-8 py-6">
       <!-- 左侧容器 -->
       <div class="flex items-center gap-6 h-5">
         <!-- 搜索按钮 -->
@@ -9,7 +9,7 @@
           aria-label="搜索"
           @click="handleSearch"
         >
-          <Icon name="heroicons:magnifying-glass" class="w-5 h-5 text-[#191a1d]" />
+          <UIcon name="i-heroicons-magnifying-glass" class="w-5 h-5 text-[#191a1d]" />
         </button>
 
         <!-- 菜单按钮 -->
@@ -18,7 +18,7 @@
           aria-label="菜单"
           @click="handleMenu"
         >
-          <Icon name="heroicons:bars-3" class="w-5 h-5 text-[#191a1d]" />
+          <UIcon name="i-heroicons-bars-3" class="w-5 h-5 text-[#191a1d]" />
         </button>
       </div>
 
@@ -27,28 +27,29 @@
         to="/"
         class="font-semibold text-2xl leading-10 tracking-[-0.53px] text-[#191a1d] whitespace-nowrap hover:opacity-80 transition-opacity"
       >
-        LOGO
+        <!-- LOGO -->
+        <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
       </NuxtLink>
 
       <!-- 右侧容器 -->
       <div class="flex items-center justify-end gap-6 h-5">
-        <!-- 相机按钮 -->
+        <!-- 购物车按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          aria-label="相机"
-          @click="handleCamera"
+          aria-label="购物袋"
+          @click="handleCart"
         >
-          <Icon name="heroicons:camera" class="w-5 h-5 text-[#191a1d]" />
+          <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5 text-[#191a1d]" />
         </button>
 
-        <!-- 网格视图按钮 -->
-        <button
+        <!-- 订单按钮 -->
+        <!-- <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
           aria-label="网格视图"
           @click="handleGrid"
         >
-          <Icon name="heroicons:squares-2x2" class="w-5 h-5 text-[#191a1d]" />
-        </button>
+          <UIcon name="i-heroicons-squares-2x2" class="w-5 h-5 text-[#191a1d]" />
+        </button> -->
 
         <!-- 用户按钮 -->
         <button
@@ -56,8 +57,52 @@
           aria-label="用户"
           @click="handleUser"
         >
-          <Icon name="heroicons:user" class="w-5 h-5 text-[#191a1d]" />
+          <UIcon name="i-heroicons-user" class="w-5 h-5 text-[#191a1d]" />
         </button>
+
+        <!-- 语言按钮 -->
+        <div class="relative" ref="languageMenuRef">
+          <button
+            class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
+            aria-label="语言"
+            @click="toggleLanguageMenu"
+          >
+            <UIcon name="i-heroicons-globe-alt" class="w-5 h-5 text-[#191a1d]" />
+          </button>
+
+          <!-- 语言下拉菜单 -->
+          <Transition
+            enter-active-class="transition ease-out duration-100"
+            enter-from-class="transform opacity-0 scale-95"
+            enter-to-class="transform opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-75"
+            leave-from-class="transform opacity-100 scale-100"
+            leave-to-class="transform opacity-0 scale-95"
+          >
+            <div
+              v-if="showLanguageMenu"
+              class="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-lg border border-[#e5e7eb] py-2 z-50"
+            >
+              <button
+                v-for="lang in availableLocales"
+                :key="lang.code"
+                class="w-full px-4 py-2 text-left text-[14px] hover:bg-[#f5f5f5] transition-colors flex items-center justify-between"
+                :class="{
+                  'text-[#191a1d] font-medium': currentLocale === lang.code,
+                  'text-[#4a5565]': currentLocale !== lang.code,
+                }"
+                @click="switchLanguage(lang.code)"
+              >
+                <span>{{ lang.name }}</span>
+                <Icon
+                  v-if="currentLocale === lang.code"
+                  name="i-heroicons-check"
+                  class="w-4 h-4 text-[#191a1d]"
+                />
+              </button>
+            </div>
+          </Transition>
+        </div>
       </div>
     </div>
 
@@ -69,10 +114,69 @@
 <script setup lang="ts">
 /**
  * HeaderBar 组件
- * 简洁版的头部导航栏，包含搜索、菜单、LOGO、相机、网格视图和用户功能
  */
 
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+
 const router = useRouter()
+const userStore = useUserStore()
+const { locale } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
+
+// 定义 emits
+const emit = defineEmits<{
+  openCategoryNav: []
+}>()
+
+// 语言菜单相关
+const showLanguageMenu = ref(false)
+const languageMenuRef = ref<HTMLElement | null>(null)
+
+// 当前语言
+const currentLocale = computed(() => locale.value)
+
+// 可用语言列表（从配置中获取）
+const availableLocales: Array<{ code: 'en' | 'zh' | 'ar'; name: string }> = [
+  { code: 'zh', name: '简体中文' },
+  { code: 'en', name: 'English' },
+  { code: 'ar', name: 'العربية' },
+]
+
+/**
+ * 切换语言菜单显示状态
+ */
+const toggleLanguageMenu = () => {
+  showLanguageMenu.value = !showLanguageMenu.value
+}
+
+/**
+ * 切换语言
+ */
+const switchLanguage = (localeCode: 'en' | 'zh' | 'ar') => {
+  showLanguageMenu.value = false
+
+  // 使用 switchLocalePath 切换到新语言
+  const path = switchLocalePath(localeCode)
+  navigateTo(path)
+}
+
+/**
+ * 点击外部关闭菜单
+ */
+const handleClickOutside = (event: MouseEvent) => {
+  if (languageMenuRef.value && !languageMenuRef.value.contains(event.target as Node)) {
+    showLanguageMenu.value = false
+  }
+}
+
+// 监听点击外部事件
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 /**
  * 处理搜索点击
@@ -86,16 +190,15 @@ const handleSearch = () => {
  * 处理菜单点击
  */
 const handleMenu = () => {
-  // TODO: 实现菜单功能
-  console.log('菜单')
+  emit('openCategoryNav')
 }
 
 /**
- * 处理相机点击
+ * 处理购物车点击
  */
-const handleCamera = () => {
-  // TODO: 实现相机功能
-  console.log('相机')
+const handleCart = () => {
+  // TODO: 实现购物车功能
+  router.push('/cart')
 }
 
 /**
@@ -110,6 +213,17 @@ const handleGrid = () => {
  * 处理用户点击
  */
 const handleUser = () => {
-  router.push('/member')
+  if (userStore.isLoggedIn) {
+    router.push('/account')
+  } else {
+    // 跳转到登录页，携带当前路由作为 redirect 参数
+    const currentPath = router.currentRoute.value.fullPath
+    router.push({
+      path: '/account/login',
+      query: {
+        redirect: currentPath,
+      },
+    })
+  }
 }
 </script>

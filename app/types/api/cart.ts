@@ -7,37 +7,39 @@
 import type { IApiResponse } from './common'
 
 /**
- * 购物车商品项接口
+ * 购物车商品项接口（真实 API 结构）
  */
 export interface ICartItem {
   /** 购物车项 ID */
-  id: string
+  cart_id: string
   /** 商品 ID */
-  product_id: string
+  item_id: string
+  /** 商品 ID（备用） */
+  goods_id: string
   /** 商品名称 */
-  product_name: string
+  item_name: string
   /** 商品图片 URL */
-  product_image: string
+  pics: string
   /** 商品规格描述 */
-  spec?: string
-  /** 规格 ID */
-  spec_id?: string
-  /** 单价(现价) */
-  price: number
-  /** 原价 */
-  original_price?: number
+  item_spec_desc?: string
+  /** 单价（字符串格式） */
+  price: string | number
+  /** 市场价 */
+  market_price?: string | number
   /** 数量 */
-  quantity: number
+  num: number
   /** 库存 */
-  stock: number
-  /** 是否可购买 */
-  available: boolean
+  store: number
   /** 是否选中 */
-  selected: boolean
+  is_checked: boolean
+  /** 公司 ID */
+  company_id?: string
   /** 创建时间 */
-  created_at?: string
+  created?: number
   /** 更新时间 */
-  updated_at?: string
+  updated?: number
+  /** 其他字段 */
+  [key: string]: any
 }
 
 /**
@@ -58,12 +60,22 @@ export interface ICartListResponse {
  * 添加商品到购物车请求接口
  */
 export interface IAddCartRequest {
-  /** 商品 ID */
-  product_id: string
+  /** 商品ID */
+  item_id: string
   /** 数量 */
-  quantity: number
-  /** 规格 ID (可选) */
-  spec_id?: string
+  num: number
+  /** 分销商ID */
+  distributor_id: string
+  /** 购物车类型：normal-普通，fastbuy-立即购买 */
+  cart_type?: 'normal' | 'fastbuy'
+  /** 店铺类型：distributor-分销商，drug-药品，pointsmall-积分商城 */
+  shop_type?: 'distributor' | 'drug' | 'pointsmall'
+  /** 是否累加（立即购买时为false） */
+  isAccumulate?: boolean
+  /** 公司ID */
+  company_id?: string
+  /** 砍价活动ID（砍价商品时必填） */
+  bargain_id?: string
 }
 
 /**

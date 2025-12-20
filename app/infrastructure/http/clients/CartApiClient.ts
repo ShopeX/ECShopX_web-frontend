@@ -59,21 +59,18 @@ export class CartApiClient {
    * 添加商品到购物车
    * 
    * @param params - 添加购物车请求参数
-   * @returns 添加结果，包含购物车项 ID 和购物车总数
+   * @returns 添加结果
    * 
    * @example
    * ```typescript
    * await client.addToCart({
-   *   product_id: '123',
-   *   quantity: 1,
-   *   spec_id: 'sku-001'
+   *   item_id: '123',
+   *   num: 1,
+   *   distributor_id: '0'
    * })
    * ```
    */
-  async addToCart(params: IAddCartRequest): Promise<{
-    id: string
-    cart_count: number
-  }> {
+  async addToCart(params: IAddCartRequest): Promise<any> {
     return this.http('/cart', {
       method: 'POST',
       body: params,
@@ -81,24 +78,19 @@ export class CartApiClient {
   }
 
   /**
-   * 更新购物车商品
+   * 更新购物车商品数量
    * 
-   * @param itemId - 购物车项 ID
-   * @param params - 更新参数
+   * @param cartId - 购物车项 ID
+   * @param num - 数量
    * @returns 更新结果
-   * 
-   * @example
-   * ```typescript
-   * await client.updateCartItem('cart-item-123', {
-   *   quantity: 2,
-   *   selected: true
-   * })
-   * ```
    */
-  async updateCartItem(itemId: string, params: IUpdateCartRequest): Promise<void> {
-    return this.http(`/api/cart/items/${itemId}`, {
+  async updateCartItem(cartId: string, num: number): Promise<void> {
+    return this.http('/cartupdate/num', {
       method: 'PUT',
-      body: params,
+      query: {
+        cart_id: cartId,
+        num: String(num),
+      },
     })
   }
 
@@ -114,8 +106,11 @@ export class CartApiClient {
    * ```
    */
   async removeCartItem(itemId: string): Promise<void> {
-    return this.http(`/api/cart/items/${itemId}`, {
+    return this.http('/cartdel', {
       method: 'DELETE',
+      query: {
+        cart_id: itemId,
+      },
     })
   }
 
@@ -151,27 +146,40 @@ export class CartApiClient {
   }
 
   /**
-   * 切换商品选中状态
+   * 更新购物车商品选中状态
    * 
-   * @param itemId - 购物车项 ID
+   * @param cartId - 购物车项 ID
+   * @param isChecked - 是否选中
    * @returns 更新结果
    */
-  async toggleItemSelection(itemId: string): Promise<void> {
-    return this.http(`/api/cart/items/${itemId}/toggle`, {
+  async updateCartItemChecked(cartId: string, isChecked: boolean): Promise<void> {
+    return this.http('/cartupdate/checkstatus', {
       method: 'PUT',
+      query: {
+        cart_id: cartId,
+        is_checked: isChecked ? 'true' : 'false',
+      },
     })
   }
 
   /**
-   * 全选/取消全选
+   * 批量更新购物车商品选中状态（全选/取消全选）
    * 
-   * @param selected - 是否全选
+   * @param cartIds - 购物车项 ID 数组
+   * @param isChecked - 是否选中
    * @returns 更新结果
    */
-  async toggleAllSelection(selected: boolean): Promise<void> {
-    return this.http('/api/cart/toggle-all', {
+  async batchUpdateCartItemChecked(cartIds: string[], isChecked: boolean): Promise<void> {
+    // 批量更新：一次调用，手动构建 query 参数
+    // 使用 cart_id[] 格式：cart_id[]=2650&cart_id[]=2465
+    const queryParams = new URLSearchParams()
+    cartIds.forEach(id => {
+      queryParams.append('cart_id[]', id)  // 使用 cart_id[] 格式
+    })
+    queryParams.append('is_checked', isChecked ? 'true' : 'false')
+
+    return this.http(`/cartupdate/checkstatus?${queryParams.toString()}`, {
       method: 'PUT',
-      body: { selected },
     })
   }
 

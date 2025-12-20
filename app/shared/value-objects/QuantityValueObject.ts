@@ -19,9 +19,9 @@
  * ```
  */
 export class QuantityValueObject {
-  private readonly _value: number
-  private readonly _min: number
-  private readonly _max: number
+  readonly _value: number
+  readonly _min: number
+  readonly _max: number
 
   private constructor(value: number, min: number = 1, max: number = 9999) {
     if (value < min) {

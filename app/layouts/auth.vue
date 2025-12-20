@@ -5,7 +5,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- 简化版头部（仅 Logo 和基本导航） -->
-    <HeaderBarSimple />
+    <!-- <HeaderBarSimple /> -->
 
     <!-- 页面内容区域 -->
     <main class="mx-auto">

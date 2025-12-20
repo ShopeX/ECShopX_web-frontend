@@ -19,8 +19,8 @@
             @click="toggleSortDropdown"
           >
             <span>{{ currentSortLabel }}</span>
-            <Icon
-              name="heroicons:chevron-down"
+            <UIcon
+              name="i-heroicons-chevron-down"
               class="size-3 transition-transform"
               :class="{ 'rotate-180': showSortDropdown }"
             />
@@ -61,7 +61,7 @@
           @click="toggleFilterPanel"
         >
           <span>筛选</span>
-          <Icon name="heroicons:funnel" class="size-4" />
+          <UIcon name="i-heroicons-funnel" class="size-4" />
         </button>
       </div>
 
@@ -93,7 +93,7 @@
               >
                 <Icon
                   v-if="isAllSelected(group.key)"
-                  name="heroicons:check"
+                  name="i-heroicons-check"
                   class="size-4 text-white"
                 />
               </div>
@@ -118,7 +118,7 @@
               >
                 <Icon
                   v-if="isOptionSelected(group.key, option.value)"
-                  name="heroicons:check"
+                  name="i-heroicons-check"
                   class="size-3 text-white"
                 />
               </div>

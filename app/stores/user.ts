@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { authApiClient } from '~/infrastructure/http/clients'
-import { AuthTransformer } from '~/infrastructure/transformers'
+import { AuthTransformer, type ILoginModel } from '~/infrastructure/transformers'
 import type { IUserInfo, ILoginRequest, IPhoneLoginRequest } from '~/types/api/auth'
 
 /**
@@ -24,12 +24,17 @@ interface UserState {
  * 用户状态管理 Store
  */
 export const useUserStore = defineStore('user', {
-  state: (): UserState => ({
-    isLoggedIn: false,
-    userInfo: null,
-    token: null,
-    refreshToken: null
-  }),
+  state: (): UserState => {
+    const token = useCookie('token')
+    const refreshToken = useCookie('refreshToken')
+
+    return {
+      isLoggedIn: !!token.value,
+      userInfo: null,
+      token: (token.value as string) || null,
+      refreshToken: (refreshToken.value as string) || null
+    }
+  },
 
   getters: {
     /**
@@ -66,21 +71,16 @@ export const useUserStore = defineStore('user', {
      * 设置令牌
      */
     setToken(token: string | null, refreshToken: string | null = null) {
+      const cookieToken = useCookie('token', { maxAge: 60 * 60 * 24 * 7 }) // 7天过期
+      const cookieRefreshToken = useCookie('refreshToken', { maxAge: 60 * 60 * 24 * 30 }) // 30天过期
+
       this.token = token
       this.refreshToken = refreshToken
+      this.isLoggedIn = !!token
 
-      // 持久化到本地存储
-      if (import.meta.client) {
-        if (token) {
-          localStorage.setItem('token', token)
-          if (refreshToken) {
-            localStorage.setItem('refreshToken', refreshToken)
-          }
-        } else {
-          localStorage.removeItem('token')
-          localStorage.removeItem('refreshToken')
-        }
-      }
+      // 更新 Cookie
+      cookieToken.value = token
+      cookieRefreshToken.value = refreshToken
     },
 
     /**
@@ -91,7 +91,7 @@ export const useUserStore = defineStore('user', {
         // 调用登录 API
         const response = await authApiClient.login(params)
 
-        // 转换数据
+        // 转换数据（传递 response.data）
         const loginData = AuthTransformer.toLoginModel(response)
 
         // 更新状态
@@ -117,12 +117,12 @@ export const useUserStore = defineStore('user', {
         // 调用手机登录 API
         const response = await authApiClient.loginWithPhone(params)
 
-        // 转换数据
+        // 转换数据（传递 response.data）
         const loginData = AuthTransformer.toLoginModel(response)
 
         // 更新状态
         this.isLoggedIn = true
-        this.userInfo = loginData.userInfo
+        this.userInfo = loginData.userInfo ?? null
         this.setToken(loginData.token, loginData.refreshToken)
 
         return { success: true, data: loginData }
@@ -166,20 +166,11 @@ export const useUserStore = defineStore('user', {
 
     /**
      * 初始化用户状态（从本地存储恢复）
+     * @deprecated 现在已通过 state 中的 useCookie 自动初始化，此方法主要用于获取用户信息
      */
     async initUserState() {
-      // 只在客户端执行
-      if (!import.meta.client) return
-
       try {
-        // 从本地存储恢复 Token
-        const token = localStorage.getItem('token')
-        const refreshToken = localStorage.getItem('refreshToken')
-
-        if (token) {
-          this.token = token
-          this.refreshToken = refreshToken
-
+        if (this.token && !this.userInfo) {
           // 获取用户信息
           await this.fetchUserInfo()
         }
@@ -202,7 +193,7 @@ export const useUserStore = defineStore('user', {
         // 调用获取用户信息 API
         const response = await authApiClient.getUserInfo()
 
-        // 转换数据
+        // 转换数据（plugin 已自动解包 data）
         const userInfo = AuthTransformer.toUserInfoModel(response)
 
         // 更新状态
@@ -237,7 +228,7 @@ export const useUserStore = defineStore('user', {
         // 调用刷新 Token API
         const response = await authApiClient.refreshToken(this.refreshToken)
 
-        // 转换数据
+        // 转换数据（传递 response.data）
         const loginData = AuthTransformer.toLoginModel(response)
 
         // 更新 Token

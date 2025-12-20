@@ -1,5 +1,5 @@
 import type { ICartItem } from '~/types/api/cart'
-import type { ICartItemModel } from '~/composables/useCart'
+import type { ICartItemModel } from '~/types/cart'
 import { MoneyValueObject, QuantityValueObject, DiscountValueObject } from '~/shared/value-objects'
 
 /**
@@ -38,28 +38,39 @@ export class CartTransformer {
    * @param apiItem - API 返回的购物车商品
    * @returns 应用模型（包含值对象）
    */
-  static toModel(apiItem: ICartItem): ICartItemModel {
+  static toModel(apiItem: any): ICartItemModel {
+    // ✅ 修复：匹配真实的 API 字段名
+    // 价格从字符串转为数字，并从分转为元（除以100）
+    const priceInCents = typeof apiItem.price === 'string' ? parseFloat(apiItem.price) : apiItem.price
+    const marketPriceInCents = typeof apiItem.market_price === 'string' 
+      ? parseFloat(apiItem.market_price) 
+      : (apiItem.market_price || priceInCents)
+
+    // 从分转为元
+    const priceValue = priceInCents / 100
+    const marketPriceValue = marketPriceInCents / 100
+
     // ✅ 转换为值对象（值对象负责验证和业务规则）
-    const price = MoneyValueObject.of(apiItem.price)
-    const marketPrice = MoneyValueObject.of(apiItem.original_price || apiItem.price)
+    const price = MoneyValueObject.of(priceValue)
+    const marketPrice = MoneyValueObject.of(marketPriceValue)
     const quantity = QuantityValueObject.of(
-      apiItem.quantity,
+      apiItem.num || 1,
       1,
-      apiItem.stock
+      apiItem.store || 0
     )
 
     return {
-      id: apiItem.id,
-      productId: apiItem.product_id,
-      productName: apiItem.product_name,
-      productImage: apiItem.product_image || '',
-      specId: apiItem.spec_id || 'default',
-      specName: apiItem.spec || '默认规格',
+      id: apiItem.cart_id || apiItem.id,
+      productId: apiItem.item_id || apiItem.goods_id,
+      productName: apiItem.item_name || '未知商品',
+      productImage: apiItem.pics || '',
+      specId: apiItem.item_id || 'default',
+      specName: apiItem.item_spec_desc || '默认规格',
       price,
       marketPrice,
       quantity,
-      stock: apiItem.stock,
-      selected: apiItem.selected ?? false,
+      stock: apiItem.store || 0,
+      selected: apiItem.is_checked ?? false,
     }
   }
 
@@ -69,7 +80,10 @@ export class CartTransformer {
    * @param apiItems - API 返回的购物车商品列表
    * @returns 应用模型列表
    */
-  static toModelList(apiItems: ICartItem[]): ICartItemModel[] {
+  static toModelList(apiItems: ICartItem[] = []): ICartItemModel[] {
+    if (!apiItems || !Array.isArray(apiItems)) {
+      return []
+    }
     return apiItems.map(item => this.toModel(item))
   }
 

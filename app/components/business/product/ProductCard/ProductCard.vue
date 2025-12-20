@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import type { IProduct } from './types'
-import { useMessage } from '~/composables/useMessage'
+import { useToastMessage } from '~/composables/useToastMessage'
 import { useCart } from '~/composables/useCart'
 import { useIntersectionObserver } from '@vueuse/core'
 
@@ -78,7 +78,7 @@ onMounted(() => {
 const { addToCart, isItemLoading } = useCart()
 
 // Toast 消息
-const message = useMessage()
+const toast = useToastMessage()
 
 // 获取当前有效价格（优先级：活动价 > 会员价 > 原价）
 const getCurrentPrice = (): number => {
@@ -137,7 +137,7 @@ async function handleAddToCart(event: Event) {
       stock: props.product.stock || 999,
     })
   } catch (error: any) {
-    message.error(error.message || '添加失败，请重试')
+    toast.show(error.message || '添加失败，请重试')
   }
 }
 </script>

@@ -1,148 +1,213 @@
 <template>
-  <div class="bg-gray-50 min-h-screen pb-12">
-    <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Your cart</h1>
-        <NuxtLink to="/" class="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-2">
-          <UIcon name="i-heroicons-shopping-bag" class="w-4 h-4" />
-          Continue shopping
-        </NuxtLink>
+  <div class="min-h-screen bg-[#f9f9f9]">
+    <!-- 页面标题 - 根据 Figma 设计 -->
+    <div class="bg-white">
+      <div class="content-stretch flex items-center px-[128px] py-[16px] relative w-full">
+        <p class="font-['Noto_Sans_SC'] font-medium leading-[48px] text-[24px] text-[#191a1d]">
+          购物袋
+        </p>
+      </div>
+    </div>
+
+    <!-- 购物车内容 -->
+    <div class="px-[128px] pt-[32px] pb-[64px] bg-white">
+      <!-- 加载状态：首次加载或正在加载 -->
+      <div v-if="!initialized || loading" class="flex justify-center py-20">
+        <Loading />
       </div>
 
-      <div v-if="cartUIStore.loading && !cartStore.initialized" class="flex justify-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
-      </div>
-
-      <div v-else-if="cartStore.items.length === 0" class="text-center py-12 bg-white rounded-lg shadow-sm">
-        <UIcon name="i-heroicons-shopping-cart" class="w-16 h-16 mx-auto text-gray-300 mb-4" />
-        <h2 class="text-xl font-medium text-gray-900 mb-2">{{ $t('app.pages.cart.index.cart') }}</h2>
-        <p class="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
-        <NuxtLink
-          to="/"
-          class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#ea580c] hover:bg-[#c2410c] transition-colors"
+      <!-- 空购物车状态：只在初始化完成且数据为空时显示 -->
+      <div
+        v-else-if="initialized && cartUI.isEmpty"
+        class="flex flex-col items-center justify-center py-20 bg-white rounded-lg"
+      >
+        <svg
+          class="w-24 h-24 mb-6 text-gray-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-         {{ $t('app.pages.cart.index.fastbuy') }}
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+          />
+        </svg>
+        <p class="text-xl text-gray-600 mb-2">您的购物袋是空的</p>
+        <p class="text-sm text-gray-400 mb-6">快去选购心仪的商品吧</p>
+        <NuxtLink
+          to="/products"
+          class="px-8 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+        >
+          开始购物
         </NuxtLink>
       </div>
 
-      <div v-else class="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
-        <!-- Cart Items List -->
-        <section class="lg:col-span-7 bg-white rounded-lg shadow-sm overflow-hidden">
-          <ul role="list" class="divide-y divide-gray-200">
-            <li v-for="item in cartStore.items" :key="item.id" class="p-6 sm:flex">
-              <div class="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-md overflow-hidden border border-gray-200">
-                <img
-                  :src="item.productImage"
-                  :alt="item.productName"
-                  class="w-full h-full object-center object-cover"
-                />
-              </div>
-
-              <div class="mt-4 sm:mt-0 sm:ml-6 flex-1 flex flex-col justify-between">
-                <div class="flex justify-between">
-                  <div>
-                    <h3 class="text-base font-medium text-gray-900">
-                      <NuxtLink :to="`/products/${item.productId}`">{{ item.productName }}</NuxtLink>
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ item.specName }}</p>
-                    <p class="mt-1 text-lg font-medium text-gray-900">{{ item.price.display }}</p>
-                  </div>
-                  <p class="text-lg font-medium text-gray-900 sm:hidden">
-                    {{ (item.price.amount * item.quantity.value).toFixed(2) }}
-                  </p>
-                </div>
-
-                <div class="mt-4 flex items-center justify-between sm:mt-0">
-                  <div class="flex items-center border border-gray-300 rounded">
-                    <button 
-                      type="button"
-                      class="px-3 py-1 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
-                      :disabled="item.quantity.value <= 1 || cartUIStore.isActionLoading(item.id)"
-                      @click="cartStore.updateQuantity(item.id, item.quantity.value - 1)"
-                    >
-                      −
-                    </button>
-                    <span class="px-3 text-gray-900 min-w-[2rem] text-center">{{ item.quantity.value }}</span>
-                    <button 
-                      type="button"
-                      class="px-3 py-1 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
-                      :disabled="cartUIStore.isActionLoading(item.id)"
-                      @click="cartStore.updateQuantity(item.id, item.quantity.value + 1)"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div class="flex items-center gap-4">
-                    <p class="hidden sm:block text-lg font-medium text-gray-900">
-                      ${{ (item.price.amount * item.quantity.value).toFixed(2) }}
-                    </p>
-                    <button
-                      type="button"
-                      class="text-gray-400 hover:text-red-500 transition-colors p-2"
-                      :disabled="cartUIStore.isActionLoading(item.id)"
-                      @click="cartStore.removeItem(item.id)"
-                    >
-                      <UIcon v-if="cartUIStore.isActionLoading(item.id)" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
-                      <UIcon v-else name="i-heroicons-trash" class="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        <!-- Order Summary -->
-        <section class="lg:col-span-5 mt-8 lg:mt-0 bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-6">{{ $t('app.pages.cart.index.ordertotal') }}</h2>
-
-          <div class="flow-root">
-            <dl class="-my-4 text-sm divide-y divide-gray-200">
-              <div class="py-4 flex items-center justify-between">
-                <dt class="text-gray-600">Subtotal</dt>
-                <dd class="font-medium text-gray-900">${{ cartStore.estimatedTotal.toFixed(2) }}</dd>
-              </div>
-              <div class="py-4 flex items-center justify-between">
-                <dt class="text-gray-600">Shipping</dt>
-                <dd class="font-medium text-gray-900">Calculated at checkout</dd>
-              </div>
-              <div class="py-4 flex items-center justify-between">
-                <dt class="text-gray-600">Tax</dt>
-                <dd class="font-medium text-gray-900">Calculated at checkout</dd>
-              </div>
-              <div class="py-4 flex items-center justify-between border-t border-gray-200">
-                <dt class="text-base font-medium text-gray-900">Estimated total</dt>
-                <dd class="text-xl font-bold text-gray-900">${{ cartStore.estimatedTotal.toFixed(2) }} USD</dd>
-              </div>
-            </dl>
-          </div>
-          
-          <p class="mt-4 text-xs text-gray-500">
-            Taxes, discounts and shipping calculated at checkout.
-          </p>
-
-          <div class="mt-6">
-            <button
-              type="button"
-              class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-[#ea580c] hover:bg-[#c2410c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ea580c] transition-colors"
+      <!-- 购物车有商品 -->
+      <div v-else class="content-stretch flex gap-[128px] items-start justify-center">
+        <!-- 左侧：商品列表容器 -->
+        <div
+          class="basis-0 bg-white content-stretch flex flex-col gap-[32px] grow items-start min-h-px min-w-px relative shrink-0"
+        >
+          <!-- 全选区域 -->
+          <div
+            class="border-[0px_0px_1px] border-[#e5e7eb] border-solid content-stretch flex gap-[8px] items-center pb-[17px] pt-0 px-0 relative shrink-0 w-full"
+          >
+            <div
+              class="border border-solid shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0 size-[16px] flex items-center justify-center cursor-pointer"
+              :class="[
+                cartUI.isAllSelected && cartUI.itemCount > 0
+                  ? 'bg-black border-black'
+                  : 'bg-white border-[#191a1d]',
+              ]"
+              @click="handleToggleAll"
             >
-              {{ $t('app.pages.cart.index.checkout') }}
-            </button>
+              <div
+                v-if="cartUI.isAllSelected && cartUI.itemCount > 0"
+                class="content-stretch flex items-center justify-center size-[14px]"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="relative shrink-0">
+              <div
+                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center relative"
+              >
+                <p
+                  class="font-['Noto_Sans_SC'] font-normal leading-[20px] relative shrink-0 text-[14px] text-[#191a1d] text-nowrap"
+                >
+                  全选
+                </p>
+              </div>
+            </div>
           </div>
-        </section>
+
+          <!-- 商品列表 -->
+          <div
+            v-for="item in cartUI.items"
+            :key="item.id"
+            class="content-stretch flex flex-col items-start relative shrink-0 w-full"
+          >
+            <CartItem
+              :item="item"
+              :loading="loading"
+              @toggle-selection="handleToggleSelection"
+              @quantity-change="handleQuantityChange"
+              @remove="handleRemove"
+            />
+          </div>
+        </div>
+
+        <!-- 右侧：订单汇总 -->
+        <div class="sticky top-4 h-fit">
+          <OrderSummary
+            :selected-count="cartUI.selectedCount"
+            :subtotal-display="cartUI.cartTotalDisplay"
+            :discount-display="cartUI.discountFeeDisplay"
+            :discount-amount="cartStore.discountFee / 100"
+            :total-display="cartUI.finalTotalDisplay"
+            :disabled="!cartUI.canCheckout"
+            :loading="loading"
+            @checkout="handleCheckout"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const cartStore = useCartStore()
-const cartUIStore = useCartUIStore()
+/**
+ * 购物车页面
+ *
+ * 根据 Figma 设计实现，展示购物袋内容和结算功能
+ */
 
-onMounted(() => {
-  if (!cartStore.initialized) {
-    cartStore.loadCart()
-  }
+definePageMeta({
+  layout: 'default',
 })
+
+const router = useRouter()
+const cartStore = useCartStore()
+const {
+  cartUI,
+  loading,
+  loadCart,
+  toggleItemSelection,
+  toggleAllSelection,
+  updateQuantity,
+  removeItem,
+  removeSelectedItems,
+} = useCart()
+
+// 追踪是否完成首次加载
+const initialized = ref(false)
+
+/**
+ * 加载购物车数据
+ */
+onMounted(async () => {
+  await loadCart()
+  initialized.value = true
+})
+
+/**
+ * 切换商品选中状态
+ */
+async function handleToggleSelection(itemId: string) {
+  await toggleItemSelection(itemId)
+}
+
+/**
+ * 全选/取消全选
+ */
+async function handleToggleAll() {
+  await toggleAllSelection(!cartUI.value.isAllSelected)
+}
+
+/**
+ * 更新商品数量
+ */
+async function handleQuantityChange(itemId: string, quantity: number) {
+  await updateQuantity(itemId, quantity)
+}
+
+/**
+ * 删除商品
+ */
+async function handleRemove(itemId: string) {
+  await removeItem(itemId)
+}
+
+/**
+ * 删除选中的商品
+ */
+async function handleRemoveSelected() {
+  if (!cartUI.value.hasSelectedItems) return
+  await removeSelectedItems()
+}
+
+/**
+ * 去结算
+ */
+function handleCheckout() {
+  if (!cartUI.value.canCheckout) return
+  // TODO: 跳转到结算页面
+  router.push('/checkout')
+}
 </script>

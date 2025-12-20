@@ -40,12 +40,13 @@ export function useAuth() {
   /**
    * 获取图形验证码
    */
-  async function getCaptcha(): Promise<boolean> {
+  async function getCaptcha(type: string = 'login'): Promise<boolean> {
     try {
       captchaLoading.value = true
       error.value = ''
 
-      const response = await authApiClient.getCaptcha()
+      const response = await authApiClient.getCaptcha({ type })
+      // company_id 由 HTTP 插件自动添加
       captcha.value = AuthTransformer.toCaptchaModel(response)
 
       return true

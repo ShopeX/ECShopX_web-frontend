@@ -34,38 +34,16 @@ import { useCartUIStore } from '~/stores/cartUI'
 import { cartApiClient } from '~/infrastructure/http/clients'
 import { CartTransformer } from '~/infrastructure/transformers/cartTransformer'
 import type { IAddCartRequest, IUpdateCartRequest } from '~/types/api/cart'
-import { useMessage } from '~/composables/useMessage'
-
-/**
- * 购物车商品模型（轻量级）
- */
-export interface ICartItemModel {
-  id: string
-  productId: string
-  productName: string
-  productImage: string
-  specId: string
-  specName: string
-  price: MoneyValueObject
-  marketPrice: MoneyValueObject
-  quantity: QuantityValueObject
-  stock: number
-  selected: boolean
-}
-
-/**
- * 购物车模型（轻量级）
- */
-export interface ICartModel {
-  items: ICartItemModel[]
-  itemCount: number
-  totalQuantity: number
-}
+import type { ICartItemModel, ICartModel } from '~/types/cart'
+import { useToastMessage } from '~/composables/useToastMessage'
+import { logger } from '~/utils/log'
 
 /**
  * 购物车 UI 数据接口
  */
 export interface ICartUI {
+  // ... (removing the old definitions of ICartItemModel and ICartModel)
+
   /** 购物车商品列表 */
   items: {
     id: string
@@ -115,18 +93,16 @@ export interface ICartUI {
  * 购物车业务组合式函数
  */
 export function useCart() {
-  // ✅ 现在 useMessage 已经是 SSR 安全的，可以直接调用
-  const message = useMessage()
+  // ✅ 使用自定义 Toast 消息提示
+  const toast = useToastMessage()
 
-  // ✅ Pinia Store 完全支持 SSR，可以直接调用（@pinia/nuxt 已处理）
+  // ✅ Pinia Store 完全支持 SSR，可以直接调用
+  const cartStore = useCartStore()
   const cartUIStore = useCartUIStore()
 
-  // 购物车状态
-  const cart = ref<ICartModel>({
-    items: [] as ICartItemModel[],
-    itemCount: 0,
-    totalQuantity: 0
-  })
+  // 移除本地 ref，改用 store 的计算属性
+  const items = computed(() => cartStore.items as ICartItemModel[])
+  const invalidItems = computed(() => cartStore.invalidItems as ICartItemModel[])
   const error = ref<string | null>(null)
   const loading = computed(() => cartUIStore.loading)
 
@@ -134,7 +110,6 @@ export function useCart() {
    * 获取用户 ID（临时实现）
    */
   const getUserId = (): string => {
-    // TODO: 从认证服务获取实际的用户 ID
     return 'current-user'
   }
 
@@ -142,7 +117,7 @@ export function useCart() {
    * 获取购物车商品列表（类型安全）
    */
   const getCartItems = (): ICartItemModel[] => {
-    return cart.value.items as ICartItemModel[]
+    return items.value
   }
 
   // ==================== 业务规则（内聚在 Composable 中） ====================
@@ -218,8 +193,6 @@ export function useCart() {
 
   /**
    * 计算商品折扣
-   * 
-   * ✅ 使用 DiscountValueObject 封装折扣计算逻辑
    */
   const calculateDiscount = (item: ICartItemModel): DiscountValueObject => {
     return DiscountValueObject.fromPrices(item.price, item.marketPrice)
@@ -228,98 +201,81 @@ export function useCart() {
   // ==================== UI 数据转换 ====================
 
   /**
+   * 将模型转换为 UI 展现格式
+   */
+  const mapToUIItem = (item: ICartItemModel) => {
+    const subtotal = calculateItemSubtotal(item)
+    const discount = calculateDiscount(item)
+
+    return {
+      id: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      productImage: item.productImage,
+      specId: item.specId,
+      specName: item.specName,
+      price: item.price.amount,
+      priceDisplay: item.price.display,
+      marketPrice: item.marketPrice.amount,
+      marketPriceDisplay: item.marketPrice.display,
+      quantity: item.quantity.value,
+      quantityMin: item.quantity.min,
+      quantityMax: item.quantity.max,
+      stock: item.stock,
+      selected: item.selected,
+      subtotal: subtotal.amount,
+      subtotalDisplay: subtotal.display,
+      canBePurchased: canItemBePurchased(item),
+      hasDiscount: discount.hasDiscount(),
+      discountPercent: discount.percent,
+    }
+  }
+
+  /**
    * 转换为 UI 数据
    */
-  const cartUI = computed<ICartUI>(() => {
-    if (cart.value.items.length === 0) {
-      return {
-        items: [],
-        total: '¥0.00',
-        totalAmount: 0,
-        selectedTotal: '¥0.00',
-        selectedAmount: 0,
-        itemCount: 0,
-        selectedCount: 0,
-        isAllSelected: false,
-        hasSelectedItems: false,
-        canCheckout: false,
-        isEmpty: true,
-      }
-    }
-
+  const cartUI = computed<ICartUI & { invalidItems: any[]; cartTotalDisplay: string; discountFeeDisplay: string; finalTotalDisplay: string }>(() => {
     const total = calculateTotal()
     const selectedTotal = calculateSelectedTotal()
 
-    return {
-      items: getCartItems().map((item) => {
-        const subtotal = calculateItemSubtotal(item)
-        const discount = calculateDiscount(item)
+    // ✅ 使用 API 返回的汇总数据（单位：分）
+    const cartTotalPrice = cartStore.cartTotalPrice / 100  // 转换为元
+    const discountFee = cartStore.discountFee / 100        // 转换为元
+    const finalTotal = cartTotalPrice - discountFee        // 最终总计（商品总计 - 优惠）
 
-        return {
-          id: item.id,
-          productId: item.productId,
-          productName: item.productName,
-          productImage: item.productImage,
-          specId: item.specId,
-          specName: item.specName,
-          price: item.price.amount,
-          priceDisplay: item.price.display,
-          marketPrice: item.marketPrice.amount,
-          marketPriceDisplay: item.marketPrice.display,
-          quantity: item.quantity.value,
-          quantityMin: item.quantity.min,
-          quantityMax: item.quantity.max,
-          stock: item.stock,
-          selected: item.selected,
-          subtotal: subtotal.amount,
-          subtotalDisplay: subtotal.display,
-          canBePurchased: canItemBePurchased(item),
-          hasDiscount: discount.hasDiscount(),
-          discountPercent: discount.percent,
-        }
-      }),
+    return {
+      items: getCartItems().map(mapToUIItem),
+      invalidItems: invalidItems.value.map(mapToUIItem),
       total: total.display,
       totalAmount: total.amount,
       selectedTotal: selectedTotal.display,
       selectedAmount: selectedTotal.amount,
-      itemCount: cart.value.itemCount,
+      itemCount: cartStore.totalItems,
       selectedCount: getSelectedCount(),
       isAllSelected: isAllSelected(),
       hasSelectedItems: hasSelectedItems(),
       canCheckout: canCheckout(),
-      isEmpty: cart.value.items.length === 0,
+      isEmpty: items.value.length === 0 && invalidItems.value.length === 0,
+      // ✅ API 返回的汇总数据
+      cartTotalDisplay: MoneyValueObject.of(cartTotalPrice).display,     // 商品总计
+      discountFeeDisplay: MoneyValueObject.of(discountFee).display,      // 优惠金额
+      finalTotalDisplay: MoneyValueObject.of(finalTotal).display,        // 最终总计
     }
   })
 
-  // ==================== API 操作 ====================
+  // ==================== API 操作（委托给 Store） ====================
 
   /**
    * 加载购物车
+   * @param options.silent 静默模式，不显示 loading 状态
+   * @param options.summaryOnly 仅更新汇总数据，不更新商品列表
    */
-  const loadCart = async () => {
-    cartUIStore.setLoading(true)
-    error.value = null
+  const loadCart = async (options?: { silent?: boolean; summaryOnly?: boolean }) => {
     try {
-      // ✅ plugin 已自动解包 data，直接获得数据
-      const data = await cartApiClient.getCartList()
-
-      // ✅ 使用 Transformer 转换 API 数据为应用模型
-      const items = CartTransformer.toModelList(data.items)
-
-      cart.value = {
-        items,
-        itemCount: items.length,
-        totalQuantity: items.reduce((sum, item) => sum + item.quantity.value, 0),
-      }
-
-      cartUIStore.updateLastUpdateTime()
-      cartUIStore.markAsInitialized()
+      await cartStore.loadCart(options)
     } catch (err: any) {
       error.value = err.message || '加载购物车失败'
-      console.error('Failed to load cart:', err)
       throw err
-    } finally {
-      cartUIStore.setLoading(false)
     }
   }
 
@@ -327,43 +283,32 @@ export function useCart() {
    * 添加商品到购物车
    */
   const addToCart = async (params: {
-    productId: string
-    specId: string
-    quantity: number
-    productName?: string
-    productImage?: string
-    specName?: string
-    price?: number
-    marketPrice?: number
+    item_id: string
+    num: number
+    distributor_id?: string
     stock?: number
+    productName?: string
   }): Promise<{ success: boolean; error?: string }> => {
     try {
-      // 业务验证
-      if (params.quantity <= 0) {
-        throw BusinessError.quantityInvalid(params.quantity)
+      // 1. 业务验证
+      if (params.num <= 0) {
+        throw BusinessError.quantityInvalid(params.num)
       }
-
-      if (params.stock !== undefined && params.quantity > params.stock) {
+      if (params.stock !== undefined && params.num > params.stock) {
         throw BusinessError.insufficientStock(params.productName || '商品', params.stock)
       }
 
-      // API 调用
-      const request: IAddCartRequest = {
-        product_id: params.productId,
-        spec_id: params.specId,
-        quantity: params.quantity,
-      }
+      // 2. 调用 Store 执行底层操作
+      await cartStore.addItem({
+        productId: params.item_id,
+        quantity: params.num
+      })
 
-      await cartApiClient.addToCart(request)
-
-      // 重新加载购物车
-      await loadCart()
-
-      message.success('已添加到购物车')
+      toast.show('已添加到购物车')
       return { success: true }
     } catch (err: any) {
       const errorMsg = err.message || '添加失败'
-      message.error(errorMsg)
+      toast.show(errorMsg)
       return { success: false, error: errorMsg }
     }
   }
@@ -376,72 +321,11 @@ export function useCart() {
     quantity: number
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      // 查找商品
-      const item = cart.value.items.find((i) => i.id === itemId)
-      if (!item) {
-        throw BusinessError.notFound('商品', itemId)
-      }
-
-      // 业务验证
-      if (quantity <= 0) {
-        throw BusinessError.quantityInvalid(quantity)
-      }
-
-      if (quantity > item.stock) {
-        throw BusinessError.insufficientStock(item.productName, item.stock)
-      }
-
-      // API 调用
-      const request: IUpdateCartRequest = {
-        quantity,
-      }
-
-      await cartApiClient.updateCartItem(itemId, request)
-
-      // 重新加载购物车
-      await loadCart()
-
+      await cartStore.updateQuantity(itemId, quantity)
       return { success: true }
     } catch (err: any) {
+      // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
       const errorMsg = err.message || '更新失败'
-      message.error(errorMsg)
-      return { success: false, error: errorMsg }
-    }
-  }
-
-  /**
-   * 删除商品
-   */
-  const removeItem = async (itemId: string): Promise<{ success: boolean; error?: string }> => {
-    try {
-      await cartApiClient.removeCartItem(itemId)
-      await loadCart()
-      message.success('已删除商品')
-      return { success: true }
-    } catch (err: any) {
-      const errorMsg = err.message || '删除失败'
-      message.error(errorMsg)
-      return { success: false, error: errorMsg }
-    }
-  }
-
-  /**
-   * 删除选中的商品
-   */
-  const removeSelectedItems = async (): Promise<{ success: boolean; error?: string }> => {
-    try {
-      // 业务验证
-      if (!hasSelectedItems()) {
-        throw BusinessError.validation('请先选择要删除的商品')
-      }
-
-      await cartApiClient.removeSelectedItems()
-      await loadCart()
-      message.success('已删除选中商品')
-      return { success: true }
-    } catch (err: any) {
-      const errorMsg = err.message || '删除失败'
-      message.error(errorMsg)
       return { success: false, error: errorMsg }
     }
   }
@@ -451,12 +335,11 @@ export function useCart() {
    */
   const toggleItemSelection = async (itemId: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      await cartApiClient.toggleItemSelection(itemId)
-      await loadCart()
+      await cartStore.toggleItemSelection(itemId)
       return { success: true }
     } catch (err: any) {
-      const errorMsg = err.message || '操作失败'
-      message.error(errorMsg)
+      // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
+      const errorMsg = err.message || '切换失败'
       return { success: false, error: errorMsg }
     }
   }
@@ -464,15 +347,45 @@ export function useCart() {
   /**
    * 全选/取消全选
    */
-  const toggleAllSelection = async (): Promise<{ success: boolean; error?: string }> => {
+  const toggleAllSelection = async (selected: boolean): Promise<{ success: boolean; error?: string }> => {
     try {
-      const selected = !isAllSelected()
-      await cartApiClient.toggleAllSelection(selected)
-      await loadCart()
+      await cartStore.toggleAllSelection(selected)
       return { success: true }
     } catch (err: any) {
-      const errorMsg = err.message || '操作失败'
-      message.error(errorMsg)
+      // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
+      const errorMsg = err.message || '全选失败'
+      return { success: false, error: errorMsg }
+    }
+  }
+
+  /**
+   * 删除选中的商品
+   */
+  const removeSelectedItems = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      await cartStore.removeSelectedItems()
+      // ✅ 只有成功时才显示成功消息
+      toast.show('已删除选中商品')
+      return { success: true }
+    } catch (err: any) {
+      // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
+      const errorMsg = err.message || '删除失败'
+      return { success: false, error: errorMsg }
+    }
+  }
+
+  /**
+   * 删除商品
+   */
+  const removeItem = async (itemId: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      await cartStore.removeItem(itemId)
+      // ✅ 只有成功时才显示成功消息
+      toast.show('已删除商品')
+      return { success: true }
+    } catch (err: any) {
+      // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
+      const errorMsg = err.message || '删除失败'
       return { success: false, error: errorMsg }
     }
   }
@@ -482,59 +395,19 @@ export function useCart() {
    */
   const clearCart = async (): Promise<{ success: boolean; error?: string }> => {
     try {
-      await cartApiClient.clearCart()
-      await loadCart()
-      message.success('已清空购物车')
+      await cartStore.clearCart()
+      // ✅ 只有成功时才显示成功消息
+      toast.show('已清空购物车')
       return { success: true }
     } catch (err: any) {
+      // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
       const errorMsg = err.message || '清空失败'
-      message.error(errorMsg)
       return { success: false, error: errorMsg }
     }
   }
 
   /**
-   * 验证结算
-   */
-  const validateCheckout = async (): Promise<{ valid: boolean; errors: string[] }> => {
-    try {
-      const errors: string[] = []
-
-      if (cart.value.items.length === 0) {
-        errors.push('购物车为空')
-        return { valid: false, errors }
-      }
-
-      const selectedItems = cart.value.items.filter((item) => item.selected)
-      if (selectedItems.length === 0) {
-        errors.push('请选择要结算的商品')
-        return { valid: false, errors }
-      }
-
-      // 验证每个选中商品
-      for (const item of selectedItems as ICartItemModel[]) {
-        if (!canItemBePurchased(item)) {
-          errors.push(`商品 ${item.productName} 不可购买`)
-        }
-        if (item.quantity.value > item.stock) {
-          errors.push(`商品 ${item.productName} 库存不足`)
-        }
-      }
-
-      return {
-        valid: errors.length === 0,
-        errors,
-      }
-    } catch (err: any) {
-      return {
-        valid: false,
-        errors: [err.message || '验证失败'],
-      }
-    }
-  }
-
-  /**
-   * 检查特定商品项的操作是否正在加载
+   * 其他 UI 状态查询保持不变，但使用 Store
    */
   const isItemLoading = (itemId: string, action: 'update' | 'remove'): boolean => {
     const key = `${action}-${itemId}`
@@ -543,24 +416,29 @@ export function useCart() {
 
   return {
     // 响应式状态
-    cart: readonly(cart),
+    items,
+    invalidItems,
     cartUI,
-    loading: readonly(loading),
-    error: readonly(error),
+    loading,
+    error,
 
     // 方法
     loadCart,
     addToCart,
     updateQuantity,
-    removeItem,
-    removeSelectedItems,
     toggleItemSelection,
     toggleAllSelection,
+    removeSelectedItems,
+    removeItem,
     clearCart,
-    validateCheckout,
-
-    // UI 状态查询
     isItemLoading,
+
+    // 兼容原有接口（如果其他地方在用）
+    cart: computed(() => ({
+      items: items.value,
+      itemCount: items.value.length,
+      totalQuantity: cartStore.totalItems
+    }))
   }
 }
 

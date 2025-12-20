@@ -69,8 +69,11 @@ export function useSmsCode() {
 
   /**
    * 发送短信验证码
+   * @param phone - 手机号
+   * @param captcha - 图形验证码
+   * @param captchaToken - 图形验证码 token
    */
-  async function sendCode(params: ISmsCodeRequest): Promise<boolean> {
+  async function sendCode(phone: string, captcha: string, captchaToken: string): Promise<boolean> {
     // 验证是否可以发送
     if (!canSend.value) {
       error.value = '请稍后再试'
@@ -78,7 +81,7 @@ export function useSmsCode() {
     }
 
     // 验证手机号格式
-    if (!AuthTransformer.validatePhone(params.phone)) {
+    if (!AuthTransformer.validatePhone(phone)) {
       error.value = '手机号格式不正确'
       return false
     }
@@ -88,7 +91,13 @@ export function useSmsCode() {
       error.value = ''
 
       // 调用发送短信验证码 API
-      const response = await authApiClient.sendSmsCode(params)
+      // company_id 由 HTTP 插件自动添加
+      const response = await authApiClient.sendSmsCode({
+        type: 'login',
+        mobile: phone,
+        yzm: captcha,
+        token: captchaToken,
+      })
       const result = AuthTransformer.toSmsCodeModel(response)
 
       if (!result.success) {

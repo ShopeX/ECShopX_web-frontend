@@ -5,6 +5,7 @@ import type { Ref } from 'vue'
 export interface HttpOptions {
   skipAuth?: boolean
   skipCompanyId?: boolean
+  useJson?: boolean // ✅ 是否使用 JSON 格式（默认使用 form-urlencoded）
   headers?: Record<string, string>
   query?: Record<string, any>
   body?: any
@@ -232,6 +233,7 @@ export interface ExtendedHttpOptions<T = any> {
   key?: string
   skipAuth?: boolean
   skipCompanyId?: boolean
+  useJson?: boolean // ✅ 是否使用 JSON 格式（默认使用 form-urlencoded）
   cache?: CacheOptions
   customRetry?: {
     attempts?: number

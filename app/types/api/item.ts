@@ -72,9 +72,9 @@ export interface IItemListParams {
   main_category: string
   is_tdk: string
   type: string
-  company_id: string
 
-  // 可选参数
+  // 可选参数（HTTP 插件会自动添加 company_id）
+  company_id?: string
   brand_id?: string
   sort?: string
   start_price?: number

@@ -3,8 +3,19 @@ import type {
   IUserInfo,
   IGetUserInfoResponse,
   ISmsCodeResponse,
+  ISmsCodeResponseData,
   ICaptchaResponse,
 } from '~/types/api/auth'
+
+/**
+ * 转换后的登录数据模型
+ */
+export interface ILoginModel {
+  token: string
+  expiresIn: number
+  refreshToken: string
+  userInfo?: IUserInfo
+}
 
 /**
  * 认证数据转换器（轻量级 DDD）
@@ -35,47 +46,43 @@ export class AuthTransformer {
   /**
    * 登录响应数据 → 应用模型
    * 
-   * @param apiResponse - API 返回的登录响应
+   * @param apiResponse - API 返回的登录响应数据（HTTP 插件已自动解包 data 字段）
    * @returns 登录数据模型
    */
-  static toLoginModel(apiResponse: ILoginResponse): ILoginResponse {
+  static toLoginModel(apiResponse: ILoginResponse): ILoginModel {
     // 验证必需字段
-    if (!apiResponse.token) {
+    if (!apiResponse?.token) {
       throw new Error('Invalid login response: missing token')
     }
 
-    console.log('apiResponse',)
-
-
-    // if (!apiResponse?.userInfo) {
-    //   throw new Error('Invalid login response: missing userInfo')
-    // }
-
     return {
       token: apiResponse.token,
-      // userInfo: this.toUserInfoModel(apiResponse.userInfo),
-      expiresIn: apiResponse.expiresIn || 7200,  // 默认 2 小时
-      refreshToken: apiResponse.refreshToken || '',
+      expiresIn: 7200,  // 默认 2 小时
+      refreshToken: '',
     }
   }
 
   /**
    * 用户信息 → 应用模型
    * 
-   * @param apiUser - API 返回的用户信息
+   * @param apiResponse - API 返回的用户信息响应
    * @returns 用户信息模型
    */
-  static toUserInfoModel(apiUser: IGetUserInfoResponse): IUserInfo {
+  static toUserInfoModel(apiResponse: IGetUserInfoResponse): IUserInfo {
     // 验证必需字段
-    if (!apiUser.memberInfo.user_id) {
-      throw new Error('Invalid user info: missing id')
+    if (!apiResponse || !apiResponse.memberInfo) {
+      throw new Error('Invalid user info: missing memberInfo')
+    }
+
+    if (!apiResponse.memberInfo.user_id) {
+      throw new Error('Invalid user info: missing user_id')
     }
 
     return {
-      user_id: apiUser.memberInfo.user_id,
-      username: apiUser.memberInfo.username || '',
-      mobile: apiUser.memberInfo.mobile || '',
-      avatar: apiUser.memberInfo.avatar || this.getDefaultAvatar(),
+      user_id: apiResponse.memberInfo.user_id,
+      username: apiResponse.memberInfo.username || '',
+      mobile: apiResponse.memberInfo.mobile || '',
+      avatar: apiResponse.memberInfo.avatar || this.getDefaultAvatar(),
     }
   }
 
@@ -85,11 +92,15 @@ export class AuthTransformer {
    * @param apiResponse - API 返回的短信验证码响应
    * @returns 短信验证码响应模型
    */
-  static toSmsCodeModel(apiResponse: ISmsCodeResponse): ISmsCodeResponse {
+  static toSmsCodeModel(apiResponse: { data: ISmsCodeResponseData }): ISmsCodeResponse {
+    const data = apiResponse.data
+    // 根据 status_code 判断是否成功 (200 表示成功)
+    const success = data.status_code === 200
+
     return {
-      success: apiResponse.success ?? false,
-      message: apiResponse.message || '',
-      expiresIn: apiResponse.expiresIn || 300,  // 默认 5 分钟
+      success: success,
+      message: data.message || '',
+      expiresIn: 300,  // 默认 5 分钟
     }
   }
 
@@ -99,16 +110,18 @@ export class AuthTransformer {
    * @param apiResponse - API 返回的图形验证码响应
    * @returns 图形验证码响应模型
    */
-  static toCaptchaModel(apiResponse: ICaptchaResponse): ICaptchaResponse {
+  static toCaptchaModel(apiResponse: { data: ICaptchaResponse }): ICaptchaResponse {
+    const data = apiResponse.data
+
     // 验证必需字段
-    if (!apiResponse.image || !apiResponse.key) {
-      throw new Error('Invalid captcha response: missing image or key')
+    if (!data.imageData || !data.imageToken) {
+      throw new Error('Invalid captcha response: missing imageData or imageToken')
     }
 
     return {
-      image: apiResponse.image,
-      key: apiResponse.key,
-      expiresIn: apiResponse.expiresIn || 300,  // 默认 5 分钟
+      imageData: data.imageData,
+      imageToken: data.imageToken,
+      expiresIn: 300,  // 默认 5 分钟
     }
   }
 

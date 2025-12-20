@@ -63,7 +63,7 @@ export class ItemApiClient {
       main_category: params.main_category,
       is_tdk: params.is_tdk,
       type: params.type,
-      company_id: params.company_id,
+      // company_id 由 HTTP 插件自动添加，无需手动传递
       ...(params.brand_id && { brand_id: params.brand_id }),
       ...(params.sort && { sort: params.sort }),
       ...(params.start_price && { start_price: params.start_price }),

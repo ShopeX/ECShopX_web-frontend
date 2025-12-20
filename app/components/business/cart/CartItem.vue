@@ -1,164 +1,194 @@
 <template>
-  <div
-    class="flex items-center gap-4 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors"
-  >
-    <!-- 勾选框 -->
-    <div class="flex-shrink-0">
-      <input
-        type="checkbox"
-        :checked="item.selected"
-        :disabled="!item.canBePurchased || loading"
-        class="w-5 h-5 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-        @change="handleToggleSelection"
-      />
-    </div>
-
-    <!-- 商品图片 -->
-    <div class="flex-shrink-0">
-      <img
-        :src="item.productImage"
-        :alt="item.productName"
-        class="w-20 h-20 object-cover rounded border border-gray-200"
-      />
-    </div>
-
-    <!-- 商品信息 -->
-    <div class="flex-1 min-w-0">
-      <h4 class="text-base font-medium text-gray-900 truncate">
-        {{ item.productName }}
-      </h4>
-      <p v-if="item.specName" class="text-sm text-gray-500 mt-1">规格: {{ item.specName }}</p>
-      <!-- 不可购买提示 -->
-      <p v-if="!item.canBePurchased" class="text-sm text-red-600 mt-1">该商品已下架或库存不足</p>
-    </div>
-
-    <!-- 单价 -->
-    <div class="flex-shrink-0 w-24 text-center">
-      <div class="text-gray-900 font-medium">{{ item.priceDisplay }}</div>
-      <div v-if="item.hasDiscount" class="text-sm text-gray-400 line-through">
-        {{ item.marketPriceDisplay }}
+  <div class="relative shrink-0 w-full" :class="{ 'opacity-60': !item.canBePurchased }">
+    <div
+      class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex gap-[16px] items-start pb-[32px] pt-0 px-0 relative w-full"
+    >
+      <!-- 勾选框 -->
+      <div
+        class="border border-solid shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0 size-[16px] flex items-center justify-center cursor-pointer"
+        :class="[item.selected ? 'bg-black border-black' : 'bg-white border-[#191a1d]']"
+        @click="$emit('toggle-selection', item.id)"
+      >
+        <div
+          v-if="item.selected"
+          class="content-stretch flex items-center justify-center size-[14px]"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
       </div>
-    </div>
 
-    <!-- 数量调整器 -->
-    <div class="flex-shrink-0 w-32">
-      <QuantityInput
-        :model-value="item.quantity"
-        :min="item.quantityMin"
-        :max="item.quantityMax"
-        :disabled="!item.canBePurchased"
-        :loading="isUpdating"
-        @change="handleQuantityChange"
-      />
-    </div>
+      <!-- 商品图片 -->
+      <div class="relative shrink-0 size-[160px] bg-[#f9f9f9]">
+        <img
+          :src="item.productImage"
+          :alt="item.productName"
+          class="absolute max-w-none object-cover size-full"
+        />
+      </div>
 
-    <!-- 小计 -->
-    <div class="flex-shrink-0 w-24 text-center">
-      <div class="text-lg font-semibold text-red-600">{{ item.subtotalDisplay }}</div>
-    </div>
-
-    <!-- 操作按钮 -->
-    <div class="flex-shrink-0 flex flex-col gap-2">
-      <button
-        type="button"
-        :disabled="isRemoving"
-        class="text-sm text-gray-600 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        @click="handleRemove"
+      <!-- 商品详情 -->
+      <div
+        class="basis-0 content-stretch flex gap-[16px] grow items-start min-h-px min-w-px relative self-stretch shrink-0"
       >
-        {{ isRemoving ? '删除中...' : '删除' }}
-      </button>
-      <button
-        type="button"
-        class="text-sm text-gray-600 hover:text-primary transition-colors"
-        @click="handleFavorite"
-      >
-        收藏
-      </button>
+        <div class="basis-0 grow min-h-px min-w-px relative shrink-0">
+          <div
+            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[4px] items-start relative w-full"
+          >
+            <div class="relative shrink-0 w-full mb-1">
+              <p
+                class="font-['Noto_Sans_SC'] font-medium leading-[20px] text-[16px] text-[#191a1d]"
+              >
+                {{ item.productName }}
+              </p>
+            </div>
+            <div v-if="item.productId" class="relative shrink-0 w-full">
+              <p
+                class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#364153]"
+              >
+                款号: {{ item.productId }}
+              </p>
+            </div>
+            <div v-if="item.specName" class="relative shrink-0 w-full">
+              <p
+                class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#364153]"
+              >
+                款式: {{ item.specName }}
+              </p>
+            </div>
+            <div class="relative shrink-0 w-full">
+              <p
+                class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#364153]"
+              >
+                尺寸: {{ '默认' }}
+              </p>
+            </div>
+            <div class="relative shrink-0 mt-2">
+              <p
+                class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[#364153] text-[14px]"
+              >
+                价格 :
+                <span class="font-['Inter'] font-medium text-[16px] ml-1">{{
+                  item.priceDisplay
+                }}</span>
+              </p>
+            </div>
+            <div v-if="!item.canBePurchased" class="text-xs text-red-500 mt-1">(暂不可售)</div>
+          </div>
+        </div>
+
+        <!-- 右侧操作区：数量和删除 -->
+        <div class="h-full relative shrink-0 w-[120px]">
+          <div
+            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col items-end justify-between relative size-full"
+          >
+            <!-- 数量调整器 -->
+            <div
+              class="bg-white border border-[#e5e7eb] border-solid relative shrink-0 w-full h-[40px]"
+            >
+              <div
+                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-between p-px relative size-full"
+              >
+                <button
+                  class="basis-0 grow h-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-30"
+                  :disabled="item.quantity <= item.quantityMin || loading"
+                  @click="$emit('quantity-change', item.id, item.quantity - 1)"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3.33331 8H12.6666"
+                      stroke="#191A1D"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+                <div class="h-full w-[40px] flex items-center justify-center">
+                  <p class="font-['Inter'] font-medium text-[14px] text-[#101828]">
+                    {{ item.quantity }}
+                  </p>
+                </div>
+                <button
+                  class="basis-0 grow h-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-30"
+                  :disabled="item.quantity >= item.quantityMax || loading"
+                  @click="$emit('quantity-change', item.id, item.quantity + 1)"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 3.33331V12.6666M3.33331 8H12.6666"
+                      stroke="#191A1D"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 删除按钮 -->
+            <div class="relative shrink-0 w-full mt-auto">
+              <div
+                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-start justify-end pb-0 pt-[16px] px-0 relative w-full"
+              >
+                <button
+                  class="relative shrink-0 hover:text-red-600 transition-colors"
+                  @click="$emit('remove', item.id)"
+                >
+                  <p
+                    class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#191a1d] hover:text-inherit"
+                  >
+                    删除
+                  </p>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-/**
- * 购物车商品项组件
- *
- * 显示单个购物车商品的完整信息和操作
- */
-
 import type { ICartUI } from '~/composables/useCart'
-import { useCart } from '~/composables/useCart'
-
-// QuantityInput 组件由 Nuxt 自动导入，无需手动 import
 
 interface Props {
-  /** 购物车商品项 */
   item: ICartUI['items'][number]
-  /** 是否正在更新 */
   loading?: boolean
 }
 
-interface Emits {
-  /** 选中状态变化 */
+defineProps<Props>()
+
+defineEmits<{
   (e: 'toggle-selection', itemId: string): void
-  /** 数量变化 */
   (e: 'quantity-change', itemId: string, quantity: number): void
-  /** 删除商品 */
   (e: 'remove', itemId: string): void
-  /** 收藏商品 */
-  (e: 'favorite', itemId: string): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-})
-
-const emit = defineEmits<Emits>()
-
-// 购物车操作
-const { isItemLoading } = useCart()
-
-/**
- * 是否正在更新数量
- */
-const isUpdating = computed(() => {
-  return props.loading || isItemLoading(props.item.id, 'update')
-})
-
-/**
- * 是否正在删除
- */
-const isRemoving = computed(() => {
-  return props.loading || isItemLoading(props.item.id, 'remove')
-})
-
-/**
- * 切换选中状态
- */
-function handleToggleSelection() {
-  if (!props.item.canBePurchased) return
-  emit('toggle-selection', props.item.id)
-}
-
-/**
- * 数量变化
- *
- * @param quantity - 新数量
- */
-function handleQuantityChange(quantity: number) {
-  emit('quantity-change', props.item.id, quantity)
-}
-
-/**
- * 删除商品
- */
-function handleRemove() {
-  emit('remove', props.item.id)
-}
-
-/**
- * 收藏商品
- */
-function handleFavorite() {
-  emit('favorite', props.item.id)
-}
+}>()
 </script>

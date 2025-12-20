@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@nuxt/ui':
         specifier: ^4.1.0
-        version: 4.1.0(@babel/parser@7.28.5)(axios@1.13.2)(db0@0.3.4)(embla-carousel@8.6.0)(ioredis@5.8.2)(magicast@0.5.1)(typescript@5.9.3)(vite@7.2.1(@types/node@20.19.24)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.1)(yaml@2.8.1))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))(zod@4.1.12)
+        version: 4.1.0(@babel/parser@7.28.5)(axios@1.13.2)(db0@0.3.4)(embla-carousel@8.6.0)(ioredis@5.8.2)(magicast@0.5.1)(nprogress@0.2.0)(typescript@5.9.3)(vite@7.2.1(@types/node@20.19.24)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.1)(yaml@2.8.1))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))(zod@4.1.12)
       '@pinia/nuxt':
         specifier: ^0.5.1
         version: 0.5.5(magicast@0.5.1)(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
@@ -4005,6 +4005,9 @@ packages:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
 
+  nprogress@0.2.0:
+    resolution: {integrity: sha512-I19aIingLgR1fmhftnbWWO3dXc0hSxqHQHQb3H8m+K3TnEn/iSeTZZOyvKXWqQESMwuUVnatlCnZdLBZZt2VSA==}
+
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
@@ -6373,7 +6376,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@nuxt/ui@4.1.0(@babel/parser@7.28.5)(axios@1.13.2)(db0@0.3.4)(embla-carousel@8.6.0)(ioredis@5.8.2)(magicast@0.5.1)(typescript@5.9.3)(vite@7.2.1(@types/node@20.19.24)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.1)(yaml@2.8.1))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))(zod@4.1.12)':
+  '@nuxt/ui@4.1.0(@babel/parser@7.28.5)(axios@1.13.2)(db0@0.3.4)(embla-carousel@8.6.0)(ioredis@5.8.2)(magicast@0.5.1)(nprogress@0.2.0)(typescript@5.9.3)(vite@7.2.1(@types/node@20.19.24)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.1)(yaml@2.8.1))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))(zod@4.1.12)':
     dependencies:
       '@ai-sdk/vue': 2.0.89(vue@3.5.23(typescript@5.9.3))(zod@4.1.12)
       '@iconify/vue': 5.0.0(vue@3.5.23(typescript@5.9.3))
@@ -6391,7 +6394,7 @@ snapshots:
       '@tanstack/vue-virtual': 3.13.12(vue@3.5.23(typescript@5.9.3))
       '@unhead/vue': 2.0.19(vue@3.5.23(typescript@5.9.3))
       '@vueuse/core': 13.9.0(vue@3.5.23(typescript@5.9.3))
-      '@vueuse/integrations': 13.9.0(axios@1.13.2)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3))
+      '@vueuse/integrations': 13.9.0(axios@1.13.2)(fuse.js@7.1.0)(nprogress@0.2.0)(vue@3.5.23(typescript@5.9.3))
       colortranslator: 5.0.0
       consola: 3.4.2
       defu: 6.1.4
@@ -7662,7 +7665,7 @@ snapshots:
       '@vueuse/shared': 13.9.0(vue@3.5.23(typescript@5.9.3))
       vue: 3.5.23(typescript@5.9.3)
 
-  '@vueuse/integrations@13.9.0(axios@1.13.2)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3))':
+  '@vueuse/integrations@13.9.0(axios@1.13.2)(fuse.js@7.1.0)(nprogress@0.2.0)(vue@3.5.23(typescript@5.9.3))':
     dependencies:
       '@vueuse/core': 13.9.0(vue@3.5.23(typescript@5.9.3))
       '@vueuse/shared': 13.9.0(vue@3.5.23(typescript@5.9.3))
@@ -7670,6 +7673,7 @@ snapshots:
     optionalDependencies:
       axios: 1.13.2
       fuse.js: 7.1.0
+      nprogress: 0.2.0
 
   '@vueuse/metadata@10.11.1': {}
 
@@ -9761,6 +9765,9 @@ snapshots:
     dependencies:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
+
+  nprogress@0.2.0:
+    optional: true
 
   nth-check@2.1.1:
     dependencies:

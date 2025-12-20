@@ -31,14 +31,14 @@
       <span :class="isPriceSortActive ? 'text-red-500' : 'text-gray-500'"> 价格 </span>
       <div class="ml-1 flex flex-col">
         <UIcon
-          name="heroicons:chevron-up"
+          name="i-heroicons-chevron-up"
           :class="
             isPriceSortActive && priceSortDirection === 'asc' ? 'text-red-500' : 'text-gray-500'
           "
           class="h-2 w-2 -mb-1"
         />
         <UIcon
-          name="heroicons:chevron-down"
+          name="i-heroicons-chevron-down"
           :class="
             isPriceSortActive && priceSortDirection === 'desc' ? 'text-red-500' : 'text-gray-500'
           "

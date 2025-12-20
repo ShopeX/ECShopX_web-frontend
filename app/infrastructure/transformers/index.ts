@@ -15,5 +15,5 @@
 
 export { CartTransformer } from './cartTransformer'
 export { ProductTransformer } from './productTransformer'
-export { AuthTransformer } from './authTransformer'
+export { AuthTransformer, type ILoginModel } from './authTransformer'
 

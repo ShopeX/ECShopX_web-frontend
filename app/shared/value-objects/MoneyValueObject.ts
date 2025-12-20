@@ -20,7 +20,7 @@
  * ```
  */
 export class MoneyValueObject {
-  private readonly _amount: number
+  readonly _amount: number
 
   private constructor(amount: number) {
     if (amount < 0) {
@@ -56,10 +56,20 @@ export class MoneyValueObject {
   }
 
   /**
-   * 格式化显示（带货币符号）
+   * 格式化显示（带货币符号和千分位）
    */
   get display(): string {
-    return `¥${this._amount.toFixed(2)}`
+    return `¥${this.formatWithThousandsSeparator(this._amount)}`
+  }
+
+  /**
+   * 千分位格式化
+   */
+  private formatWithThousandsSeparator(amount: number): string {
+    const fixed = amount.toFixed(2)
+    const [integerPart, decimalPart] = fixed.split('.')
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    return `${formattedInteger}.${decimalPart}`
   }
 
   // ==================== 不可变操作（返回新对象） ====================

@@ -38,6 +38,7 @@ import type { IProduct } from '~/components/business/product/ProductCard/types'
 import type { IItemListParams, IItemDetailParams, IProductListItem, IBrand } from '~/types/api/item'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { logger } from '~/utils/log'
 
 /**
  * 商品业务组合式函数
@@ -102,7 +103,7 @@ export function useProduct() {
 
       return { success: true }
     } catch (err: any) {
-      console.error('Load products error:', err)
+      logger.error('[useProduct] Load products error:', err)
       listError.value = err.message || '加载商品列表失败'
 
       products.value = []
@@ -147,7 +148,7 @@ export function useProduct() {
 
       return { success: true }
     } catch (err: any) {
-      console.error('Load more products error:', err)
+      logger.error('[useProduct] Load more products error:', err)
       listError.value = err.message || '加载更多商品失败'
       return { success: false, error: listError.value || undefined }
     } finally {
@@ -213,6 +214,41 @@ export function useProduct() {
   }
 
   /**
+   * 加载商品详情（SSR 支持版本）
+   * 
+   * 使用 useAsyncData 实现，支持服务端渲染
+   * 应该在页面的 <script setup> 顶层调用
+   * 
+   * @param params - 查询参数
+   * @returns useAsyncData 返回值
+   * 
+   * @example
+   * ```typescript
+   * // 在页面中使用
+   * const { loadProductWithSSR } = useProduct()
+   * const { data: product, pending, error } = await loadProductWithSSR({ id: '123' })
+   * ```
+   */
+  const loadProductWithSSR = (params: IItemDetailParams) => {
+    return useAsyncData(
+      `product-detail-${params.id}`,
+      async () => {
+        try {
+          const data = await itemApiClient.getItemDetail(params)
+          return data as IProductListItem
+        } catch (error) {
+          logger.error('[useProduct] Load product detail error:', error)
+          throw error
+        }
+      },
+      {
+        server: true, // 在服务端执行
+        lazy: false,  // 不延迟加载
+      }
+    )
+  }
+
+  /**
    * 重置详情状态
    */
   const resetDetail = () => {
@@ -260,6 +296,7 @@ export function useProduct() {
 
     // 方法
     loadProduct,
+    loadProductWithSSR, // SSR 支持
     resetDetail,
 
     // ==================== 通用 ====================

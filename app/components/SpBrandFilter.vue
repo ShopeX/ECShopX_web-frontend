@@ -4,7 +4,7 @@
       <h3 class="title">品牌</h3>
       <button v-if="showMore" class="more-btn" @click="toggleExpand">
         {{ isExpanded ? '收起' : '更多' }}
-        <Icon :name="isExpanded ? 'heroicons:chevron-up' : 'heroicons:chevron-down'" />
+        <UIcon :name="isExpanded ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'" />
       </button>
     </div>
 

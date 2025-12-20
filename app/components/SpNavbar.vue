@@ -89,7 +89,7 @@
         <div class="relative group">
           <button class="flex items-center space-x-2 h-10 px-6 bg-primary-500 text-white">
             <span>全部商品分类</span>
-            <Icon name="heroicons:chevron-down" />
+            <UIcon name="i-heroicons-chevron-down" />
           </button>
           <!-- 分类下拉菜单 -->
           <div
@@ -103,7 +103,7 @@
                 <span>{{ category.name }}</span>
                 <Icon
                   v-if="category.children?.length"
-                  name="heroicons:chevron-right"
+                  name="i-heroicons-chevron-right"
                   class="text-gray-400"
                 />
               </NuxtLink>
@@ -138,7 +138,7 @@
                 {{ nav.label }}
                 <Icon
                   v-if="nav.children?.length"
-                  name="heroicons:chevron-down"
+                  name="i-heroicons-chevron-down"
                   class="w-3 h-3 transition-transform duration-300 group-hover:rotate-180"
                 />
               </span>
@@ -192,9 +192,9 @@ const topMenus = [
 
 // 用户操作区
 const userActions = [
-  { key: 'message', label: '消息', path: '/member/messages', icon: 'heroicons:bell' },
-  { key: 'cart', label: '购物车', path: '/cart', icon: 'heroicons:shopping-cart' },
-  { key: 'user', label: '我的', path: '/member', icon: 'heroicons:user' },
+  { key: 'message', label: '消息', path: '/member/messages', icon: 'i-heroicons-bell' },
+  { key: 'cart', label: '购物车', path: '/cart', icon: 'i-heroicons-shopping-cart' },
+  { key: 'user', label: '我的', path: '/member', icon: 'i-heroicons-user' },
 ]
 
 // 主导航

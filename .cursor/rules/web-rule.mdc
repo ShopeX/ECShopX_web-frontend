@@ -7,6 +7,24 @@
 - **包管理器**: pnpm
 - **Node.js 版本**: ^20.19.0
 
+## 架构规范
+
+**重要**：本项目采用分层架构，开发新功能前请务必参考：
+
+📘 **[@architecture-rules.mdc](./.cursor/rules/architecture-rules.mdc)** - 架构决策规则
+
+**核心原则**：根据复杂度选择架构
+- **方案 1（完整架构）**：`UI → Composable → Store → API Client → Transformer` - 用于核心业务（用户、购物车、订单）
+- **方案 2（简化架构）**：`UI → Composable → API Client → Transformer` - 用于一般业务（商品、文章、表单）
+- **方案 3（最简架构）**：`UI → 直接处理` - 用于简单页面（关于、条款）
+
+**快速决策**：
+- 需要跨组件共享状态？→ 使用 Store（方案 1）
+- 有复杂业务逻辑但不需要共享？→ 使用 Composable（方案 2）
+- 简单静态页面？→ 直接在组件中处理（方案 3）
+
+详细规则请查看 `architecture-rules.mdc`
+
 ## 技术栈规范
 
 ### 核心框架
@@ -93,6 +111,79 @@ app/
 2. **数据转换**: 使用 `transformers/` 目录下的转换器处理 API 数据
 3. **错误处理**: 统一的错误处理机制
 4. **类型安全**: API 调用必须类型安全
+5. **API 路径规范**: 
+   - APIfox 文档中的接口路径格式：`/api/h5app/wxapp/xxx`
+   - 实际代码中使用的路径格式：去掉 `/api/h5app/wxapp` 前缀，直接使用 `/xxx`
+   - 示例对照：
+     * APIfox: `/api/h5app/wxapp/login` → 代码: `/login`
+     * APIfox: `/api/h5app/wxapp/member/image/code` → 代码: `/member/image/code`
+     * APIfox: `/api/h5app/wxapp/member/sms/code` → 代码: `/member/sms/code`
+     * APIfox: `/api/h5app/wxapp/member` → 代码: `/member`
+   - 原因：HTTP 插件会自动添加 `/api/h5app/wxapp` 前缀，代码中只需写相对路径
+6. **Company ID 自动注入**:
+   - **HTTP 插件自动处理**：所有请求自动添加 `company_id` 参数
+   - **配置来源**：从环境变量 `NUXT_PUBLIC_COMPANY_ID` 读取
+   - **注入规则**：
+     * GET 请求：添加到 query 参数
+     * POST/PUT/PATCH 请求：添加到 body 中
+   - **禁止手动传递**：类型定义中 `company_id` 为可选，无需在代码中传递
+   - 示例：
+     ```typescript
+     // ✅ 正确：不传 company_id
+     await login({
+       username: '13917609856',
+       password: '123456'
+       // company_id 由 HTTP 插件自动添加
+     })
+     
+     // ❌ 错误：手动传递 company_id
+     await login({
+       username: '13917609856',
+       password: '123456',
+       company_id: '38'  // ❌ 多余，会重复
+     })
+     
+     // ⚠️ 特殊情况：跳过自动注入
+     this.http('/api/public', {
+       method: 'GET',
+       skipCompanyId: true  // 跳过自动注入
+     })
+     ```
+   - 详细文档：[Company ID 处理规范](../docs/api/company-id-handling.md)
+
+7. **Content-Type 处理规范**:
+   - **默认使用 form-urlencoded 格式**：项目后端统一使用 `application/x-www-form-urlencoded`
+   - **HTTP 插件自动处理**：所有带 body 的请求默认转换为 URLSearchParams
+   - **特殊情况覆盖**：如果某个接口需要 JSON 格式，使用 `useJson: true`
+   - 示例：
+     ```typescript
+     // ✅ 默认情况（form-urlencoded）- 不需要额外配置
+     this.http('/login', {
+       method: 'POST',
+       body: params, // 自动转换为 form-urlencoded
+     })
+     
+     // ✅ 特殊情况（JSON）- 明确指定
+     this.http('/api/special', {
+       method: 'POST',
+       useJson: true, // 使用 JSON 格式
+       body: params,
+     })
+     
+     // ✅ 文件上传（自动识别）
+     this.http('/upload', {
+       method: 'POST',
+       body: formData, // FormData 自动识别，不做转换
+     })
+     
+     // ❌ 错误：手动设置 Content-Type
+     this.http('/login', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+       body: params,
+     })
+     ```
+   - 原因：统一在 HTTP 插件层处理，符合项目后端规范，避免重复代码
 
 ## 组件开发规范
 
@@ -490,3 +581,6 @@ export const handleApiError = (error: any) => {
 - 2025-01-09: 添加错误处理规范和响应式设计规范
 - 2025-12-15: 添加日志规范，强制使用 logger 工具
 - 2025-12-15: 从 .cursorrules 迁移到 .cursor/rules/web-rule.mdc
+- 2025-12-15: 添加 API 路径规范，定义 APIfox 文档路径与代码路径的转换规则
+- 2025-12-15: 优化 Content-Type 处理规范，默认使用 form-urlencoded（符合项目后端统一规范）
+- 2025-12-15: 添加 Company ID 自动注入机制，从环境变量读取并自动添加到所有请求

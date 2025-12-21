@@ -2,9 +2,7 @@
   <div v-if="pending" class="flex justify-center p-8">
     <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-gray-400" />
   </div>
-  <div v-else-if="error" class="p-4 text-center text-red-500">
-    加载模板失败: {{ error.message }}
-  </div>
+  <!-- 优先渲染模板，即使有 error（因为可能使用了默认模板） -->
   <div v-else-if="template">
     <template v-for="sectionKey in template.order" :key="sectionKey">
       <template v-if="namedSlotKeys.includes(sectionKey)">
@@ -18,6 +16,14 @@
         />
       </template>
     </template>
+  </div>
+  <!-- 只有在没有可用模板时才显示错误（API 和默认模板都失败） -->
+  <div v-else-if="error" class="p-4 text-center text-red-500">
+    加载模板失败: {{ error.message }}
+  </div>
+  <!-- 没有模板也没有错误时显示空状态 -->
+  <div v-else class="p-4 text-center text-gray-400">
+    暂无模板
   </div>
 </template>
 

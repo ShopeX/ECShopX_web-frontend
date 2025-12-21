@@ -4,7 +4,10 @@
     <div class="header-container sticky top-0 z-50 bg-white">
       <TemplateEngine template="header">
         <template #header>
-          <HeaderBar @open-category-nav="handleOpenCategoryNav" />
+          <HeaderBar 
+            @open-category-nav="handleOpenCategoryNav"
+            @open-mini-cart="handleOpenMiniCart"
+          />
         </template>
       </TemplateEngine>
     </div>
@@ -28,6 +31,16 @@
         />
       </template>
     </USlideover>
+
+    <!-- Mini 购物车侧边栏 -->
+    <USlideover v-model:open="showMiniCart" side="right">
+      <template #content>
+        <MiniCart
+          v-model="showMiniCart"
+          @close="showMiniCart = false"
+        />
+      </template>
+    </USlideover>
   </div>
 </template>
 
@@ -35,6 +48,7 @@
 import { ref } from 'vue'
 import { Footer } from '~/components/business/footer'
 import { CategoryNav } from '~/components/business/categoryNav'
+import { MiniCart } from '~/components/business/cart'
 
 // 默认布局组件 - 使用完整的电商头部
 
@@ -42,10 +56,17 @@ const router = useRouter()
 
 // 分类导航侧边栏状态
 const showCategoryNav = ref(false)
+// Mini 购物车侧边栏状态
+const showMiniCart = ref(false)
 
 // 手动处理打开分类导航
 const handleOpenCategoryNav = () => {
   showCategoryNav.value = true
+}
+
+// 手动处理打开 Mini 购物车
+const handleOpenMiniCart = () => {
+  showMiniCart.value = true
 }
 
 /**

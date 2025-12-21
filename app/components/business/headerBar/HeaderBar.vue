@@ -126,6 +126,7 @@ const switchLocalePath = useSwitchLocalePath()
 // 定义 emits
 const emit = defineEmits<{
   openCategoryNav: []
+  openMiniCart: []
 }>()
 
 // 语言菜单相关
@@ -197,8 +198,8 @@ const handleMenu = () => {
  * 处理购物车点击
  */
 const handleCart = () => {
-  // TODO: 实现购物车功能
-  router.push('/cart')
+  // 打开 Mini 购物车侧边栏
+  emit('openMiniCart')
 }
 
 /**

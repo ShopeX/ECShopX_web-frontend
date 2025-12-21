@@ -88,11 +88,18 @@ export const useTemplate = (name: string) => {
   const { data: template, pending, error, refresh } = useAsyncData<ITemplateConfig>(
     `template-${name}`,
     async () => {
-      const response = await templateApiClient.getTemplateConfig(name)
-      // 根据 API 响应结构，数据可能在 data 字段中
-      // 如果后端直接返回配置对象，则直接返回 response
-      // 这里假设遵循标准的 ApiResponse 结构
-      return response.data || response
+      try {
+        const response = await templateApiClient.getTemplateConfig(name)
+        // 根据 API 响应结构，数据可能在 data 字段中
+        // 如果后端直接返回配置对象，则直接返回 response
+        // 这里假设遵循标准的 ApiResponse 结构
+        return response.data || response
+      } catch (err: any) {
+        // 模板接口失败时不抛出错误，返回 null 让 fallback 机制接管
+        // 这样可以避免在控制台显示刺眼的错误信息
+        logger.warn(`[useTemplate] Failed to fetch template "${name}" from API:`, err.message)
+        return null
+      }
     },
     {
       lazy: false, // 页面关键数据，建议非懒加载，或者根据需求调整
@@ -153,28 +160,28 @@ export const useTemplateWithFallback = async (name: string) => {
     const hasValidApiTemplate = isValidTemplate(apiTemplate.value)
 
     if (hasValidApiTemplate) {
-      logger.info(`[useTemplate] Using API template: ${name}`)
+      logger.info(`[useTemplate] ✓ Using API template: ${name}`)
       return apiTemplate.value
     }
 
     // API 模板无效，使用默认模板
     if (defaultTemplate.value) {
-      // 记录使用默认模板的原因
+      // 记录使用默认模板的原因（使用 info 级别，因为这是正常的降级行为）
       if (error.value) {
-        logger.warn(`[useTemplate] API request failed, using default template: ${name}`, error.value)
+        logger.info(`[useTemplate] ⚠ API request failed (${error.value.message}), using default template: ${name}`)
       } else if (!apiTemplate.value) {
-        logger.warn(`[useTemplate] API returned null, using default template: ${name}`)
+        logger.info(`[useTemplate] ⚠ API returned null, using default template: ${name}`)
       } else if (Array.isArray(apiTemplate.value) && apiTemplate.value.length === 0) {
-        logger.warn(`[useTemplate] API returned empty array, using default template: ${name}`)
+        logger.info(`[useTemplate] ⚠ API returned empty array, using default template: ${name}`)
       } else {
-        logger.warn(`[useTemplate] API template invalid, using default template: ${name}`)
+        logger.info(`[useTemplate] ⚠ API template invalid, using default template: ${name}`)
       }
 
       return defaultTemplate.value
     }
 
     // 没有可用的模板
-    logger.error(`[useTemplate] No valid template available for: ${name}`)
+    logger.error(`[useTemplate] ✗ No valid template available for: ${name}`)
     return null
   })
 

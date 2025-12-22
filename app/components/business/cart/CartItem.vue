@@ -32,7 +32,7 @@
       </div>
 
       <!-- 商品图片 -->
-      <div class="relative shrink-0 size-[160px] bg-[#f9f9f9]">
+      <div class="relative shrink-0 size-[110px] lg:size-[160px] bg-[#f9f9f9]">
         <img
           :src="item.productImage"
           :alt="item.productName"
@@ -42,9 +42,9 @@
 
       <!-- 商品详情 -->
       <div
-        class="basis-0 content-stretch flex gap-[16px] grow items-start min-h-px min-w-px relative self-stretch shrink-0"
+        class="basis-0 content-stretch flex flex-col lg:flex-row gap-[16px] grow items-start min-h-px min-w-px relative self-stretch shrink-0"
       >
-        <div class="basis-0 grow min-h-px min-w-px relative shrink-0">
+        <div class="w-full lg:basis-0 lg:grow min-h-px min-w-px relative shrink-0">
           <div
             class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[4px] items-start relative w-full"
           >
@@ -91,19 +91,19 @@
         </div>
 
         <!-- 右侧操作区：数量和删除 -->
-        <div class="h-full relative shrink-0 w-[120px]">
+        <div class="w-full lg:w-[120px] lg:h-full relative shrink-0">
           <div
-            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col items-end justify-between relative size-full"
+            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col items-start lg:items-end justify-between relative w-full lg:size-full"
           >
             <!-- 数量调整器 -->
             <div
-              class="bg-white border border-[#e5e7eb] border-solid relative shrink-0 w-full h-[40px]"
+              class="bg-white border border-[#e5e7eb] border-solid relative shrink-0 w-auto lg:w-full h-[38px] lg:h-[40px]"
             >
               <div
                 class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-between p-px relative size-full"
               >
                 <button
-                  class="basis-0 grow h-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-30"
+                  class="w-[40px] lg:basis-0 lg:grow h-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 transition-colors"
                   :disabled="item.quantity <= item.quantityMin || loading"
                   @click="$emit('quantity-change', item.id, item.quantity - 1)"
                 >
@@ -124,12 +124,14 @@
                   </svg>
                 </button>
                 <div class="h-full w-[40px] flex items-center justify-center">
-                  <p class="font-['Inter'] font-medium text-[14px] text-[#101828]">
+                  <p
+                    class="font-['Inter'] font-medium text-[14px] text-[#101828] tracking-[-0.15px]"
+                  >
                     {{ item.quantity }}
                   </p>
                 </div>
                 <button
-                  class="basis-0 grow h-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-30"
+                  class="w-[40px] lg:basis-0 lg:grow h-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 transition-colors"
                   :disabled="item.quantity >= item.quantityMax || loading"
                   @click="$emit('quantity-change', item.id, item.quantity + 1)"
                 >
@@ -153,9 +155,9 @@
             </div>
 
             <!-- 删除按钮 -->
-            <div class="relative shrink-0 w-full mt-auto">
+            <div class="relative shrink-0 w-full lg:mt-auto">
               <div
-                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-start justify-end pb-0 pt-[16px] px-0 relative w-full"
+                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-start justify-start lg:justify-end pb-0 pt-[16px] px-0 relative w-full"
               >
                 <button
                   class="relative shrink-0 hover:text-red-600 transition-colors"

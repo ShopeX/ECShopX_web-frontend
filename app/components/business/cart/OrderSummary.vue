@@ -1,14 +1,14 @@
 <template>
-  <div class="bg-white content-stretch flex flex-col items-start relative shrink-0 w-[320px]">
-    <div class="relative shrink-0 w-[320px]">
+  <div class="bg-white content-stretch flex flex-col items-start relative shrink-0 w-full lg:w-[320px]">
+    <div class="relative shrink-0 w-full lg:w-[320px]">
       <div
         class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[24px] items-start relative w-full"
       >
         <div
-          class="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-[320px]"
+          class="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full lg:w-[320px]"
         >
           <!-- 商品数量 -->
-          <div class="relative shrink-0 w-[320px]">
+          <div class="relative shrink-0 w-full lg:w-[320px]">
             <div
               class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex gap-[8px] items-center relative w-full"
             >
@@ -28,7 +28,7 @@
           </div>
 
           <!-- 商品总计 (不含优惠) -->
-          <div class="relative shrink-0 w-[320px]">
+          <div class="relative shrink-0 w-full lg:w-[320px]">
             <div
               class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-between relative w-full"
             >
@@ -50,7 +50,7 @@
           </div>
 
           <!-- 运费 -->
-          <div class="relative shrink-0 w-[320px]">
+          <div class="relative shrink-0 w-full lg:w-[320px]">
             <div
               class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-between relative w-full"
             >
@@ -72,7 +72,7 @@
           </div>
 
           <!-- 优惠 -->
-          <div v-if="discountAmount > 0" class="relative shrink-0 w-[320px]">
+          <div v-if="discountAmount > 0" class="relative shrink-0 w-full lg:w-[320px]">
             <div
               class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-between relative w-full"
             >
@@ -94,7 +94,7 @@
           </div>
 
           <!-- 分割线 -->
-          <div class="bg-[rgba(0,0,0,0.1)] h-px shrink-0 w-[320px]" />
+          <div class="bg-[rgba(0,0,0,0.1)] h-px shrink-0 w-full lg:w-[320px]" />
 
           <!-- 总计 -->
           <div class="relative shrink-0 w-full">

@@ -1,8 +1,13 @@
 <template>
   <header class="sp-header-bar bg-white w-full">
-    <div class="flex items-center justify-between px-8 py-6">
+    <div class="flex items-center justify-between px-4 py-6 lg:px-8">
       <!-- 左侧容器 -->
-      <div class="flex items-center gap-6 h-5">
+      <div class="flex items-center gap-3 lg:gap-6 h-5">
+        <!-- LOGO - 移动端显示在左侧，桌面端隐藏 -->
+        <NuxtLink to="/" class="lg:hidden hover:opacity-80 transition-opacity">
+          <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8" />
+        </NuxtLink>
+
         <!-- 搜索按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
@@ -22,34 +27,28 @@
         </button>
       </div>
 
-      <!-- 中间 LOGO -->
-      <NuxtLink
-        to="/"
-        class="font-semibold text-2xl leading-10 tracking-[-0.53px] text-[#191a1d] whitespace-nowrap hover:opacity-80 transition-opacity"
-      >
-        <!-- LOGO -->
+      <!-- 中间 LOGO - 桌面端显示在中间，移动端隐藏 -->
+      <NuxtLink to="/" class="hidden lg:block hover:opacity-80 transition-opacity">
         <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
       </NuxtLink>
 
       <!-- 右侧容器 -->
-      <div class="flex items-center justify-end gap-6 h-5">
+      <div class="flex items-center justify-end gap-3 lg:gap-6 h-5">
         <!-- 购物车按钮 -->
         <button
-          class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
+          class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity relative"
           aria-label="购物袋"
           @click="handleCart"
         >
           <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5 text-[#191a1d]" />
+          <!-- 购物车数量徽章 - 移动端显示 -->
+          <span
+            v-if="cartItemCount > 0"
+            class="absolute -top-1 -right-1 lg:hidden bg-[#191a1d] text-white text-[10px] font-medium leading-5 px-1 min-w-[16px] h-4 flex items-center justify-center rounded-sm"
+          >
+            {{ cartItemCount > 99 ? '99+' : cartItemCount }}
+          </span>
         </button>
-
-        <!-- 订单按钮 -->
-        <!-- <button
-          class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          aria-label="网格视图"
-          @click="handleGrid"
-        >
-          <UIcon name="i-heroicons-squares-2x2" class="w-5 h-5 text-[#191a1d]" />
-        </button> -->
 
         <!-- 用户按钮 -->
         <button
@@ -120,6 +119,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const router = useRouter()
 const userStore = useUserStore()
+const cartStore = useCartStore()
 const { locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 
@@ -135,6 +135,9 @@ const languageMenuRef = ref<HTMLElement | null>(null)
 
 // 当前语言
 const currentLocale = computed(() => locale.value)
+
+// 购物车商品数量
+const cartItemCount = computed(() => cartStore.totalItems || 0)
 
 // 可用语言列表（从配置中获取）
 const availableLocales: Array<{ code: 'en' | 'zh' | 'ar'; name: string }> = [
@@ -196,10 +199,20 @@ const handleMenu = () => {
 
 /**
  * 处理购物车点击
+ * 移动端：跳转到购物车页面
+ * 桌面端：打开 Mini 购物车侧边栏
  */
 const handleCart = () => {
-  // 打开 Mini 购物车侧边栏
-  emit('openMiniCart')
+  // 检测是否为移动端（小于 lg 断点 1024px）
+  const isMobile = window.innerWidth < 1024
+
+  if (isMobile) {
+    // 移动端：直接跳转到购物车页面
+    router.push('/cart')
+  } else {
+    // 桌面端：打开 Mini 购物车侧边栏
+    emit('openMiniCart')
+  }
 }
 
 /**

@@ -33,11 +33,13 @@ app/components/ui/
 │   ├── types.ts
 │   └── index.ts
 │
-├── select/                  ⏳ 待创建
+├── select/                  ✅ 已重构
 │   ├── Select.vue
-│   ├── SelectOption.vue
 │   ├── types.ts
-│   └── index.ts
+│   ├── index.ts
+│   ├── README.md
+│   ├── QUICK_START.md
+│   └── example.vue
 │
 ├── radio/                   ⏳ 待创建
 │   ├── Radio.vue
@@ -45,11 +47,13 @@ app/components/ui/
 │   ├── types.ts
 │   └── index.ts
 │
-├── checkbox/                ⏳ 待创建
+├── checkbox/                ✅ 已重构
 │   ├── Checkbox.vue
-│   ├── CheckboxGroup.vue
 │   ├── types.ts
-│   └── index.ts
+│   ├── index.ts
+│   ├── README.md
+│   ├── QUICK_START.md
+│   └── example.vue
 │
 ├── toast/                   ⏳ 待创建
 │   ├── Toast.vue
@@ -122,11 +126,24 @@ const formData = ref({})
    - 增强功能（clearable, password toggle）
    - 完整类型定义
 
+5. **checkbox/** - 复选框组件
+   - 支持 v-model 双向绑定
+   - 三种尺寸（sm、md、lg）
+   - 三种样式变体（default、primary、secondary）
+   - 支持禁用状态和自定义标签
+   - 完整文档和示例
+
+6. **select/** - 下拉选择组件
+   - 支持 v-model 双向绑定
+   - 三种尺寸（sm、md、lg）
+   - 三种样式变体（default、outlined、filled）
+   - 支持禁用、错误状态
+   - 自定义下拉箭头图标
+   - 完整文档和示例
+
 ## ⏳ 待完成的模块
 
-5. **select/** - 下拉选择组件
-6. **radio/** - 单选框组件
-7. **checkbox/** - 复选框组件
+7. **radio/** - 单选框组件
 8. **toast/** - 提示组件
 9. **quantity-input/** - 数量输入器
 

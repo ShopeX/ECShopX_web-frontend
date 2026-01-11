@@ -283,28 +283,32 @@ export function useCart() {
    * 添加商品到购物车
    */
   const addToCart = async (params: {
+    cart_type?: 'cart' | 'fastbuy'
     item_id: string
     num: number
-    distributor_id?: string
-    stock?: number
-    productName?: string
+    distributor_id?: string,
+    shop_type?: 'distributor'
   }): Promise<{ success: boolean; error?: string }> => {
     try {
       // 1. 业务验证
       if (params.num <= 0) {
         throw BusinessError.quantityInvalid(params.num)
       }
-      if (params.stock !== undefined && params.num > params.stock) {
-        throw BusinessError.insufficientStock(params.productName || '商品', params.stock)
-      }
+      // if (params.stock !== undefined && params.num > params.stock) {
+      //   throw BusinessError.insufficientStock(params.productName || '商品', params.stock)
+      // }
 
       // 2. 调用 Store 执行底层操作
       await cartStore.addItem({
-        productId: params.item_id,
-        quantity: params.num
+        item_id: params.item_id,
+        num: params.num,
+        distributor_id: String(params.distributor_id ?? 0),
+        shop_type: params.shop_type ?? 'distributor',
+        cart_type: params.cart_type ?? 'cart',
       })
 
-      toast.show('已添加到购物车')
+      params.cart_type === 'cart' && toast.show('已添加到购物车')
+
       return { success: true }
     } catch (err: any) {
       const errorMsg = err.message || '添加失败'

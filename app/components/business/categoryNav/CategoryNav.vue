@@ -30,6 +30,7 @@
           :key="category.id"
           :to="category.link"
           class="text-base font-medium text-[#191a1d] leading-5 hover:opacity-70 transition-opacity"
+          @click="handleClose"
         >
           {{ category.name }}
         </NuxtLink>
@@ -143,21 +144,13 @@ input:focus {
   outline: none;
 }
 
-/* 自定义滚动条 */
+/* 隐藏滚动条 */
+.overflow-auto {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 和 Edge */
+}
+
 .overflow-auto::-webkit-scrollbar {
-  width: 4px;
-}
-
-.overflow-auto::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.overflow-auto::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
-  border-radius: 2px;
-}
-
-.overflow-auto::-webkit-scrollbar-thumb:hover {
-  background: #d1d5db;
+  display: none; /* Chrome, Safari, Opera */
 }
 </style>

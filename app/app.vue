@@ -4,7 +4,7 @@
       color="repeating-linear-gradient(to right, #111827 0%, #1f2937 50%, #6b7280 100%)"
     />
     <NuxtLayout>
-      <NuxtPage />
+      <NuxtPage :keepalive="{ max: 10 }" />
     </NuxtLayout>
     <!-- <CartDrawer /> -->
   </UApp>

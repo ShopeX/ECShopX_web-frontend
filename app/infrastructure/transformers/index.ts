@@ -16,4 +16,6 @@
 export { CartTransformer } from './cartTransformer'
 export { ProductTransformer } from './productTransformer'
 export { AuthTransformer, type ILoginModel } from './authTransformer'
+export { OrderTransformer } from './orderTransformer'
+export type { IOrderCalculateModel, IAddressModel, ICouponModel } from './orderTransformer'
 

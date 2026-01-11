@@ -4,32 +4,11 @@
       class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex gap-[16px] items-start pb-[32px] pt-0 px-0 relative w-full"
     >
       <!-- 勾选框 -->
-      <div
-        class="border border-solid shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0 size-[16px] flex items-center justify-center cursor-pointer"
-        :class="[item.selected ? 'bg-black border-black' : 'bg-white border-[#191a1d]']"
-        @click="$emit('toggle-selection', item.id)"
-      >
-        <div
-          v-if="item.selected"
-          class="content-stretch flex items-center justify-center size-[14px]"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
+      <Checkbox
+        :checked="item.selected"
+        size="sm"
+        @change="$emit('toggle-selection', item.id)"
+      />
 
       <!-- 商品图片 -->
       <div class="relative shrink-0 size-[110px] lg:size-[160px] bg-[#f9f9f9]">
@@ -179,6 +158,7 @@
 </template>
 
 <script setup lang="ts">
+import { Checkbox } from '~/components/ui/checkbox'
 import type { ICartUI } from '~/composables/useCart'
 
 interface Props {

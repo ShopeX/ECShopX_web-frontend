@@ -66,16 +66,10 @@ export interface IAddCartRequest {
   num: number
   /** 分销商ID */
   distributor_id: string
-  /** 购物车类型：normal-普通，fastbuy-立即购买 */
-  cart_type?: 'normal' | 'fastbuy'
+  /** 购物车类型：cart-普通，fastbuy-立即购买 */
+  cart_type: 'cart' | 'fastbuy'
   /** 店铺类型：distributor-分销商，drug-药品，pointsmall-积分商城 */
-  shop_type?: 'distributor' | 'drug' | 'pointsmall'
-  /** 是否累加（立即购买时为false） */
-  isAccumulate?: boolean
-  /** 公司ID */
-  company_id?: string
-  /** 砍价活动ID（砍价商品时必填） */
-  bargain_id?: string
+  shop_type: 'distributor' | 'drug' | 'pointsmall'
 }
 
 /**

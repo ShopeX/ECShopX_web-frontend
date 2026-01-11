@@ -26,7 +26,7 @@
       <div class="w-full">
         <!-- 加载状态 -->
         <div v-if="pending && !products.length" class="flex justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+          <Loading />
         </div>
 
         <!-- 错误状态 -->
@@ -101,6 +101,11 @@ import { ESortOption } from '~/components/business/product/ProductFilter'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
+
+// 启用页面缓存
+definePageMeta({
+  keepalive: true,
+})
 
 // SEO 元数据配置
 useSeoMeta({

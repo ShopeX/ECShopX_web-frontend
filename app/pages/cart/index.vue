@@ -59,47 +59,12 @@
           <div
             class="hidden lg:flex border-[0px_0px_1px] border-[#e5e7eb] border-solid content-stretch gap-[8px] items-center pb-[17px] pt-0 px-0 relative shrink-0 w-full"
           >
-            <div
-              class="border border-solid shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0 size-[16px] flex items-center justify-center cursor-pointer"
-              :class="[
-                cartUI.isAllSelected && cartUI.itemCount > 0
-                  ? 'bg-black border-black'
-                  : 'bg-white border-[#191a1d]',
-              ]"
-              @click="handleToggleAll"
-            >
-              <div
-                v-if="cartUI.isAllSelected && cartUI.itemCount > 0"
-                class="content-stretch flex items-center justify-center size-[14px]"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-                    stroke="white"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div class="relative shrink-0">
-              <div
-                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center relative"
-              >
-                <p
-                  class="font-['Noto_Sans_SC'] font-normal leading-[20px] relative shrink-0 text-[14px] text-[#191a1d] text-nowrap"
-                >
-                  全选
-                </p>
-              </div>
-            </div>
+            <Checkbox
+              :checked="cartUI.isAllSelected && cartUI.itemCount > 0"
+              size="sm"
+              label="全选"
+              @change="handleToggleAll"
+            />
           </div>
 
           <!-- 商品列表 -->
@@ -146,47 +111,12 @@
           <div
             class="border-[0px_0px_1px] border-[#e5e7eb] border-solid content-stretch flex gap-[8px] items-center pb-[17px] pt-0 px-0 relative shrink-0 w-full"
           >
-            <div
-              class="border border-solid shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0 size-[16px] flex items-center justify-center cursor-pointer"
-              :class="[
-                cartUI.isAllSelected && cartUI.itemCount > 0
-                  ? 'bg-black border-black'
-                  : 'bg-white border-[#191a1d]',
-              ]"
-              @click="handleToggleAll"
-            >
-              <div
-                v-if="cartUI.isAllSelected && cartUI.itemCount > 0"
-                class="content-stretch flex items-center justify-center size-[14px]"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-                    stroke="white"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div class="relative shrink-0">
-              <div
-                class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center relative"
-              >
-                <p
-                  class="font-['Noto_Sans_SC'] font-normal leading-[20px] relative shrink-0 text-[14px] text-[#191a1d] text-nowrap"
-                >
-                  全选
-                </p>
-              </div>
-            </div>
+            <Checkbox
+              :checked="cartUI.isAllSelected && cartUI.itemCount > 0"
+              size="sm"
+              label="全选"
+              @change="handleToggleAll"
+            />
           </div>
 
           <!-- 优惠和总计 -->
@@ -248,6 +178,7 @@
  *
  * 根据 Figma 设计实现，展示购物袋内容和结算功能
  */
+import { Checkbox } from '~/components/ui/checkbox'
 
 definePageMeta({
   layout: 'default',

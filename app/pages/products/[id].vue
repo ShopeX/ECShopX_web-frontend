@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="bg-white">
     <!-- 加载状态 -->
     <div v-if="detailLoading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
@@ -24,9 +24,12 @@
     </div>
 
     <!-- 商品详情内容 -->
-    <div v-else-if="rawProductData" class="flex items-start w-full bg-white px-24">
-      <!-- Left Column: Thumbnail Navigation -->
-      <div class="flex flex-col gap-4 items-center px-8 py-0 shrink-0">
+    <div
+      v-else-if="rawProductData"
+      class="flex flex-col lg:flex-row items-start w-full bg-white lg:px-24"
+    >
+      <!-- Left Column: Thumbnail Navigation (PC Only) -->
+      <div class="hidden lg:flex flex-col gap-4 items-center px-8 py-0 shrink-0">
         <!-- Up Arrow -->
         <button
           class="flex items-center justify-center shrink-0 transition-opacity"
@@ -64,9 +67,14 @@
       </div>
 
       <!-- Middle Column: Main Image Display -->
-      <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div class="flex-1 flex flex-col min-w-0 overflow-hidden w-full">
         <!-- 当前选中的大图（带过渡动画） -->
-        <div class="w-full aspect-square relative overflow-hidden bg-gray-100">
+        <div
+          class="w-full aspect-square relative overflow-hidden bg-gray-100"
+          @touchstart="handleTouchStart"
+          @touchmove="handleTouchMove"
+          @touchend="handleTouchEnd"
+        >
           <TransitionGroup :name="imageTransitionName">
             <div
               v-if="product.images[currentImageIndex]"
@@ -80,19 +88,59 @@
               />
             </div>
           </TransitionGroup>
+
+          <!-- 移动端图片指示点 -->
+          <div
+            class="lg:hidden absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-10"
+          >
+            <div
+              v-for="(image, index) in product.images"
+              :key="index"
+              class="w-2 h-2 rounded-full transition-colors"
+              :class="currentImageIndex === index ? 'bg-[#191a1d]' : 'bg-[#99a1af]'"
+            />
+          </div>
+        </div>
+
+        <!-- 移动端左右滑动按钮 -->
+        <div
+          class="lg:hidden absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 pointer-events-none"
+        >
+          <button
+            v-if="canScrollUp"
+            class="pointer-events-auto w-8 h-8 flex items-center justify-center bg-white/80 rounded-full shadow-md"
+            @click="scrollThumbnails('up')"
+          >
+            <UIcon name="i-heroicons-chevron-left" class="w-5 h-5 text-gray-900" />
+          </button>
+          <div v-else class="w-8"></div>
+          <button
+            v-if="canScrollDown"
+            class="pointer-events-auto w-8 h-8 flex items-center justify-center bg-white/80 rounded-full shadow-md"
+            @click="scrollThumbnails('down')"
+          >
+            <UIcon name="i-heroicons-chevron-right" class="w-5 h-5 text-gray-900" />
+          </button>
+          <div v-else class="w-8"></div>
         </div>
       </div>
 
       <!-- Right Column: Product Details -->
-      <div class="flex-1 flex items-center justify-center bg-white sticky top-[88px] min-w-0">
-        <div class="w-full max-w-[504px] flex flex-col gap-8 px-16 py-12">
+      <div
+        class="flex-1 flex items-center justify-center bg-white lg:sticky lg:top-[88px] min-w-0 w-full"
+      >
+        <div
+          class="w-full lg:max-w-[504px] flex flex-col gap-6 lg:gap-8 px-4 lg:px-16 py-6 lg:py-12"
+        >
           <!-- Title and Price -->
-          <div class="flex items-start justify-between w-full">
-            <div class="flex flex-col gap-2">
-              <h1 class="text-2xl font-normal text-[#191a1d] leading-[1.2] tracking-[-0.48px]">
+          <div class="flex items-start justify-between w-full gap-4">
+            <div class="flex flex-col gap-2 flex-1 min-w-0">
+              <h1
+                class="text-xl lg:text-2xl font-normal text-[#191a1d] leading-[1.2] tracking-[-0.48px]"
+              >
                 {{ product.title }}
               </h1>
-              <div class="text-2xl font-medium leading-9 text-[#191a1d]">
+              <div class="text-xl lg:text-2xl font-medium leading-8 lg:leading-9 text-[#191a1d]">
                 ¥{{ product.price.toLocaleString() }}
               </div>
             </div>
@@ -102,9 +150,9 @@
           </div>
 
           <!-- 动态规格选择器 -->
-          <div v-if="product.specs.length > 0" class="flex flex-col gap-4 w-full max-w-[376px]">
+          <div v-if="product.specs.length > 0" class="flex flex-col gap-4 w-full lg:max-w-[376px]">
             <template v-for="(spec, specIndex) in product.specs" :key="spec.spec_name">
-              <div class="flex flex-col gap-6">
+              <div class="flex flex-col gap-4 lg:gap-6">
                 <h3 class="text-sm font-normal leading-5 text-[#4a5565]">{{ spec.spec_name }}</h3>
 
                 <!-- 如果有规格图片，显示图片样式选择器 -->
@@ -137,7 +185,7 @@
                   <button
                     v-for="specValue in spec.spec_values"
                     :key="specValue.spec_value_id"
-                    class="h-[38.4px] px-4 border-r border-b border-[#e5e7eb] flex items-center justify-center text-sm leading-5 tracking-[-0.1504px] text-[#191a1d] transition-all"
+                    class="h-[38.4px] px-3 lg:px-4 border-r border-b border-[#e5e7eb] flex items-center justify-center text-sm leading-5 tracking-[-0.1504px] text-[#191a1d] transition-all"
                     :class="
                       isSpecValueSelected(spec.spec_name, specValue.spec_value_id)
                         ? 'bg-[#f3f4f6] border-[#0f0f10]'
@@ -155,8 +203,8 @@
             </template>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="flex flex-col gap-4">
+          <!-- Action Buttons - PC端内嵌 -->
+          <div class="hidden lg:flex flex-col gap-4">
             <button
               class="w-full px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] transition-colors"
               @click="addToCart"
@@ -172,12 +220,12 @@
           </div>
 
           <!-- Accordion Sections -->
-          <div class="border-t border-white w-full max-w-[376px]">
+          <div class="border-t border-white w-full lg:max-w-[376px]">
             <div class="flex flex-col">
               <!-- Product Details Accordion -->
               <div class="border-b border-[#e5e7eb]">
                 <button
-                  class="w-full flex items-center justify-between py-4 text-sm leading-5 text-[#364153]"
+                  class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('details')"
                 >
                   <span>商品详情</span>
@@ -187,7 +235,7 @@
                     :class="openAccordion === 'details' ? 'rotate-180' : ''"
                   />
                 </button>
-                <div v-if="openAccordion === 'details'" class="pb-4">
+                <div v-if="openAccordion === 'details'" class="pb-3 lg:pb-4">
                   <div
                     class="product-description text-sm leading-5 text-[#364153]"
                     v-html="product.description"
@@ -198,7 +246,7 @@
               <!-- Additional Info Accordion 1 -->
               <div class="border-b border-[#e5e7eb]">
                 <button
-                  class="w-full flex items-center justify-between py-4 text-sm leading-5 text-[#364153]"
+                  class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('info1')"
                 >
                   <span>可配信息</span>
@@ -213,7 +261,7 @@
               <!-- Additional Info Accordion 2 -->
               <div class="border-b border-[#e5e7eb]">
                 <button
-                  class="w-full flex items-center justify-between py-4 text-sm leading-5 text-[#364153]"
+                  class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('info2')"
                 >
                   <span>可配信息</span>
@@ -235,6 +283,32 @@
       :recommended-products="recommendedProducts"
       :recent-products="recentProducts"
     />
+
+    <!-- 移动端底部操作栏 (sticky) -->
+    <div
+      class="lg:hidden sticky bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] px-4 py-4 flex items-center gap-6 z-50 shadow-lg"
+    >
+      <!-- 价格 -->
+      <p class="text-base font-medium leading-5 text-[#191a1d] shrink-0">
+        ¥{{ product.price.toLocaleString() }}
+      </p>
+
+      <!-- 按钮组 -->
+      <div class="flex-1 flex gap-4">
+        <button
+          class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] active:bg-[#000] transition-colors"
+          @click="addToCart"
+        >
+          加入购物袋
+        </button>
+        <button
+          class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          @click="buyNow"
+        >
+          立即购买
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -243,6 +317,7 @@ import type { IItem } from '~/types/api/item'
 import { logger } from '~/utils/log'
 
 const route = useRoute()
+const router = useRouter()
 const id = String((route.params as { id: string }).id || '')
 const toast = useToastMessage()
 
@@ -287,6 +362,10 @@ const openAccordion = ref<string | null>('details')
 const currentImageIndex = ref(0) // 当前显示的大图索引
 const thumbnailStartIndex = ref(0) // 缩略图开始显示的索引
 const imageTransitionName = ref<'slide-left' | 'slide-right'>('slide-right') // 图片切换动画方向
+
+// 触摸滑动支持
+const touchStartX = ref(0)
+const touchEndX = ref(0)
 
 // 缩略图配置
 const MAX_VISIBLE_THUMBNAILS = 5
@@ -441,6 +520,34 @@ const selectImage = (imageIndex: number) => {
   currentImageIndex.value = imageIndex
 }
 
+// 触摸事件处理
+const handleTouchStart = (e: TouchEvent) => {
+  touchStartX.value = e.touches[0].clientX
+}
+
+const handleTouchMove = (e: TouchEvent) => {
+  touchEndX.value = e.touches[0].clientX
+}
+
+const handleTouchEnd = () => {
+  const swipeThreshold = 50 // 最小滑动距离
+  const diff = touchStartX.value - touchEndX.value
+
+  if (Math.abs(diff) > swipeThreshold) {
+    if (diff > 0) {
+      // 向左滑动，显示下一张
+      scrollThumbnails('down')
+    } else {
+      // 向右滑动，显示上一张
+      scrollThumbnails('up')
+    }
+  }
+
+  // 重置触摸坐标
+  touchStartX.value = 0
+  touchEndX.value = 0
+}
+
 // 计算当前选中的规格 ID（用于加购）
 const currentSpecIdString = computed(() => {
   if (product.value.specs.length === 0) {
@@ -541,19 +648,32 @@ const buyNow = async () => {
   // 架构优化：通过 useCart composable 处理业务逻辑
   await requireAuth(
     async () => {
-      const result = await addToCartAction({
-        item_id: realItemId.value,
-        num: quantity.value,
-        distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
-        cart_type: 'fastbuy', // 立即购买
-        isAccumulate: false,
-        productName: product.value.title,
-        stock: currentStock.value,
-      })
+      // 手动触发加载指示器，确保用户能看到加载状态
+      const loadingIndicator = useLoadingIndicator()
+      loadingIndicator.start()
+      
+      try {
+        const result = await addToCartAction({
+          cart_type: 'fastbuy', // 立即购买,
+          num: 1,
+          distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
+          item_id: realItemId.value,
+          shop_type: 'distributor',
+        })
 
-      // 立即购买：加入成功后直接打开购物车
-      if (result.success) {
-        cartUI.open()
+        // 立即购买：加入成功后跳转到结算页面
+        if (result.success) {
+          // 使用 navigateTo 替代 router.push，更好地集成 Nuxt 路由系统
+          // navigateTo 会自动触发加载指示器，但我们已经手动启动了，所以会继续显示
+          await navigateTo('/checkout')
+        } else {
+          // 如果失败，停止加载指示器
+          loadingIndicator.finish()
+        }
+      } catch (error) {
+        // 发生错误时，停止加载指示器
+        loadingIndicator.finish()
+        throw error
       }
     },
     {

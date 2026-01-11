@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { cartApiClient } from '~/infrastructure/http/clients'
 import { CartTransformer } from '~/infrastructure/transformers/cartTransformer'
 import type { ICartItemModel } from '~/types/cart'
+import type { IAddCartRequest } from '~/types/api/cart'
 import { useCartUIStore } from './cartUI'
 import { MoneyValueObject, QuantityValueObject } from '~/shared/value-objects'
 
@@ -143,18 +144,16 @@ export const useCartStore = defineStore('cart', {
     /**
      * 添加商品到购物车
      */
-    async addItem(params: {
-      productId: string
-      quantity: number
-      specId?: string
-    }) {
+    async addItem(params: IAddCartRequest) {
       const cartUI = useCartUIStore()
       cartUI.setLoading(true)
       try {
         await cartApiClient.addToCart({
-          item_id: params.productId,
-          num: params.quantity,
-          distributor_id: '0'
+          item_id: params.item_id,
+          num: params.num,
+          distributor_id: params.distributor_id,
+          shop_type: params.shop_type,
+          cart_type: params.cart_type,
         })
         await this.loadCart()
       } catch (error) {

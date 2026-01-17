@@ -1,0 +1,10 @@
+# .gitkeep 文件说明
+# 
+# 用途：确保此目录被 Git 跟踪
+# 
+# Git 不会跟踪空目录，如果需要在 Git 中保留一个空目录（即使它是空的），
+# 通常会创建一个 .gitkeep 文件。这样即使目录是空的，Git 也会跟踪这个目录。
+# 
+# 此目录用于存放生成的 Figma 页面节点 JSON 文件：
+# - figma-pages.json: 单个文件的页面节点数据
+# - figma-project-pages.json: 整个项目的所有文件页面节点数据

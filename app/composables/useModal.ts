@@ -1,6 +1,6 @@
 import { h, render, type VNode, type AppContext } from 'vue'
-import { Modal } from '~/components/ui/modal'
-import type { IModalOptions, IModalInstance } from '~/components/ui/modal/types'
+import { ECModal } from '~/components/ECModal'
+import type { IModalOptions, IModalInstance } from '~/components/ECModal/types'
 
 /**
  * 创建弹窗容器
@@ -39,7 +39,7 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
     isVisible = true
 
     // 创建 VNode
-    vnode = h(Modal, {
+    vnode = h(ECModal, {
       modelValue: true,
       title: options.title || '提示',
       content: options.content || '',

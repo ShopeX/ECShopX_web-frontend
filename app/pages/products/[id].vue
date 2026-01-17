@@ -279,7 +279,7 @@
     </div>
 
     <!-- 推荐商品区域 -->
-    <ProductRecommendations
+    <BCProductRecommendations
       :recommended-products="recommendedProducts"
       :recent-products="recentProducts"
     />
@@ -313,6 +313,7 @@
 </template>
 
 <script setup lang="ts">
+import BCProductRecommendations from '~/components/BCProductRecommendations/BCProductRecommendations.vue'
 import type { IItem } from '~/types/api/item'
 import { logger } from '~/utils/log'
 
@@ -522,11 +523,15 @@ const selectImage = (imageIndex: number) => {
 
 // 触摸事件处理
 const handleTouchStart = (e: TouchEvent) => {
-  touchStartX.value = e.touches[0].clientX
+  if (e.touches[0]) {
+    touchStartX.value = e.touches[0].clientX
+  }
 }
 
 const handleTouchMove = (e: TouchEvent) => {
-  touchEndX.value = e.touches[0].clientX
+  if (e.touches[0]) {
+    touchEndX.value = e.touches[0].clientX
+  }
 }
 
 const handleTouchEnd = () => {
@@ -627,8 +632,6 @@ const addToCart = async () => {
         item_id: realItemId.value,
         num: quantity.value,
         distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
-        productName: product.value.title,
-        stock: currentStock.value,
       })
       // useCart 内部已经处理了：
       // - 业务验证（数量、库存检查）

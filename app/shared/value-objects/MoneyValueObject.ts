@@ -68,8 +68,8 @@ export class MoneyValueObject {
   private formatWithThousandsSeparator(amount: number): string {
     const fixed = amount.toFixed(2)
     const [integerPart, decimalPart] = fixed.split('.')
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    return `${formattedInteger}.${decimalPart}`
+    const formattedInteger = (integerPart || '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    return `${formattedInteger}.${decimalPart || '00'}`
   }
 
   // ==================== 不可变操作（返回新对象） ====================

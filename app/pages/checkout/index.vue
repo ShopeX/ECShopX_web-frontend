@@ -117,10 +117,10 @@
             <span>本单最大可用积分：{{ calculateResult.maxPoint }}</span>
           </div>
 
-          <Checkbox :checked="form.usePoint" size="sm" label="使用积分" @change="toggleUsePoint" />
+          <ECCheckbox :checked="form.usePoint" size="sm" label="使用积分" @change="toggleUsePoint" />
 
           <div v-if="form.usePoint" class="flex items-center gap-2">
-            <Checkbox
+            <ECCheckbox
               :checked="form.useFullPoint"
               size="sm"
               label="全额抵扣"
@@ -140,7 +140,7 @@
         <!-- 发票信息 -->
         <div class="bg-white flex flex-col gap-4 p-6">
           <h3 class="text-base font-medium text-[#191a1d] leading-5">发票信息</h3>
-          <Checkbox
+          <ECCheckbox
             :checked="form.needInvoice"
             size="sm"
             label="需要电子发票"
@@ -226,14 +226,14 @@
 
         <!-- 协议和支付按钮 -->
         <div class="flex flex-col gap-4">
-          <Checkbox v-model="agreeTerms" size="sm">
+          <ECCheckbox v-model="agreeTerms" size="sm">
             <span class="text-xs text-[#4a5565] leading-4">
               我同意
               <a href="#" class="underline">隐私政策</a>
               以及
               <a href="#" class="underline">销售条款</a>
             </span>
-          </Checkbox>
+          </ECCheckbox>
 
           <button
             :disabled="!canSubmit || loading"
@@ -247,7 +247,7 @@
     </div>
 
     <!-- 地址弹窗 -->
-    <AddressModal
+    <BCAddressModal
       v-model="showAddressModal"
       :address-id="editingAddressId"
       :initial-data="editingAddressData"
@@ -257,7 +257,7 @@
     <!-- 优惠券选择抽屉 -->
     <USlideover v-model:open="showCouponSelector" side="right">
       <template #content>
-        <CouponSelector
+        <BCCouponSelector
           v-model="showCouponSelector"
           :coupons="[...coupons]"
           :selected-coupon="selectedCoupon"
@@ -270,7 +270,7 @@
     </USlideover>
 
     <!-- 发票弹窗 -->
-    <InvoiceModal
+    <BCInvoiceModal
       v-model="showInvoiceModal"
       :initial-data="invoiceData"
       @success="handleInvoiceSuccess"
@@ -282,10 +282,12 @@
 import { computed, onMounted, watch } from 'vue'
 import { useCheckout } from '~/composables/useCheckout'
 import { useCart } from '~/composables/useCart'
-import { AddressModal, type IAddressFormData } from '~/components/business/address'
-import { InvoiceModal, type IInvoiceFormData } from '~/components/business/invoice'
-import { CouponSelector } from '~/components/business/coupon'
-import { Checkbox } from '~/components/ui/checkbox'
+import BCAddressModal from '~/components/BCAddressModal/BCAddressModal.vue'
+import BCInvoiceModal from '~/components/BCInvoiceModal/BCInvoiceModal.vue'
+import BCCouponSelector from '~/components/BCCouponSelector/BCCouponSelector.vue'
+import type { IAddressFormData } from '~/composables/useAddress'
+import type { IInvoiceFormData } from '~/components/BCInvoiceModal/types'
+import { ECCheckbox } from '~/components/ECCheckbox'
 
 // 设置页面元信息
 definePageMeta({
@@ -401,6 +403,7 @@ function handleEditAddress(addressId: string) {
       province: address.province,
       city: address.city,
       district: address.district,
+      tmp_code: [],
       detail: address.detail,
       isDefault: address.isDefault,
     }

@@ -73,15 +73,16 @@ export function useCheckout() {
       loading.value = true
       const response = await addressApiClient.getAddressList()
       addresses.value = OrderTransformer.toAddressModelList(response)
-      
+
       // 自动选择默认地址
       const defaultAddress = addresses.value.find(addr => addr.isDefault)
       if (defaultAddress) {
         selectedAddress.value = defaultAddress
         form.value.selectedAddressId = defaultAddress.id
       } else if (addresses.value.length > 0) {
-        selectedAddress.value = addresses.value[0]
-        form.value.selectedAddressId = addresses.value[0].id
+        const firstAddress = addresses.value[0] as IAddressModel
+        selectedAddress.value = firstAddress
+        form.value.selectedAddressId = firstAddress.id
       }
     } catch (err: any) {
       error.value = err.message || '加载地址列表失败'
@@ -286,14 +287,14 @@ export function useCheckout() {
       }
 
       const response = await orderApiClient.createOrder(params)
-      
+
       return {
         success: true,
         orderId: response.order_id || response.trade_info?.order_id,
       }
     } catch (err: any) {
       error.value = err.message || '创建订单失败'
-      return { success: false, error: error.value }
+      return { success: false, error: error.value || undefined }
     } finally {
       loading.value = false
     }

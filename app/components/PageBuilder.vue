@@ -31,10 +31,10 @@ defineProps<{
 }>()
 
 // Dynamic Component Resolution
-const WidgetCarousel = defineAsyncComponent(() => import('./widgets/WidgetCarousel.vue'))
-const WidgetProductList = defineAsyncComponent(() => import('./widgets/WidgetProductList.vue'))
-const WidgetBanner = defineAsyncComponent(() => import('./widgets/WidgetBanner.vue'))
-const WidgetHotZone = defineAsyncComponent(() => import('./widgets/WidgetHotZone.vue'))
+const WidgetCarousel = defineAsyncComponent(() => import('./WCWidgetCarousel/WCWidgetCarousel.vue'))
+const WidgetProductList = defineAsyncComponent(() => import('./WCWidgetProductList/WCWidgetProductList.vue'))
+const WidgetBanner = defineAsyncComponent(() => import('./WCWidgetBanner/WCWidgetBanner.vue'))
+const WidgetHotZone = defineAsyncComponent(() => import('./WCWidgetHotZone/WCWidgetHotZone.vue'))
 
 const resolveWidget = (type: WidgetType) => {
   switch (type) {

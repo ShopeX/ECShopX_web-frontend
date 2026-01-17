@@ -42,8 +42,8 @@ export class CartTransformer {
     // ✅ 修复：匹配真实的 API 字段名
     // 价格从字符串转为数字，并从分转为元（除以100）
     const priceInCents = typeof apiItem.price === 'string' ? parseFloat(apiItem.price) : apiItem.price
-    const marketPriceInCents = typeof apiItem.market_price === 'string' 
-      ? parseFloat(apiItem.market_price) 
+    const marketPriceInCents = typeof apiItem.market_price === 'string'
+      ? parseFloat(apiItem.market_price)
       : (apiItem.market_price || priceInCents)
 
     // 从分转为元
@@ -97,12 +97,12 @@ export class CartTransformer {
    */
   static validateCartItem(item: Partial<ICartItem>): item is ICartItem {
     return !!(
-      item.id &&
-      item.product_id &&
-      item.product_name &&
-      typeof item.price === 'number' &&
-      typeof item.quantity === 'number' &&
-      typeof item.stock === 'number'
+      item.cart_id &&
+      item.item_id &&
+      item.item_name &&
+      (typeof item.price === 'number' || typeof item.price === 'string') &&
+      typeof item.num === 'number' &&
+      typeof item.store === 'number'
     )
   }
 
@@ -119,20 +119,19 @@ export class CartTransformer {
    */
   static sanitizeCartItem(item: Partial<ICartItem>): ICartItem {
     return {
-      id: item.id || '',
-      product_id: item.product_id || '',
-      product_name: item.product_name || '未知商品',
-      product_image: item.product_image || '',
-      spec: item.spec || '默认规格',
-      spec_id: item.spec_id || 'default',
-      price: typeof item.price === 'number' ? item.price : 0,
-      original_price: typeof item.original_price === 'number' ? item.original_price : item.price || 0,
-      quantity: typeof item.quantity === 'number' ? item.quantity : 1,
-      stock: typeof item.stock === 'number' ? item.stock : 0,
-      available: item.available ?? true,
-      selected: item.selected ?? false,
-      created_at: item.created_at || '',
-      updated_at: item.updated_at || '',
+      cart_id: item.cart_id || '',
+      item_id: item.item_id || '',
+      goods_id: item.goods_id || '',
+      item_name: item.item_name || '未知商品',
+      pics: item.pics || '',
+      item_spec_desc: item.item_spec_desc || '默认规格',
+      price: typeof item.price === 'number' || typeof item.price === 'string' ? item.price : 0,
+      market_price: typeof item.market_price === 'number' || typeof item.market_price === 'string' ? item.market_price : item.price || 0,
+      num: typeof item.num === 'number' ? item.num : 1,
+      store: typeof item.store === 'number' ? item.store : 0,
+      is_checked: item.is_checked ?? false,
+      created: item.created || 0,
+      updated: item.updated || 0,
     }
   }
 

@@ -28,8 +28,10 @@ export interface IAddressFormData {
   city: string
   // tmpCode: Array<string>
   district: string
+  tmp_code: string[]
   detail: string
   isDefault: boolean
+  receiver_zip?: string
 }
 
 /**
@@ -58,11 +60,13 @@ export function useAddress() {
     return {
       username: formData.name,
       telephone: `${formData.phone}`,
-      province: formData.province,
-      city: formData.city,
-      county: formData.district,
+      province: formData.province || '',
+      city: formData.city || '',
+      county: formData.district || '',
+      tmp_code: formData.tmp_code || [],
       adrdetail: formData.detail,
       is_def: (formData.isDefault ? 1 : 0) as 0 | 1,
+      receiver_zip: formData.receiver_zip,
     }
   }
 
@@ -79,8 +83,8 @@ export function useAddress() {
     if (telephone.startsWith('+')) {
       const match = telephone.match(/^(\+\d{2,3})(.+)$/)
       if (match) {
-        countryCode = match[1]
-        phone = match[2]
+        countryCode = match[1] || '+86'
+        phone = match[2] || telephone
       }
     }
 
@@ -91,8 +95,10 @@ export function useAddress() {
       province: apiData.province,
       city: apiData.city,
       district: apiData.county,
+      tmp_code: [], // API doesn't return this in IAddressItem, so we use empty array
       detail: apiData.adrdetail,
       isDefault: apiData.is_def === 1,
+      receiver_zip: apiData.receiver_zip,
     }
   }
 

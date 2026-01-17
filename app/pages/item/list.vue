@@ -9,7 +9,7 @@
     </div>
 
     <!-- 筛选器 -->
-    <ItemFilter v-model="filterParams" :brands="brands" @change="handleFilterChange" />
+    <BCItemFilter v-model="filterParams" :brands="brands" @change="handleFilterChange" />
 
     <!-- 主内容区域 - 响应式容器 -->
     <div class="container bg-white mx-auto px-4 sm:px-6 py-4 sm:py-6">
@@ -68,7 +68,7 @@
         <div
           class="grid gap-3 sm:gap-4 mb-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7"
         >
-          <ProductCard
+          <BCProductCard
             v-for="product in products"
             :key="product.itemId"
             :product="product"
@@ -100,7 +100,9 @@
 </template>
 
 <script setup lang="ts">
-import type { IProduct } from '~/components/business/product/ProductCard/types'
+import BCItemFilter from '~/components/BCItemFilter/BCItemFilter.vue'
+import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
+import type { IProduct } from '~/components/BCProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'

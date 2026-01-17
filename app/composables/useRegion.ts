@@ -9,7 +9,7 @@
 
 import { ref } from 'vue'
 import { addressApiClient } from '~/infrastructure/http/clients'
-import type { IRegionItem } from '~/components/business/address/regionData'
+import type { IRegionItem } from '~/components/BCAddressModal/regionData'
 
 // 全局缓存（单例模式）
 const regionDataCache = ref<IRegionItem[]>([])

@@ -211,11 +211,11 @@ async function handleSendCode() {
   }
 
   // 调用发送验证码 API
-  const success = await sendSmsCode({
-    phone: registerForm.phone,
-    captcha: '',
-    captchaKey: '',
-  })
+  const success = await sendSmsCode(
+    registerForm.phone,
+    '', // captcha
+    '' // captchaToken
+  )
 
   if (success) {
     // 提示发送成功

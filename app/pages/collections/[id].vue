@@ -12,7 +12,7 @@
     </div> -->
 
     <!-- 筛选器 -->
-    <ProductFilter
+    <BCProductFilter
       v-model="productFilterValue"
       :filter-groups="filterGroups"
       :show-filter-panel="showFilterPanel"
@@ -26,7 +26,7 @@
       <div class="w-full">
         <!-- 加载状态 -->
         <div v-if="pending && !products.length" class="flex justify-center py-12">
-          <Loading />
+          <ECLoading />
         </div>
 
         <!-- 错误状态 -->
@@ -66,7 +66,7 @@
         <div v-else>
           <!-- 商品网格布局 - 固定宽度居中布局 -->
           <div class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5">
-            <LazyProductCard
+            <BCProductCard
               v-for="product in products"
               :key="product.itemId"
               :product="product"
@@ -93,11 +93,13 @@
 </template>
 
 <script setup lang="ts">
-import type { IProduct } from '~/components/business/product/ProductCard/types'
+import BCProductFilter from '~/components/BCProductFilter/BCProductFilter.vue'
+import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
+import type { IProduct } from '~/components/BCProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
-import type { ICategory } from '~/components/business/product/ItemFilter/ItemFilter.vue'
-import type { IProductFilterValue, IFilterGroup } from '~/components/business/product/ProductFilter'
-import { ESortOption } from '~/components/business/product/ProductFilter'
+import type { ICategory } from '~/components/BCItemFilter/BCItemFilter.vue'
+import type { IProductFilterValue, IFilterGroup } from '~/components/BCProductFilter/types'
+import { ESortOption } from '~/components/BCProductFilter/types'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'

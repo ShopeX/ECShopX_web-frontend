@@ -4,7 +4,7 @@
     <div class="header-container sticky top-0 z-50 bg-white">
       <TemplateEngine template="header">
         <template #header>
-          <HeaderBar 
+          <BCHeaderBar 
             @open-category-nav="handleOpenCategoryNav"
             @open-mini-cart="handleOpenMiniCart"
           />
@@ -18,12 +18,12 @@
     </main>
 
     <!-- Footer 区域 -->
-    <Footer />
+    <BCFooter />
 
     <!-- 分类导航侧边栏 -->
     <USlideover v-model:open="showCategoryNav" side="left">
       <template #content>
-        <CategoryNav
+        <BCCategoryNav
           v-model="showCategoryNav"
           @close="showCategoryNav = false"
           @search="handleCategorySearch"
@@ -35,7 +35,7 @@
     <!-- Mini 购物车侧边栏 -->
     <USlideover v-model:open="showMiniCart" side="right">
       <template #content>
-        <MiniCart
+        <BCMiniCart
           v-model="showMiniCart"
           @close="showMiniCart = false"
         />
@@ -46,9 +46,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Footer } from '~/components/business/footer'
-import { CategoryNav } from '~/components/business/categoryNav'
-import { MiniCart } from '~/components/business/cart'
+import BCHeaderBar from '~/components/BCHeaderBar/BCHeaderBar.vue'
+import BCFooter from '~/components/BCFooter/BCFooter.vue'
+import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
+import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
 
 // 默认布局组件 - 使用完整的电商头部
 

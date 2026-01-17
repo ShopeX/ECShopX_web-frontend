@@ -15,7 +15,7 @@
     >
       <!-- 加载状态：首次加载或正在加载 -->
       <div v-if="!initialized || loading" class="flex justify-center py-20">
-        <Loading />
+        <ECLoading />
       </div>
 
       <!-- 空购物车状态：只在初始化完成且数据为空时显示 -->
@@ -59,7 +59,7 @@
           <div
             class="hidden lg:flex border-[0px_0px_1px] border-[#e5e7eb] border-solid content-stretch gap-[8px] items-center pb-[17px] pt-0 px-0 relative shrink-0 w-full"
           >
-            <Checkbox
+            <ECCheckbox
               :checked="cartUI.isAllSelected && cartUI.itemCount > 0"
               size="sm"
               label="全选"
@@ -111,7 +111,7 @@
           <div
             class="border-[0px_0px_1px] border-[#e5e7eb] border-solid content-stretch flex gap-[8px] items-center pb-[17px] pt-0 px-0 relative shrink-0 w-full"
           >
-            <Checkbox
+            <ECCheckbox
               :checked="cartUI.isAllSelected && cartUI.itemCount > 0"
               size="sm"
               label="全选"
@@ -178,7 +178,7 @@
  *
  * 根据 Figma 设计实现，展示购物袋内容和结算功能
  */
-import { Checkbox } from '~/components/ui/checkbox'
+import { ECCheckbox } from '~/components/ECCheckbox'
 
 definePageMeta({
   layout: 'default',

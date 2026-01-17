@@ -34,7 +34,7 @@
  * ```
  */
 
-import type { IProduct } from '~/components/business/product/ProductCard/types'
+import type { IProduct } from '~/components/BCProductCard/types'
 import type { IItemListParams, IItemDetailParams, IProductListItem, IBrand } from '~/types/api/item'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'

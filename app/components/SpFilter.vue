@@ -8,37 +8,37 @@
       <!-- 排序选项列表 -->
       <div class="flex items-center gap-5">
         <!-- 综合 -->
-        <Button
+        <ECButton
           variant="ghost"
           size="sm"
           :class="sortClass(EFilterSort.COMPREHENSIVE)"
           @click="handleSortChange(EFilterSort.COMPREHENSIVE)"
         >
           综合
-        </Button>
+        </ECButton>
 
         <!-- 销量 -->
-        <Button
+        <ECButton
           variant="ghost"
           size="sm"
           :class="sortClass(EFilterSort.SALES)"
           @click="handleSortChange(EFilterSort.SALES)"
         >
           销量
-        </Button>
+        </ECButton>
 
         <!-- 上新 -->
-        <Button
+        <ECButton
           variant="ghost"
           size="sm"
           :class="sortClass(EFilterSort.NEW)"
           @click="handleSortChange(EFilterSort.NEW)"
         >
           上新
-        </Button>
+        </ECButton>
 
         <!-- 价格排序 -->
-        <Button
+        <ECButton
           variant="ghost"
           size="sm"
           :class="[sortClass(EFilterSort.PRICE), 'flex items-center gap-1']"
@@ -55,13 +55,13 @@
               :class="priceArrowClass('down')"
             />
           </div>
-        </Button>
+        </ECButton>
       </div>
 
       <!-- 价格区间 -->
       <div class="flex items-center gap-2">
         <div class="relative">
-          <Input
+          <ECInput
             v-model="minPrice"
             type="number"
             size="sm"
@@ -73,7 +73,7 @@
         </div>
         <span class="text-xs">-</span>
         <div class="relative">
-          <Input
+          <ECInput
             v-model="maxPrice"
             type="number"
             size="sm"
@@ -83,7 +83,7 @@
           />
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[#999]">¥</span>
         </div>
-        <Button variant="solid" size="sm" class="px-4" @click="handlePriceConfirm"> 确定 </Button>
+        <ECButton variant="solid" size="sm" class="px-4" @click="handlePriceConfirm"> 确定 </ECButton>
       </div>
     </div>
 

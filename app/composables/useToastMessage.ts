@@ -1,6 +1,6 @@
 import { h, render } from 'vue'
-import type { ToastOptions } from '~/components/ui/toast'
-import Toast from '~/components/ui/toast/Toast.vue'
+import type { ToastOptions } from '~/components/ECToast'
+import ECToast from '~/components/ECToast/ECToast.vue'
 
 /**
  * Toast 管理器
@@ -39,13 +39,13 @@ function createToastContainer() {
  */
 function createToastInstance() {
   const container = createToastContainer()
-  
+
   // 创建 VNode
-  toastVNode = h(Toast)
-  
+  toastVNode = h(ECToast)
+
   // 渲染到容器
   render(toastVNode, container)
-  
+
   return toastVNode.component?.exposed
 }
 
@@ -64,8 +64,8 @@ export function useToastMessage() {
   // SSR 环境下返回空实现
   if (import.meta.server) {
     return {
-      show: () => {},
-      hide: () => {}
+      show: () => { },
+      hide: () => { }
     }
   }
 
@@ -77,11 +77,11 @@ export function useToastMessage() {
     show(options: string | ToastOptions) {
       // 如果还没有实例，创建一个
       let instance = toastVNode?.component?.exposed
-      
+
       if (!instance) {
         instance = createToastInstance()
       }
-      
+
       if (instance && instance.show) {
         instance.show(options)
       }

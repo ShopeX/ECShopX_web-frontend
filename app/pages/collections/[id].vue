@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50" data-testid="collections-page">
     <!-- 集合封面头部 -->
     <img src="~/assets/images/banners/banner.png" class="w-full object-cover" />
 
@@ -16,6 +16,7 @@
       v-model="productFilterValue"
       :filter-groups="filterGroups"
       :show-filter-panel="showFilterPanel"
+      data-testid="collections-filter"
       @update:show-filter-panel="showFilterPanel = $event"
       @change="handleFilterChange"
     />
@@ -25,12 +26,12 @@
     <div class="bg-white pb-8 flex justify-center">
       <div class="w-full">
         <!-- 加载状态 -->
-        <div v-if="pending && !products.length" class="flex justify-center py-12">
+        <div v-if="pending && !products.length" class="flex justify-center py-12" data-testid="collections-loading">
           <ECLoading />
         </div>
 
         <!-- 错误状态 -->
-        <div v-else-if="error" class="text-center py-12">
+        <div v-else-if="error" class="text-center py-12" data-testid="collections-error">
           <div class="text-gray-500 mb-4">
             <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -47,7 +48,7 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-else-if="!products.length && !pending" class="text-center py-12">
+        <div v-else-if="!products.length && !pending" class="text-center py-12" data-testid="collections-empty">
           <div class="text-gray-400 mb-4">
             <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -65,25 +66,26 @@
         <!-- 商品展示 -->
         <div v-else>
           <!-- 商品网格布局 - 固定宽度居中布局 -->
-          <div class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5">
+          <div class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5" data-testid="collections-product-grid">
             <BCProductCard
               v-for="product in products"
               :key="product.itemId"
               :product="product"
+              :data-testid="`collections-product-card-${product.itemId}`"
               loading="lazy"
             />
           </div>
 
           <!-- 加载更多触发器（滚动到此处自动加载） -->
-          <div v-if="hasMore" ref="loadMoreTrigger" class="text-center pt-8 pb-4">
-            <div v-if="loadingMore" class="flex items-center justify-center gap-2">
+          <div v-if="hasMore" ref="loadMoreTrigger" class="text-center pt-8 pb-4" data-testid="collections-load-more-trigger">
+            <div v-if="loadingMore" class="flex items-center justify-center gap-2" data-testid="collections-loading-more">
               <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
               <span class="text-gray-500 text-sm">加载中...</span>
             </div>
           </div>
 
           <!-- 到底了提示 -->
-          <div v-else-if="products.length > 0" class="text-center pt-8 pb-4">
+          <div v-else-if="products.length > 0" class="text-center pt-8 pb-4" data-testid="collections-end-message">
             <p class="text-gray-400 text-sm">— 到底了 —</p>
           </div>
         </div>

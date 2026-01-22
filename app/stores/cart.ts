@@ -167,17 +167,29 @@ export const useCartStore = defineStore('cart', {
     /**
      * 删除购物车商品（乐观更新 + 后台同步）
      */
+    /**
+     * 删除购物车商品（乐观更新 + 后台同步）
+     */
     async removeItem(itemId: string) {
       const cartUI = useCartUIStore()
 
       // 1. 找到要删除的商品并保存（用于回滚）
-      const itemIndex = this.items.findIndex(i => i.id === itemId)
+      // 先在有效商品列表中找
+      let targetList = this.items
+      let itemIndex = this.items.findIndex(i => i.id === itemId)
+
+      // 如果没找到，在失效商品列表中找
+      if (itemIndex === -1) {
+        targetList = this.invalidItems
+        itemIndex = this.invalidItems.findIndex(i => i.id === itemId)
+      }
+
       if (itemIndex === -1) return
 
-      const removedItem = this.items[itemIndex]!  // 断言：已检查 index 存在
+      const removedItem = targetList[itemIndex]!  // 断言：已检查 index 存在
 
       // 2. 乐观更新：立即从列表中移除
-      this.items.splice(itemIndex, 1)
+      targetList.splice(itemIndex, 1)
 
       // 3. 调用 API
       cartUI.setActionLoading(itemId, true)
@@ -188,7 +200,7 @@ export const useCartStore = defineStore('cart', {
       } catch (error) {
         // ❌ 失败：恢复商品到原位置
         console.error('Failed to remove item:', error)
-        this.items.splice(itemIndex, 0, removedItem)
+        targetList.splice(itemIndex, 0, removedItem)
         throw error
       } finally {
         cartUI.setActionLoading(itemId, false)

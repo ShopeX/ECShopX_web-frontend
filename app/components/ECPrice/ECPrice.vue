@@ -4,7 +4,7 @@
     v-bind="$attrs"
   >
     <span :class="['mr-0.5', symbolClass]">{{ symbol }}</span>
-    <span :class="['font-bold', amountClass]">{{ formattedAmount }}</span>
+    <span :class="amountClass">{{ formattedAmount }}</span>
   </span>
 </template>
 
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<ECPriceProps>(), {
   symbol: '￥',
   className: '',
   symbolClass: 'text-sm',
-  amountClass: 'text-lg'
+  amountClass: 'text-lg font-bold'
 })
 
 const formattedAmount = computed(() => {

@@ -19,22 +19,22 @@
 
       <!-- 商品信息区域 - 带灰色背景 -->
       <div
-        class="sp-product-card__info bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center leading-none"
+        class="sp-product-card__info bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center"
       >
         <!-- 商品标题 -->
         <h2
-          class="sp-product-card__title text-[#191a1d] text-sm font-medium leading-5 w-full min-w-full h-10"
+          class="sp-product-card__title text-[#191a1d] text-sm font-medium leading-5 w-full"
         >
           {{ product.itemName }}
         </h2>
 
         <!-- 价格区域 -->
-        <div class="sp-product-card__price w-full h-6 flex flex-col justify-center">
+        <div class="sp-product-card__price w-full flex flex-col items-center">
           <ECPrice
             :amount="getCurrentPrice()"
-            class-name="text-[#191a1d]"
-            amount-class="text-md leading-[14px]"
-            symbol-class="text-xs"
+            class-name="text-[#191a1d] font-sans"
+            symbol-class="text-sm leading-5"
+            amount-class="text-sm font-normal leading-5"
           />
         </div>
       </div>

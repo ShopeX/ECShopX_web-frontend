@@ -5,6 +5,7 @@
       <!-- 标题 -->
       <div
         class="flex flex-col font-medium justify-center leading-none w-full text-2xl text-[#191a1d] mb-8"
+        data-testid="filter-title"
       >
         <h2 class="block leading-[48px]">全部商品</h2>
       </div>
@@ -16,6 +17,7 @@
           <span class="text-sm text-[#99a1af] font-normal leading-5">排序：</span>
           <button
             class="flex items-center gap-2 text-sm font-medium leading-5 text-[#191a1d] hover:opacity-80 transition-opacity"
+            data-testid="filter-sort-button"
             @click="toggleSortDropdown"
           >
             <span>{{ currentSortLabel }}</span>
@@ -38,6 +40,7 @@
             <div
               v-if="showSortDropdown"
               class="absolute left-0 top-full mt-2 z-10 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[160px]"
+              data-testid="filter-sort-dropdown"
             >
               <div
                 v-for="option in sortOptions"
@@ -47,6 +50,7 @@
                   'text-[#191a1d] font-medium': localValue.sort === option.value,
                   'text-[#99a1af]': localValue.sort !== option.value,
                 }"
+                :data-testid="`filter-sort-option-${option.value}`"
                 @click="handleSortChange(option.value)"
               >
                 {{ option.label }}
@@ -58,6 +62,7 @@
         <!-- 右侧：筛选按钮 -->
         <button
           class="flex items-center gap-2 text-sm font-medium leading-5 text-[#191a1d] hover:opacity-80 transition-opacity"
+          data-testid="filter-toggle-button"
           @click="toggleFilterPanel"
         >
           <span>筛选</span>
@@ -66,7 +71,7 @@
       </div>
 
       <!-- 筛选面板 -->
-      <div v-if="showFilterPanel" class="flex items-start justify-between w-full gap-8 py-4">
+      <div v-if="showFilterPanel" class="flex items-start justify-between w-full gap-8 py-4" data-testid="filter-panel">
         <!-- 渲染每个筛选组 -->
         <div v-for="group in filterGroups" :key="group.key" class="flex flex-col gap-4 items-start">
           <!-- 筛选组标题 -->

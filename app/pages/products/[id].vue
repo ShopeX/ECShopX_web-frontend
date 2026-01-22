@@ -206,10 +206,12 @@
           <!-- Action Buttons - PC端内嵌 -->
           <div class="hidden lg:flex flex-col gap-4">
             <button
-              class="w-full px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] transition-colors"
+              class="w-full px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              :disabled="isAddingToCart"
               @click="addToCart"
             >
-              加入购物袋
+              <UIcon v-if="isAddingToCart" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
+              {{ isAddingToCart ? '加入中...' : '加入购物袋' }}
             </button>
             <button
               class="w-full px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 transition-colors"
@@ -296,10 +298,12 @@
       <!-- 按钮组 -->
       <div class="flex-1 flex gap-4">
         <button
-          class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] active:bg-[#000] transition-colors"
+          class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] active:bg-[#000] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          :disabled="isAddingToCart"
           @click="addToCart"
         >
-          加入购物袋
+          <UIcon v-if="isAddingToCart" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
+          {{ isAddingToCart ? '加入中...' : '加入购物袋' }}
         </button>
         <button
           class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 active:bg-gray-100 transition-colors"
@@ -363,6 +367,7 @@ const openAccordion = ref<string | null>('details')
 const currentImageIndex = ref(0) // 当前显示的大图索引
 const thumbnailStartIndex = ref(0) // 缩略图开始显示的索引
 const imageTransitionName = ref<'slide-left' | 'slide-right'>('slide-right') // 图片切换动画方向
+const isAddingToCart = ref(false) // 加入购物车 loading 状态
 
 // 触摸滑动支持
 const touchStartX = ref(0)
@@ -624,27 +629,37 @@ const currentPrice = computed(() => {
 })
 
 const addToCart = async () => {
-  // 架构优化：通过 useCart composable 处理业务逻辑
+  // 防止重复点击
+  if (isAddingToCart.value) return
+  
+  // 架构优化:通过 useCart composable 处理业务逻辑
   // UI层 → useCart (Composable) → cartApiClient (Infrastructure) → API
-  await requireAuth(
-    async () => {
-      await addToCartAction({
-        item_id: realItemId.value,
-        num: quantity.value,
-        distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
-      })
-      // useCart 内部已经处理了：
-      // - 业务验证（数量、库存检查）
-      // - API 调用
-      // - 错误处理
-      // - 消息提示（成功/失败）
-      // - 自动重新加载购物车数据
-    },
-    {
-      loginMessage: '请先登录后再加入购物袋',
-      redirectAfterLogin: true,
-    }
-  )
+  isAddingToCart.value = true
+  
+  try {
+    await requireAuth(
+      async () => {
+        await addToCartAction({
+          item_id: realItemId.value,
+          num: quantity.value,
+          distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
+          cart_type: 'cart',
+        })
+        // useCart 内部已经处理了:
+        // - 业务验证(数量、库存检查)
+        // - API 调用
+        // - 错误处理
+        // - 消息提示(成功/失败)
+        // - 自动重新加载购物车数据
+      },
+      {
+        loginMessage: '请先登录后再加入购物袋',
+        redirectAfterLogin: true,
+      }
+    )
+  } finally {
+    isAddingToCart.value = false
+  }
 }
 
 const buyNow = async () => {

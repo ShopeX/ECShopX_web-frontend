@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Homepage E2E Tests', () => {
+test.describe('首页 E2E 测试', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to the homepage
+    // 导航到首页
     await page.goto('/');
-    // Wait for initial loading to finish if applicable
+    // 等待初始加载完成
     const loading = page.getByTestId('home-loading');
     if (await loading.isVisible()) {
       await expect(loading).toBeHidden({ timeout: 10000 });
     }
   });
 
-  test('should display hero banner with title and discover button', async ({ page }) => {
+  test('应该显示英雄横幅及标题和发现按钮', async ({ page }) => {
     const heroSection = page.getByTestId('home-hero-section');
     await expect(heroSection).toBeVisible();
 
@@ -23,11 +23,11 @@ test.describe('Homepage E2E Tests', () => {
     await expect(discoverBtn).toContainText(/发现更多|发现/);
   });
 
-  test('should display popular products section', async ({ page }) => {
+  test('应该显示热门商品区域', async ({ page }) => {
     const popularSection = page.getByTestId('home-popular-section');
     await expect(popularSection).toBeVisible();
 
-    // Wait for at least one product card to be visible
+    // 等待至少一个商品卡片可见
     const firstProduct = popularSection.getByTestId('home-product-card').first();
     await expect(firstProduct).toBeVisible({ timeout: 10000 });
 
@@ -35,11 +35,11 @@ test.describe('Homepage E2E Tests', () => {
     await expect(firstProduct.getByTestId('home-product-subtitle')).toBeVisible();
   });
 
-  test('should display new arrivals section with prices', async ({ page }) => {
+  test('应该显示新品推荐区域及价格', async ({ page }) => {
     const newArrivalSection = page.getByTestId('home-new-arrival-section');
     await expect(newArrivalSection).toBeVisible();
 
-    // Wait for at least one product card to be visible
+    // 等待至少一个商品卡片可见
     const firstProduct = newArrivalSection.getByTestId('home-product-card').first();
     await expect(firstProduct).toBeVisible({ timeout: 10000 });
 
@@ -47,7 +47,7 @@ test.describe('Homepage E2E Tests', () => {
     await expect(firstProduct.getByTestId('home-product-price')).toBeVisible();
   });
 
-  test('should display brand news section', async ({ page }) => {
+  test('应该显示品牌资讯区域', async ({ page }) => {
     const newsSection = page.getByTestId('home-brand-news-section');
     await expect(newsSection).toBeVisible();
 
@@ -62,18 +62,18 @@ test.describe('Homepage E2E Tests', () => {
     await expect(page.getByTestId('home-brand-news-btn')).toBeVisible();
   });
 
-  test('should handle add to cart interaction in new arrivals', async ({ page }) => {
+  test('应该处理新品区域的加入购物车交互', async ({ page }) => {
     const newArrivalSection = page.getByTestId('home-new-arrival-section');
     const firstProduct = newArrivalSection.getByTestId('home-product-card').first();
 
-    // Hover to reveal add to cart button (as defined in ProductCard.vue)
+    // 悬停显示加入购物车按钮
     await firstProduct.hover();
 
     const addToCartBtn = firstProduct.getByTestId('home-product-add-to-cart-btn');
     await expect(addToCartBtn).toBeVisible();
 
-    // Clicking should trigger console.log (as currently implemented)
-    // In a real test, we would check for a toast or cart update
+    // 点击应该触发 console.log（当前实现）
+    // 在真实测试中，我们会检查 toast 或购物车更新
     await addToCartBtn.click();
   });
 });

@@ -14,7 +14,9 @@
       <div class="flex h-[42px] items-center justify-between w-full lg:mb-8">
         <!-- 左侧：排序选择器 -->
         <div class="relative flex items-center gap-2">
-          <span class="text-sm text-[#99a1af] font-normal leading-5">{{ $t('filter.sortLabel') }}</span>
+          <span class="text-sm text-[#99a1af] font-normal leading-5">{{
+            $t('filter.sortLabel')
+          }}</span>
           <button
             class="flex items-center gap-2 text-sm font-medium leading-5 text-[#191a1d] hover:opacity-80 transition-opacity"
             data-testid="filter-sort-button"

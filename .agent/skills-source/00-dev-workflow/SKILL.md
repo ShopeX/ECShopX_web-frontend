@@ -188,13 +188,13 @@ grep -r 'useI18n' app/components/<新组件>/
 
 **RTL 布局适配要点**：
 
-| LTR 类（避免使用） | RTL 友好类（推荐） | 说明 |
-|-------------------|-------------------|------|
-| `ml-4` / `mr-4` | `ms-4` / `me-4` | margin-start/end |
-| `pl-4` / `pr-4` | `ps-4` / `pe-4` | padding-start/end |
-| `left-0` / `right-0` | `start-0` / `end-0` | 定位 |
-| `text-left` / `text-right` | `text-start` / `text-end` | 文本对齐 |
-| `flex-row` | `flex-row` + `rtl:flex-row-reverse` | Flex 方向 |
+| LTR 类（避免使用）         | RTL 友好类（推荐）                  | 说明              |
+| -------------------------- | ----------------------------------- | ----------------- |
+| `ml-4` / `mr-4`            | `ms-4` / `me-4`                     | margin-start/end  |
+| `pl-4` / `pr-4`            | `ps-4` / `pe-4`                     | padding-start/end |
+| `left-0` / `right-0`       | `start-0` / `end-0`                 | 定位              |
+| `text-left` / `text-right` | `text-start` / `text-end`           | 文本对齐          |
+| `flex-row`                 | `flex-row` + `rtl:flex-row-reverse` | Flex 方向         |
 
 **方向性图标镜像**：
 

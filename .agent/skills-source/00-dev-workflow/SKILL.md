@@ -14,14 +14,14 @@ description: 自动化开发工作流的唯一入口。覆盖需求分析、UI�
 ## 工作流总览
 
 ```
-PRD 输入 → 需求产物 → 设计产物 → 开发实现 → i18n → 代码提交 → 测试门禁 → 可合并
+PRD 输入 → 需求产物 → 设计产物 → 开发实现 → i18n → 测试门禁 → 代码提交 → 可合并
    │          │          │          │        │        │          │
    ▼          ▼          ▼          ▼        ▼        ▼          ▼
- feature.md  01-spec   10-figma   02-infra  04-i18n  05-system  03-testing
+ feature.md  01-spec   10-figma   02-infra  04-i18n  03-testing  05-system
                        11-apifox
 ```
 
-> ⚠️ **i18n 是必须步骤**：开发完成后必须执行 `04-i18n`，不可跳过。
+> ⚠️ **先测试，再提交**：确保代码通过测试门禁后才能提交。
 
 ---
 
@@ -164,19 +164,19 @@ grep -r 'useI18n' app/components/<新组件>/
 
 **必须产出**：
 
-| 文件 | 说明 |
-|------|------|
-| `app/locales/zh-CN.json` | 中文（开发时填写） |
-| `app/locales/en-US.json` | 英文（AI 翻译 + 校对） |
-| `app/locales/ar.json` | 阿拉伯语（AI 翻译 + RTL 验证） |
+| 文件                     | 说明                           |
+| ------------------------ | ------------------------------ |
+| `app/locales/zh-CN.json` | 中文（开发时填写）             |
+| `app/locales/en-US.json` | 英文（AI 翻译 + 校对）         |
+| `app/locales/ar.json`    | 阿拉伯语（AI 翻译 + RTL 验证） |
 
 **新增 Key 模板**（PRD 中必须列出）：
 
 ```markdown
 ## i18n 文案 Keys
 
-| Key | 中文 | English | العربية | 说明 |
-|-----|------|---------|---------|------|
+| Key             | 中文     | English       | العربية      | 说明       |
+| --------------- | -------- | ------------- | ------------ | ---------- |
 | `feature.title` | 功能标题 | Feature Title | عنوان الميزة | 页面主标题 |
 ```
 
@@ -189,6 +189,7 @@ grep -r 'useI18n' app/components/<新组件>/
 **自动化提醒**：
 
 > ⚠️ **AI 必须在 Step 3 完成后主动执行**：
+>
 > 1. 扫描新增组件中的硬编码文案
 > 2. 提取并生成 i18n Keys
 > 3. 同步更新三个语言文件
@@ -196,39 +197,7 @@ grep -r 'useI18n' app/components/<新组件>/
 
 ---
 
-## Step 5: 代码提交（Commit）
-
-**加载技能**：`05-system`
-
-**Commit Message 格式**（Conventional Commits）：
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Type 枚举**：
-
-- `feat`: 新功能
-- `fix`: 修复 Bug
-- `docs`: 文档变更
-- `style`: 代码格式
-- `refactor`: 重构
-- `perf`: 性能优化
-- `test`: 测试
-- `chore`: 构建/工具
-
-**自动生成规则**：
-
-- 从 PRD 标题 + diff + AC 自动总结
-- scope 为模块名（如 `cart`, `product`, `auth`）
-
----
-
-## Step 6: 测试门禁（Testing Gate）
+## Step 5: 测试门禁（Testing Gate）
 
 **加载技能**：`03-testing`
 
@@ -281,6 +250,40 @@ console.log('✅ All i18n keys present in 3 languages');
 
 ---
 
+## Step 6: 代码提交（Commit）
+
+**前置条件**：Step 5 测试门禁全部通过
+
+**加载技能**：`05-system`
+
+**Commit Message 格式**（Conventional Commits）：
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Type 枚举**：
+
+- `feat`: 新功能
+- `fix`: 修复 Bug
+- `docs`: 文档变更
+- `style`: 代码格式
+- `refactor`: 重构
+- `perf`: 性能优化
+- `test`: 测试
+- `chore`: 构建/工具
+
+**自动生成规则**：
+
+- 从 PRD 标题 + diff + AC 自动总结
+- scope 为模块名（如 `cart`, `product`, `auth`）
+
+---
+
 ## 技能依赖图
 
 ```
@@ -330,10 +333,13 @@ console.log('✅ All i18n keys present in 3 languages');
 ## 常见问题
 
 **Q: 如何跳过某个步骤？**
-A: 明确告知跳过原因，但测试门禁（Step 6）不可跳过。
+A: 明确告知跳过原因，但测试门禁（Step 5）不可跳过。
 
 **Q: 后端 API 未就绪怎么办？**
 A: 使用 ApiFox Mock URL 进行并行开发，参考 `11-apifox-to-impl`。
 
 **Q: 如何处理紧急 hotfix？**
-A: 最小化 Step 1-4，但 Step 5-6 必须完整执行。
+A: 最小化 Step 1-4，但 Step 5-6（测试 + 提交）必须完整执行。
+
+**Q: 测试不通过能提交吗？**
+A: 不能。Step 6 的前置条件是 Step 5 测试门禁全部通过。

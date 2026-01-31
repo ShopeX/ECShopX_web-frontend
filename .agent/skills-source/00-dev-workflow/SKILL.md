@@ -14,12 +14,14 @@ description: 自动化开发工作流的唯一入口。覆盖需求分析、UI�
 ## 工作流总览
 
 ```
-PRD 输入 → 需求产物 → 设计产物 → 开发实现 → 代码提交 → 测试门禁 → 可合并
-   │          │          │          │          │          │
-   ▼          ▼          ▼          ▼          ▼          ▼
- feature.md  01-spec   10-figma   02-infra   05-system  03-testing
-                       11-apifox             04-i18n
+PRD 输入 → 需求产物 → 设计产物 → 开发实现 → i18n → 代码提交 → 测试门禁 → 可合并
+   │          │          │          │        │        │          │
+   ▼          ▼          ▼          ▼        ▼        ▼          ▼
+ feature.md  01-spec   10-figma   02-infra  04-i18n  05-system  03-testing
+                       11-apifox
 ```
+
+> ⚠️ **i18n 是必须步骤**：开发完成后必须执行 `04-i18n`，不可跳过。
 
 ---
 
@@ -147,17 +149,50 @@ app/
 
 **加载技能**：`04-i18n`
 
+**触发条件**：开发实现完成后，**必须自动执行** i18n 检查。
+
+**执行流程**：
+
+```bash
+# 1. 扫描新增/修改的 Vue 组件中的硬编码文案
+grep -r ">[^<{]*[\u4e00-\u9fa5]" app/components/<新组件>/
+
+# 2. 检查是否使用 $t() 或 t()
+grep -r '\$t\(' app/components/<新组件>/
+grep -r 'useI18n' app/components/<新组件>/
+```
+
 **必须产出**：
 
-- `app/locales/zh-CN.json`：中文
-- `app/locales/en-US.json`：英文
-- `app/locales/ar.json`：阿拉伯语（含 RTL）
+| 文件 | 说明 |
+|------|------|
+| `app/locales/zh-CN.json` | 中文（开发时填写） |
+| `app/locales/en-US.json` | 英文（AI 翻译 + 校对） |
+| `app/locales/ar.json` | 阿拉伯语（AI 翻译 + RTL 验证） |
+
+**新增 Key 模板**（PRD 中必须列出）：
+
+```markdown
+## i18n 文案 Keys
+
+| Key | 中文 | English | العربية | 说明 |
+|-----|------|---------|---------|------|
+| `feature.title` | 功能标题 | Feature Title | عنوان الميزة | 页面主标题 |
+```
 
 **检查点**：
 
-- [ ] 所有新文案都有 key
-- [ ] 三种语言都已翻译
-- [ ] RTL 布局无错位
+- [ ] 组件无硬编码中文（使用 `$t()` 或 `t()`）
+- [ ] 三种语言文件 Key 一致
+- [ ] ar 模式下布局无错位（RTL 验证）
+
+**自动化提醒**：
+
+> ⚠️ **AI 必须在 Step 3 完成后主动执行**：
+> 1. 扫描新增组件中的硬编码文案
+> 2. 提取并生成 i18n Keys
+> 3. 同步更新三个语言文件
+> 4. 提示用户验证 RTL 布局
 
 ---
 
@@ -207,6 +242,22 @@ vue-tsc --noEmit
 
 # 2. E2E 核心链路
 pnpm test:e2e
+
+# 3. i18n 完整性检查（必跑）
+node -e "
+const zh = require('./app/locales/zh-CN.json');
+const en = require('./app/locales/en-US.json');
+const ar = require('./app/locales/ar.json');
+const zhKeys = Object.keys(zh).sort();
+const enKeys = Object.keys(en).sort();
+const arKeys = Object.keys(ar).sort();
+const missing = zhKeys.filter(k => !enKeys.includes(k) || !arKeys.includes(k));
+if (missing.length) {
+  console.error('❌ Missing i18n keys:', missing);
+  process.exit(1);
+}
+console.log('✅ All i18n keys present in 3 languages');
+"
 ```
 
 **核心链路（必测）**：
@@ -216,15 +267,17 @@ pnpm test:e2e
 
 **i18n/RTL 门禁**：
 
-- ar 语言模式下关键页面不崩溃
-- 关键布局方向正确
+- [ ] 三语言文件 Key 一致
+- [ ] ar 语言模式下关键页面不崩溃
+- [ ] 关键布局方向正确
 
 **通过标准**：
 
 - [ ] lint 通过
 - [ ] typecheck 通过
 - [ ] E2E 核心链路 100% 通过
-- [ ] i18n/RTL 检查通过
+- [ ] i18n 三语言 Key 一致
+- [ ] RTL 布局检查通过
 
 ---
 

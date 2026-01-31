@@ -27,3 +27,5 @@ logs
 package-lock.json
 yarn.lock
 # Keep pnpm-lock.yaml 
+
+oh-my-opencode/

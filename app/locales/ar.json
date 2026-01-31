@@ -14,5 +14,14 @@
   "search.resultTitle": "نتائج \"{keyword}\"",
   "search.noResult": "لم يتم العثور على منتجات",
   "search.noResultTip": "جرب كلمات أخرى",
-  "allProducts": "جميع المنتجات"
+  "allProducts": "جميع المنتجات",
+  "filter.title": "جميع المنتجات",
+  "filter.sortLabel": "الترتيب: ",
+  "filter.filterButton": "تصفية",
+  "filter.all": "الكل",
+  "filter.sort.sales": "الأكثر مبيعاً",
+  "filter.sort.new": "وصل حديثاً",
+  "filter.sort.priceDesc": "السعر: من الأعلى للأدنى",
+  "filter.sort.priceAsc": "السعر: من الأدنى للأعلى",
+  "filter.sort.default": "افتراضي"
 }

@@ -14,5 +14,14 @@
   "search.resultTitle": "\"{keyword}\" 的搜索结果",
   "search.noResult": "未找到相关商品",
   "search.noResultTip": "请尝试其他关键词",
-  "allProducts": "全部商品"
+  "allProducts": "全部商品",
+  "filter.title": "全部商品",
+  "filter.sortLabel": "排序：",
+  "filter.filterButton": "筛选",
+  "filter.all": "全部",
+  "filter.sort.sales": "销量",
+  "filter.sort.new": "上新",
+  "filter.sort.priceDesc": "价格由高到低",
+  "filter.sort.priceAsc": "价格由低到高",
+  "filter.sort.default": "综合"
 }

@@ -14,5 +14,14 @@
   "search.resultTitle": "Results for \"{keyword}\"",
   "search.noResult": "No products found",
   "search.noResultTip": "Try other keywords",
-  "allProducts": "All Products"
+  "allProducts": "All Products",
+  "filter.title": "All Products",
+  "filter.sortLabel": "Sort: ",
+  "filter.filterButton": "Filter",
+  "filter.all": "All",
+  "filter.sort.sales": "Best Sellers",
+  "filter.sort.new": "New Arrivals",
+  "filter.sort.priceDesc": "Price: High to Low",
+  "filter.sort.priceAsc": "Price: Low to High",
+  "filter.sort.default": "Default"
 }

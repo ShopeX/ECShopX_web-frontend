@@ -186,6 +186,23 @@ grep -r 'useI18n' app/components/<新组件>/
 - [ ] 三种语言文件 Key 一致
 - [ ] ar 模式下布局无错位（RTL 验证）
 
+**RTL 布局适配要点**：
+
+| LTR 类（避免使用） | RTL 友好类（推荐） | 说明 |
+|-------------------|-------------------|------|
+| `ml-4` / `mr-4` | `ms-4` / `me-4` | margin-start/end |
+| `pl-4` / `pr-4` | `ps-4` / `pe-4` | padding-start/end |
+| `left-0` / `right-0` | `start-0` / `end-0` | 定位 |
+| `text-left` / `text-right` | `text-start` / `text-end` | 文本对齐 |
+| `flex-row` | `flex-row` + `rtl:flex-row-reverse` | Flex 方向 |
+
+**方向性图标镜像**：
+
+```vue
+<!-- 箭头等方向性图标需要在 RTL 下镜像 -->
+<UIcon name="arrow-left" class="rtl:scale-x-[-1]" />
+```
+
 **自动化提醒**：
 
 > ⚠️ **AI 必须在 Step 3 完成后主动执行**：
@@ -193,7 +210,8 @@ grep -r 'useI18n' app/components/<新组件>/
 > 1. 扫描新增组件中的硬编码文案
 > 2. 提取并生成 i18n Keys
 > 3. 同步更新三个语言文件
-> 4. 提示用户验证 RTL 布局
+> 4. 检查是否使用了 RTL 友好的 Tailwind 类
+> 5. 提示用户在 ar 语言下验证布局
 
 ---
 
@@ -238,7 +256,22 @@ console.log('✅ All i18n keys present in 3 languages');
 
 - [ ] 三语言文件 Key 一致
 - [ ] ar 语言模式下关键页面不崩溃
-- [ ] 关键布局方向正确
+- [ ] 关键布局方向正确（左右镜像）
+
+**RTL 手动验证清单**：
+
+```bash
+# 1. 切换到阿拉伯语
+# 在浏览器访问 /ar/collections/all 或点击语言切换
+
+# 2. 检查以下元素
+- [ ] 页面整体布局从右到左
+- [ ] 导航菜单/侧边栏在右侧
+- [ ] 文本对齐方向正确
+- [ ] 箭头图标方向正确
+- [ ] 表单输入框布局正确
+- [ ] 按钮和图标顺序正确
+```
 
 **通过标准**：
 
@@ -246,7 +279,7 @@ console.log('✅ All i18n keys present in 3 languages');
 - [ ] typecheck 通过
 - [ ] E2E 核心链路 100% 通过
 - [ ] i18n 三语言 Key 一致
-- [ ] RTL 布局检查通过
+- [ ] RTL 布局手动验证通过
 
 ---
 

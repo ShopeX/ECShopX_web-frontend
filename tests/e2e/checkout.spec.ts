@@ -55,7 +55,7 @@ test.describe('结算页 E2E 测试', () => {
     test('应该显示右侧订单摘要', async ({ page }, testInfo) => {
       // 跳过移动端浏览器
       test.skip(testInfo.project.name.includes('Mobile'), 'PC 专属测试')
-      
+
       // 商品数量
       const itemCount = page.getByText(/件商品|item\(s\)|منتج/)
       await expect(itemCount.first()).toBeVisible()
@@ -72,7 +72,7 @@ test.describe('结算页 E2E 测试', () => {
     test('应该显示价格明细', async ({ page }, testInfo) => {
       // 跳过移动端浏览器
       test.skip(testInfo.project.name.includes('Mobile'), 'PC 专属测试')
-      
+
       // 商品总计
       const subtotal = page.locator('span.text-sm').filter({ hasText: /商品总计|Subtotal|المجموع الفرعي/ })
       await expect(subtotal.first()).toBeVisible()
@@ -91,7 +91,7 @@ test.describe('结算页 E2E 测试', () => {
     test('应该显示底部固定支付栏', async ({ page }, testInfo) => {
       // 跳过桌面端浏览器
       test.skip(!testInfo.project.name.includes('Mobile'), 'H5 专属测试')
-      
+
       // 底部支付栏
       const bottomBar = page.locator('.fixed.bottom-0')
       await expect(bottomBar).toBeVisible()
@@ -127,11 +127,11 @@ test.describe('结算页 E2E 测试', () => {
 
       // 等待弹窗出现（UModal 组件可能使用不同的结构）
       await page.waitForTimeout(500)
-      
+
       // 验证弹窗打开 - 查找 UModal 的内容区域
       const modalContent = page.locator('.fixed.inset-0, [data-headlessui-state="open"]').first()
       const isModalVisible = await modalContent.isVisible().catch(() => false)
-      
+
       // 如果弹窗可见则通过，否则跳过（可能组件结构不同）
       if (!isModalVisible) {
         test.skip(true, '弹窗组件结构可能不同，跳过此测试')
@@ -153,11 +153,11 @@ test.describe('结算页 E2E 测试', () => {
 
       // 等待弹窗
       await page.waitForTimeout(500)
-      
+
       // 验证发票弹窗打开或状态变化
       const modalContent = page.locator('.fixed.inset-0, [data-headlessui-state="open"]').first()
       const isModalVisible = await modalContent.isVisible().catch(() => false)
-      
+
       if (!isModalVisible) {
         test.skip(true, '弹窗组件结构可能不同，跳过此测试')
       }
@@ -169,8 +169,8 @@ test.describe('结算页 E2E 测试', () => {
     })
 
     test('同意协议后支付按钮状态变化', async ({ page }) => {
-      // 勾选同意协议 - 使用 first() 避免多元素问题
-      const agreeCheckbox = page.locator('span').filter({ hasText: /我同意|I agree to|أوافق على/ }).first()
+      // 使用 getByRole 定位 checkbox - Playwright 最佳实践
+      const agreeCheckbox = page.getByRole('checkbox', { name: /我同意|I agree to|أوافق على/ }).first()
       await agreeCheckbox.click()
 
       // 支付按钮应该可见（状态取决于购物车是否有商品）
@@ -193,7 +193,7 @@ test.describe('结算页 E2E 测试', () => {
     test('有地址时应显示地址卡片', async ({ page }) => {
       const addressCards = page.locator('.border.p-\\[17px\\]')
       const count = await addressCards.count()
-      
+
       if (count > 0) {
         // 验证地址卡片包含编辑按钮
         const editBtn = page.getByText(/编辑|Edit|تعديل/).first()

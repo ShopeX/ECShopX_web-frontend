@@ -4,5 +4,15 @@
   "app.pages.cart.index.checkout": "查看",
   "app.pages.cart.index.buybuy": "买买",
   "app.pages.cart.index.fastbuy": "立即购买",
-  "app.pages.account.login.forgetPassword": "忘记密码?"
+  "app.pages.account.login.forgetPassword": "忘记密码?",
+  "common.close": "关闭",
+  "search.placeholder": "甄选手袋礼品",
+  "search.hotKeywords": "热门搜索",
+  "search.historyKeywords": "历史搜索",
+  "search.clearHistory": "清空历史",
+  "search.noHistory": "暂无搜索历史",
+  "search.resultTitle": "\"{keyword}\" 的搜索结果",
+  "search.noResult": "未找到相关商品",
+  "search.noResultTip": "请尝试其他关键词",
+  "allProducts": "全部商品"
 }

@@ -1,17 +1,13 @@
 <template>
   <header class="sp-header-bar bg-white w-full">
-    <div class="flex items-center justify-between px-4 py-6 lg:px-8">
+    <div class="relative flex items-center justify-between px-4 py-6 lg:px-8">
       <!-- 左侧容器 -->
       <div class="flex items-center gap-3 lg:gap-6 h-5">
-        <!-- LOGO - 移动端显示在左侧，桌面端隐藏 -->
-        <NuxtLink to="/" class="lg:hidden hover:opacity-80 transition-opacity">
-          <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8" />
-        </NuxtLink>
-
         <!-- 搜索按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
           aria-label="搜索"
+          data-testid="search-trigger"
           @click="handleSearch"
         >
           <UIcon name="i-heroicons-magnifying-glass" class="w-5 h-5 text-[#191a1d]" />
@@ -27,8 +23,11 @@
         </button>
       </div>
 
-      <!-- 中间 LOGO - 桌面端显示在中间，移动端隐藏 -->
-      <NuxtLink to="/" class="hidden lg:block hover:opacity-80 transition-opacity">
+      <!-- 中间 LOGO - 绝对定位居中，H5和PC都显示 -->
+      <NuxtLink
+        to="/"
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hover:opacity-80 transition-opacity"
+      >
         <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
       </NuxtLink>
 
@@ -127,6 +126,7 @@ const switchLocalePath = useSwitchLocalePath()
 const emit = defineEmits<{
   openCategoryNav: []
   openMiniCart: []
+  openSearch: []
 }>()
 
 // 语言菜单相关
@@ -183,11 +183,10 @@ onBeforeUnmount(() => {
 })
 
 /**
- * 处理搜索点击
+ * 处理搜索点击 - 打开全局搜索抽屉
  */
 const handleSearch = () => {
-  // TODO: 实现搜索功能
-  console.log('搜索')
+  emit('openSearch')
 }
 
 /**

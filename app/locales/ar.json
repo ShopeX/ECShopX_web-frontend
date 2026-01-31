@@ -4,5 +4,15 @@
   "app.pages.cart.index.checkout": "عرض",
   "app.pages.cart.index.buybuy": "شراء شراء",
   "app.pages.cart.index.fastbuy": "اشتري الآن",
-  "app.pages.account.login.forgetPassword": "نسيت كلمة المرور؟"
+  "app.pages.account.login.forgetPassword": "نسيت كلمة المرور؟",
+  "common.close": "إغلاق",
+  "search.placeholder": "ابحث عن الحقائب والهدايا",
+  "search.hotKeywords": "عمليات البحث الشائعة",
+  "search.historyKeywords": "سجل البحث",
+  "search.clearHistory": "مسح السجل",
+  "search.noHistory": "لا يوجد سجل بحث",
+  "search.resultTitle": "نتائج \"{keyword}\"",
+  "search.noResult": "لم يتم العثور على منتجات",
+  "search.noResultTip": "جرب كلمات أخرى",
+  "allProducts": "جميع المنتجات"
 }

@@ -26,7 +26,11 @@
     <div class="bg-white pb-8 flex justify-center">
       <div class="w-full">
         <!-- 加载状态 -->
-        <div v-if="pending && !products.length" class="flex justify-center py-12" data-testid="collections-loading">
+        <div
+          v-if="pending && !products.length"
+          class="flex justify-center py-12"
+          data-testid="collections-loading"
+        >
           <ECLoading />
         </div>
 
@@ -48,7 +52,11 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-else-if="!products.length && !pending" class="text-center py-12" data-testid="collections-empty">
+        <div
+          v-else-if="!products.length && !pending"
+          class="text-center py-12"
+          data-testid="collections-empty"
+        >
           <div class="text-gray-400 mb-4">
             <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -66,7 +74,10 @@
         <!-- 商品展示 -->
         <div v-else>
           <!-- 商品网格布局 - 固定宽度居中布局 -->
-          <div class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5" data-testid="collections-product-grid">
+          <div
+            class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5"
+            data-testid="collections-product-grid"
+          >
             <BCProductCard
               v-for="product in products"
               :key="product.itemId"
@@ -77,15 +88,28 @@
           </div>
 
           <!-- 加载更多触发器（滚动到此处自动加载） -->
-          <div v-if="hasMore" ref="loadMoreTrigger" class="text-center pt-8 pb-4" data-testid="collections-load-more-trigger">
-            <div v-if="loadingMore" class="flex items-center justify-center gap-2" data-testid="collections-loading-more">
+          <div
+            v-if="hasMore"
+            ref="loadMoreTrigger"
+            class="text-center pt-8 pb-4"
+            data-testid="collections-load-more-trigger"
+          >
+            <div
+              v-if="loadingMore"
+              class="flex items-center justify-center gap-2"
+              data-testid="collections-loading-more"
+            >
               <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
               <span class="text-gray-500 text-sm">加载中...</span>
             </div>
           </div>
 
           <!-- 到底了提示 -->
-          <div v-else-if="products.length > 0" class="text-center pt-8 pb-4" data-testid="collections-end-message">
+          <div
+            v-else-if="products.length > 0"
+            class="text-center pt-8 pb-4"
+            data-testid="collections-end-message"
+          >
             <p class="text-gray-400 text-sm">— 到底了 —</p>
           </div>
         </div>
@@ -153,6 +177,7 @@ const filterParams = ref({
   sort: 'default',
   startPrice: undefined as number | undefined,
   endPrice: undefined as number | undefined,
+  keyword: '', // 搜索关键词
 })
 
 // ProductFilter 组件筛选值
@@ -273,6 +298,7 @@ const buildApiParams = (page: number, pageSize: number): IItemListParams => {
     ...(filterParams.value.sort !== 'default' && { sort: filterParams.value.sort }),
     ...(filterParams.value.startPrice && { start_price: filterParams.value.startPrice }),
     ...(filterParams.value.endPrice && { end_price: filterParams.value.endPrice }),
+    ...(filterParams.value.keyword && { keywords: filterParams.value.keyword }),
   }
 }
 
@@ -403,6 +429,10 @@ const updateUrlParams = () => {
     query.max_price = filterParams.value.endPrice.toString()
   }
 
+  if (filterParams.value.keyword) {
+    query.keyword = filterParams.value.keyword
+  }
+
   router.replace({ query })
 }
 
@@ -429,6 +459,10 @@ const restoreFromUrl = () => {
   if (query.max_price) {
     filterParams.value.endPrice = Number(query.max_price)
   }
+
+  if (query.keyword) {
+    filterParams.value.keyword = query.keyword as string
+  }
 }
 
 // 从 URL 恢复筛选状态的函数（独立版本，用于SSR）
@@ -440,6 +474,7 @@ const getFilterParamsFromUrl = () => {
     sort: query.sort ? (query.sort as string) : 'default',
     startPrice: query.min_price ? Number(query.min_price) : undefined,
     endPrice: query.max_price ? Number(query.max_price) : undefined,
+    keyword: query.keyword ? (query.keyword as string) : '',
   }
 }
 
@@ -541,6 +576,7 @@ onMounted(async () => {
       !filterParams.value.brandId &&
       !filterParams.value.startPrice &&
       !filterParams.value.endPrice &&
+      !filterParams.value.keyword &&
       filterParams.value.sort === 'default'
     ) {
       restoreFromUrl()

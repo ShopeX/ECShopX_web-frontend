@@ -4,9 +4,10 @@
     <div class="header-container sticky top-0 z-50 bg-white">
       <TemplateEngine template="header">
         <template #header>
-          <BCHeaderBar 
+          <BCHeaderBar
             @open-category-nav="handleOpenCategoryNav"
             @open-mini-cart="handleOpenMiniCart"
+            @open-search="handleOpenSearch"
           />
         </template>
       </TemplateEngine>
@@ -19,6 +20,18 @@
 
     <!-- Footer 区域 -->
     <BCFooter />
+
+    <!-- 全局搜索抽屉 - 使用 USlideover 包裹，和分类导航一致 -->
+    <USlideover v-model:open="showSearchDrawer" side="left">
+      <template #content>
+        <BCSearchDrawer
+          v-model="showSearchDrawer"
+          :hot-keywords="hotKeywords"
+          @close="showSearchDrawer = false"
+          @search="handleSearch"
+        />
+      </template>
+    </USlideover>
 
     <!-- 分类导航侧边栏 -->
     <USlideover v-model:open="showCategoryNav" side="left">
@@ -35,10 +48,7 @@
     <!-- Mini 购物车侧边栏 -->
     <USlideover v-model:open="showMiniCart" side="right">
       <template #content>
-        <BCMiniCart
-          v-model="showMiniCart"
-          @close="showMiniCart = false"
-        />
+        <BCMiniCart v-model="showMiniCart" @close="showMiniCart = false" />
       </template>
     </USlideover>
   </div>
@@ -50,6 +60,7 @@ import BCHeaderBar from '~/components/BCHeaderBar/BCHeaderBar.vue'
 import BCFooter from '~/components/BCFooter/BCFooter.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
 import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
+import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
 
 // 默认布局组件 - 使用完整的电商头部
 
@@ -59,6 +70,11 @@ const router = useRouter()
 const showCategoryNav = ref(false)
 // Mini 购物车侧边栏状态
 const showMiniCart = ref(false)
+// 搜索抽屉状态
+const showSearchDrawer = ref(false)
+
+// 热门搜索关键词
+const hotKeywords = ref(['手袋', '双十二', '新品', '手表', '香水彩妆', '珠宝腕表', '手提袋'])
 
 // 手动处理打开分类导航
 const handleOpenCategoryNav = () => {
@@ -68,6 +84,24 @@ const handleOpenCategoryNav = () => {
 // 手动处理打开 Mini 购物车
 const handleOpenMiniCart = () => {
   showMiniCart.value = true
+}
+
+// 手动处理打开搜索抽屉
+const handleOpenSearch = () => {
+  showSearchDrawer.value = true
+}
+
+/**
+ * 处理搜索 - 跳转到商品列表页
+ */
+const handleSearch = (keyword: string) => {
+  if (keyword.trim()) {
+    showSearchDrawer.value = false
+    router.push({
+      path: '/collections/all',
+      query: { keyword },
+    })
+  }
 }
 
 /**

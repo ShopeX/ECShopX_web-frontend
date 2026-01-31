@@ -4,5 +4,15 @@
   "app.pages.cart.index.checkout": "checkout",
   "app.pages.cart.index.buybuy": "buybuy",
   "app.pages.cart.index.fastbuy": "fastbuy",
-  "app.pages.account.login.forgetPassword": "forget the password?"
+  "app.pages.account.login.forgetPassword": "forget the password?",
+  "common.close": "Close",
+  "search.placeholder": "Search for handbags & gifts",
+  "search.hotKeywords": "Hot Searches",
+  "search.historyKeywords": "Search History",
+  "search.clearHistory": "Clear History",
+  "search.noHistory": "No search history",
+  "search.resultTitle": "Results for \"{keyword}\"",
+  "search.noResult": "No products found",
+  "search.noResultTip": "Try other keywords",
+  "allProducts": "All Products"
 }

@@ -1,17 +1,17 @@
 <template>
   <div class="w-full bg-white">
     <!-- 内容容器 -->
-    <div class="w-full max-w-[1440px] mx-auto px-8 sm:px-16 lg:px-32 py-8 sm:py-12 lg:py-16">
+    <div class="w-full max-w-[1440px] mx-auto px-4 lg:px-32 py-4 lg:py-16">
       <!-- 标题 -->
       <div
-        class="flex flex-col font-medium justify-center leading-none w-full text-2xl text-[#191a1d] mb-8"
+        class="flex flex-col font-medium justify-center leading-none w-full text-2xl text-[#191a1d] mb-2 lg:mb-8"
         data-testid="filter-title"
       >
         <h2 class="block leading-[48px]">全部商品</h2>
       </div>
 
       <!-- 筛选栏：排序和筛选按钮 -->
-      <div class="flex h-[42px] items-center justify-between w-full mb-8">
+      <div class="flex h-[42px] items-center justify-between w-full lg:mb-8">
         <!-- 左侧：排序选择器 -->
         <div class="relative flex items-center gap-2">
           <span class="text-sm text-[#99a1af] font-normal leading-5">排序：</span>
@@ -28,7 +28,7 @@
             />
           </button>
 
-          <!-- 排序下拉菜单 -->
+          <!-- 排序下拉菜单 - PC 端（定位在按钮下方） -->
           <Transition
             enter-active-class="transition ease-out duration-100"
             enter-from-class="transform opacity-0 scale-95"
@@ -39,16 +39,16 @@
           >
             <div
               v-if="showSortDropdown"
-              class="absolute left-0 top-full mt-2 z-10 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[160px]"
+              class="hidden lg:block absolute left-0 top-full mt-2 z-10 bg-white border border-[#e5e7eb] shadow-lg min-w-[160px] rounded-lg"
               data-testid="filter-sort-dropdown"
             >
               <div
                 v-for="option in sortOptions"
                 :key="option.value"
-                class="px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                class="flex items-center p-4 text-sm font-medium leading-5 cursor-pointer transition-colors first:rounded-t-lg last:rounded-b-lg"
                 :class="{
-                  'text-[#191a1d] font-medium': localValue.sort === option.value,
-                  'text-[#99a1af]': localValue.sort !== option.value,
+                  'bg-[#f3f4f6] text-[#191a1d]': localValue.sort === option.value,
+                  'bg-white text-[#191a1d] hover:bg-gray-50': localValue.sort !== option.value,
                 }"
                 :data-testid="`filter-sort-option-${option.value}`"
                 @click="handleSortChange(option.value)"
@@ -70,8 +70,35 @@
         </button>
       </div>
 
-      <!-- 筛选面板 -->
-      <div v-if="showFilterPanel" class="flex items-start justify-between w-full gap-8 py-4" data-testid="filter-panel">
+      <!-- H5 端排序下拉菜单 - 全宽显示在筛选栏下方 -->
+      <div
+        v-if="showSortDropdown"
+        class="lg:hidden bg-white"
+        data-testid="filter-sort-dropdown-mobile"
+      >
+        <div
+          v-for="(option, index) in sortOptions"
+          :key="option.value"
+          class="flex items-center p-4 text-sm font-medium leading-5 cursor-pointer transition-colors"
+          :class="[
+            localValue.sort === option.value
+              ? 'bg-[#f3f4f6] text-[#191a1d]'
+              : 'bg-white text-[#191a1d]',
+            index < sortOptions.length - 1 ? 'border-b border-[#e5e7eb]' : '',
+          ]"
+          :data-testid="`filter-sort-option-mobile-${option.value}`"
+          @click="handleSortChange(option.value)"
+        >
+          {{ option.label }}
+        </div>
+      </div>
+
+      <!-- 筛选面板 - PC 端横向排列 -->
+      <div
+        v-if="showFilterPanel"
+        class="hidden lg:flex items-start justify-between w-full gap-8 py-4"
+        data-testid="filter-panel"
+      >
         <!-- 渲染每个筛选组 -->
         <div v-for="group in filterGroups" :key="group.key" class="flex flex-col gap-4 items-start">
           <!-- 筛选组标题 -->
@@ -134,6 +161,93 @@
           </div>
         </div>
       </div>
+
+      <!-- 筛选面板 - H5 端手风琴样式 -->
+      <div
+        v-if="showFilterPanel"
+        class="flex lg:hidden flex-col border-t border-[#e5e7eb] bg-white"
+        data-testid="filter-panel-mobile"
+      >
+        <!-- 渲染每个筛选组为手风琴项 -->
+        <div
+          v-for="group in filterGroups"
+          :key="group.key"
+          class="border-b border-[#e5e7eb] last:border-b-0"
+        >
+          <!-- 手风琴标题行 -->
+          <button
+            class="flex items-center justify-between w-full p-4 text-sm font-medium leading-5 text-[#191a1d] hover:bg-gray-50 transition-colors"
+            :data-testid="`filter-accordion-${group.key}`"
+            @click="toggleAccordion(group.key)"
+          >
+            <span>{{ group.label }}</span>
+            <UIcon
+              name="i-heroicons-plus"
+              class="size-4 transition-transform"
+              :class="{ 'rotate-45': expandedGroups.includes(group.key) }"
+            />
+          </button>
+
+          <!-- 手风琴内容 -->
+          <Transition
+            enter-active-class="transition-all duration-200 ease-out"
+            enter-from-class="max-h-0 opacity-0"
+            enter-to-class="max-h-[500px] opacity-100"
+            leave-active-class="transition-all duration-150 ease-in"
+            leave-from-class="max-h-[500px] opacity-100"
+            leave-to-class="max-h-0 opacity-0"
+          >
+            <div v-if="expandedGroups.includes(group.key)" class="overflow-hidden bg-[#f9fafb]">
+              <div class="flex flex-col p-4 gap-3">
+                <!-- "全部" 选项 -->
+                <div
+                  class="flex gap-2.5 items-center cursor-pointer"
+                  @click="handleSelectAll(group.key)"
+                >
+                  <div
+                    class="size-5 border border-[#191a1d] flex items-center justify-center"
+                    :class="isAllSelected(group.key) ? 'bg-black' : 'bg-white'"
+                  >
+                    <Icon
+                      v-if="isAllSelected(group.key)"
+                      name="i-heroicons-check"
+                      class="size-4 text-white"
+                    />
+                  </div>
+                  <p
+                    class="text-sm font-medium leading-5"
+                    :class="isAllSelected(group.key) ? 'text-[#191a1d]' : 'text-[#99a1af]'"
+                  >
+                    全部
+                  </p>
+                </div>
+
+                <!-- 其他选项 -->
+                <div
+                  v-for="option in group.options"
+                  :key="option.id"
+                  class="flex gap-2.5 items-center cursor-pointer"
+                  @click="handleOptionToggle(group.key, option.value)"
+                >
+                  <div
+                    class="size-5 border border-[#191a1d] flex items-center justify-center"
+                    :class="isOptionSelected(group.key, option.value) ? 'bg-black' : 'bg-white'"
+                  >
+                    <Icon
+                      v-if="isOptionSelected(group.key, option.value)"
+                      name="i-heroicons-check"
+                      class="size-4 text-white"
+                    />
+                  </div>
+                  <p class="text-sm font-medium leading-5 text-[#191a1d]">
+                    {{ option.label }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -165,25 +279,31 @@ const showSortDropdown = ref(false)
 // 排序下拉菜单引用
 const sortDropdownRef = ref<HTMLElement | null>(null)
 
-// 排序选项
+// H5 端手风琴展开的筛选组
+const expandedGroups = ref<string[]>([])
+
+// 排序选项（按 Figma 设计调整顺序和名称）
 const sortOptions = [
-  { value: ESortOption.DEFAULT, label: '默认' },
-  { value: ESortOption.PRICE_ASC, label: '价格从低到高' },
-  { value: ESortOption.PRICE_DESC, label: '价格从高到低' },
   { value: ESortOption.SALES, label: '销量' },
   { value: ESortOption.NEW, label: '上新' },
+  { value: ESortOption.PRICE_DESC, label: '价格由高到低' },
+  { value: ESortOption.PRICE_ASC, label: '价格由低到高' },
 ]
 
 // 当前排序标签
 const currentSortLabel = computed(() => {
   const option = sortOptions.find((opt) => opt.value === localValue.value.sort)
-  return option?.label || '价格'
+  return option?.label || '综合'
 })
 
 /**
  * 切换排序下拉菜单
  */
 function toggleSortDropdown() {
+  // H5 端互斥：打开排序时关闭筛选面板
+  if (!showSortDropdown.value && props.showFilterPanel) {
+    emit('update:showFilterPanel', false)
+  }
   showSortDropdown.value = !showSortDropdown.value
 }
 
@@ -191,7 +311,23 @@ function toggleSortDropdown() {
  * 切换筛选面板
  */
 function toggleFilterPanel() {
+  // H5 端互斥：打开筛选时关闭排序下拉
+  if (!props.showFilterPanel && showSortDropdown.value) {
+    showSortDropdown.value = false
+  }
   emit('update:showFilterPanel', !props.showFilterPanel)
+}
+
+/**
+ * 切换手风琴展开状态（H5 端）
+ */
+function toggleAccordion(groupKey: string) {
+  const index = expandedGroups.value.indexOf(groupKey)
+  if (index > -1) {
+    expandedGroups.value.splice(index, 1)
+  } else {
+    expandedGroups.value.push(groupKey)
+  }
 }
 
 /**

@@ -6,7 +6,7 @@
         <div
           class="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"
         ></div>
-        <p class="text-gray-600">加载中...</p>
+        <p class="text-gray-600">{{ $t('product.loading') }}</p>
       </div>
     </div>
 
@@ -18,7 +18,7 @@
           class="px-6 py-2 bg-gray-900 text-white rounded hover:bg-gray-800"
           @click="$router.back()"
         >
-          返回
+          {{ $t('common.back') }}
         </button>
       </div>
     </div>
@@ -211,13 +211,13 @@
               @click="addToCart"
             >
               <UIcon v-if="isAddingToCart" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
-              {{ isAddingToCart ? '加入中...' : '加入购物袋' }}
+              {{ isAddingToCart ? $t('product.adding') : $t('product.addToCart') }}
             </button>
             <button
               class="w-full px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 transition-colors"
               @click="buyNow"
             >
-              立即购买
+              {{ $t('product.buyNow') }}
             </button>
           </div>
 
@@ -230,7 +230,7 @@
                   class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('details')"
                 >
-                  <span>商品详情</span>
+                  <span>{{ $t('product.details') }}</span>
                   <UIcon
                     name="i-heroicons-chevron-down"
                     class="w-4 h-4 transition-transform"
@@ -251,7 +251,7 @@
                   class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('info1')"
                 >
-                  <span>可配信息</span>
+                  <span>{{ $t('product.deliveryInfo') }}</span>
                   <UIcon
                     name="i-heroicons-chevron-down"
                     class="w-4 h-4 transition-transform"
@@ -266,7 +266,7 @@
                   class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('info2')"
                 >
-                  <span>可配信息</span>
+                  <span>{{ $t('product.deliveryInfo') }}</span>
                   <UIcon
                     name="i-heroicons-chevron-down"
                     class="w-4 h-4 transition-transform"
@@ -303,13 +303,13 @@
           @click="addToCart"
         >
           <UIcon v-if="isAddingToCart" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
-          {{ isAddingToCart ? '加入中...' : '加入购物袋' }}
+          {{ isAddingToCart ? $t('product.adding') : $t('product.addToCart') }}
         </button>
         <button
           class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 active:bg-gray-100 transition-colors"
           @click="buyNow"
         >
-          立即购买
+          {{ $t('product.buyNow') }}
         </button>
       </div>
     </div>
@@ -323,6 +323,7 @@ import { logger } from '~/utils/log'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const id = String((route.params as { id: string }).id || '')
 const toast = useToastMessage()
 
@@ -339,10 +340,10 @@ const {
 // 错误处理
 const detailError = computed(() => {
   if (fetchError.value) {
-    return '加载商品详情失败'
+    return t('product.loadError')
   }
   if (!rawProductData.value && !detailLoading.value) {
-    return '商品不存在'
+    return t('product.notFound')
   }
   return null
 })
@@ -653,7 +654,7 @@ const addToCart = async () => {
         // - 自动重新加载购物车数据
       },
       {
-        loginMessage: '请先登录后再加入购物袋',
+        loginMessage: t('product.loginRequired'),
         redirectAfterLogin: true,
       }
     )

@@ -66,5 +66,16 @@
   "checkout.invoiceContentGoods": "تفاصيل المنتج",
   "checkout.invoiceContentService": "رسوم الخدمة",
   "checkout.invoiceContentGoodsService": "المنتجات والخدمات",
-  "checkout.invoiceContentOther": "أخرى"
+  "checkout.invoiceContentOther": "أخرى",
+  "common.back": "رجوع",
+  "product.loading": "جاري التحميل...",
+  "product.loadError": "فشل تحميل المنتج",
+  "product.notFound": "المنتج غير موجود",
+  "product.addToCart": "أضف إلى الحقيبة",
+  "product.adding": "جاري الإضافة...",
+  "product.buyNow": "اشترِ الآن",
+  "product.details": "تفاصيل المنتج",
+  "product.deliveryInfo": "معلومات التوصيل",
+  "product.recommendations": "منتجات مقترحة",
+  "product.loginRequired": "يرجى تسجيل الدخول للإضافة إلى الحقيبة"
 }

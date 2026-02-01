@@ -66,5 +66,16 @@
   "checkout.invoiceContentGoods": "商品明细",
   "checkout.invoiceContentService": "服务费",
   "checkout.invoiceContentGoodsService": "商品及服务",
-  "checkout.invoiceContentOther": "其他"
+  "checkout.invoiceContentOther": "其他",
+  "common.back": "返回",
+  "product.loading": "加载中...",
+  "product.loadError": "加载商品详情失败",
+  "product.notFound": "商品不存在",
+  "product.addToCart": "加入购物袋",
+  "product.adding": "加入中...",
+  "product.buyNow": "立即购买",
+  "product.details": "商品详情",
+  "product.deliveryInfo": "可配信息",
+  "product.recommendations": "推荐商品",
+  "product.loginRequired": "请先登录后再加入购物袋"
 }

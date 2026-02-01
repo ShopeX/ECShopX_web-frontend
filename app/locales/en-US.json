@@ -66,5 +66,16 @@
   "checkout.invoiceContentGoods": "Product Details",
   "checkout.invoiceContentService": "Service Fee",
   "checkout.invoiceContentGoodsService": "Products & Services",
-  "checkout.invoiceContentOther": "Other"
+  "checkout.invoiceContentOther": "Other",
+  "common.back": "Back",
+  "product.loading": "Loading...",
+  "product.loadError": "Failed to load product",
+  "product.notFound": "Product not found",
+  "product.addToCart": "Add to Bag",
+  "product.adding": "Adding...",
+  "product.buyNow": "Buy Now",
+  "product.details": "Product Details",
+  "product.deliveryInfo": "Delivery Info",
+  "product.recommendations": "Recommendations",
+  "product.loginRequired": "Please login to add to bag"
 }

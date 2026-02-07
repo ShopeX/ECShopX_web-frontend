@@ -161,7 +161,7 @@ export default defineNuxtPlugin({
         console.log(`[API Request] ${options.method || 'GET'} ${options.baseURL}${(options as any).url || ''}`)
       },
 
-      async onResponse({ response }) {
+      async onResponse({ response, options }) {
         // 响应日志
         console.log(`[API Response] ${response.status} ${response.url}`)
 
@@ -175,6 +175,9 @@ export default defineNuxtPlugin({
         if (refreshToken) {
           useCookie('refresh-token').value = refreshToken
         }
+
+        // 获取跳过错误码配置
+        const skipErrorCodes = (options as any).skipErrorCodes || []
 
         // ✅ 业务状态码检查
         const data = response._data?.data
@@ -190,7 +193,11 @@ export default defineNuxtPlugin({
                 status_code: statusCode,
                 data: data
               } as ApiResponse)
-              await showErrorMessage(error)
+
+              const shouldSkipToast = skipErrorCodes.includes(statusCode)
+              if (!shouldSkipToast) {
+                await showErrorMessage(error)
+              }
               throw error
             }
           } else {
@@ -198,6 +205,7 @@ export default defineNuxtPlugin({
             const apiResponse = data as ApiResponse
             if (!isBusinessSuccess(apiResponse)) {
               const error = createBusinessError(apiResponse)
+              // 某些旧接口可能没有明确的状态码，这里无法精确 skip，除非 skipErrorCodes 包含特定标识
               await showErrorMessage(error)
               throw error
             }
@@ -207,7 +215,7 @@ export default defineNuxtPlugin({
         }
       },
 
-      async onResponseError({ response, error }) {
+      async onResponseError({ response, error, options }) {
         // 错误日志
         console.error(`[API Error] ${response?.status || 'Network'} ${response?.url || ''}`)
 
@@ -246,8 +254,14 @@ export default defineNuxtPlugin({
           )
         }
 
-        // 显示错误消息
-        await showErrorMessage(httpError)
+        // 检查是否需要跳过全局错误提示
+        const skipErrorCodes = (options as any).skipErrorCodes || []
+        const shouldSkipToast = response && skipErrorCodes.includes(response.status)
+
+        if (!shouldSkipToast) {
+          // 显示错误消息
+          await showErrorMessage(httpError)
+        }
 
         // 重新抛出标准错误对象
         throw httpError

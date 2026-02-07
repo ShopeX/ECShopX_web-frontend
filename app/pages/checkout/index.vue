@@ -44,8 +44,25 @@
               </button>
             </div>
 
+            <!-- 加载中骨架屏 -->
+            <div v-if="initialAddressesLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div v-for="i in 2" :key="i" class="border p-[17px] flex flex-col gap-4 border-[#e5e7eb]">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <USkeleton class="h-5 w-16" />
+                    <USkeleton class="h-5 w-24" />
+                  </div>
+                  <USkeleton class="h-4 w-12" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <USkeleton class="h-5 w-32" />
+                  <USkeleton class="h-5 w-full" />
+                </div>
+              </div>
+            </div>
+
             <!-- 地址列表 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div v-else-if="addresses.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div
                 v-for="address in addresses"
                 :key="address.id"
@@ -82,7 +99,7 @@
             </div>
 
             <!-- 空状态 -->
-            <div v-if="addresses.length === 0" class="py-8 text-center text-[#4a5565]">
+            <div v-else class="py-8 text-center text-[#4a5565]">
               {{ $t('checkout.noAddress') }}
             </div>
           </div>
@@ -330,6 +347,11 @@
       </div>
     </div>
 
+    <BCCheckoutErrorModal
+      v-model="showErrorModal"
+      :error-message="errorMessage"
+    />
+
     <!-- 地址弹窗 -->
     <BCAddressModal
       v-model="showAddressModal"
@@ -381,9 +403,10 @@ definePageMeta({
 const { t } = useI18n()
 
 const router = useRouter()
-const { cartUI, items } = useCart()
+const { cartUI, items, loadCart } = useCart()
 const {
   loading,
+  initialAddressesLoading,
   calculating,
   error,
   addresses,
@@ -391,6 +414,8 @@ const {
   coupons,
   selectedCoupon,
   calculateResult,
+  checkoutItems,
+  checkoutError,
   form,
   itemTotalDisplay,
   freightDisplay,
@@ -408,6 +433,9 @@ const {
   createOrder,
 } = useCheckout()
 
+// 引入错误弹窗
+import BCCheckoutErrorModal from '~/components/BCCheckoutErrorModal/BCCheckoutErrorModal.vue'
+
 // 协议同意状态
 const agreeTerms = ref(false)
 
@@ -423,9 +451,25 @@ const showCouponSelector = ref(false)
 const showInvoiceModal = ref(false)
 const invoiceData = ref<IInvoiceFormData | undefined>()
 
-// 选中的商品列表
+// 结算错误弹窗
+const showErrorModal = computed({
+  get: () => !!checkoutError.value,
+  set: (val) => {
+    // 这种情况下通常不应该手动关闭，或者是通过弹窗内部按钮关闭
+    if (!val) {
+      // 如果需要清理错误状态，可以在这里处理，
+      // 但 currently useCheckout expose 的 checkoutError 是 readonly
+      // 所以我们依赖弹窗自身的路由跳转来通过离开页面解决问题
+      // 或者如果只是关闭弹窗留在当前页，可能需要 useCheckout 提供 clearError 方法
+      // 目前需求是跳转，所以暂不处理 set false 的逻辑回写
+    }
+  }
+})
+const errorMessage = computed(() => checkoutError.value?.message)
+
+// 选中的商品列表 (使用后端计算返回的商品列表)
 const selectedItems = computed(() => {
-  return cartUI.value.items.filter((item) => item.selected)
+  return checkoutItems.value || []
 })
 
 // 运费显示文本（支持 i18n）
@@ -464,11 +508,11 @@ watch(
 
 // 初始化
 onMounted(async () => {
+  // 确保购物车数据已加载
+  await loadCart()
+
   // 加载地址列表
   await loadAddresses()
-
-  // 初始计算订单金额
-  await calculateOrderAmount()
 
   // 加载优惠券列表
   await loadCoupons()

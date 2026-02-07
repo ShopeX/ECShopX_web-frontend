@@ -106,11 +106,12 @@ export class OrderApiClient {
    * @param params - 计算订单金额的参数
    * @returns 原始 API 响应
    */
-  async calculateOrder(params: ICalculateOrderRequest): Promise<any> {
+  async calculateOrder(params: ICalculateOrderRequest, options?: any): Promise<any> {
     return this.http('/getFreightFee', {
       method: 'POST',
       body: params,
-    })
+      ...options,
+    } as any)
   }
 
   /**
@@ -119,10 +120,55 @@ export class OrderApiClient {
    * @param params - 创建订单的参数
    * @returns 原始 API 响应
    */
-  async createOrder(params: ICreateOrderRequest): Promise<any> {
+  async createOrder(params: ICreateOrderRequest, options?: any): Promise<any> {
     return this.http('/order_new', {
       method: 'POST',
       body: params,
+      ...options,
+    } as any)
+  }
+
+  /**
+   * 获取订单列表
+   */
+  async getOrderList(params?: { status?: string; page?: number; page_size?: number }): Promise<any> {
+    return this.http('/order/list', {
+      method: 'GET',
+      params: {
+        status: params?.status || '',
+        page: params?.page || 1,
+        page_size: params?.page_size || 10,
+      },
+    })
+  }
+
+  /**
+   * 取消订单
+   */
+  async cancelOrder(orderId: string): Promise<any> {
+    return this.http('/order/cancel', {
+      method: 'POST',
+      body: { order_id: orderId },
+    })
+  }
+
+  /**
+   * 确认收货
+   */
+  async confirmReceipt(orderId: string): Promise<any> {
+    return this.http('/order/confirm', {
+      method: 'POST',
+      body: { order_id: orderId },
+    })
+  }
+
+  /**
+   * 删除订单
+   */
+  async deleteOrder(orderId: string): Promise<any> {
+    return this.http('/order/delete', {
+      method: 'POST',
+      body: { order_id: orderId },
     })
   }
 }

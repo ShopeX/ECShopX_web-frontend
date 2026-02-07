@@ -9,8 +9,20 @@ import { MoneyValueObject } from '~/shared/value-objects'
  * - 提供默认值处理
  */
 
+export interface ICheckoutItem {
+  id: string
+  productId: string
+  productName: string
+  productImage: string
+  specName: string
+  quantity: number
+  price: number
+  subtotal: number
+  subtotalDisplay: string
+}
+
 export interface IOrderCalculateModel {
-  items: any[]
+  items: ICheckoutItem[]
   itemFee: number
   itemFeeNew: number
   marketFee: number
@@ -67,11 +79,32 @@ export interface ICouponModel {
 
 export class OrderTransformer {
   /**
+   * 转换结算商品项
+   */
+  static toCheckoutItemModel(apiItem: any): ICheckoutItem {
+    const price = Number(apiItem.price || 0) / 100 // 分转元
+    const quantity = Number(apiItem.quantity || 0)
+    const subtotal = price * quantity
+
+    return {
+      id: String(apiItem.item_id || ''),
+      productId: String(apiItem.item_id || ''),
+      productName: apiItem.item_name || apiItem.title || '',
+      productImage: apiItem.item_image || apiItem.pic || '',
+      specName: apiItem.spec_name || apiItem.spec_info || '',
+      quantity,
+      price,
+      subtotal,
+      subtotalDisplay: MoneyValueObject.of(subtotal).display,
+    }
+  }
+
+  /**
    * 计算订单金额响应 → 应用模型
    */
   static toCalculateModel(response: any): IOrderCalculateModel {
     return {
-      items: response.items || [],
+      items: (response.items || []).map(OrderTransformer.toCheckoutItemModel),
       itemFee: Number(response.item_fee || 0) / 100, // 分转元
       itemFeeNew: Number(response.item_fee_new || 0) / 100,
       marketFee: Number(response.market_fee || 0) / 100,
@@ -146,6 +179,71 @@ export class OrderTransformer {
       minFee: Number(item.min_fee || 0) / 100,
       expireTime: item.expire_time,
     }))
+  }
+
+  /**
+   * 获取订单状态文本
+   */
+  static getOrderStatusText(status: string): string {
+    const statusMap: Record<string, string> = {
+      pending_payment: '待付款',
+      pending_shipment: '待发货',
+      shipped: '待收货',
+      completed: '已完成',
+      cancelled: '已取消',
+    }
+    return statusMap[status] || status
+  }
+
+  /**
+   * 转换订单商品项
+   */
+  static toOrderItemModel(apiItem: any) {
+    const price = Number(apiItem.price || 0) / 100 // 分转元
+    return {
+      itemId: String(apiItem.item_id || ''),
+      itemName: apiItem.item_name || '',
+      itemImage: apiItem.item_image || '',
+      specName: apiItem.spec_name || '',
+      quantity: Number(apiItem.quantity || 0),
+      price,
+      subtotal: price * Number(apiItem.quantity || 0),
+    }
+  }
+
+  /**
+   * 转换订单
+   */
+  static toOrderModel(apiOrder: any) {
+    const status = apiOrder.status || ''
+
+    return {
+      orderId: String(apiOrder.order_id || ''),
+      orderTime: apiOrder.order_time || '',
+      status,
+      statusText: OrderTransformer.getOrderStatusText(status),
+      items: (apiOrder.items || []).map(OrderTransformer.toOrderItemModel),
+      totalAmount: Number(apiOrder.total_amount || 0) / 100, // 分转元
+      shippingAddress: apiOrder.shipping_address,
+      // 根据订单状态判断可执行的操作
+      canCancel: status === 'pending_payment',
+      canPay: status === 'pending_payment',
+      canConfirmReceipt: status === 'shipped',
+      canDelete: status === 'cancelled',
+    }
+  }
+
+  /**
+   * 批量转换订单列表
+   */
+  static toOrderListModel(response: any) {
+    const orders = response?.orders || response?.list || []
+    return {
+      orders: orders.map(OrderTransformer.toOrderModel),
+      total: Number(response?.total || 0),
+      page: Number(response?.page || 1),
+      pageSize: Number(response?.page_size || 10),
+    }
   }
 }
 

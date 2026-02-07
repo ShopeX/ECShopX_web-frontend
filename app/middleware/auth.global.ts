@@ -23,7 +23,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     // 如果未登录，重定向到登录页并携带当前路由
     if (!userStore.isLoggedIn) {
       logger.warn(`[AuthMiddleware] 未登录访问受保护路由: ${to.path}`)
-      
+
       return navigateTo({
         path: '/account/login',
         query: {

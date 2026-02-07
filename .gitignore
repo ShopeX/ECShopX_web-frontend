@@ -28,4 +28,9 @@ package-lock.json
 yarn.lock
 # Keep pnpm-lock.yaml 
 
+# Playwright
+playwright-report
+test-results
+playwright/.cache
+
 oh-my-opencode/

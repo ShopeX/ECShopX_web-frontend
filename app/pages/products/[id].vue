@@ -210,7 +210,11 @@
               :disabled="isAddingToCart"
               @click="addToCart"
             >
-              <UIcon v-if="isAddingToCart" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
+              <UIcon
+                v-if="isAddingToCart"
+                name="i-heroicons-arrow-path"
+                class="w-5 h-5 animate-spin"
+              />
               {{ isAddingToCart ? $t('product.adding') : $t('product.addToCart') }}
             </button>
             <button
@@ -632,11 +636,11 @@ const currentPrice = computed(() => {
 const addToCart = async () => {
   // 防止重复点击
   if (isAddingToCart.value) return
-  
+
   // 架构优化:通过 useCart composable 处理业务逻辑
   // UI层 → useCart (Composable) → cartApiClient (Infrastructure) → API
   isAddingToCart.value = true
-  
+
   try {
     await requireAuth(
       async () => {
@@ -670,7 +674,7 @@ const buyNow = async () => {
       // 手动触发加载指示器，确保用户能看到加载状态
       const loadingIndicator = useLoadingIndicator()
       loadingIndicator.start()
-      
+
       try {
         const result = await addToCartAction({
           cart_type: 'fastbuy', // 立即购买,
@@ -684,7 +688,7 @@ const buyNow = async () => {
         if (result.success) {
           // 使用 navigateTo 替代 router.push，更好地集成 Nuxt 路由系统
           // navigateTo 会自动触发加载指示器，但我们已经手动启动了，所以会继续显示
-          await navigateTo('/checkout')
+          await navigateTo('/checkout?mode=fastbuy')
         } else {
           // 如果失败，停止加载指示器
           loadingIndicator.finish()

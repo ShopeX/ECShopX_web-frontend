@@ -17,6 +17,7 @@ import { OrderTransformer, type IOrderCalculateModel, type IAddressModel, type I
 import { useCart } from './useCart'
 import { MoneyValueObject } from '~/shared/value-objects'
 import type { ICreateOrderRequest } from '~/infrastructure/http/clients/OrderApiClient'
+import { HttpStatus } from '~/types/http'
 
 export interface ICheckoutForm {
   // 配送方式
@@ -37,10 +38,12 @@ export interface ICheckoutForm {
 }
 
 export function useCheckout() {
+  const route = useRoute()
   const { cartUI, items } = useCart()
 
   // 状态
   const loading = ref(false)
+  const initialAddressesLoading = ref(true)
   const calculating = ref(false)
   const error = ref<string | null>(null)
 
@@ -54,6 +57,8 @@ export function useCheckout() {
 
   // 订单计算结果
   const calculateResult = ref<IOrderCalculateModel | null>(null)
+  // 结算错误
+  const checkoutError = ref<{ code: number; message: string } | null>(null)
 
   // 表单数据
   const form = ref<ICheckoutForm>({
@@ -65,12 +70,13 @@ export function useCheckout() {
     needInvoice: false,
   })
 
-  /**
+  /*
    * 加载地址列表
    */
   const loadAddresses = async () => {
     try {
       loading.value = true
+      initialAddressesLoading.value = true
       const response = await addressApiClient.getAddressList()
       addresses.value = OrderTransformer.toAddressModelList(response)
 
@@ -89,6 +95,7 @@ export function useCheckout() {
       throw err
     } finally {
       loading.value = false
+      initialAddressesLoading.value = false
     }
   }
 
@@ -100,8 +107,6 @@ export function useCheckout() {
     if (address) {
       selectedAddress.value = address
       form.value.selectedAddressId = addressId
-      // 重新计算订单金额
-      calculateOrderAmount()
     }
   }
 
@@ -189,9 +194,11 @@ export function useCheckout() {
       }
 
       // 构建计算参数
+      const mode = (route.query.mode as string) || 'normal'
       const params: any = {
         distributor_id: '0', // TODO: 从配置或用户信息获取
-        cart_type: 'normal',
+        cart_type: mode,
+        order_type: 'normal',
         receipt_type: form.value.receiptType,
         not_use_coupon: form.value.notUseCoupon ? 1 : 0,
         point_use: form.value.usePoint ? form.value.pointUse : 0,
@@ -199,6 +206,8 @@ export function useCheckout() {
 
       // 快递配送需要地址信息
       if (form.value.receiptType === 'express' && selectedAddress.value) {
+        params.receiver_name = selectedAddress.value.name
+        params.receiver_mobile = selectedAddress.value.phone
         params.receiver_state = selectedAddress.value.province
         params.receiver_city = selectedAddress.value.city
         params.receiver_district = selectedAddress.value.district
@@ -215,7 +224,7 @@ export function useCheckout() {
         params.coupon_discount = form.value.couponCode
       }
 
-      const response = await orderApiClient.calculateOrder(params)
+      const response = await orderApiClient.calculateOrder(params, { skipErrorCodes: [HttpStatus.UNPROCESSABLE_ENTITY] })
       calculateResult.value = OrderTransformer.toCalculateModel(response)
 
       // 如果开启了积分抵扣，更新最大可用积分
@@ -226,8 +235,17 @@ export function useCheckout() {
         }
       }
     } catch (err: any) {
-      error.value = err.message || '计算订单金额失败'
       console.error('计算订单金额失败:', err)
+
+      // 拦截 422 错误 (业务逻辑错误，如商品库存不足、无效商品等)
+      if (isUnprocessableEntity(err)) {
+        checkoutError.value = {
+          code: HttpStatus.UNPROCESSABLE_ENTITY,
+          message: err.data?.message || err.message || '结算商品异常'
+        }
+      } else {
+        error.value = err.message || '计算订单金额失败'
+      }
     } finally {
       calculating.value = false
     }
@@ -244,6 +262,7 @@ export function useCheckout() {
     try {
       loading.value = true
       error.value = null
+      checkoutError.value = null
 
       const selectedItems = items.value.filter(item => item.selected)
       if (selectedItems.length === 0) {
@@ -251,9 +270,11 @@ export function useCheckout() {
       }
 
       // 构建创建订单参数
+      const mode = (route.query.mode as string) || 'normal'
       const params: ICreateOrderRequest = {
         distributor_id: '0', // TODO: 从配置或用户信息获取
-        cart_type: 'normal',
+        cart_type: mode as any,
+        order_type: 'normal',
         receipt_type: form.value.receiptType,
         pay_type: payType as any,
         not_use_coupon: form.value.notUseCoupon ? 1 : 0,
@@ -286,13 +307,22 @@ export function useCheckout() {
         params.invoice_content = form.value.invoiceContent
       }
 
-      const response = await orderApiClient.createOrder(params)
+      const response = await orderApiClient.createOrder(params, { skipErrorCodes: [HttpStatus.UNPROCESSABLE_ENTITY] })
 
       return {
         success: true,
         orderId: response.order_id || response.trade_info?.order_id,
       }
     } catch (err: any) {
+      // 同样拦截 422
+      if (isUnprocessableEntity(err)) {
+        checkoutError.value = {
+          code: HttpStatus.UNPROCESSABLE_ENTITY,
+          message: err.data?.message || err.message || '下单异常'
+        }
+        return { success: false, error: checkoutError.value.message }
+      }
+
       error.value = err.message || '创建订单失败'
       return { success: false, error: error.value || undefined }
     } finally {
@@ -362,11 +392,20 @@ export function useCheckout() {
       .reduce((sum, item) => sum + item.quantity.value, 0)
   })
 
+  /**
+   * 结算商品列表
+   */
+  const checkoutItems = computed(() => {
+    return calculateResult.value?.items || []
+  })
+
   return {
     // 状态
     loading: readonly(loading),
+    initialAddressesLoading: readonly(initialAddressesLoading),
     calculating: readonly(calculating),
     error: readonly(error),
+    checkoutError: readonly(checkoutError),
 
     // 数据
     addresses: readonly(addresses),
@@ -374,6 +413,7 @@ export function useCheckout() {
     coupons: readonly(coupons),
     selectedCoupon: readonly(selectedCoupon),
     calculateResult: readonly(calculateResult),
+    checkoutItems, // 暴露结算商品列表
     form,
 
     // 计算属性
@@ -395,5 +435,15 @@ export function useCheckout() {
     calculateOrderAmount,
     createOrder,
   }
+}
+
+/**
+ * 判断是否为 422 错误
+ */
+function isUnprocessableEntity(err: any): boolean {
+  // code: 业务错误码 (from createBusinessError)
+  // status: HTTP 状态码 (from createHttpError)
+  return err.code === HttpStatus.UNPROCESSABLE_ENTITY ||
+    err.status === HttpStatus.UNPROCESSABLE_ENTITY
 }
 

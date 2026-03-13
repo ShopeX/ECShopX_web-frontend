@@ -31,4 +31,3 @@ function handleClose() {
   showMiniCart.value = false
 }
 </script>
-

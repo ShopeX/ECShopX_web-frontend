@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="bg-white content-stretch flex flex-col items-start p-[32px] relative size-full"
-  >
+  <div class="bg-white content-stretch flex flex-col items-start p-[32px] relative size-full">
     <!-- 顶部标题栏 -->
     <div class="relative shrink-0 w-full">
       <div
@@ -60,17 +58,19 @@
       </div>
 
       <!-- 优惠券列表 -->
-      <BCCouponCard
-        v-for="coupon in coupons"
-        v-else
-        :key="coupon.id"
-        :coupon="coupon"
-        :is-selected="selectedCoupon?.id === coupon.id"
-        :loading="loading"
-        @claim="handleClaim"
-        @select="handleSelect"
-        @unselect="handleUnselect"
-      />
+      <div v-else class="flex flex-col gap-4 w-full" data-testid="coupon-list">
+        <BCCouponCard
+          v-for="coupon in coupons"
+          :key="coupon.id"
+          data-testid="coupon-item"
+          :coupon="coupon"
+          :is-selected="selectedCoupon?.id === coupon.id"
+          :loading="loading"
+          @claim="handleClaim"
+          @select="handleSelect"
+          @unselect="handleUnselect"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -170,7 +170,3 @@ function handleUnselect() {
   background: #d1d5db;
 }
 </style>
-
-
-
-

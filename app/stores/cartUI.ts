@@ -18,20 +18,20 @@ interface CartUIState {
 
 /**
  * 购物车 UI 状态管理 Store (DDD 架构版本)
- * 
+ *
  * 职责：
  * - 管理 UI 加载状态
  * - 管理操作加载状态
  * - 不包含任何业务逻辑
  * - 业务逻辑全部在领域层处理
- * 
+ *
  * @example
  * ```typescript
  * const cartUIStore = useCartUIStore()
- * 
+ *
  * // 设置加载状态
  * cartUIStore.setLoading(true)
- * 
+ *
  * // 设置操作加载状态
  * cartUIStore.setActionLoading('add-to-cart', true)
  * ```
@@ -54,15 +54,17 @@ export const useCartUIStore = defineStore('cart-ui', {
     /**
      * 检查特定操作是否正在加载
      */
-    isActionLoading: (state) => (key: string): boolean => {
-      return state.actionLoading[key] || false
-    },
+    isActionLoading:
+      (state) =>
+      (key: string): boolean => {
+        return state.actionLoading[key] || false
+      },
 
     /**
      * 获取所有正在进行的操作
      */
     activeActions: (state): string[] => {
-      return Object.keys(state.actionLoading).filter(key => state.actionLoading[key])
+      return Object.keys(state.actionLoading).filter((key) => state.actionLoading[key])
     },
   },
 
@@ -89,7 +91,7 @@ export const useCartUIStore = defineStore('cart-ui', {
      * 批量设置操作加载状态
      */
     setMultipleActionLoading(keys: string[], loading: boolean) {
-      keys.forEach(key => this.setActionLoading(key, loading))
+      keys.forEach((key) => this.setActionLoading(key, loading))
     },
 
     /**
@@ -134,7 +136,6 @@ export const useCartUIStore = defineStore('cart-ui', {
 
     toggle() {
       this.isOpen = !this.isOpen
-    }
+    },
   },
 })
-

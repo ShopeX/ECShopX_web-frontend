@@ -1,11 +1,11 @@
 /**
  * 地址相关 API 客户端
- * 
+ *
  * 职责：
  * - 封装地址相关的 HTTP 请求
  * - 只负责网络通信，不做数据转换
  * - 返回原始 API 响应
- * 
+ *
  * 设计原则：
  * - 纯粹的 HTTP 调用层
  * - 不包含业务逻辑
@@ -56,7 +56,7 @@ export class AddressApiClient {
 
   /**
    * 获取地址列表
-   * 
+   *
    * @returns 原始 API 响应
    */
   async getAddressList() {
@@ -67,7 +67,7 @@ export class AddressApiClient {
 
   /**
    * 获取省市区列表
-   * 
+   *
    * @returns 原始 API 响应
    */
   async getRegionList() {
@@ -78,7 +78,7 @@ export class AddressApiClient {
 
   /**
    * 新增收货地址
-   * 
+   *
    * @param data - 地址数据
    * @returns 原始 API 响应
    */
@@ -91,7 +91,7 @@ export class AddressApiClient {
 
   /**
    * 更新收货地址
-   * 
+   *
    * @param addressId - 地址 ID
    * @param data - 地址数据
    * @returns 原始 API 响应
@@ -105,7 +105,7 @@ export class AddressApiClient {
 
   /**
    * 删除收货地址
-   * 
+   *
    * @param addressId - 地址 ID
    * @returns 原始 API 响应
    */
@@ -121,4 +121,3 @@ export class AddressApiClient {
  * 在整个应用中共享同一个实例
  */
 export const addressApiClient = new AddressApiClient()
-

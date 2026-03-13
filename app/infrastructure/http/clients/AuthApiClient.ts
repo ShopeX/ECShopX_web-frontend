@@ -13,18 +13,18 @@ import type {
 
 /**
  * 认证 HTTP 客户端
- * 
+ *
  * 职责：
  * - 封装认证相关的 HTTP 请求
  * - 只负责网络通信，不做数据转换
  * - 返回原始 API 响应
- * 
+ *
  * 设计原则：
  * - 纯粹的 HTTP 调用层
  * - 不包含业务逻辑
  * - 不包含数据转换
  * - 职责单一，易于测试
- * 
+ *
  * @example
  * ```typescript
  * const client = new AuthApiClient()
@@ -52,10 +52,10 @@ export class AuthApiClient {
 
   /**
    * 账号密码登录
-   * 
+   *
    * @param params - 登录请求参数
    * @returns 登录响应数据（HTTP 插件已自动解包 data 字段）
-   * 
+   *
    * @example
    * ```typescript
    * const response = await client.login({
@@ -76,10 +76,10 @@ export class AuthApiClient {
 
   /**
    * 手机验证码登录
-   * 
+   *
    * @param params - 手机登录请求参数
    * @returns 登录响应数据（HTTP 插件已自动解包 data 字段）
-   * 
+   *
    * @example
    * ```typescript
    * const response = await client.loginWithPhone({
@@ -98,10 +98,10 @@ export class AuthApiClient {
 
   /**
    * 获取图形验证码
-   * 
+   *
    * @param params - 验证码请求参数
    * @returns 验证码图片和 token
-   * 
+   *
    * @example
    * ```typescript
    * const response = await client.getCaptcha({ type: 'login' })
@@ -113,16 +113,16 @@ export class AuthApiClient {
     return this.http('/member/image/code', {
       method: 'GET',
       params: params,
-      cache: 'no-cache',  // 验证码不缓存
+      cache: 'no-cache', // 验证码不缓存
     })
   }
 
   /**
    * 发送短信验证码
-   * 
+   *
    * @param params - 发送短信请求参数
    * @returns 发送结果
-   * 
+   *
    * @example
    * ```typescript
    * await client.sendSmsCode({
@@ -143,10 +143,10 @@ export class AuthApiClient {
 
   /**
    * 登出
-   * 
+   *
    * @param params - 登出请求参数（可选）
    * @returns 登出结果
-   * 
+   *
    * @example
    * ```typescript
    * await client.logout()
@@ -161,9 +161,9 @@ export class AuthApiClient {
 
   /**
    * 获取当前用户信息
-   * 
+   *
    * @returns 用户信息
-   * 
+   *
    * @example
    * ```typescript
    * const userInfo = await client.getUserInfo()
@@ -178,10 +178,10 @@ export class AuthApiClient {
 
   /**
    * 刷新 Token
-   * 
+   *
    * @param refreshToken - Refresh Token
    * @returns 新的 Token 信息（HTTP 插件已自动解包 data 字段）
-   * 
+   *
    * @example
    * ```typescript
    * const response = await client.refreshToken('refresh-token-xxx')
@@ -198,4 +198,3 @@ export class AuthApiClient {
 
 // 导出单例实例
 export const authApiClient = new AuthApiClient()
-

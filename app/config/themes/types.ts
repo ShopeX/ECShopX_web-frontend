@@ -1,6 +1,6 @@
 /**
  * 主题配置类型定义
- * 
+ *
  * 支持多套主题切换，每个主题包含：
  * - 基础配置：主题名称、版本等
  * - 颜色配置：品牌色、背景色等
@@ -129,4 +129,3 @@ export interface IThemeConfig {
   /** 是否支持暗黑模式 */
   supportsDarkMode: boolean
 }
-

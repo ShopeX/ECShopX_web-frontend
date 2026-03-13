@@ -11,14 +11,14 @@
         disabled && 'bg-gray-100 text-gray-500 cursor-not-allowed',
         inputVariants[variant],
         inputSizes[size],
-        className
+        className,
       ]"
       @input="handleInput"
       @blur="$emit('blur')"
       @focus="$emit('focus')"
       v-bind="$attrs"
     />
-    
+
     <!-- 密码显示/隐藏按钮 -->
     <button
       v-if="type === 'password' && showPasswordToggle"
@@ -66,14 +66,14 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   clearable: false,
   showPasswordToggle: false,
-  className: ''
+  className: '',
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
-  'blur': []
-  'focus': []
-  'clear': []
+  blur: []
+  focus: []
+  clear: []
 }>()
 
 // 密码显示状态
@@ -110,4 +110,3 @@ function handleClear() {
   emit('clear')
 }
 </script>
-

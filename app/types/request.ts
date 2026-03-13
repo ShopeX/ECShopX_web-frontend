@@ -40,4 +40,4 @@ export interface IRequestContext {
   req?: {
     headers: Record<string, string>
   }
-} 
+}

@@ -2,7 +2,7 @@ import type { ITemplateConfig } from '~/types/api/template'
 
 /**
  * 模板配置 HTTP 客户端
- * 
+ *
  * 职责：
  * - 封装模板配置相关的 HTTP 请求
  * - 返回原始 API 响应
@@ -27,7 +27,7 @@ export class TemplateApiClient {
 
   /**
    * 获取模板配置
-   * 
+   *
    * @param name - 模板名称 (如 'index', 'cart')
    * @returns 模板配置数据
    */
@@ -44,4 +44,3 @@ export class TemplateApiClient {
  * 导出单例实例
  */
 export const templateApiClient = new TemplateApiClient()
-

@@ -13,11 +13,7 @@
 
         <!-- 品牌 Logo -->
         <div class="w-[120px] h-[30px]">
-          <img
-            src="/images/logo/logo.png"
-            alt="Brand Logo"
-            class="w-full h-full object-contain"
-          />
+          <img src="/images/logo/logo.png" alt="Brand Logo" class="w-full h-full object-contain" />
         </div>
       </div>
 
@@ -33,11 +29,7 @@
 
         <!-- 品牌 Logo -->
         <div class="w-[120px] h-[30px]">
-          <img
-            src="/images/logo/logo.png"
-            alt="Brand Logo"
-            class="w-full h-full object-contain"
-          />
+          <img src="/images/logo/logo.png" alt="Brand Logo" class="w-full h-full object-contain" />
         </div>
       </div>
     </div>
@@ -53,4 +45,3 @@ defineOptions({
 <style scoped>
 /* Noto Sans SC 字体已在全局引入，这里不需要额外设置 */
 </style>
-

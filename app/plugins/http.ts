@@ -8,6 +8,11 @@ export default defineNuxtPlugin({
   setup() {
     const config = useRuntimeConfig()
     const userStore = useUserStore()
+    const countryCodeCookie = useCookie<string>('i18n_redirected')
+
+    /** 全局参数 country_code：优先 runtimeConfig，其次 i18n cookie，默认 zh-CN */
+    const getCountryCode = (): string =>
+      (config.public.countryCode as string) ?? countryCodeCookie.value ?? 'zh-CN'
 
     // ============ 辅助函数 ============
 
@@ -15,7 +20,7 @@ export default defineNuxtPlugin({
      * 判断是否为业务成功响应
      */
     const isBusinessSuccess = (data: any): boolean => {
-      if (!data || typeof data !== 'object' || ('status_code' in data)) {
+      if (!data || typeof data !== 'object' || 'status_code' in data) {
         return false
       }
       return true
@@ -119,7 +124,7 @@ export default defineNuxtPlugin({
           if (token) {
             options.headers = {
               ...options.headers,
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             } as any
           }
         }
@@ -128,14 +133,19 @@ export default defineNuxtPlugin({
         // 这符合项目后端的统一规范（所有 POST/PUT/PATCH 都使用 form-urlencoded）
         if (options.body && !(options as any).useJson) {
           // 排除已经是特殊格式的情况（FormData 用于文件上传，URLSearchParams 已处理，Blob 用于二进制数据）
-          if (!(options.body instanceof FormData) &&
+          if (
+            !(options.body instanceof FormData) &&
             !(options.body instanceof URLSearchParams) &&
-            !(options.body instanceof Blob)) {
-
-            // ✅ 在转换为 URLSearchParams 之前，先添加 company_id 到 body
-            const bodyData = typeof options.body === 'object' ? { ...options.body as Record<string, any> } : {}
+            !(options.body instanceof Blob)
+          ) {
+            // ✅ 在转换为 URLSearchParams 之前，先添加全局参数 company_id、country_code 到 body
+            const bodyData =
+              typeof options.body === 'object' ? { ...(options.body as Record<string, any>) } : {}
             if (!(options as any).skipCompanyId && config.public.companyId) {
               bodyData.company_id = config.public.companyId
+            }
+            if (!(options as any).skipCountryCode) {
+              bodyData.country_code = getCountryCode()
             }
 
             const params = new URLSearchParams()
@@ -148,17 +158,21 @@ export default defineNuxtPlugin({
             // URLSearchParams 会自动设置正确的 Content-Type: application/x-www-form-urlencoded
           }
         } else {
-          // ✅ GET 请求或没有 body 的请求：company_id 添加到 query 参数
+          // ✅ GET 请求或没有 body 的请求：company_id、country_code 添加到 query 参数
+          const query = { ...(options.query as Record<string, any>) }
           if (!(options as any).skipCompanyId && config.public.companyId) {
-            options.query = {
-              ...options.query,
-              company_id: config.public.companyId,
-            }
+            query.company_id = config.public.companyId
           }
+          if (!(options as any).skipCountryCode) {
+            query.country_code = getCountryCode()
+          }
+          options.query = query
         }
 
         // 请求日志
-        console.log(`[API Request] ${options.method || 'GET'} ${options.baseURL}${(options as any).url || ''}`)
+        console.log(
+          `[API Request] ${options.method || 'GET'} ${options.baseURL}${(options as any).url || ''}`
+        )
       },
 
       async onResponse({ response, options }) {
@@ -191,7 +205,7 @@ export default defineNuxtPlugin({
               const error = createBusinessError({
                 message: data.message || '请求失败',
                 status_code: statusCode,
-                data: data
+                data: data,
               } as ApiResponse)
 
               const shouldSkipToast = skipErrorCodes.includes(statusCode)
@@ -226,7 +240,11 @@ export default defineNuxtPlugin({
           // HTTP 响应错误（401, 403, 500 等）
           const errorType = getErrorType(response.status)
           // ✅ 优先从嵌套的 data.message 中提取，兼容多种响应格式
-          const message = response._data?.data?.message || response._data?.message || response.statusText || '请求失败'
+          const message =
+            response._data?.data?.message ||
+            response._data?.message ||
+            response.statusText ||
+            '请求失败'
 
           httpError = createHttpError(message, errorType, response.status, response._data)
 
@@ -236,22 +254,13 @@ export default defineNuxtPlugin({
           }
         } else if (error?.message?.includes('timeout')) {
           // 超时错误
-          httpError = createHttpError(
-            '请求超时，请检查网络连接',
-            ErrorType.TIMEOUT_ERROR
-          )
+          httpError = createHttpError('请求超时，请检查网络连接', ErrorType.TIMEOUT_ERROR)
         } else if (error?.message?.includes('fetch') || error?.message?.includes('Network')) {
           // 网络错误
-          httpError = createHttpError(
-            '网络连接失败，请检查网络设置',
-            ErrorType.NETWORK_ERROR
-          )
+          httpError = createHttpError('网络连接失败，请检查网络设置', ErrorType.NETWORK_ERROR)
         } else {
           // 未知错误
-          httpError = createHttpError(
-            error?.message || '未知错误',
-            ErrorType.UNKNOWN_ERROR
-          )
+          httpError = createHttpError(error?.message || '未知错误', ErrorType.UNKNOWN_ERROR)
         }
 
         // 检查是否需要跳过全局错误提示
@@ -273,5 +282,5 @@ export default defineNuxtPlugin({
         api: $api,
       },
     }
-  }
+  },
 })

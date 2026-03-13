@@ -1,5 +1,11 @@
 <template>
-  <ECModal v-model="visible" title="发票信息" :width="598" :show-footer="false" @close="handleClose">
+  <ECModal
+    v-model="visible"
+    title="发票信息"
+    :width="598"
+    :show-footer="false"
+    @close="handleClose"
+  >
     <form class="flex flex-col gap-8" @submit.prevent="handleSubmit">
       <!-- 发票类型 -->
       <div class="flex flex-col gap-2">

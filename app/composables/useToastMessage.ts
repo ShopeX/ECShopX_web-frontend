@@ -5,12 +5,12 @@ import ECToast from '~/components/ECToast/ECToast.vue'
 /**
  * Toast 管理器
  * 提供全局的 Toast 提示功能，动态创建和销毁 Toast 组件
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const toast = useToastMessage()
- * 
+ *
  * function handleClick() {
  *   toast.show('请选择尺码')
  * }
@@ -51,21 +51,21 @@ function createToastInstance() {
 
 /**
  * 使用 Toast 消息提示
- * 
+ *
  * @example
  * ```ts
  * const toast = useToastMessage()
  * toast.show('请选择尺码')
  * ```
- * 
+ *
  * @note 不使用 useToast 命名以避免与 Nuxt UI 的 useToast 冲突
  */
 export function useToastMessage() {
   // SSR 环境下返回空实现
   if (import.meta.server) {
     return {
-      show: () => { },
-      hide: () => { }
+      show: () => {},
+      hide: () => {},
     }
   }
 
@@ -95,7 +95,6 @@ export function useToastMessage() {
       if (instance && instance.hide) {
         instance.hide()
       }
-    }
+    },
   }
 }
-

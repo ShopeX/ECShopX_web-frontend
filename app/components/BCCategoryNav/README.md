@@ -55,18 +55,18 @@ function handleChangeRegion() {
 
 ## Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
+| 属性       | 类型      | 默认值  | 说明                         |
+| ---------- | --------- | ------- | ---------------------------- |
 | modelValue | `boolean` | `false` | 是否显示组件（用于 v-model） |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | `(value: boolean)` | 更新显示状态 |
-| close | - | 关闭组件时触发 |
-| search | `(keyword: string)` | 搜索时触发 |
-| changeRegion | - | 点击配送地区时触发 |
+| 事件名            | 参数                | 说明               |
+| ----------------- | ------------------- | ------------------ |
+| update:modelValue | `(value: boolean)`  | 更新显示状态       |
+| close             | -                   | 关闭组件时触发     |
+| search            | `(keyword: string)` | 搜索时触发         |
+| changeRegion      | -                   | 点击配送地区时触发 |
 
 ## 组件结构
 
@@ -80,22 +80,26 @@ CategoryNav/
 ## 设计规范
 
 ### 尺寸
+
 - 宽度：496px（建议放在侧边栏容器中）
 - 内容区域高度：810px
 - 内边距：32px
 
 ### 颜色
+
 - 背景色：`#ffffff`
 - 分类文字：`#191a1d`
 - 搜索占位符：`#99a1af`
 - 边框：`#e5e7eb`
 
 ### 字体
+
 - 分类标题：16px / Medium
 - 搜索框：14px / Regular
 - 底部信息：14px / Regular
 
 ### 间距
+
 - 分类项间距：32px
 - 底部信息间距：16px
 
@@ -155,4 +159,3 @@ interface Category {
 4. **多语言支持**
    - 国际化配置
    - 动态切换语言
-

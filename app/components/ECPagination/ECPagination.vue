@@ -48,7 +48,12 @@ const pages = computed(() => {
 })
 
 const handlePageChange = (page: number | string) => {
-  if (typeof page === 'number' && page !== props.currentPage && page >= 1 && page <= totalPages.value) {
+  if (
+    typeof page === 'number' &&
+    page !== props.currentPage &&
+    page >= 1 &&
+    page <= totalPages.value
+  ) {
     emit('update:currentPage', page)
   }
 }
@@ -63,7 +68,7 @@ const handlePageChange = (page: number | string) => {
     >
       &lt;
     </button>
-    
+
     <button
       v-for="(page, index) in pages"
       :key="index"
@@ -72,7 +77,7 @@ const handlePageChange = (page: number | string) => {
         page === currentPage
           ? 'bg-primary-500 border-primary-500 text-white'
           : 'text-gray-600 hover:border-primary-500 hover:text-primary-500',
-        page === '...' ? 'border-none hover:border-none cursor-default' : ''
+        page === '...' ? 'border-none hover:border-none cursor-default' : '',
       ]"
       @click="handlePageChange(page)"
     >

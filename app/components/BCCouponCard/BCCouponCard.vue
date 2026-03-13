@@ -25,9 +25,7 @@
             class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[8px] items-start justify-center relative"
           >
             <!-- 满减条件 -->
-            <div
-              class="content-stretch flex items-center justify-end relative shrink-0 w-full"
-            >
+            <div class="content-stretch flex items-center justify-end relative shrink-0 w-full">
               <p
                 class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-[#4a5565] text-nowrap"
               >
@@ -35,9 +33,7 @@
               </p>
             </div>
             <!-- 使用说明 -->
-            <div
-              class="content-stretch flex items-center justify-end relative shrink-0 w-full"
-            >
+            <div class="content-stretch flex items-center justify-end relative shrink-0 w-full">
               <p
                 class="font-['Noto_Sans_SC'] font-normal leading-[16px] relative shrink-0 text-[12px] text-[#4a5565] text-nowrap"
               >
@@ -163,7 +159,3 @@ function handleUnselect() {
   emit('unselect')
 }
 </script>
-
-
-
-

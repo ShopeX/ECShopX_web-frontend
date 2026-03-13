@@ -33,9 +33,9 @@ const showPanel = ref(false)
 // 筛选组配置
 const filterGroups = ref<IFilterGroup[]>([
   {
-    key: 'category',        // 对应 filterValue 中的字段
+    key: 'category', // 对应 filterValue 中的字段
     label: '分类',
-    multiple: false,        // 单选模式
+    multiple: false, // 单选模式
     options: [
       { id: '1', label: '男士箱包', value: '1' },
       { id: '2', label: '男士成衣', value: '2' },
@@ -44,7 +44,7 @@ const filterGroups = ref<IFilterGroup[]>([
   {
     key: 'colors',
     label: '颜色',
-    multiple: true,         // 多选模式 (默认)
+    multiple: true, // 多选模式 (默认)
     options: [
       { id: '1', label: '黑色', value: 'black' },
       { id: '2', label: '白色', value: 'white' },
@@ -191,15 +191,19 @@ const filterValue = ref<IProductFilterValue>({
 })
 
 // 监听筛选变化，同步到 URL
-watch(filterValue, (newValue) => {
-  navigateTo({
-    query: {
-      category: newValue.category,
-      colors: newValue.colors?.join(','),
-      sort: newValue.sort,
-    },
-  })
-}, { deep: true })
+watch(
+  filterValue,
+  (newValue) => {
+    navigateTo({
+      query: {
+        category: newValue.category,
+        colors: newValue.colors?.join(','),
+        sort: newValue.sort,
+      },
+    })
+  },
+  { deep: true }
+)
 ```
 
 ### 2. 防抖处理
@@ -231,10 +235,10 @@ const { data: filterGroups } = await useAsyncData('filters', async () => {
 
 ```typescript
 interface IFilterGroup {
-  key: string              // 必须对应 IProductFilterValue 中的字段
-  label: string            // 显示标签
+  key: string // 必须对应 IProductFilterValue 中的字段
+  label: string // 显示标签
   options: IFilterOption[] // 选项列表
-  multiple?: boolean       // 是否多选，默认 true
+  multiple?: boolean // 是否多选，默认 true
 }
 ```
 
@@ -242,9 +246,9 @@ interface IFilterGroup {
 
 ```typescript
 interface IFilterOption {
-  id: string | number      // 唯一标识
-  label: string            // 显示文本
-  value: string | number   // 实际值
+  id: string | number // 唯一标识
+  label: string // 显示文本
+  value: string | number // 实际值
 }
 ```
 
@@ -252,43 +256,40 @@ interface IFilterOption {
 
 ```typescript
 enum ESortOption {
-  DEFAULT = 'default',       // 默认排序
-  PRICE_ASC = 'price_asc',   // 价格升序
+  DEFAULT = 'default', // 默认排序
+  PRICE_ASC = 'price_asc', // 价格升序
   PRICE_DESC = 'price_desc', // 价格降序
-  SALES = 'sales',           // 销量排序
-  NEW = 'new',               // 上新排序
+  SALES = 'sales', // 销量排序
+  NEW = 'new', // 上新排序
 }
 ```
 
 ## ⚠️ 注意事项
 
 1. **筛选组的 `key` 必须与 `IProductFilterValue` 中的字段名对应**
-   
+
    ```typescript
    // ❌ 错误
    { key: 'colour', ... }  // IProductFilterValue 中没有 colour 字段
-   
+
    // ✅ 正确
    { key: 'colors', ... }  // IProductFilterValue 中有 colors 字段
    ```
 
 2. **单选和多选的数据类型不同**
-   
+
    ```typescript
    // 单选: string | number | undefined
    category: '1'
-   
+
    // 多选: (string | number)[]
    colors: ['black', 'white']
    ```
 
 3. **筛选面板需要手动控制显示**
-   
+
    ```vue
-   <ProductFilter
-     :show-filter-panel="showPanel"
-     @update:show-filter-panel="showPanel = $event"
-   />
+   <ProductFilter :show-filter-panel="showPanel" @update:show-filter-panel="showPanel = $event" />
    ```
 
 ## 🔗 相关文档
@@ -311,10 +312,7 @@ enum ESortOption {
 A: 需要将 `showFilterPanel` 设置为 `true`，并监听 `update:showFilterPanel` 事件：
 
 ```vue
-<ProductFilter
-  :show-filter-panel="showPanel"
-  @update:show-filter-panel="showPanel = $event"
-/>
+<ProductFilter :show-filter-panel="showPanel" @update:show-filter-panel="showPanel = $event" />
 ```
 
 ### Q: 如何添加新的筛选维度？
@@ -347,4 +345,3 @@ A: 修改组件内的 `sortOptions` 数组，或在 `ESortOption` 枚举中添�
 ---
 
 **开始使用吧！** 如有问题，请查看[完整文档](./README.md)。
-

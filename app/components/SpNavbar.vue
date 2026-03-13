@@ -125,11 +125,7 @@
           </div>
         </div>
         <div class="flex items-center space-x-8">
-          <div
-            v-for="nav in mainNavs"
-            :key="nav.key"
-            class="relative group"
-          >
+          <div v-for="nav in mainNavs" :key="nav.key" class="relative group">
             <NuxtLink
               :to="nav.path"
               class="relative py-2 text-gray-700 hover:text-primary-500 transition-colors duration-300"
@@ -143,7 +139,9 @@
                 />
               </span>
               <!-- Hover Line Animation -->
-              <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"></span>
+              <span
+                class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"
+              ></span>
             </NuxtLink>
 
             <!-- Dropdown Menu -->
@@ -151,7 +149,9 @@
               v-if="nav.children?.length"
               class="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-40 hidden group-hover:block z-50"
             >
-              <div class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden py-2 animate-slide-up">
+              <div
+                class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden py-2 animate-slide-up"
+              >
                 <NuxtLink
                   v-for="child in nav.children"
                   :key="child.key"
@@ -201,15 +201,15 @@ const userActions = [
 const mainNavs = [
   { key: 'skin-care', label: '肌肤护理', path: '/category/skin-care' },
   { key: 'beauty-fragrance', label: '美妆香氛', path: '/category/beauty-fragrance' },
-  { 
-    key: 'fashion-beauty', 
-    label: '时尚美妆', 
+  {
+    key: 'fashion-beauty',
+    label: '时尚美妆',
     path: '/category/fashion-beauty',
     children: [
       { key: 'skincare', label: '面部护理', path: '/category/fashion-beauty/skincare' },
       { key: 'makeup', label: '彩妆香氛', path: '/category/fashion-beauty/makeup' },
       { key: 'perfume', label: '大牌香水', path: '/category/fashion-beauty/perfume' },
-    ]
+    ],
   },
   { key: 'face-care', label: '面部护理', path: '/category/face-care' },
   { key: 'sun-protection', label: '防晒隔离', path: '/category/sun-protection' },

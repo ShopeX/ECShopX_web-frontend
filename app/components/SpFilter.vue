@@ -83,7 +83,9 @@
           />
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[#999]">¥</span>
         </div>
-        <ECButton variant="solid" size="sm" class="px-4" @click="handlePriceConfirm"> 确定 </ECButton>
+        <ECButton variant="solid" size="sm" class="px-4" @click="handlePriceConfirm">
+          确定
+        </ECButton>
       </div>
     </div>
 

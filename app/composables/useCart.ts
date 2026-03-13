@@ -1,26 +1,26 @@
 /**
  * 购物车业务组合式函数（轻量级 DDD）
- * 
+ *
  * 职责：
  * - 管理购物车状态和业务逻辑
  * - 封装业务规则和验证
  * - 提供统一的 API 给视图层
- * 
+ *
  * 特点：
  * - 使用值对象保证数据安全
  * - 直接操作简单对象，不使用复杂的领域模型
  * - 业务逻辑内聚在 Composable 中
- * 
+ *
  * @example
  * ```vue
  * <script setup>
- * const { 
+ * const {
  *   cart,
  *   loading,
  *   addToCart,
  *   updateQuantity
  * } = useCart()
- * 
+ *
  * onMounted(() => {
  *   loadCart()
  * })
@@ -152,7 +152,10 @@ export function useCart() {
   const calculateSelectedTotal = (): MoneyValueObject => {
     return getCartItems()
       .filter((item) => item.selected)
-      .reduce<MoneyValueObject>((total, item) => total.add(calculateItemSubtotal(item)), MoneyValueObject.zero())
+      .reduce<MoneyValueObject>(
+        (total, item) => total.add(calculateItemSubtotal(item)),
+        MoneyValueObject.zero()
+      )
   }
 
   /**
@@ -234,14 +237,21 @@ export function useCart() {
   /**
    * 转换为 UI 数据
    */
-  const cartUI = computed<ICartUI & { invalidItems: any[]; cartTotalDisplay: string; discountFeeDisplay: string; finalTotalDisplay: string }>(() => {
+  const cartUI = computed<
+    ICartUI & {
+      invalidItems: any[]
+      cartTotalDisplay: string
+      discountFeeDisplay: string
+      finalTotalDisplay: string
+    }
+  >(() => {
     const total = calculateTotal()
     const selectedTotal = calculateSelectedTotal()
 
     // ✅ 使用 API 返回的汇总数据（单位：分）
-    const cartTotalPrice = cartStore.cartTotalPrice / 100  // 转换为元
-    const discountFee = cartStore.discountFee / 100        // 转换为元
-    const finalTotal = cartTotalPrice - discountFee        // 最终总计（商品总计 - 优惠）
+    const cartTotalPrice = cartStore.cartTotalPrice / 100 // 转换为元
+    const discountFee = cartStore.discountFee / 100 // 转换为元
+    const finalTotal = cartTotalPrice - discountFee // 最终总计（商品总计 - 优惠）
 
     return {
       items: getCartItems().map(mapToUIItem),
@@ -257,9 +267,9 @@ export function useCart() {
       canCheckout: canCheckout(),
       isEmpty: items.value.length === 0 && invalidItems.value.length === 0,
       // ✅ API 返回的汇总数据
-      cartTotalDisplay: MoneyValueObject.of(cartTotalPrice).display,     // 商品总计
-      discountFeeDisplay: MoneyValueObject.of(discountFee).display,      // 优惠金额
-      finalTotalDisplay: MoneyValueObject.of(finalTotal).display,        // 最终总计
+      cartTotalDisplay: MoneyValueObject.of(cartTotalPrice).display, // 商品总计
+      discountFeeDisplay: MoneyValueObject.of(discountFee).display, // 优惠金额
+      finalTotalDisplay: MoneyValueObject.of(finalTotal).display, // 最终总计
     }
   })
 
@@ -286,7 +296,7 @@ export function useCart() {
     cart_type?: 'cart' | 'fastbuy'
     item_id: string
     num: number
-    distributor_id?: string,
+    distributor_id?: string
     shop_type?: 'distributor'
   }): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -337,7 +347,9 @@ export function useCart() {
   /**
    * 切换商品选中状态
    */
-  const toggleItemSelection = async (itemId: string): Promise<{ success: boolean; error?: string }> => {
+  const toggleItemSelection = async (
+    itemId: string
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
       await cartStore.toggleItemSelection(itemId)
       return { success: true }
@@ -351,7 +363,9 @@ export function useCart() {
   /**
    * 全选/取消全选
    */
-  const toggleAllSelection = async (selected: boolean): Promise<{ success: boolean; error?: string }> => {
+  const toggleAllSelection = async (
+    selected: boolean
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
       await cartStore.toggleAllSelection(selected)
       return { success: true }
@@ -441,8 +455,7 @@ export function useCart() {
     cart: computed(() => ({
       items: items.value,
       itemCount: items.value.length,
-      totalQuantity: cartStore.totalItems
-    }))
+      totalQuantity: cartStore.totalItems,
+    })),
   }
 }
-

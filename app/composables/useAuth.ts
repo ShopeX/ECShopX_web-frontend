@@ -6,18 +6,18 @@ import type { ILoginRequest, IPhoneLoginRequest, ICaptchaResponse } from '~/type
 
 /**
  * 认证组合式函数
- * 
+ *
  * 职责：
  * - 封装认证相关的业务逻辑
  * - 管理登录、登出状态
  * - 管理图形验证码
  * - 与 useUserStore 交互
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const { login, loginWithPhone, logout, isLoading, error } = useAuth()
- * 
+ *
  * await login({ username, password, captcha, captchaKey })
  * </script>
  * ```
@@ -205,4 +205,3 @@ export function useAuth() {
     clearError,
   }
 }
-

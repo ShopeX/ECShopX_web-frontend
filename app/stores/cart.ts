@@ -45,20 +45,20 @@ export const useCartStore = defineStore('cart', {
           // 我们使用 CartTransformer 的逻辑，但由于它是从已经转换过的缓存恢复，
           // 我们需要小心处理，或者直接再次通过 Transformer
           // 最安全的方法是把缓存中的数据当做 Partial<ICartItem> 再次处理
-          initialItems = rawItems.map(item => {
+          initialItems = rawItems.map((item) => {
             return {
               ...item,
               price: MoneyValueObject.of(item.price.amount || item.price),
               marketPrice: MoneyValueObject.of(item.marketPrice.amount || item.marketPrice),
-              quantity: QuantityValueObject.of(item.quantity.value || item.quantity, 1, item.stock)
+              quantity: QuantityValueObject.of(item.quantity.value || item.quantity, 1, item.stock),
             }
           })
-          initialInvalidItems = rawInvalidItems.map(item => {
+          initialInvalidItems = rawInvalidItems.map((item) => {
             return {
               ...item,
               price: MoneyValueObject.of(item.price.amount || item.price),
               marketPrice: MoneyValueObject.of(item.marketPrice.amount || item.marketPrice),
-              quantity: QuantityValueObject.of(item.quantity.value || item.quantity, 1, item.stock)
+              quantity: QuantityValueObject.of(item.quantity.value || item.quantity, 1, item.stock),
             }
           })
         }
@@ -72,7 +72,7 @@ export const useCartStore = defineStore('cart', {
       invalidItems: initialInvalidItems,
       cartTotalPrice: 0,
       discountFee: 0,
-      initialized: false
+      initialized: false,
     }
   },
 
@@ -85,7 +85,7 @@ export const useCartStore = defineStore('cart', {
 
     estimatedTotal: (state) => {
       return state.items.reduce((total, item) => total + item.price.amount * item.quantity.value, 0)
-    }
+    },
   },
 
   actions: {
@@ -122,8 +122,8 @@ export const useCartStore = defineStore('cart', {
         // ✅ 提取 API 返回的汇总数据（始终更新）
         // 从第一个分组中提取汇总数据（通常所有分组的汇总数据都在第一个）
         const firstGroup = validCartGroups[0] || {}
-        this.cartTotalPrice = Number(firstGroup.cart_total_price || 0)  // 商品总计（分）
-        this.discountFee = Number(firstGroup.discount_fee || 0)        // 优惠金额（分）
+        this.cartTotalPrice = Number(firstGroup.cart_total_price || 0) // 商品总计（分）
+        this.discountFee = Number(firstGroup.discount_fee || 0) // 优惠金额（分）
 
         this.initialized = true
         cartUI.updateLastUpdateTime()
@@ -176,17 +176,17 @@ export const useCartStore = defineStore('cart', {
       // 1. 找到要删除的商品并保存（用于回滚）
       // 先在有效商品列表中找
       let targetList = this.items
-      let itemIndex = this.items.findIndex(i => i.id === itemId)
+      let itemIndex = this.items.findIndex((i) => i.id === itemId)
 
       // 如果没找到，在失效商品列表中找
       if (itemIndex === -1) {
         targetList = this.invalidItems
-        itemIndex = this.invalidItems.findIndex(i => i.id === itemId)
+        itemIndex = this.invalidItems.findIndex((i) => i.id === itemId)
       }
 
       if (itemIndex === -1) return
 
-      const removedItem = targetList[itemIndex]!  // 断言：已检查 index 存在
+      const removedItem = targetList[itemIndex]! // 断言：已检查 index 存在
 
       // 2. 乐观更新：立即从列表中移除
       targetList.splice(itemIndex, 1)
@@ -214,7 +214,7 @@ export const useCartStore = defineStore('cart', {
       const cartUI = useCartUIStore()
 
       // 1. 找到要更新的商品并保存旧数量
-      const item = this.items.find(i => i.id === itemId)
+      const item = this.items.find((i) => i.id === itemId)
       if (!item) return
 
       const oldQuantity = item.quantity.value
@@ -250,7 +250,7 @@ export const useCartStore = defineStore('cart', {
       const cartUI = useCartUIStore()
 
       // 1. 找到要更新的商品并保存旧状态
-      const item = this.items.find(i => i.id === itemId)
+      const item = this.items.find((i) => i.id === itemId)
       if (!item) return
 
       const oldSelected = item.selected
@@ -288,16 +288,16 @@ export const useCartStore = defineStore('cart', {
 
       // 1. 筛选可购买的商品（有库存且数量不超过库存）
       const availableItems = this.items.filter(
-        item => item.stock > 0 && item.quantity.value <= item.stock
+        (item) => item.stock > 0 && item.quantity.value <= item.stock
       )
 
       if (availableItems.length === 0) return
 
       // 2. 保存所有可购买商品的旧选中状态
-      const oldStates = availableItems.map(item => ({ id: item.id, selected: item.selected }))
+      const oldStates = availableItems.map((item) => ({ id: item.id, selected: item.selected }))
 
       // 3. 乐观更新：立即更新可购买商品的选中状态
-      availableItems.forEach(item => {
+      availableItems.forEach((item) => {
         item.selected = selected
       })
 
@@ -307,15 +307,15 @@ export const useCartStore = defineStore('cart', {
       // 5. 调用 API - 批量更新可购买商品的选中状态
       cartUI.setActionLoading('toggle-all', true)
       try {
-        const cartIds = availableItems.map(item => item.id)
+        const cartIds = availableItems.map((item) => item.id)
         await cartApiClient.batchUpdateCartItemChecked(cartIds, selected)
         // ✅ 成功：只更新汇总数据（商品总计、优惠等），不重新加载商品列表
         await this.loadCart({ silent: true, summaryOnly: true })
       } catch (error) {
         // ❌ 失败：恢复所有商品的旧状态
         console.error('Failed to toggle all selection:', error)
-        oldStates.forEach(oldState => {
-          const item = this.items.find(i => i.id === oldState.id)
+        oldStates.forEach((oldState) => {
+          const item = this.items.find((i) => i.id === oldState.id)
           if (item) {
             item.selected = oldState.selected
           }
@@ -368,11 +368,14 @@ export const useCartStore = defineStore('cart', {
      */
     syncToCache() {
       if (import.meta.client) {
-        localStorage.setItem('cart_cache', JSON.stringify({
-          items: this.items,
-          invalidItems: this.invalidItems
-        }))
+        localStorage.setItem(
+          'cart_cache',
+          JSON.stringify({
+            items: this.items,
+            invalidItems: this.invalidItems,
+          })
+        )
       }
-    }
-  }
+    },
+  },
 })

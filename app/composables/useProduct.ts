@@ -1,33 +1,33 @@
 /**
  * 商品业务组合式函数（轻量级 DDD）
- * 
+ *
  * 职责：
  * - 管理商品列表和详情的状态和业务逻辑
  * - 封装商品相关的业务规则
  * - 提供统一的 API 给视图层
- * 
+ *
  * 特点：
  * - 扁平化结构，符合 Vue 3 最佳实践
  * - 合并列表和详情功能，减少文件数量
  * - 直接调用 HTTP Client，简化数据流
- * 
+ *
  * @example
  * ```vue
  * <script setup>
- * const { 
+ * const {
  *   // 列表相关
  *   products,
  *   loadProducts,
  *   loadMore,
- *   
+ *
  *   // 详情相关
  *   product,
  *   loadProduct
  * } = useProduct()
- * 
+ *
  * // 加载列表
  * await loadProducts({ page: '1', pageSize: '20' })
- * 
+ *
  * // 加载详情
  * await loadProduct({ id: '123' })
  * </script>
@@ -69,11 +69,13 @@ export function useProduct() {
 
   /**
    * 加载商品列表
-   * 
+   *
    * @param params - 查询参数
    * @returns 加载结果
    */
-  const loadProducts = async (params: IItemListParams): Promise<{
+  const loadProducts = async (
+    params: IItemListParams
+  ): Promise<{
     success: boolean
     error?: string
   }> => {
@@ -118,11 +120,13 @@ export function useProduct() {
 
   /**
    * 加载更多商品（分页）
-   * 
+   *
    * @param params - 查询参数
    * @returns 加载结果
    */
-  const loadMore = async (params: IItemListParams): Promise<{
+  const loadMore = async (
+    params: IItemListParams
+  ): Promise<{
     success: boolean
     error?: string
   }> => {
@@ -171,11 +175,13 @@ export function useProduct() {
 
   /**
    * 加载商品详情
-   * 
+   *
    * @param params - 查询参数
    * @returns 加载结果
    */
-  const loadProduct = async (params: IItemDetailParams): Promise<{
+  const loadProduct = async (
+    params: IItemDetailParams
+  ): Promise<{
     success: boolean
     error?: string
   }> => {
@@ -215,13 +221,13 @@ export function useProduct() {
 
   /**
    * 加载商品详情（SSR 支持版本）
-   * 
+   *
    * 使用 useAsyncData 实现，支持服务端渲染
    * 应该在页面的 <script setup> 顶层调用
-   * 
+   *
    * @param params - 查询参数
    * @returns useAsyncData 返回值
-   * 
+   *
    * @example
    * ```typescript
    * // 在页面中使用
@@ -243,7 +249,7 @@ export function useProduct() {
       },
       {
         server: true, // 在服务端执行
-        lazy: false,  // 不延迟加载
+        lazy: false, // 不延迟加载
       }
     )
   }
@@ -304,4 +310,3 @@ export function useProduct() {
     reset,
   }
 }
-

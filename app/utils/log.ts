@@ -6,7 +6,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
-  NONE = 4
+  NONE = 4,
 }
 
 /**
@@ -43,7 +43,7 @@ const defaultConfig: ILogConfig = {
   level: process.env.NODE_ENV === 'production' ? LogLevel.ERROR : LogLevel.DEBUG,
   showTimestamp: true,
   showCaller: true,
-  prefix: '[ECSHOPX-WEB]'
+  prefix: '[ECSHOPX-WEB]',
 }
 
 /**
@@ -61,7 +61,7 @@ const logStyles = {
   error: 'color: #ef4444; font-weight: bold',
   timestamp: 'color: #9ca3af; font-size: 0.85em',
   caller: 'color: #10b981; font-size: 0.85em',
-  prefix: 'color: #6366f1; font-weight: bold'
+  prefix: 'color: #6366f1; font-weight: bold',
 }
 
 /**
@@ -80,19 +80,19 @@ function getCallerInfo(): string {
     if (!stack) return ''
 
     const stackLines = stack.split('\n')
-    
+
     // 查找第一个不在 log.ts 文件中的调用栈
     // 跳过: Error、getCallerInfo、formatMessage、log、logger.debug/info/warn/error
     for (let i = 3; i < stackLines.length; i++) {
       const line = stackLines[i]
       if (!line) continue
-      
+
       // 匹配多种调用栈格式：
       // 1. at functionName (file:line:column)
       // 2. at file:line:column
       // 3. at Object.functionName (file:line:column)
       let match = line.match(/at\s+(.+?)\s+\((.+?):(\d+):(\d+)\)/)
-      
+
       if (!match) {
         // 尝试匹配没有函数名的格式: at file:line:column
         match = line.match(/at\s+(.+?):(\d+):(\d+)/)
@@ -106,7 +106,7 @@ function getCallerInfo(): string {
         }
         continue
       }
-      
+
       if (match.length >= 4) {
         const file = match[2]
         const line = match[3]
@@ -116,7 +116,7 @@ function getCallerInfo(): string {
         }
       }
     }
-    
+
     return ''
   } catch {
     return ''
@@ -130,14 +130,14 @@ function getFileName(filePath: string): string {
   // 处理不同操作系统的路径分隔符
   const parts = filePath.split(/[/\\]/)
   const fileName = parts[parts.length - 1] || filePath
-  
+
   // 如果是相对路径，尝试保留一些路径信息以便识别
   if (filePath.includes('app/')) {
     const appIndex = filePath.indexOf('app/')
     const relativePath = filePath.substring(appIndex + 4) // 跳过 'app/'
     return relativePath.replace(/[/\\]/g, '/')
   }
-  
+
   return fileName
 }
 
@@ -180,7 +180,7 @@ function formatMessage(
     [LogLevel.INFO]: '%c[INFO]',
     [LogLevel.WARN]: '%c[WARN]',
     [LogLevel.ERROR]: '%c[ERROR]',
-    [LogLevel.NONE]: '%c[NONE]'
+    [LogLevel.NONE]: '%c[NONE]',
   }
 
   if (level in levelLabels) {
@@ -329,7 +329,7 @@ export const logger = {
   assert(condition: boolean, ...messages: any[]): void {
     if (!currentConfig.enabled) return
     console.assert(condition, ...messages)
-  }
+  },
 }
 
 /**

@@ -3,7 +3,7 @@ import { useCartStore } from '~/stores/cart'
 
 /**
  * 认证与数据初始化插件
- * 
+ *
  * 职责：
  * 1. 应用启动时，从 Cookie 恢复用户状态
  * 2. 如果已登录，自动获取用户信息
@@ -28,8 +28,7 @@ export default defineNuxtPlugin({
     // 2. 初始化购物车 (仅客户端)
     if (import.meta.client) {
       // 异步加载购物车，不阻塞应用渲染
-      cartStore.loadCart().catch(e => console.error('Cart init failed:', e))
+      cartStore.loadCart().catch((e) => console.error('Cart init failed:', e))
     }
-  }
+  },
 })
-

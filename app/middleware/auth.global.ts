@@ -3,9 +3,9 @@ import { useUserStore } from '~/stores/user'
 
 // 需要登录才能访问的路由路径前缀
 const protectedRoutes = [
-  '/member',    // 个人中心
-  '/cart',      // 购物车（如果需要登录）
-  '/order',     // 订单
+  '/member', // 个人中心
+  '/cart', // 购物车（如果需要登录）
+  '/order', // 订单
   '/account/profile', // 个人信息
 ]
 
@@ -14,7 +14,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   logger.info(`[AuthMiddleware] 路由导航: ${from?.path || '/'} -> ${to.path}`)
 
   // 检查是否是需要登录的路由
-  const requiresAuth = protectedRoutes.some(route => to.path.startsWith(route))
+  const requiresAuth = protectedRoutes.some((route) => to.path.startsWith(route))
 
   if (requiresAuth) {
     // 获取用户登录状态
@@ -27,8 +27,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
       return navigateTo({
         path: '/account/login',
         query: {
-          redirect: to.fullPath
-        }
+          redirect: to.fullPath,
+        },
       })
     }
   }

@@ -25,13 +25,13 @@ export const useGlobal = () => {
         clearTimeout(timeoutId)
         timeoutId = setTimeout(() => fn.apply(this, args), delay)
       }
-    }
+    },
   }
 
   return {
     isLoading,
     handleError,
     showSuccess,
-    utils
+    utils,
   }
 }

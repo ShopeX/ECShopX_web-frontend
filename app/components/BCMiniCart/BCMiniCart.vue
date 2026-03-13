@@ -226,14 +226,8 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const {
-  cartUI,
-  loading,
-  loadCart,
-  toggleItemSelection,
-  toggleAllSelection,
-  updateQuantity,
-} = useCart()
+const { cartUI, loading, loadCart, toggleItemSelection, toggleAllSelection, updateQuantity } =
+  useCart()
 
 // 追踪是否完成首次加载
 const initialized = ref(false)
@@ -318,4 +312,3 @@ function handleViewCart() {
   background: #d1d5db;
 }
 </style>
-

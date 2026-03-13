@@ -4,4 +4,3 @@
 
 export { default as BCProductFilter } from './BCProductFilter.vue'
 export * from './types'
-

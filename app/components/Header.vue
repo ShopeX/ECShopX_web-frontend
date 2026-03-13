@@ -29,9 +29,12 @@
         </div>
 
         <!-- 购物车图标 -->
-        <button class="relative p-2 hover:bg-gray-100 rounded-full transition-colors" @click="cartUI.open()">
+        <button
+          class="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+          @click="cartUI.open()"
+        >
           <UIcon name="i-heroicons-shopping-bag" class="w-6 h-6 text-gray-700" />
-          <span 
+          <span
             v-if="cartStore.totalItems > 0"
             class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full"
           >

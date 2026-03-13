@@ -9,7 +9,9 @@
         >
           <h2
             class="text-[20px] lg:text-2xl leading-5 lg:leading-[48px] whitespace-nowrap font-medium lg:font-medium"
-            :class="activeTab === 'recommended' ? 'text-[#191a1d]' : 'text-[#4a5565] lg:font-normal'"
+            :class="
+              activeTab === 'recommended' ? 'text-[#191a1d]' : 'text-[#4a5565] lg:font-normal'
+            "
           >
             猜你喜欢
           </h2>
@@ -26,7 +28,7 @@
           <h2
             class="text-[20px] lg:text-2xl leading-5 lg:leading-[48px] whitespace-nowrap"
             :class="[
-              activeTab === 'recent' ? 'text-[#191a1d] font-medium' : 'text-[#4a5565] font-normal'
+              activeTab === 'recent' ? 'text-[#191a1d] font-medium' : 'text-[#4a5565] font-normal',
             ]"
           >
             最近浏览
@@ -44,7 +46,7 @@
     <div class="pb-8 lg:pb-16 w-full">
       <!-- 移动端：横向滚动，无左右padding -->
       <div class="lg:hidden overflow-x-auto scrollbar-hide">
-        <div class="flex" style="width: max-content;">
+        <div class="flex" style="width: max-content">
           <div
             v-for="(product, index) in displayProducts"
             :key="product.id || index"
@@ -62,14 +64,16 @@
               </div>
 
               <!-- 商品信息 -->
-              <div class="bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center">
-                <h2 class="text-sm font-medium leading-5 text-[#191a1d] w-full min-w-full line-clamp-2">
+              <div
+                class="bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center"
+              >
+                <h2
+                  class="text-sm font-medium leading-5 text-[#191a1d] w-full min-w-full line-clamp-2"
+                >
                   {{ product.name }}
                 </h2>
                 <div class="h-6 flex flex-col justify-center w-full">
-                  <p class="text-sm leading-5 text-[#191a1d]">
-                    ￥{{ formatPrice(product.price) }}
-                  </p>
+                  <p class="text-sm leading-5 text-[#191a1d]">￥{{ formatPrice(product.price) }}</p>
                 </div>
               </div>
             </NuxtLink>
@@ -123,16 +127,15 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   recommendedProducts: () => [],
-  recentProducts: () => []
+  recentProducts: () => [],
 })
 
 const activeTab = ref<'recommended' | 'recent'>('recommended')
 
 const displayProducts = computed(() => {
-  const products = activeTab.value === 'recommended' 
-    ? props.recommendedProducts 
-    : props.recentProducts
-  
+  const products =
+    activeTab.value === 'recommended' ? props.recommendedProducts : props.recentProducts
+
   // 限制最多显示 5 个商品
   return products.slice(0, 5)
 })
@@ -140,7 +143,7 @@ const displayProducts = computed(() => {
 const formatPrice = (price: number) => {
   return price.toLocaleString('zh-CN', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   })
 }
 </script>
@@ -164,4 +167,3 @@ const formatPrice = (price: number) => {
   overflow: hidden;
 }
 </style>
-

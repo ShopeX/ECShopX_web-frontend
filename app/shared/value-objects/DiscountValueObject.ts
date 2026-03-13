@@ -1,30 +1,30 @@
 /**
  * 折扣值对象
- * 
+ *
  * 用途：
  * - 封装折扣相关的业务逻辑
  * - 支持多种折扣表示方式
  * - 提供折扣计算和格式化
- * 
+ *
  * 特点：
  * - 不可变（Immutable）
  * - 范围验证（0-100%）
  * - 支持折扣应用
- * 
+ *
  * @example
  * ```ts
  * // 从百分比创建
  * const discount = DiscountValueObject.of(20)  // 20% off
- * 
+ *
  * // 从价格计算
  * const currentPrice = MoneyValueObject.of(80)
  * const originalPrice = MoneyValueObject.of(100)
  * const discount = DiscountValueObject.fromPrices(currentPrice, originalPrice)
- * 
+ *
  * // 应用折扣
  * const price = MoneyValueObject.of(100)
  * const discountedPrice = discount.applyTo(price)  // ¥80.00
- * 
+ *
  * // 显示
  * console.log(discount.display)         // "20%"
  * console.log(discount.displayChinese)  // "8折"
@@ -80,8 +80,7 @@ export class DiscountValueObject {
     }
 
     // 计算折扣百分比
-    const percent =
-      ((originalPrice.amount - currentPrice.amount) / originalPrice.amount) * 100
+    const percent = ((originalPrice.amount - currentPrice.amount) / originalPrice.amount) * 100
 
     return new DiscountValueObject(percent)
   }
@@ -199,4 +198,3 @@ export class DiscountValueObject {
     return this._percent < other._percent
   }
 }
-

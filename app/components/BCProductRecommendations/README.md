@@ -28,7 +28,7 @@ const recommendedProducts = ref<ProductRecommendation[]>([
     id: '1',
     name: '明基大包套耳机',
     price: 1999.0,
-    image: 'https://example.com/image1.jpg'
+    image: 'https://example.com/image1.jpg',
   },
   // ... 更多商品
 ])
@@ -38,7 +38,7 @@ const recentProducts = ref<ProductRecommendation[]>([
     id: '6',
     name: '商品名称',
     price: 999.0,
-    image: 'https://example.com/image6.jpg'
+    image: 'https://example.com/image6.jpg',
   },
   // ... 更多商品
 ])
@@ -47,19 +47,19 @@ const recentProducts = ref<ProductRecommendation[]>([
 
 ## Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|--------|------|--------|------|
-| recommendedProducts | `ProductRecommendation[]` | `[]` | 推荐商品列表 |
-| recentProducts | `ProductRecommendation[]` | `[]` | 最近浏览商品列表 |
+| 属性名              | 类型                      | 默认值 | 说明             |
+| ------------------- | ------------------------- | ------ | ---------------- |
+| recommendedProducts | `ProductRecommendation[]` | `[]`   | 推荐商品列表     |
+| recentProducts      | `ProductRecommendation[]` | `[]`   | 最近浏览商品列表 |
 
 ## ProductRecommendation 类型
 
 ```typescript
 interface ProductRecommendation {
-  id: string        // 商品 ID
-  name: string      // 商品名称
-  price: number     // 商品价格
-  image: string     // 商品图片 URL
+  id: string // 商品 ID
+  name: string // 商品名称
+  price: number // 商品价格
+  image: string // 商品图片 URL
 }
 ```
 
@@ -85,4 +85,3 @@ interface ProductRecommendation {
 - 商品详情页底部推荐
 - 购物车页面相关推荐
 - 首页个性化推荐区域
-

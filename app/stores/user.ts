@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', {
       isLoggedIn: !!token.value,
       userInfo: null,
       token: (token.value as string) || null,
-      refreshToken: (refreshToken.value as string) || null
+      refreshToken: (refreshToken.value as string) || null,
     }
   },
 
@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', {
      */
     isPlusVip: (state): boolean => {
       return state.userInfo?.isPlusVip || false
-    }
+    },
   },
 
   actions: {
@@ -104,7 +104,7 @@ export const useUserStore = defineStore('user', {
         console.error('Login error:', error)
         return {
           success: false,
-          error: error.message || '登录失败，请稍后重试'
+          error: error.message || '登录失败，请稍后重试',
         }
       }
     },
@@ -130,7 +130,7 @@ export const useUserStore = defineStore('user', {
         console.error('Phone login error:', error)
         return {
           success: false,
-          error: error.message || '登录失败，请稍后重试'
+          error: error.message || '登录失败，请稍后重试',
         }
       }
     },
@@ -159,7 +159,7 @@ export const useUserStore = defineStore('user', {
 
         return {
           success: false,
-          error: error.message || '登出失败'
+          error: error.message || '登出失败',
         }
       }
     },
@@ -211,7 +211,7 @@ export const useUserStore = defineStore('user', {
 
         return {
           success: false,
-          error: error.message || '获取用户信息失败'
+          error: error.message || '获取用户信息失败',
         }
       }
     },
@@ -245,10 +245,9 @@ export const useUserStore = defineStore('user', {
 
         return {
           success: false,
-          error: error.message || '刷新令牌失败'
+          error: error.message || '刷新令牌失败',
         }
       }
-    }
-  }
+    },
+  },
 })
-

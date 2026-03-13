@@ -1,6 +1,6 @@
 /**
  * 购物车 API 类型定义
- * 
+ *
  * 基于 Apifox MCP 购物车 API 规范
  */
 
@@ -122,4 +122,3 @@ export type AddCartApiResponse = IApiResponse<IAddCartResponse>
 export type UpdateCartApiResponse = IApiResponse<void>
 export type RemoveCartApiResponse = IApiResponse<void>
 export type ClearCartApiResponse = IApiResponse<void>
-

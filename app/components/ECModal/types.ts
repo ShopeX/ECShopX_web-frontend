@@ -63,4 +63,3 @@ export interface IModalState extends IModalOptions {
   /** 取消按钮加载状态 */
   cancelLoading: boolean
 }
-

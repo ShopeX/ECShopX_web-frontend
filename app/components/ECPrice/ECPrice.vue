@@ -1,8 +1,5 @@
 <template>
-  <span 
-    :class="['inline-flex items-baseline font-mono', className]"
-    v-bind="$attrs"
-  >
+  <span :class="['inline-flex items-baseline font-mono', className]" v-bind="$attrs">
     <span :class="['mr-0.5', symbolClass]">{{ symbol }}</span>
     <span :class="amountClass">{{ formattedAmount }}</span>
   </span>
@@ -23,7 +20,7 @@ const props = withDefaults(defineProps<ECPriceProps>(), {
   symbol: '￥',
   className: '',
   symbolClass: 'text-sm',
-  amountClass: 'text-lg font-bold'
+  amountClass: 'text-lg font-bold',
 })
 
 const formattedAmount = computed(() => {

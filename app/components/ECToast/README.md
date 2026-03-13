@@ -27,6 +27,7 @@ function handleClick() {
 ```
 
 > **注意**：
+>
 > 1. 使用 `useToastMessage` 而不是 `useToast`，因为 Nuxt UI 已经有一个同名的 composable
 > 2. Toast 组件会在首次调用时自动创建，无需在模板中预先放置
 > 3. 组件实例会自动管理和复用
@@ -35,11 +36,11 @@ function handleClick() {
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| message | string | '' | 提示消息 |
-| duration | number | 2000 | 显示时长（毫秒），0 表示不自动关闭 |
-| size | 'sm' \| 'md' \| 'lg' | 'md' | 尺寸大小 |
+| 属性     | 类型                 | 默认值 | 说明                               |
+| -------- | -------------------- | ------ | ---------------------------------- |
+| message  | string               | ''     | 提示消息                           |
+| duration | number               | 2000   | 显示时长（毫秒），0 表示不自动关闭 |
+| size     | 'sm' \| 'md' \| 'lg' | 'md'   | 尺寸大小                           |
 
 ### 方法
 
@@ -55,11 +56,12 @@ toast.show('提示消息')
 toast.show({
   message: '提示消息',
   duration: 3000,
-  size: 'lg'
+  size: 'lg',
 })
 ```
 
 **参数：**
+
 - `options`: `string | ToastOptions` - 消息内容或完整配置对象
 
 #### hide()
@@ -83,7 +85,7 @@ toast.show('操作成功')
 ```typescript
 toast.show({
   message: '这是一条较长的提示消息',
-  duration: 3000
+  duration: 3000,
 })
 ```
 
@@ -93,13 +95,13 @@ toast.show({
 // 小尺寸
 toast.show({
   message: '提示',
-  size: 'sm'
+  size: 'sm',
 })
 
 // 大尺寸
 toast.show({
   message: '这是一条很长的提示消息，需要更大的空间来显示',
-  size: 'lg'
+  size: 'lg',
 })
 ```
 
@@ -107,7 +109,7 @@ toast.show({
 
 ```typescript
 toast.show({
-  message: '第一行文本\n第二行文本\n第三行文本'
+  message: '第一行文本\n第二行文本\n第三行文本',
 })
 ```
 
@@ -119,7 +121,7 @@ const toastRef = ref<ToastInstance>()
 
 toastRef.value?.show({
   message: '需要手动关闭',
-  duration: 0
+  duration: 0,
 })
 
 // 稍后手动关闭
@@ -134,13 +136,7 @@ setTimeout(() => {
 
 ```vue
 <!-- 修改背景颜色和透明度 -->
-<div class="bg-gray-800 bg-opacity-90">
-
-<!-- 修改圆角 -->
-<div class="rounded-2xl">
-
-<!-- 修改文字样式 -->
-<p class="text-center text-sm">
+<div class="bg-gray-800 bg-opacity-90"></div>
 ```
 
 ## 注意事项
@@ -161,7 +157,6 @@ const toast = useToastMessage()
 const options: ToastOptions = {
   message: '提示消息',
   duration: 2000,
-  size: 'md'
+  size: 'md',
 }
 ```
-

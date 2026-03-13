@@ -13,4 +13,3 @@ export interface IInvoiceFormData {
   /** 接收邮箱 */
   email: string
 }
-

@@ -2,18 +2,18 @@ import type { IItemListParams, IItemDetailParams } from '~/types/api/item'
 
 /**
  * 商品 HTTP 客户端
- * 
+ *
  * 职责：
  * - 封装商品相关的 HTTP 请求
  * - 只负责网络通信，不做数据转换
  * - 返回原始 API 响应
- * 
+ *
  * 设计原则：
  * - 纯粹的 HTTP 调用层
  * - 不包含业务逻辑
  * - 不包含数据转换
  * - 职责单一，易于测试
- * 
+ *
  * @example
  * ```typescript
  * const client = new ItemApiClient()
@@ -41,10 +41,10 @@ export class ItemApiClient {
 
   /**
    * 获取商品列表
-   * 
+   *
    * @param params - 商品列表查询参数
    * @returns 原始 API 响应
-   * 
+   *
    * @example
    * ```typescript
    * const response = await client.getItemList({
@@ -80,10 +80,10 @@ export class ItemApiClient {
 
   /**
    * 获取单个商品详情
-   * 
+   *
    * @param params - 商品详情查询参数
    * @returns 原始 API 响应
-   * 
+   *
    * @example
    * ```typescript
    * const response = await client.getItemDetail({ id: '123' })
@@ -98,7 +98,7 @@ export class ItemApiClient {
 
   /**
    * 搜索商品
-   * 
+   *
    * @param keyword - 搜索关键词
    * @param page - 页码
    * @param pageSize - 每页数量
@@ -114,7 +114,7 @@ export class ItemApiClient {
 
   /**
    * 获取商品评价列表
-   * 
+   *
    * @param itemId - 商品 ID
    * @param page - 页码
    * @param pageSize - 每页数量
@@ -130,7 +130,7 @@ export class ItemApiClient {
 
   /**
    * 获取推荐商品
-   * 
+   *
    * @param itemId - 基准商品 ID
    * @param limit - 推荐数量
    * @returns 原始 API 响应
@@ -149,4 +149,3 @@ export class ItemApiClient {
  * 在整个应用中共享同一个实例，减少内存开销
  */
 export const itemApiClient = new ItemApiClient()
-

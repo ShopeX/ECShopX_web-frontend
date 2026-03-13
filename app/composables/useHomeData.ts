@@ -22,8 +22,8 @@ export function useHomeData() {
           item_type: 'normal',
           main_category: '0',
           is_tdk: '0',
-          type: 'all'
-        })
+          type: 'all',
+        }),
       ])
 
       if (configRes) {
@@ -43,7 +43,7 @@ export function useHomeData() {
       await fetchHomeData()
       return {
         pageConfig: pageConfig.value,
-        products: products.value
+        products: products.value,
       }
     })
   }
@@ -54,6 +54,6 @@ export function useHomeData() {
     pending: computed(() => pending.value || productsLoading.value),
     error,
     fetchHomeData,
-    fetchWithSSR
+    fetchWithSSR,
   }
 }

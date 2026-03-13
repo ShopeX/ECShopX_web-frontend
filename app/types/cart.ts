@@ -25,12 +25,3 @@ export interface ICartModel {
   itemCount: number
   totalQuantity: number
 }
-
-
-
-
-
-
-
-
-

@@ -19,4 +19,3 @@ export interface ITemplateConfig {
   sections: Record<string, ITemplateSection>
   order: string[]
 }
-

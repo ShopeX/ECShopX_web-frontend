@@ -20,11 +20,7 @@ export interface MessagePayload<T = any> {
  * @param options - Configuration options
  */
 export function usePostMessage(channel: string, options: PostMessageOptions = {}) {
-  const {
-    targetOrigin = '*',
-    isParent = false,
-    iframeRef
-  } = options
+  const { targetOrigin = '*', isParent = false, iframeRef } = options
 
   // Reactive state for the latest received message payload
   const data = ref<any>(null)
@@ -36,7 +32,7 @@ export function usePostMessage(channel: string, options: PostMessageOptions = {}
     const message: MessagePayload<T> = {
       channel,
       type,
-      payload
+      payload,
     }
 
     // Vue 3 uses Proxy, deep clone to ensure data is transferable
@@ -91,6 +87,6 @@ export function usePostMessage(channel: string, options: PostMessageOptions = {}
   return {
     data,
     post,
-    on
+    on,
   }
 }

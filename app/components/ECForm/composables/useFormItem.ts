@@ -3,7 +3,7 @@ import type { FormItemType } from '../types'
 
 /**
  * 表单项 Composable
- * 
+ *
  * 职责：
  * - 提供表单项共享逻辑
  * - 处理表单上下文
@@ -32,16 +32,14 @@ export function useFormItem(props: {
   })
 
   // 表单项容器样式
-  const itemClasses = computed(() => [
-    'mb-6'
-  ])
+  const itemClasses = computed(() => ['mb-6'])
 
   // 标签样式
   const labelClasses = computed(() => [
     'block mb-2 text-sm font-medium text-gray-700',
     {
-      'before:content-["*"] before:text-red-500 before:mr-1': isRequired.value
-    }
+      'before:content-["*"] before:text-red-500 before:mr-1': isRequired.value,
+    },
   ])
 
   return {
@@ -50,7 +48,6 @@ export function useFormItem(props: {
     isDisabled,
     isRequired,
     itemClasses,
-    labelClasses
+    labelClasses,
   }
 }
-

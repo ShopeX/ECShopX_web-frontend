@@ -1,6 +1,6 @@
 /**
  * 主题配置导出
- * 
+ *
  * 统一导出所有主题配置
  */
 
@@ -26,4 +26,3 @@ export const availableThemes: Record<string, IThemeConfig> = {
 export function getTheme(themeId: string): IThemeConfig {
   return availableThemes[themeId] || defaultTheme
 }
-

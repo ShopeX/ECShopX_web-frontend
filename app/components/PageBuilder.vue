@@ -32,7 +32,9 @@ defineProps<{
 
 // Dynamic Component Resolution
 const WidgetCarousel = defineAsyncComponent(() => import('./WCWidgetCarousel/WCWidgetCarousel.vue'))
-const WidgetProductList = defineAsyncComponent(() => import('./WCWidgetProductList/WCWidgetProductList.vue'))
+const WidgetProductList = defineAsyncComponent(
+  () => import('./WCWidgetProductList/WCWidgetProductList.vue')
+)
 const WidgetBanner = defineAsyncComponent(() => import('./WCWidgetBanner/WCWidgetBanner.vue'))
 const WidgetHotZone = defineAsyncComponent(() => import('./WCWidgetHotZone/WCWidgetHotZone.vue'))
 

@@ -9,12 +9,14 @@
       :class="[
         'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all',
         disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-gray-300',
-        error ? 'border-red-500 focus:ring-red-500' : 'focus:ring-purple-500 focus:border-transparent'
+        error
+          ? 'border-red-500 focus:ring-red-500'
+          : 'focus:ring-purple-500 focus:border-transparent',
       ]"
       @input="handleInput"
       @blur="$emit('blur')"
     />
-    
+
     <!-- 密码显示/隐藏按钮 -->
     <button
       v-if="type === 'password' && showPassword"
@@ -45,12 +47,12 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
   error: false,
-  showPassword: false
+  showPassword: false,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
-  'blur': []
+  blur: []
 }>()
 
 // 密码显示状态

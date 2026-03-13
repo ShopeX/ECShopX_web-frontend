@@ -32,11 +32,11 @@ export interface UseHttpReturn<T> {
 
 // 标准 API 响应格式（业务层）
 export interface ApiResponse<T = any> {
-  status_code: number | string    // 业务状态码（0 表示成功）
-  message: string          // 响应消息
-  data: T                  // 响应数据
-  timestamp?: number       // 时间戳
-  traceId?: string        // 追踪ID
+  status_code: number | string // 业务状态码（0 表示成功）
+  message: string // 响应消息
+  data: T // 响应数据
+  timestamp?: number // 时间戳
+  traceId?: string // 追踪ID
 }
 
 // API 响应基础结构（兼容旧版）
@@ -63,27 +63,27 @@ export interface IPaginatedResponse<T = any> {
 
 // 错误类型枚举
 export enum ErrorType {
-  NETWORK_ERROR = 'NETWORK_ERROR',           // 网络错误
-  HTTP_ERROR = 'HTTP_ERROR',                 // HTTP状态码错误  
-  BUSINESS_ERROR = 'BUSINESS_ERROR',         // 业务逻辑错误
-  VALIDATION_ERROR = 'VALIDATION_ERROR',     // 参数验证错误
-  AUTH_ERROR = 'AUTH_ERROR',                 // 认证错误
-  PERMISSION_ERROR = 'PERMISSION_ERROR',     // 权限错误
-  SERVER_ERROR = 'SERVER_ERROR',             // 服务器错误
-  TIMEOUT_ERROR = 'TIMEOUT_ERROR',           // 超时错误
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR'            // 未知错误
+  NETWORK_ERROR = 'NETWORK_ERROR', // 网络错误
+  HTTP_ERROR = 'HTTP_ERROR', // HTTP状态码错误
+  BUSINESS_ERROR = 'BUSINESS_ERROR', // 业务逻辑错误
+  VALIDATION_ERROR = 'VALIDATION_ERROR', // 参数验证错误
+  AUTH_ERROR = 'AUTH_ERROR', // 认证错误
+  PERMISSION_ERROR = 'PERMISSION_ERROR', // 权限错误
+  SERVER_ERROR = 'SERVER_ERROR', // 服务器错误
+  TIMEOUT_ERROR = 'TIMEOUT_ERROR', // 超时错误
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR', // 未知错误
 }
 
 // 扩展的 HTTP 错误接口
 export interface HttpError extends Error {
-  type: ErrorType          // 错误类型
-  code?: number | string   // 业务错误码
-  status?: number          // HTTP 状态码
-  statusText?: string      // HTTP 状态文本
-  url?: string             // 请求 URL
-  method?: string          // 请求方法
-  details?: any            // 错误详情
-  retry?: boolean          // 是否可重试
+  type: ErrorType // 错误类型
+  code?: number | string // 业务错误码
+  status?: number // HTTP 状态码
+  statusText?: string // HTTP 状态文本
+  url?: string // 请求 URL
+  method?: string // 请求方法
+  details?: any // 错误详情
+  retry?: boolean // 是否可重试
 }
 
 // API 错误接口（兼容旧版）

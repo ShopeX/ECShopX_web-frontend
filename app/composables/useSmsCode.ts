@@ -5,17 +5,17 @@ import type { ISmsCodeRequest } from '~/types/api/auth'
 
 /**
  * 短信验证码组合式函数
- * 
+ *
  * 职责：
  * - 发送短信验证码
  * - 管理倒计时状态
  * - 管理发送状态和错误
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const { sendCode, countdown, isSending, canSend, error } = useSmsCode()
- * 
+ *
  * // 发送验证码
  * await sendCode({ phone: '13800138000', captcha: '1234', captchaKey: 'xxx' })
  * </script>
@@ -25,7 +25,7 @@ export function useSmsCode() {
   // 状态管理
   const isSending = ref(false)
   const error = ref<string>('')
-  const countdown = ref(0)  // 倒计时秒数
+  const countdown = ref(0) // 倒计时秒数
 
   // 倒计时定时器
   let countdownTimer: NodeJS.Timeout | null = null
@@ -156,4 +156,3 @@ export function useSmsCode() {
     stopCountdown,
   }
 }
-

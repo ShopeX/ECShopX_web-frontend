@@ -2,7 +2,7 @@ import type { IFormRule } from '../types'
 
 /**
  * 表单验证 Composable
- * 
+ *
  * 职责：
  * - 提供字段验证逻辑
  * - 支持多种验证规则（必填、长度、正则、自定义）
@@ -11,7 +11,7 @@ import type { IFormRule } from '../types'
 export function useFormValidation() {
   /**
    * 验证单个字段
-   * 
+   *
    * @param value - 字段值
    * @param rules - 验证规则数组
    * @returns 错误信息（空字符串表示验证通过）
@@ -80,7 +80,7 @@ export function useFormValidation() {
 
   /**
    * 验证多个字段
-   * 
+   *
    * @param fields - 字段数组 { name, value, rules }
    * @returns 错误对象 { fieldName: errorMessage }
    */
@@ -101,7 +101,7 @@ export function useFormValidation() {
 
   /**
    * 根据触发时机过滤规则
-   * 
+   *
    * @param rules - 规则数组
    * @param trigger - 触发时机
    * @returns 过滤后的规则数组
@@ -114,7 +114,7 @@ export function useFormValidation() {
       return []
     }
 
-    return rules.filter(rule => {
+    return rules.filter((rule) => {
       // 如果规则没有指定 trigger，则在所有时机都触发
       if (!rule.trigger) {
         return true
@@ -126,7 +126,6 @@ export function useFormValidation() {
   return {
     validateField,
     validateFields,
-    filterRulesByTrigger
+    filterRulesByTrigger,
   }
 }
-

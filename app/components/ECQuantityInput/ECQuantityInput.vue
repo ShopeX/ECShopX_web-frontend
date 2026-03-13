@@ -37,9 +37,9 @@
 <script setup lang="ts">
 /**
  * 数量调整器组件
- * 
+ *
  * 提供商品数量的增加、减少和直接输入功能
- * 
+ *
  * @example
  * ```vue
  * <ECQuantityInput
@@ -76,7 +76,7 @@ const props = withDefaults(defineProps<Props>(), {
   max: undefined,
   disabled: false,
   loading: false,
-  debounce: 500
+  debounce: 500,
 })
 
 const emit = defineEmits<Emits>()
@@ -84,16 +84,19 @@ const emit = defineEmits<Emits>()
 // 当前数量
 const quantity = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => emit('update:modelValue', value),
 })
 
 // 输入框显示值
 const inputValue = ref(String(props.modelValue))
 
 // 监听 modelValue 变化，更新输入框显示
-watch(() => props.modelValue, (newValue) => {
-  inputValue.value = String(newValue)
-})
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    inputValue.value = String(newValue)
+  }
+)
 
 // 防抖定时器
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -110,35 +113,35 @@ function clearDebounceTimer() {
 
 /**
  * 验证并规范化数量值
- * 
+ *
  * @param value - 输入值
  * @returns 规范化后的数量
  */
 function normalizeQuantity(value: string | number): number {
   // 转换为数字
   let num = typeof value === 'string' ? parseInt(value, 10) : value
-  
+
   // 处理非法值
   if (isNaN(num) || num < props.min) {
     num = props.min
   }
-  
+
   // 处理最大值限制
   if (props.max && num > props.max) {
     num = props.max
   }
-  
+
   return num
 }
 
 /**
  * 更新数量（带防抖）
- * 
+ *
  * @param value - 新数量
  */
 function updateQuantity(value: number) {
   clearDebounceTimer()
-  
+
   if (props.debounce > 0) {
     debounceTimer = setTimeout(() => {
       quantity.value = value
@@ -152,7 +155,7 @@ function updateQuantity(value: number) {
 
 /**
  * 处理输入框输入
- * 
+ *
  * 只允许输入数字
  */
 function handleInput(event: Event) {
@@ -164,13 +167,13 @@ function handleInput(event: Event) {
 
 /**
  * 处理输入框失焦
- * 
+ *
  * 验证并更新数量
  */
 function handleBlur() {
   const value = normalizeQuantity(inputValue.value)
   inputValue.value = String(value)
-  
+
   if (value !== quantity.value) {
     updateQuantity(value)
   }
@@ -178,11 +181,11 @@ function handleBlur() {
 
 /**
  * 处理回车键
- * 
+ *
  * 触发失焦逻辑
  */
 function handleEnter(event: KeyboardEvent) {
-  (event.target as HTMLInputElement).blur()
+  ;(event.target as HTMLInputElement).blur()
 }
 
 /**
@@ -190,7 +193,7 @@ function handleEnter(event: KeyboardEvent) {
  */
 function handleDecrease() {
   if (quantity.value <= props.min) return
-  
+
   const newValue = quantity.value - 1
   inputValue.value = String(newValue)
   updateQuantity(newValue)
@@ -201,7 +204,7 @@ function handleDecrease() {
  */
 function handleIncrease() {
   if (props.max && quantity.value >= props.max) return
-  
+
   const newValue = quantity.value + 1
   inputValue.value = String(newValue)
   updateQuantity(newValue)
@@ -212,4 +215,3 @@ onBeforeUnmount(() => {
   clearDebounceTimer()
 })
 </script>
-

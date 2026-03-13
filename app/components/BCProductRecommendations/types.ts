@@ -4,4 +4,3 @@ export interface ProductRecommendation {
   price: number
   image: string
 }
-

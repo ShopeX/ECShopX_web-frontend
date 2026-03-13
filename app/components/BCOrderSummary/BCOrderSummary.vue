@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white content-stretch flex flex-col items-start relative shrink-0 w-full lg:w-[320px]">
+  <div
+    class="bg-white content-stretch flex flex-col items-start relative shrink-0 w-full lg:w-[320px]"
+  >
     <div class="relative shrink-0 w-full lg:w-[320px]">
       <div
         class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[24px] items-start relative w-full"

@@ -1,6 +1,6 @@
 /**
  * 优惠券 HTTP 客户端
- * 
+ *
  * 职责：
  * - 封装优惠券相关的 HTTP 请求
  * - 只负责网络通信，不做数据转换
@@ -32,7 +32,7 @@ export class CouponApiClient {
 
   /**
    * 获取可用优惠券列表
-   * 
+   *
    * @param params - 查询参数
    * @returns 原始 API 响应
    */
@@ -45,4 +45,3 @@ export class CouponApiClient {
 }
 
 export const couponApiClient = new CouponApiClient()
-

@@ -1,20 +1,20 @@
 /**
  * 主题管理 Composable
- * 
+ *
  * 功能：
  * - 主题切换
  * - 主题配置获取
  * - 暗黑模式切换
  * - 主题 CSS 变量注入
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const { currentTheme, switchTheme, isDarkMode, toggleDarkMode } = useTheme()
- * 
+ *
  * // 切换主题
  * switchTheme('minimal')
- * 
+ *
  * // 切换暗黑模式
  * toggleDarkMode()
  * </script>
@@ -168,4 +168,3 @@ export function useTheme() {
     initTheme,
   }
 }
-

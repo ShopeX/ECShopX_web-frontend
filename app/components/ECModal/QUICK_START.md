@@ -15,7 +15,7 @@ confirm('您确定要执行此操作吗？')
 // 带标题
 confirm({
   title: '删除确认',
-  content: '删除后无法恢复，确定要删除吗？'
+  content: '删除后无法恢复，确定要删除吗？',
 })
 
 // 带回调
@@ -25,7 +25,7 @@ confirm({
   onConfirm: async () => {
     await logout()
     router.push('/login')
-  }
+  },
 })
 ```
 
@@ -40,7 +40,7 @@ alert('操作成功！')
 // 带标题
 alert({
   title: '提示',
-  content: '您的操作已完成'
+  content: '您的操作已完成',
 })
 ```
 
@@ -62,7 +62,7 @@ function handleLogout() {
     onConfirm: async () => {
       await logout()
       router.push('/account/login')
-    }
+    },
   })
 }
 ```
@@ -79,11 +79,11 @@ function handleDelete(id: string) {
       onClick: async () => {
         await deleteItem(id)
         await fetchList() // 刷新列表
-      }
+      },
     },
     cancelButton: {
-      text: '我再想想'
-    }
+      text: '我再想想',
+    },
   })
 }
 ```
@@ -98,7 +98,7 @@ function handleSubmit() {
     onConfirm: async () => {
       await submitForm()
       alert('提交成功！')
-    }
+    },
   })
 }
 ```
@@ -111,12 +111,8 @@ function handleSubmit() {
 <template>
   <div>
     <button @click="showModal = true">打开弹窗</button>
-    
-    <Modal
-      v-model="showModal"
-      title="自定义内容"
-      @confirm="handleConfirm"
-    >
+
+    <Modal v-model="showModal" title="自定义内容" @confirm="handleConfirm">
       <!-- 自定义内容 -->
       <div class="space-y-4">
         <input v-model="inputValue" type="text" class="border px-4 py-2" />
@@ -148,7 +144,7 @@ const { confirm } = useModal()
 const instance = confirm({
   title: '加载中...',
   content: '请稍候',
-  showCancel: false
+  showCancel: false,
 })
 
 // 异步操作完成后关闭
@@ -161,16 +157,16 @@ setTimeout(() => {
 
 ```typescript
 interface IModalOptions {
-  title?: string              // 标题，默认 '提示'
-  content?: string            // 内容
-  width?: string | number     // 宽度，默认 '480px'
-  showClose?: boolean         // 显示关闭按钮，默认 true
-  maskClosable?: boolean      // 点击遮罩关闭，默认 true
-  confirmButton?: IModalButton | false  // 确认按钮配置
-  cancelButton?: IModalButton | false   // 取消按钮配置
-  onConfirm?: () => void | Promise<void>  // 确认回调
-  onCancel?: () => void | Promise<void>   // 取消回调
-  onClose?: () => void        // 关闭回调
+  title?: string // 标题，默认 '提示'
+  content?: string // 内容
+  width?: string | number // 宽度，默认 '480px'
+  showClose?: boolean // 显示关闭按钮，默认 true
+  maskClosable?: boolean // 点击遮罩关闭，默认 true
+  confirmButton?: IModalButton | false // 确认按钮配置
+  cancelButton?: IModalButton | false // 取消按钮配置
+  onConfirm?: () => void | Promise<void> // 确认回调
+  onCancel?: () => void | Promise<void> // 取消回调
+  onClose?: () => void // 关闭回调
 }
 ```
 
@@ -188,7 +184,7 @@ interface IModalOptions {
 ```typescript
 confirm({
   confirmButton: { text: '确定删除' },
-  cancelButton: { text: '我再想想' }
+  cancelButton: { text: '我再想想' },
 })
 ```
 
@@ -197,12 +193,12 @@ confirm({
 ```typescript
 // 隐藏取消按钮（alert 的默认行为）
 confirm({
-  cancelButton: false
+  cancelButton: false,
 })
 
 // 隐藏确认按钮
 confirm({
-  confirmButton: false
+  confirmButton: false,
 })
 ```
 
@@ -210,7 +206,7 @@ confirm({
 
 ```typescript
 confirm({
-  maskClosable: false
+  maskClosable: false,
 })
 ```
 
@@ -218,11 +214,10 @@ confirm({
 
 ```typescript
 confirm({
-  width: '600px'  // 或者 600（数字会自动转换为 px）
+  width: '600px', // 或者 600（数字会自动转换为 px）
 })
 ```
 
 ## 完整示例
 
 查看 `example.vue` 文件获取完整的使用示例。
-

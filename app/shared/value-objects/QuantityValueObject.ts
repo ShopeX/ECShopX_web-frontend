@@ -1,16 +1,16 @@
 /**
  * 数量值对象
- * 
+ *
  * 用途：
  * - 封装数量相关的业务逻辑和验证
  * - 确保数量的有效性（范围、整数）
  * - 提供数量运算方法
- * 
+ *
  * 特点：
  * - 不可变（Immutable）
  * - 自动验证范围
  * - 只允许整数
- * 
+ *
  * @example
  * ```ts
  * const qty = QuantityValueObject.of(5, 1, 10)  // 数量为5，范围1-10
@@ -169,4 +169,3 @@ export class QuantityValueObject {
     return this._value >= this._min && this._value <= this._max
   }
 }
-

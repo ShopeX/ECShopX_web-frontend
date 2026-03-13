@@ -85,27 +85,21 @@ const countryCodeOptions = [
 ### 之后
 
 ```vue
-<Select 
-  v-model="value" 
-  :options="options"
-  placeholder="请选择"
-  class="w-[180px]"
-/>
+<Select v-model="value" :options="options" placeholder="请选择" class="w-[180px]" />
 ```
 
 ## Props 速查
 
-| Props | 值 | 说明 |
-|-------|---|------|
-| v-model | `string \| number` | 双向绑定 |
-| options | `ISelectOption[]` | 选项数组 |
-| placeholder | `string` | 占位符 |
-| size | `sm` \| `md` \| `lg` | 尺寸 |
-| variant | `default` \| `outlined` \| `filled` | 样式 |
-| disabled | `boolean` | 禁用 |
-| error | `boolean` | 错误状态 |
+| Props       | 值                                  | 说明     |
+| ----------- | ----------------------------------- | -------- |
+| v-model     | `string \| number`                  | 双向绑定 |
+| options     | `ISelectOption[]`                   | 选项数组 |
+| placeholder | `string`                            | 占位符   |
+| size        | `sm` \| `md` \| `lg`                | 尺寸     |
+| variant     | `default` \| `outlined` \| `filled` | 样式     |
+| disabled    | `boolean`                           | 禁用     |
+| error       | `boolean`                           | 错误状态 |
 
 ## 更多示例
 
 查看 `example.vue` 获取更多使用示例。
-

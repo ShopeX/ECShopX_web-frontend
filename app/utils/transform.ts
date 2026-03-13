@@ -9,8 +9,6 @@ export interface ITransformer<From, To> {
   transform(from: From): To
 }
 
-
-
 /**
  * 转换分页数据
  */
@@ -19,7 +17,7 @@ export function transformPagination<T, R>(
   transformer: ITransformer<T, R>
 ): { list: R[]; total: number } {
   return {
-    list: response.data.list.map(item => transformer.transform(item)),
-    total: response.data.total_count
+    list: response.data.list.map((item) => transformer.transform(item)),
+    total: response.data.total_count,
   }
-} 
+}

@@ -19,7 +19,10 @@
         <!-- 标题和关闭按钮 -->
         <div class="flex items-center justify-between mb-4">
           <h4 class="m-0 text-base font-semibold text-gray-900">请输入价格区间</h4>
-          <button @click="isOpen = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            @click="isOpen = false"
+            class="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <UIcon name="i-lucide-x" class="h-4 w-4" />
           </button>
         </div>
@@ -27,8 +30,12 @@
         <!-- 自定义价格输入 -->
         <div class="mb-4">
           <div class="flex items-center gap-3">
-            <div class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
-              <span class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300">¥</span>
+            <div
+              class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white"
+            >
+              <span class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300"
+                >¥</span
+              >
               <UInput
                 v-model="localStartPrice"
                 type="number"
@@ -39,8 +46,12 @@
               />
             </div>
             <span class="text-gray-500 font-medium">-</span>
-            <div class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
-              <span class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300">¥</span>
+            <div
+              class="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white"
+            >
+              <span class="px-3 py-2 bg-gray-50 text-gray-500 font-medium border-r border-gray-300"
+                >¥</span
+              >
               <UInput
                 v-model="localEndPrice"
                 type="number"
@@ -86,7 +97,7 @@
 <script setup lang="ts">
 /**
  * 价格区间筛选组件
- * 
+ *
  * 提供自定义价格输入和快捷价格区间选择功能
  */
 
@@ -102,7 +113,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:startPrice': [value: number | undefined]
   'update:endPrice': [value: number | undefined]
-  'change': []
+  change: []
 }>()
 
 // 弹窗显示状态
@@ -133,17 +144,16 @@ watch(
 /**
  * 检查价格区间是否被选中
  */
-function isPriceRangeSelected(option: typeof priceRangeOptions[number]) {
+function isPriceRangeSelected(option: (typeof priceRangeOptions)[number]) {
   return (
-    localStartPrice.value === option.min.toString() &&
-    localEndPrice.value === option.max.toString()
+    localStartPrice.value === option.min.toString() && localEndPrice.value === option.max.toString()
   )
 }
 
 /**
  * 选择快捷价格区间
  */
-function selectPriceRange(option: typeof priceRangeOptions[number]) {
+function selectPriceRange(option: (typeof priceRangeOptions)[number]) {
   localStartPrice.value = option.min.toString()
   localEndPrice.value = option.max.toString()
   emitPriceChange()
@@ -185,4 +195,3 @@ function emitPriceChange() {
   emit('change')
 }
 </script>
-

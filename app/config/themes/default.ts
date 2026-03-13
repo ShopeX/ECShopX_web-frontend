@@ -1,6 +1,6 @@
 /**
  * 默认主题配置
- * 
+ *
  * 这是系统的默认主题，包含完整的样式配置
  */
 
@@ -71,4 +71,3 @@ export const defaultTheme: IThemeConfig = {
     },
   },
 }
-

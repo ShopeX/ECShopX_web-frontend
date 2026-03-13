@@ -52,7 +52,7 @@
 <script setup lang="ts">
 /**
  * 排序区域组件
- * 
+ *
  * 提供综合、销量、评论数、价格排序功能
  */
 
@@ -118,4 +118,3 @@ function handlePriceSort() {
   emit('update:sort', sortValue)
 }
 </script>
-

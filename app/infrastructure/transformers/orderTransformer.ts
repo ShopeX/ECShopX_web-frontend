@@ -2,7 +2,7 @@ import { MoneyValueObject } from '~/shared/value-objects'
 
 /**
  * 订单数据转换器
- * 
+ *
  * 职责：
  * - API 数据 → 应用模型转换
  * - 数据验证和清洗
@@ -116,12 +116,14 @@ export class OrderTransformer {
       freightFee: Number(response.freight_fee || 0) / 100,
       freightType: response.freight_type || '',
       freightPoint: Number(response.freight_point || 0),
-      couponInfo: response.coupon_info ? {
-        id: response.coupon_info.id || '',
-        couponCode: response.coupon_info.coupon_code || '',
-        info: response.coupon_info.info || '',
-        discountFee: Number(response.coupon_info.discount_fee || 0) / 100,
-      } : undefined,
+      couponInfo: response.coupon_info
+        ? {
+            id: response.coupon_info.id || '',
+            couponCode: response.coupon_info.coupon_code || '',
+            info: response.coupon_info.info || '',
+            discountFee: Number(response.coupon_info.discount_fee || 0) / 100,
+          }
+        : undefined,
       totalFee: Number(response.total_fee || 0) / 100,
       invoiceStatus: Number(response.invoice_status || 0),
       point: Number(response.point || 0),
@@ -145,12 +147,9 @@ export class OrderTransformer {
   static toAddressModelList(response: any): IAddressModel[] {
     const list = response?.list || []
     return list.map((item: any) => {
-      const fullAddress = [
-        item.province,
-        item.city,
-        item.county,
-        item.adrdetail,
-      ].filter(Boolean).join(' ')
+      const fullAddress = [item.province, item.city, item.county, item.adrdetail]
+        .filter(Boolean)
+        .join(' ')
 
       return {
         id: String(item.address_id || ''),
@@ -246,4 +245,3 @@ export class OrderTransformer {
     }
   }
 }
-

@@ -1,17 +1,17 @@
 /**
  * 权限守卫组合式函数
- * 
+ *
  * 职责：
  * - 检查用户登录状态
  * - 处理需要登录的操作
  * - 未登录时跳转到登录页，并保存返回路径
  * - 提供统一的权限检查接口
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const { requireAuth } = useAuthGuard()
- * 
+ *
  * // 需要登录的操作
  * const addToCart = async () => {
  *   await requireAuth(async () => {
@@ -35,11 +35,11 @@ export function useAuthGuard() {
 
   /**
    * 需要登录才能执行的操作
-   * 
+   *
    * @param action - 需要登录后执行的回调函数
    * @param options - 配置选项
    * @returns 操作结果
-   * 
+   *
    * @example
    * ```typescript
    * await requireAuth(async () => {
@@ -95,7 +95,7 @@ export function useAuthGuard() {
 
   /**
    * 检查登录状态（不执行操作，只检查）
-   * 
+   *
    * @param options - 配置选项
    * @returns 是否已登录
    */
@@ -131,7 +131,7 @@ export function useAuthGuard() {
 
   /**
    * 需要登录才能访问的路由守卫
-   * 
+   *
    * @example
    * ```typescript
    * // 在页面中使用
@@ -139,15 +139,15 @@ export function useAuthGuard() {
    * guardRoute('/account/profile')
    * ```
    */
-  const guardRoute = (targetPath: string, options?: {
-    loginMessage?: string
-    loginPath?: string
-  }) => {
+  const guardRoute = (
+    targetPath: string,
+    options?: {
+      loginMessage?: string
+      loginPath?: string
+    }
+  ) => {
     if (!isLoggedIn.value) {
-      const {
-        loginMessage = '请先登录',
-        loginPath = '/account/login',
-      } = options || {}
+      const { loginMessage = '请先登录', loginPath = '/account/login' } = options || {}
 
       toast.show(loginMessage)
 
@@ -172,4 +172,3 @@ export function useAuthGuard() {
     guardRoute,
   }
 }
-

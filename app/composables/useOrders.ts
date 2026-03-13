@@ -1,6 +1,6 @@
 /**
  * 订单列表 Composable
- * 
+ *
  * 职责:
  * - 管理订单列表状态
  * - 处理订单操作(取消、确认收货、删除)
@@ -11,7 +11,13 @@ import { ref, computed } from 'vue'
 import { orderApiClient } from '~/infrastructure/http/clients/OrderApiClient'
 import { OrderTransformer } from '~/infrastructure/transformers/orderTransformer'
 
-export type OrderStatus = 'all' | 'pending_payment' | 'pending_shipment' | 'shipped' | 'completed' | 'cancelled'
+export type OrderStatus =
+  | 'all'
+  | 'pending_payment'
+  | 'pending_shipment'
+  | 'shipped'
+  | 'completed'
+  | 'cancelled'
 
 export function useOrders() {
   const toast = useToastMessage()

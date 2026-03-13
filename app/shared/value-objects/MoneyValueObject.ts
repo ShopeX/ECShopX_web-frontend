@@ -1,17 +1,17 @@
 /**
  * 金额值对象
- * 
+ *
  * 用途：
  * - 封装金额相关的业务逻辑
  * - 确保金额的不可变性
  * - 避免浮点数精度问题
  * - 提供金额格式化
- * 
+ *
  * 特点：
  * - 不可变（Immutable）
  * - 通过值比较
  * - 工厂方法创建
- * 
+ *
  * @example
  * ```ts
  * const price = MoneyValueObject.of(99.9)
@@ -156,4 +156,3 @@ export class MoneyValueObject {
     return this._amount > 0
   }
 }
-

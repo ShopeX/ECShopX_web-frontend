@@ -9,16 +9,16 @@
     </div>
 
     <div class="brand-list" :class="{ expanded: isExpanded }">
-      <div class="brand-item" 
-           :class="{ active: modelValue === '' }"
-           @click="handleSelect('')">
+      <div class="brand-item" :class="{ active: modelValue === '' }" @click="handleSelect('')">
         全部
       </div>
-      <div v-for="brand in brands" 
-           :key="brand.attribute_id" 
-           class="brand-item"
-           :class="{ active: modelValue === brand.attribute_id }"
-           @click="handleSelect(brand.attribute_id)">
+      <div
+        v-for="brand in brands"
+        :key="brand.attribute_id"
+        class="brand-item"
+        :class="{ active: modelValue === brand.attribute_id }"
+        @click="handleSelect(brand.attribute_id)"
+      >
         {{ brand.attribute_name }}
       </div>
     </div>
@@ -122,4 +122,4 @@ const toggleExpand = () => {
     }
   }
 }
-</style> 
+</style>

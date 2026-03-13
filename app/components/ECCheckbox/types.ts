@@ -23,4 +23,3 @@ export interface ICheckboxEmits {
   /** 变化事件 */
   change: [value: boolean]
 }
-

@@ -140,11 +140,11 @@ function handleFilterChange() {
 
 ## Props
 
-| 属性 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| modelValue | IProductFilterValue | 是 | - | 筛选值对象 |
-| filterGroups | IFilterGroup[] | 是 | - | 筛选组配置列表 |
-| showFilterPanel | boolean | 否 | false | 是否显示筛选面板 |
+| 属性            | 类型                | 必填 | 默认值 | 说明             |
+| --------------- | ------------------- | ---- | ------ | ---------------- |
+| modelValue      | IProductFilterValue | 是   | -      | 筛选值对象       |
+| filterGroups    | IFilterGroup[]      | 是   | -      | 筛选组配置列表   |
+| showFilterPanel | boolean             | 否   | false  | 是否显示筛选面板 |
 
 ### 类型定义
 
@@ -173,10 +173,10 @@ interface IProductFilterValue {
 
 ```typescript
 interface IFilterGroup {
-  key: string                // 筛选组键名，对应 IProductFilterValue 中的属性
-  label: string              // 筛选组标签
-  options: IFilterOption[]   // 筛选选项列表
-  multiple?: boolean         // 是否支持多选，默认为 true
+  key: string // 筛选组键名，对应 IProductFilterValue 中的属性
+  label: string // 筛选组标签
+  options: IFilterOption[] // 筛选选项列表
+  multiple?: boolean // 是否支持多选，默认为 true
 }
 ```
 
@@ -184,9 +184,9 @@ interface IFilterGroup {
 
 ```typescript
 interface IFilterOption {
-  id: string | number        // 选项 ID
-  label: string              // 选项标签
-  value: string | number     // 选项值
+  id: string | number // 选项 ID
+  label: string // 选项标签
+  value: string | number // 选项值
 }
 ```
 
@@ -194,21 +194,21 @@ interface IFilterOption {
 
 ```typescript
 enum ESortOption {
-  DEFAULT = 'default',       // 默认排序
-  PRICE_ASC = 'price_asc',   // 价格升序
+  DEFAULT = 'default', // 默认排序
+  PRICE_ASC = 'price_asc', // 价格升序
   PRICE_DESC = 'price_desc', // 价格降序
-  SALES = 'sales',           // 销量排序
-  NEW = 'new',               // 上新排序
+  SALES = 'sales', // 销量排序
+  NEW = 'new', // 上新排序
 }
 ```
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | IProductFilterValue | 筛选值更新时触发 |
-| update:showFilterPanel | boolean | 筛选面板显示状态变化时触发 |
-| change | - | 筛选条件变化时触发（用于重新加载数据） |
+| 事件名                 | 参数                | 说明                                   |
+| ---------------------- | ------------------- | -------------------------------------- |
+| update:modelValue      | IProductFilterValue | 筛选值更新时触发                       |
+| update:showFilterPanel | boolean             | 筛选面板显示状态变化时触发             |
+| change                 | -                   | 筛选条件变化时触发（用于重新加载数据） |
 
 ## 样式说明
 
@@ -268,18 +268,22 @@ const filterValue = ref<IProductFilterValue>({
 })
 
 // 监听筛选值变化，同步到 URL
-watch(filterValue, (newValue) => {
-  router.push({
-    query: {
-      ...route.query,
-      category: newValue.category || undefined,
-      series: newValue.series?.join(',') || undefined,
-      colors: newValue.colors?.join(',') || undefined,
-      // ... 其他属性
-      sort: newValue.sort,
-    },
-  })
-}, { deep: true })
+watch(
+  filterValue,
+  (newValue) => {
+    router.push({
+      query: {
+        ...route.query,
+        category: newValue.category || undefined,
+        series: newValue.series?.join(',') || undefined,
+        colors: newValue.colors?.join(',') || undefined,
+        // ... 其他属性
+        sort: newValue.sort,
+      },
+    })
+  },
+  { deep: true }
+)
 </script>
 ```
 
@@ -332,4 +336,3 @@ function handleFilterChange() {
 - `SpFilter`: 简化版筛选组件
 - `FilterBrandSection`: 品牌筛选子组件
 - `FilterPriceRange`: 价格区间筛选子组件
-

@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden cursor-pointer transition-all duration-200 hover:transform hover:-translate-y-1" 
+  <div
+    class="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden cursor-pointer transition-all duration-200 hover:transform hover:-translate-y-1"
     @click="handleClick"
   >
     <!-- 商品图片 -->
@@ -11,9 +11,12 @@
         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         loading="lazy"
       />
-      
+
       <!-- 折扣标签 -->
-      <div v-if="item.discount" class="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
+      <div
+        v-if="item.discount"
+        class="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded"
+      >
         {{ item.discount }}折
       </div>
     </div>
@@ -27,18 +30,14 @@
 
       <!-- 价格 -->
       <div class="flex items-baseline gap-2 mb-2">
-        <span class="text-lg font-bold text-red-600">
-          ¥{{ item.price }}
-        </span>
+        <span class="text-lg font-bold text-red-600"> ¥{{ item.price }} </span>
         <span v-if="item.originalPrice" class="text-sm text-gray-400 line-through">
           ¥{{ item.originalPrice }}
         </span>
       </div>
 
       <!-- 销量 -->
-      <div class="text-xs text-gray-500">
-        已售 {{ item.sales }}
-      </div>
+      <div class="text-xs text-gray-500">已售 {{ item.sales }}</div>
     </div>
   </div>
 </template>
@@ -61,11 +60,10 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  'click': [item: ItemData]
+  click: [item: ItemData]
 }>()
 
 function handleClick() {
   emit('click', props.item)
 }
 </script>
-

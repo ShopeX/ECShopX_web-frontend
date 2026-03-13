@@ -9,7 +9,7 @@ import { logger } from '~/utils/log'
 export function useDesignMode() {
   // Initialize communication channel
   const { post, on } = usePostMessage('ecshopx-bridge', {
-    isParent: false // This is running in the child iframe
+    isParent: false, // This is running in the child iframe
   })
 
   // Reactive schema state
@@ -19,11 +19,15 @@ export function useDesignMode() {
   /**
    * Notify parent when a widget is selected
    */
-  const notifySelection = (id: string | null, rect?: DOMRect | { top: number; left: number; width: number; height: number }, schema?: any) => {
+  const notifySelection = (
+    id: string | null,
+    rect?: DOMRect | { top: number; left: number; width: number; height: number },
+    schema?: any
+  ) => {
     post('WIDGET_SELECTED', {
       id,
       rect,
-      schema
+      schema,
     })
   }
 
@@ -33,7 +37,7 @@ export function useDesignMode() {
   const notifyReady = () => {
     post('CHILD_READY', {
       timestamp: Date.now(),
-      url: window.location.href
+      url: window.location.href,
     })
   }
 
@@ -59,6 +63,6 @@ export function useDesignMode() {
   return {
     pageSchema,
     notifySelection,
-    notifyReady
+    notifyReady,
   }
 }

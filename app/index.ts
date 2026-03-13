@@ -9,7 +9,7 @@ export const APP_CONFIG = {
   name: 'ECSHOPX',
   version: '1.0.0',
   description: '电商平台前端应用',
-  author: 'ECSHOPX Team'
+  author: 'ECSHOPX Team',
 } as const
 
 // 导出应用常量
@@ -17,13 +17,13 @@ export const CONSTANTS = {
   API_ENDPOINTS: {
     ITEMS: '/api/item',
     PRODUCTS: '/api/products',
-    USERS: '/api/users'
+    USERS: '/api/users',
   },
   STORAGE_KEYS: {
     TOKEN: 'auth_token',
     USER: 'user_info',
-    CART: 'shopping_cart'
-  }
+    CART: 'shopping_cart',
+  },
 } as const
 
 // 导出工具类型

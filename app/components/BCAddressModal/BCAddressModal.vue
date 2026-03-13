@@ -6,7 +6,7 @@
     :show-footer="false"
     @close="handleClose"
   >
-    <form class="flex flex-col gap-8" @submit.prevent="handleSubmit">
+    <form class="flex flex-col gap-8" data-testid="address-form" @submit.prevent="handleSubmit">
       <!-- 收货人 -->
       <div class="flex flex-col gap-2">
         <label class="text-xs text-[#4a5565] leading-4">收货人</label>

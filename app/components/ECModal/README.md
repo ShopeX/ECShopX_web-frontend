@@ -16,23 +16,23 @@
 
 ```typescript
 interface IModalOptions {
-  title?: string                    // 弹窗标题
-  content?: string                  // 弹窗内容
-  width?: string | number           // 宽度
-  showClose?: boolean               // 是否显示关闭按钮
-  maskClosable?: boolean            // 是否可以点击遮罩关闭
-  confirmButton?: IModalButton | false  // 确认按钮配置
-  cancelButton?: IModalButton | false   // 取消按钮配置
-  onConfirm?: () => void | Promise<void>  // 确认回调
-  onCancel?: () => void | Promise<void>   // 取消回调
-  onClose?: () => void              // 关闭回调
+  title?: string // 弹窗标题
+  content?: string // 弹窗内容
+  width?: string | number // 宽度
+  showClose?: boolean // 是否显示关闭按钮
+  maskClosable?: boolean // 是否可以点击遮罩关闭
+  confirmButton?: IModalButton | false // 确认按钮配置
+  cancelButton?: IModalButton | false // 取消按钮配置
+  onConfirm?: () => void | Promise<void> // 确认回调
+  onCancel?: () => void | Promise<void> // 取消回调
+  onClose?: () => void // 关闭回调
 }
 
 interface IModalButton {
-  text: string                      // 按钮文本
-  type?: 'primary' | 'default'      // 按钮类型
-  onClick?: () => void | Promise<void>  // 点击回调
-  loading?: boolean                 // 是否加载中
+  text: string // 按钮文本
+  type?: 'primary' | 'default' // 按钮类型
+  onClick?: () => void | Promise<void> // 点击回调
+  loading?: boolean // 是否加载中
 }
 ```
 
@@ -44,7 +44,7 @@ interface IModalButton {
 <template>
   <div>
     <button @click="showModal = true">打开弹窗</button>
-    
+
     <Modal
       v-model="showModal"
       title="退出登录"
@@ -92,7 +92,7 @@ confirm({
   },
   onCancel: () => {
     console.log('取消退出')
-  }
+  },
 })
 ```
 
@@ -112,7 +112,7 @@ alert({
   content: '您的操作已完成',
   onConfirm: () => {
     console.log('知道了')
-  }
+  },
 })
 ```
 
@@ -128,11 +128,11 @@ confirm({
     text: '确定删除',
     onClick: async () => {
       await deleteItem()
-    }
+    },
   },
   cancelButton: {
     text: '我再想想',
-  }
+  },
 })
 ```
 
@@ -156,7 +156,7 @@ const { confirm } = useModal()
 
 const instance = confirm({
   title: '提示',
-  content: '这是一个可控制的弹窗'
+  content: '这是一个可控制的弹窗',
 })
 
 // 手动关闭
@@ -167,7 +167,7 @@ setTimeout(() => {
 // 更新配置
 instance.update({
   title: '新标题',
-  content: '内容已更新'
+  content: '内容已更新',
 })
 
 // 销毁弹窗
@@ -176,43 +176,43 @@ instance.destroy()
 
 ## Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| modelValue | `boolean` | `false` | 是否显示弹窗（v-model） |
-| title | `string` | `'提示'` | 弹窗标题 |
-| content | `string` | `''` | 弹窗内容 |
-| width | `string \| number` | `'480px'` | 弹窗宽度 |
-| showClose | `boolean` | `true` | 是否显示关闭按钮 |
-| maskClosable | `boolean` | `true` | 是否可以点击遮罩关闭 |
-| confirmText | `string` | `'确定'` | 确认按钮文本 |
-| cancelText | `string` | `'取消'` | 取消按钮文本 |
-| showConfirm | `boolean` | `true` | 是否显示确认按钮 |
-| showCancel | `boolean` | `true` | 是否显示取消按钮 |
-| showFooter | `boolean` | `true` | 是否显示底部按钮区域 |
+| 属性         | 类型               | 默认值    | 说明                    |
+| ------------ | ------------------ | --------- | ----------------------- |
+| modelValue   | `boolean`          | `false`   | 是否显示弹窗（v-model） |
+| title        | `string`           | `'提示'`  | 弹窗标题                |
+| content      | `string`           | `''`      | 弹窗内容                |
+| width        | `string \| number` | `'480px'` | 弹窗宽度                |
+| showClose    | `boolean`          | `true`    | 是否显示关闭按钮        |
+| maskClosable | `boolean`          | `true`    | 是否可以点击遮罩关闭    |
+| confirmText  | `string`           | `'确定'`  | 确认按钮文本            |
+| cancelText   | `string`           | `'取消'`  | 取消按钮文本            |
+| showConfirm  | `boolean`          | `true`    | 是否显示确认按钮        |
+| showCancel   | `boolean`          | `true`    | 是否显示取消按钮        |
+| showFooter   | `boolean`          | `true`    | 是否显示底部按钮区域    |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | `(value: boolean)` | v-model 更新事件 |
-| confirm | - | 点击确认按钮时触发 |
-| cancel | - | 点击取消按钮时触发 |
-| close | - | 点击关闭按钮或遮罩时触发 |
+| 事件名            | 参数               | 说明                     |
+| ----------------- | ------------------ | ------------------------ |
+| update:modelValue | `(value: boolean)` | v-model 更新事件         |
+| confirm           | -                  | 点击确认按钮时触发       |
+| cancel            | -                  | 点击取消按钮时触发       |
+| close             | -                  | 点击关闭按钮或遮罩时触发 |
 
 ## Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明         |
+| ------- | ------------ |
 | default | 弹窗内容区域 |
 
 ## 实例方法
 
-| 方法名 | 参数 | 说明 |
-|--------|------|------|
-| show | - | 显示弹窗 |
-| hide | - | 隐藏弹窗 |
-| update | `(options: Partial<IModalOptions>)` | 更新配置 |
-| destroy | - | 销毁弹窗 |
+| 方法名  | 参数                                | 说明     |
+| ------- | ----------------------------------- | -------- |
+| show    | -                                   | 显示弹窗 |
+| hide    | -                                   | 隐藏弹窗 |
+| update  | `(options: Partial<IModalOptions>)` | 更新配置 |
+| destroy | -                                   | 销毁弹窗 |
 
 ## 实际应用示例
 
@@ -232,7 +232,7 @@ function handleLogout() {
     onConfirm: async () => {
       await logout()
       router.push('/account/login')
-    }
+    },
   })
 }
 ```
@@ -252,8 +252,8 @@ function handleDelete(id: string) {
         await deleteItem(id)
         // 刷新列表
         await fetchList()
-      }
-    }
+      },
+    },
   })
 }
 ```
@@ -272,4 +272,3 @@ function handleDelete(id: string) {
 ## Figma 设计稿
 
 - 节点：[2512-17618](https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/ECshopex-demo-PC%E7%AB%AF?node-id=2512-17618)
-

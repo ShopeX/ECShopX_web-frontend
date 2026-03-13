@@ -73,8 +73,18 @@ const options = [
 ```vue
 <template>
   <div class="flex flex-col gap-4">
-    <Select v-model="value1" :options="options" variant="default" placeholder="默认样式 (default)" />
-    <Select v-model="value2" :options="options" variant="outlined" placeholder="边框样式 (outlined)" />
+    <Select
+      v-model="value1"
+      :options="options"
+      variant="default"
+      placeholder="默认样式 (default)"
+    />
+    <Select
+      v-model="value2"
+      :options="options"
+      variant="outlined"
+      placeholder="边框样式 (outlined)"
+    />
     <Select v-model="value3" :options="options" variant="filled" placeholder="填充样式 (filled)" />
   </div>
 </template>
@@ -132,15 +142,8 @@ const optionsWithDisabled = [
 ```vue
 <template>
   <div class="flex flex-col gap-2">
-    <Select 
-      v-model="selected" 
-      :options="options" 
-      :error="!selected"
-      placeholder="请选择"
-    />
-    <p v-if="!selected" class="text-xs text-[#d0112f]">
-      此字段为必填项
-    </p>
+    <Select v-model="selected" :options="options" :error="!selected" placeholder="请选择" />
+    <p v-if="!selected" class="text-xs text-[#d0112f]">此字段为必填项</p>
   </div>
 </template>
 
@@ -186,8 +189,8 @@ const countryOptions = [
 
 ```vue
 <template>
-  <Select 
-    v-model="selected" 
+  <Select
+    v-model="selected"
     :options="options"
     placeholder="选择一个选项"
     @change="handleChange"
@@ -228,28 +231,26 @@ function handleBlur() {
   <form @submit.prevent="handleSubmit" class="flex flex-col gap-4">
     <div class="flex flex-col gap-2">
       <label class="text-sm font-medium">国家/地区</label>
-      <Select 
-        v-model="form.country" 
+      <Select
+        v-model="form.country"
         :options="countries"
         :error="submitted && !form.country"
         placeholder="请选择国家"
       />
-      <p v-if="submitted && !form.country" class="text-xs text-[#d0112f]">
-        请选择国家
-      </p>
+      <p v-if="submitted && !form.country" class="text-xs text-[#d0112f]">请选择国家</p>
     </div>
 
     <div class="flex flex-col gap-2">
       <label class="text-sm font-medium">城市</label>
-      <Select 
-        v-model="form.city" 
+      <Select
+        v-model="form.city"
         :options="cities"
         :disabled="!form.country"
         placeholder="请选择城市"
       />
     </div>
 
-    <button 
+    <button
       type="submit"
       class="bg-[#191a1d] text-white px-6 py-3 hover:bg-[#191a1d]/90 transition-colors"
     >
@@ -303,7 +304,7 @@ function handleSubmit() {
     <!-- 省 -->
     <div class="flex-1 flex flex-col gap-2">
       <label class="text-xs text-[#4a5565] leading-4">省</label>
-      <Select 
+      <Select
         v-model="formData.province"
         :options="provinces"
         placeholder="省份/直辖市"
@@ -315,7 +316,7 @@ function handleSubmit() {
     <!-- 市 -->
     <div class="flex-1 flex flex-col gap-2">
       <label class="text-xs text-[#4a5565] leading-4">市</label>
-      <Select 
+      <Select
         v-model="formData.city"
         :options="cities"
         :disabled="!formData.province"
@@ -328,7 +329,7 @@ function handleSubmit() {
     <!-- 区 -->
     <div class="flex-1 flex flex-col gap-2">
       <label class="text-xs text-[#4a5565] leading-4">区</label>
-      <Select 
+      <Select
         v-model="formData.district"
         :options="districts"
         :disabled="!formData.city"
@@ -351,7 +352,7 @@ const formData = reactive({
 })
 
 const provinces = computed(() => {
-  return regionData.map(item => ({
+  return regionData.map((item) => ({
     value: item.code,
     label: item.name,
   }))
@@ -359,21 +360,25 @@ const provinces = computed(() => {
 
 const cities = computed(() => {
   if (!formData.province) return []
-  const province = regionData.find(item => item.code === formData.province)
-  return province?.children?.map(item => ({
-    value: item.code,
-    label: item.name,
-  })) || []
+  const province = regionData.find((item) => item.code === formData.province)
+  return (
+    province?.children?.map((item) => ({
+      value: item.code,
+      label: item.name,
+    })) || []
+  )
 })
 
 const districts = computed(() => {
   if (!formData.city) return []
-  const province = regionData.find(item => item.code === formData.province)
-  const city = province?.children?.find(item => item.code === formData.city)
-  return city?.children?.map(item => ({
-    value: item.code,
-    label: item.name,
-  })) || []
+  const province = regionData.find((item) => item.code === formData.province)
+  const city = province?.children?.find((item) => item.code === formData.city)
+  return (
+    city?.children?.map((item) => ({
+      value: item.code,
+      label: item.name,
+    })) || []
+  )
 })
 
 function handleProvinceChange() {
@@ -389,25 +394,25 @@ function handleCityChange() {
 
 ## Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| modelValue | `string \| number` | `''` | 绑定值（v-model） |
-| options | `ISelectOption[]` | `[]` | 选项列表 |
-| placeholder | `string` | `'请选择'` | 占位符 |
-| disabled | `boolean` | `false` | 是否禁用 |
-| size | `'sm' \| 'md' \| 'lg'` | `'md'` | 尺寸 |
-| variant | `'default' \| 'outlined' \| 'filled'` | `'default'` | 样式变体 |
-| error | `boolean` | `false` | 是否显示错误状态 |
+| 属性        | 类型                                  | 默认值      | 说明              |
+| ----------- | ------------------------------------- | ----------- | ----------------- |
+| modelValue  | `string \| number`                    | `''`        | 绑定值（v-model） |
+| options     | `ISelectOption[]`                     | `[]`        | 选项列表          |
+| placeholder | `string`                              | `'请选择'`  | 占位符            |
+| disabled    | `boolean`                             | `false`     | 是否禁用          |
+| size        | `'sm' \| 'md' \| 'lg'`                | `'md'`      | 尺寸              |
+| variant     | `'default' \| 'outlined' \| 'filled'` | `'default'` | 样式变体          |
+| error       | `boolean`                             | `false`     | 是否显示错误状态  |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | `(value: string \| number)` | v-model 更新事件 |
-| change | `(value: string \| number, option: ISelectOption)` | 值变化时触发，返回 value 和完整的选项对象 |
-| select | `(option: ISelectOption)` | 选择选项时触发，返回完整的选项对象（包含 value 和 label） |
-| blur | - | 失焦时触发 |
-| focus | - | 聚焦时触发 |
+| 事件名            | 参数                                               | 说明                                                      |
+| ----------------- | -------------------------------------------------- | --------------------------------------------------------- |
+| update:modelValue | `(value: string \| number)`                        | v-model 更新事件                                          |
+| change            | `(value: string \| number, option: ISelectOption)` | 值变化时触发，返回 value 和完整的选项对象                 |
+| select            | `(option: ISelectOption)`                          | 选择选项时触发，返回完整的选项对象（包含 value 和 label） |
+| blur              | -                                                  | 失焦时触发                                                |
+| focus             | -                                                  | 聚焦时触发                                                |
 
 ## Slots
 
@@ -453,6 +458,7 @@ interface ISelectOption {
 ## 下拉箭头
 
 组件使用内联 SVG 图标作为下拉箭头：
+
 - 位置：右侧
 - 尺寸：16px × 16px
 - 颜色：`#4a5565`
@@ -462,6 +468,7 @@ interface ISelectOption {
 ## 与原生 select 的区别
 
 本组件**不使用原生 `<select>` 元素**，而是完全自定义实现，优势：
+
 - ✅ 完全自定义样式
 - ✅ 更好的视觉效果和动画
 - ✅ 跨浏览器样式一致
@@ -472,12 +479,14 @@ interface ISelectOption {
 ## 与 FormSelect 对比
 
 ### Select (新组件)
+
 - 通用 UI 组件，可独立使用
 - 支持多种尺寸和变体
 - 更灵活的样式定制
 - 符合项目设计规范
 
 ### FormSelect (表单组件)
+
 - 专门用于 Form 组件中
 - 与表单验证集成
 - 较少的自定义选项
@@ -489,13 +498,7 @@ interface ISelectOption {
 组件支持所有原生 select 的属性，如 `name`, `id`, `required`, `multiple` 等：
 
 ```vue
-<Select 
-  v-model="selected" 
-  :options="options"
-  name="country"
-  id="country-select"
-  required
-/>
+<Select v-model="selected" :options="options" name="country" id="country-select" required />
 ```
 
 ## 无障碍访问
@@ -541,4 +544,3 @@ select/
 - 平滑过渡动画（200ms）
 - 悬停时浅灰色背景
 - 选中项加粗显示
-

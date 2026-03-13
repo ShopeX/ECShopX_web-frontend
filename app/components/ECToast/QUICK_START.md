@@ -29,8 +29,8 @@ function handleClick() {
 ```typescript
 toast.show({
   message: '提示消息',
-  duration: 3000,  // 显示时长（毫秒）
-  size: 'lg'       // 'sm' | 'md' | 'lg'
+  duration: 3000, // 显示时长（毫秒）
+  size: 'lg', // 'sm' | 'md' | 'lg'
 })
 ```
 
@@ -40,7 +40,7 @@ toast.show({
 // 显示不自动关闭的提示
 toast.show({
   message: '需要手动关闭',
-  duration: 0
+  duration: 0,
 })
 
 // 稍后手动关闭
@@ -81,6 +81,7 @@ toast.show('提示内容第一行\n提示内容第二行')
 ## 🎨 设计说明
 
 根据产品截图设计的简洁 Toast 组件：
+
 - 深灰色背景（`bg-gray-800` + 90% 透明度）
 - 白色文字
 - 大圆角（`rounded-2xl`）
@@ -92,4 +93,3 @@ toast.show('提示内容第一行\n提示内容第二行')
 查看 [README.md](./README.md) 了解更多高级用法和API文档。
 
 查看 [EXAMPLE.vue](./EXAMPLE.vue) 查看所有使用示例。
-

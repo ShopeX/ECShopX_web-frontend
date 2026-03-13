@@ -19,22 +19,22 @@ export interface ILoginModel {
 
 /**
  * 认证数据转换器（轻量级 DDD）
- * 
+ *
  * 职责：
  * - API 数据 → 应用模型转换
  * - 数据验证和清洗
  * - 提供默认值处理
- * 
+ *
  * 不负责：
  * - ❌ 业务规则（由 Composable 负责）
  * - ❌ 格式化显示（由 Composable 负责）
  * - ❌ 业务计算（由 Composable 负责）
- * 
+ *
  * 特点：
  * - 纯函数，无副作用
  * - 只做数据结构转换
  * - 数据验证和默认值处理
- * 
+ *
  * @example
  * ```typescript
  * // API 数据转换为应用模型
@@ -45,7 +45,7 @@ export interface ILoginModel {
 export class AuthTransformer {
   /**
    * 登录响应数据 → 应用模型
-   * 
+   *
    * @param apiResponse - API 返回的登录响应数据（HTTP 插件已自动解包 data 字段）
    * @returns 登录数据模型
    */
@@ -57,14 +57,14 @@ export class AuthTransformer {
 
     return {
       token: apiResponse.token,
-      expiresIn: 7200,  // 默认 2 小时
+      expiresIn: 7200, // 默认 2 小时
       refreshToken: '',
     }
   }
 
   /**
    * 用户信息 → 应用模型
-   * 
+   *
    * @param apiResponse - API 返回的用户信息响应
    * @returns 用户信息模型
    */
@@ -88,7 +88,7 @@ export class AuthTransformer {
 
   /**
    * 短信验证码响应 → 应用模型
-   * 
+   *
    * @param apiResponse - API 返回的短信验证码响应
    * @returns 短信验证码响应模型
    */
@@ -100,13 +100,13 @@ export class AuthTransformer {
     return {
       success: success,
       message: data.message || '',
-      expiresIn: 300,  // 默认 5 分钟
+      expiresIn: 300, // 默认 5 分钟
     }
   }
 
   /**
    * 图形验证码响应 → 应用模型
-   * 
+   *
    * @param apiResponse - API 返回的图形验证码响应
    * @returns 图形验证码响应模型
    */
@@ -121,13 +121,13 @@ export class AuthTransformer {
     return {
       imageData: data.imageData,
       imageToken: data.imageToken,
-      expiresIn: 300,  // 默认 5 分钟
+      expiresIn: 300, // 默认 5 分钟
     }
   }
 
   /**
    * 验证登录响应数据完整性
-   * 
+   *
    * @param data - 登录响应数据
    * @returns 是否有效
    */
@@ -150,7 +150,7 @@ export class AuthTransformer {
 
   /**
    * 验证用户信息数据完整性
-   * 
+   *
    * @param data - 用户信息数据
    * @returns 是否有效
    */
@@ -169,7 +169,7 @@ export class AuthTransformer {
 
   /**
    * 清理用户信息（移除敏感信息）
-   * 
+   *
    * @param userInfo - 用户信息
    * @returns 清理后的用户信息
    */
@@ -185,7 +185,7 @@ export class AuthTransformer {
 
   /**
    * 获取默认头像
-   * 
+   *
    * @returns 默认头像 URL
    */
   private static getDefaultAvatar(): string {
@@ -195,10 +195,10 @@ export class AuthTransformer {
 
   /**
    * 格式化手机号（脱敏）
-   * 
+   *
    * @param phone - 手机号
    * @returns 脱敏后的手机号
-   * 
+   *
    * @example
    * formatPhone('13800138000') // => '138****8000'
    */
@@ -211,7 +211,7 @@ export class AuthTransformer {
 
   /**
    * 验证手机号格式
-   * 
+   *
    * @param phone - 手机号
    * @returns 是否有效
    */
@@ -222,7 +222,7 @@ export class AuthTransformer {
 
   /**
    * 验证邮箱格式
-   * 
+   *
    * @param email - 邮箱
    * @returns 是否有效
    */
@@ -231,4 +231,3 @@ export class AuthTransformer {
     return emailReg.test(email)
   }
 }
-

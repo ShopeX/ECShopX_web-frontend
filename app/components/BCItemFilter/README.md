@@ -7,10 +7,12 @@
 ## 功能特性
 
 ### 主筛选区域
+
 - **分类筛选**：横向布局，支持单选，点击已选分类可取消选择
 - **品牌筛选**：横向布局，支持多选，带"更多"弹窗，显示选中状态（✓）
 
 ### 次筛选区域
+
 - **排序选项**：默认排序、销量、价格等
 - **价格区间**：支持自定义价格范围筛选
 - **品牌下拉**：备用的品牌下拉选择器
@@ -63,11 +65,11 @@ function handleFilterChange() {
 
 ## Props
 
-| 属性 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| modelValue | IFilterValue | 是 | - | 筛选参数对象 |
-| categories | ICategory[] | 否 | [] | 分类列表 |
-| brands | IBrand[] | 是 | - | 品牌列表 |
+| 属性       | 类型         | 必填 | 默认值 | 说明         |
+| ---------- | ------------ | ---- | ------ | ------------ |
+| modelValue | IFilterValue | 是   | -      | 筛选参数对象 |
+| categories | ICategory[]  | 否   | []     | 分类列表     |
+| brands     | IBrand[]     | 是   | -      | 品牌列表     |
 
 ### IFilterValue 接口
 
@@ -92,19 +94,21 @@ interface ICategory {
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | IFilterValue | 筛选参数更新时触发 |
-| change | - | 筛选条件变化时触发（需要重新加载数据） |
+| 事件名            | 参数         | 说明                                   |
+| ----------------- | ------------ | -------------------------------------- |
+| update:modelValue | IFilterValue | 筛选参数更新时触发                     |
+| change            | -            | 筛选条件变化时触发（需要重新加载数据） |
 
 ## 子组件
 
 ### FilterCategorySection
+
 - 分类筛选组件（横向布局）
 - 支持单选
 - 选中状态高亮显示
 
 ### FilterBrandSection
+
 - 品牌筛选组件（横向布局）
 - 支持多选
 - 默认显示前 8 个品牌
@@ -112,14 +116,17 @@ interface ICategory {
 - 选中品牌带 ✓ 标记
 
 ### FilterSortSection
+
 - 排序选项组件
 - 支持默认、销量、价格等排序方式
 
 ### FilterPriceRange
+
 - 价格区间筛选组件
 - 支持自定义起始和结束价格
 
 ### FilterBrandSelect
+
 - 品牌下拉选择器（备用）
 - 弹窗式多选
 

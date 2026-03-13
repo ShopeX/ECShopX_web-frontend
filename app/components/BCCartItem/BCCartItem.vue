@@ -4,11 +4,7 @@
       class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex gap-[16px] items-start pb-[32px] pt-0 px-0 relative w-full"
     >
       <!-- 勾选框 -->
-      <ECCheckbox
-        :checked="item.selected"
-        size="sm"
-        @change="$emit('toggle-selection', item.id)"
-      />
+      <ECCheckbox :checked="item.selected" size="sm" @change="$emit('toggle-selection', item.id)" />
 
       <!-- 商品图片 -->
       <div class="relative shrink-0 size-[110px] lg:size-[160px] bg-[#f9f9f9]">

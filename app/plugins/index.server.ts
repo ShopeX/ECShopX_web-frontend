@@ -1,4 +1,4 @@
-// 服务端入口文件  
+// 服务端入口文件
 export default defineNuxtPlugin(() => {
   console.log('服务端应用启动')
 

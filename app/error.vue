@@ -19,11 +19,11 @@
 
 <script setup lang="ts">
 const props = defineProps({
-  error: Object
+  error: Object,
 })
 
 const handleError = () => {
   clearError()
   navigateTo('/')
 }
-</script> 
+</script>

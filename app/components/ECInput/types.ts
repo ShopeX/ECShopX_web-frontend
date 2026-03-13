@@ -26,4 +26,3 @@ export interface IInputProps {
   /** 自定义类名 */
   className?: string
 }
-

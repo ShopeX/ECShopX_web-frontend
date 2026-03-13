@@ -1,12 +1,12 @@
 /**
  * useAddress Composable
- * 
+ *
  * 职责：
  * - 封装地址相关的业务逻辑
  * - 处理字段映射和数据转换
  * - 调用 AddressApiClient
  * - 提供统一的错误处理
- * 
+ *
  * 使用场景：
  * - AddressModal 组件
  * - Checkout 页面
@@ -15,7 +15,10 @@
 
 import { ref } from 'vue'
 import { addressApiClient } from '~/infrastructure/http/clients/AddressApiClient'
-import type { ICreateAddressRequest, IUpdateAddressRequest } from '~/infrastructure/http/clients/AddressApiClient'
+import type {
+  ICreateAddressRequest,
+  IUpdateAddressRequest,
+} from '~/infrastructure/http/clients/AddressApiClient'
 
 /**
  * 表单数据结构（UI 层使用）
@@ -236,4 +239,3 @@ export function useAddress() {
     transformFromApiFormat,
   }
 }
-

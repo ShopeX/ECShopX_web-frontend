@@ -1,23 +1,19 @@
-import type {
-  IAddCartRequest,
-  IUpdateCartRequest,
-  IBatchRemoveCartRequest,
-} from '~/types/api/cart'
+import type { IAddCartRequest, IUpdateCartRequest, IBatchRemoveCartRequest } from '~/types/api/cart'
 
 /**
  * 购物车 HTTP 客户端
- * 
+ *
  * 职责：
  * - 封装购物车相关的 HTTP 请求
  * - 只负责网络通信，不做数据转换
  * - 返回原始 API 响应
- * 
+ *
  * 设计原则：
  * - 纯粹的 HTTP 调用层
  * - 不包含业务逻辑
  * - 不包含数据转换
  * - 职责单一，易于测试
- * 
+ *
  * @example
  * ```typescript
  * const client = new CartApiClient()
@@ -45,7 +41,7 @@ export class CartApiClient {
 
   /**
    * 获取购物车列表
-   * 
+   *
    * @returns 原始 API 响应
    */
   async getCartList(): Promise<any> {
@@ -57,10 +53,10 @@ export class CartApiClient {
 
   /**
    * 添加商品到购物车
-   * 
+   *
    * @param params - 添加购物车请求参数
    * @returns 添加结果
-   * 
+   *
    * @example
    * ```typescript
    * await client.addToCart({
@@ -79,7 +75,7 @@ export class CartApiClient {
 
   /**
    * 更新购物车商品数量
-   * 
+   *
    * @param cartId - 购物车项 ID
    * @param num - 数量
    * @returns 更新结果
@@ -96,10 +92,10 @@ export class CartApiClient {
 
   /**
    * 删除购物车商品
-   * 
+   *
    * @param itemId - 购物车项 ID
    * @returns 删除结果
-   * 
+   *
    * @example
    * ```typescript
    * await client.removeCartItem('cart-item-123')
@@ -116,10 +112,10 @@ export class CartApiClient {
 
   /**
    * 批量删除购物车商品
-   * 
+   *
    * @param params - 批量删除参数
    * @returns 删除结果
-   * 
+   *
    * @example
    * ```typescript
    * await client.batchRemoveItems({
@@ -136,7 +132,7 @@ export class CartApiClient {
 
   /**
    * 删除选中的商品
-   * 
+   *
    * @returns 删除结果
    */
   async removeSelectedItems(): Promise<void> {
@@ -147,7 +143,7 @@ export class CartApiClient {
 
   /**
    * 更新购物车商品选中状态
-   * 
+   *
    * @param cartId - 购物车项 ID
    * @param isChecked - 是否选中
    * @returns 更新结果
@@ -164,7 +160,7 @@ export class CartApiClient {
 
   /**
    * 批量更新购物车商品选中状态（全选/取消全选）
-   * 
+   *
    * @param cartIds - 购物车项 ID 数组
    * @param isChecked - 是否选中
    * @returns 更新结果
@@ -173,8 +169,8 @@ export class CartApiClient {
     // 批量更新：一次调用，手动构建 query 参数
     // 使用 cart_id[] 格式：cart_id[]=2650&cart_id[]=2465
     const queryParams = new URLSearchParams()
-    cartIds.forEach(id => {
-      queryParams.append('cart_id[]', id)  // 使用 cart_id[] 格式
+    cartIds.forEach((id) => {
+      queryParams.append('cart_id[]', id) // 使用 cart_id[] 格式
     })
     queryParams.append('is_checked', isChecked ? 'true' : 'false')
 
@@ -185,9 +181,9 @@ export class CartApiClient {
 
   /**
    * 清空购物车
-   * 
+   *
    * @returns 清空结果
-   * 
+   *
    * @example
    * ```typescript
    * await client.clearCart()
@@ -201,7 +197,7 @@ export class CartApiClient {
 
   /**
    * 验证购物车结算
-   * 
+   *
    * @returns 验证结果
    */
   async validateCheckout(): Promise<{
@@ -219,4 +215,3 @@ export class CartApiClient {
  * 在整个应用中共享同一个实例，减少内存开销
  */
 export const cartApiClient = new CartApiClient()
-

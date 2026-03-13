@@ -18,11 +18,8 @@
 <template>
   <div>
     <button @click="showInvoiceModal = true">填写发票信息</button>
-    
-    <InvoiceModal
-      v-model="showInvoiceModal"
-      @success="handleInvoiceSuccess"
-    />
+
+    <InvoiceModal v-model="showInvoiceModal" @success="handleInvoiceSuccess" />
   </div>
 </template>
 
@@ -71,18 +68,18 @@ function handleInvoiceSuccess(data: IInvoiceFormData) {
 
 ## Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-|--------|------|--------|------|
-| modelValue | `boolean` | `false` | 是否显示弹窗 |
+| 属性名      | 类型               | 默认值      | 说明                 |
+| ----------- | ------------------ | ----------- | -------------------- |
+| modelValue  | `boolean`          | `false`     | 是否显示弹窗         |
 | initialData | `IInvoiceFormData` | `undefined` | 初始数据（编辑模式） |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | `(value: boolean)` | 弹窗显示状态变化 |
-| success | `(data: IInvoiceFormData)` | 保存成功时触发 |
-| close | - | 关闭弹窗时触发 |
+| 事件名            | 参数                       | 说明             |
+| ----------------- | -------------------------- | ---------------- |
+| update:modelValue | `(value: boolean)`         | 弹窗显示状态变化 |
+| success           | `(data: IInvoiceFormData)` | 保存成功时触发   |
+| close             | -                          | 关闭弹窗时触发   |
 
 ## 类型定义
 
@@ -114,4 +111,3 @@ interface IInvoiceFormData {
 - `service` - 服务费
 - `goods_service` - 商品及服务
 - `other` - 其他
-

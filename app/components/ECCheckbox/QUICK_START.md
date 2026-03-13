@@ -75,15 +75,14 @@ const checked = ref(false)
 
 ## Props 速查
 
-| Props | 值 | 说明 |
-|-------|---|------|
-| v-model | `boolean` | 双向绑定 |
-| label | `string` | 标签文本 |
-| size | `sm` \| `md` \| `lg` | 尺寸 |
-| variant | `default` \| `primary` \| `secondary` | 样式 |
-| disabled | `boolean` | 禁用 |
+| Props    | 值                                    | 说明     |
+| -------- | ------------------------------------- | -------- |
+| v-model  | `boolean`                             | 双向绑定 |
+| label    | `string`                              | 标签文本 |
+| size     | `sm` \| `md` \| `lg`                  | 尺寸     |
+| variant  | `default` \| `primary` \| `secondary` | 样式     |
+| disabled | `boolean`                             | 禁用     |
 
 ## 更多示例
 
 查看 `example.vue` 获取更多使用示例。
-

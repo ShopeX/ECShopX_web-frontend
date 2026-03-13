@@ -1,9 +1,9 @@
 .claude/
-  skills/
-    00-system/
-      nuxt4-architecture.md
-      code-style-and-conventions.md
-      [security-and-compliance.md](http://security-and-compliance.md)
+skills/
+00-system/
+nuxt4-architecture.md
+code-style-and-conventions.md
+[security-and-compliance.md](http://security-and-compliance.md)
 
 ```
 10-catalog/
@@ -58,4 +58,3 @@
   cms-version-and-publish.md
   seo-and-meta.md
 ```
-

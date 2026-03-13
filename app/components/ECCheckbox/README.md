@@ -96,7 +96,9 @@ const checked2 = ref(true)
 ```vue
 <template>
   <Checkbox v-model="checked">
-    <span class="font-medium">我已阅读并同意 <a href="#" class="text-blue-600 underline">用户协议</a></span>
+    <span class="font-medium"
+      >我已阅读并同意 <a href="#" class="text-blue-600 underline">用户协议</a></span
+    >
   </Checkbox>
 </template>
 
@@ -135,11 +137,7 @@ function handleChange(value: boolean) {
 
 ```vue
 <template>
-  <Checkbox 
-    v-model="checked" 
-    label="监听变化" 
-    @change="handleChange"
-  />
+  <Checkbox v-model="checked" label="监听变化" @change="handleChange" />
 </template>
 
 <script setup lang="ts">
@@ -164,9 +162,9 @@ function handleChange(value: boolean) {
       <Checkbox v-model="form.agreeTerms" label="同意用户协议" />
       <Checkbox v-model="form.subscribeNewsletter" label="订阅邮件通知" />
       <Checkbox v-model="form.rememberMe" label="记住我" />
-      
-      <button 
-        type="submit" 
+
+      <button
+        type="submit"
         :disabled="!form.agreeTerms"
         class="bg-black text-white px-6 py-3 disabled:opacity-50"
       >
@@ -198,32 +196,18 @@ function handleSubmit() {
 <template>
   <div class="checkout-page">
     <!-- 使用积分 -->
-    <Checkbox 
-      v-model="form.usePoint" 
-      label="使用积分抵扣"
-      @change="handleUsePointChange"
-    />
+    <Checkbox v-model="form.usePoint" label="使用积分抵扣" @change="handleUsePointChange" />
 
     <!-- 全额使用积分 -->
-    <Checkbox 
-      v-if="form.usePoint"
-      v-model="form.useFullPoint"
-      label="全额使用积分"
-    />
+    <Checkbox v-if="form.usePoint" v-model="form.useFullPoint" label="全额使用积分" />
 
     <!-- 需要发票 -->
-    <Checkbox 
-      v-model="form.needInvoice"
-      label="需要发票"
-    />
+    <Checkbox v-model="form.needInvoice" label="需要发票" />
 
     <!-- 同意条款 -->
-    <Checkbox 
-      v-model="agreeTerms"
-      size="sm"
-    >
-      我已阅读并同意 
-      <a href="#" class="text-blue-600 underline">购物条款</a> 和 
+    <Checkbox v-model="agreeTerms" size="sm">
+      我已阅读并同意
+      <a href="#" class="text-blue-600 underline">购物条款</a> 和
       <a href="#" class="text-blue-600 underline">隐私政策</a>
     </Checkbox>
   </div>
@@ -250,26 +234,26 @@ function handleUsePointChange(value: boolean) {
 
 ## Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| modelValue | `boolean` | `false` | 绑定值（v-model） |
-| checked | `boolean` | - | 是否选中（受控模式） |
-| disabled | `boolean` | `false` | 是否禁用 |
-| size | `'sm' \| 'md' \| 'lg'` | `'md'` | 尺寸 |
-| variant | `'default' \| 'primary' \| 'secondary'` | `'default'` | 样式变体 |
-| label | `string` | `''` | 标签文本 |
+| 属性       | 类型                                    | 默认值      | 说明                 |
+| ---------- | --------------------------------------- | ----------- | -------------------- |
+| modelValue | `boolean`                               | `false`     | 绑定值（v-model）    |
+| checked    | `boolean`                               | -           | 是否选中（受控模式） |
+| disabled   | `boolean`                               | `false`     | 是否禁用             |
+| size       | `'sm' \| 'md' \| 'lg'`                  | `'md'`      | 尺寸                 |
+| variant    | `'default' \| 'primary' \| 'secondary'` | `'default'` | 样式变体             |
+| label      | `string`                                | `''`        | 标签文本             |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
+| 事件名            | 参数               | 说明             |
+| ----------------- | ------------------ | ---------------- |
 | update:modelValue | `(value: boolean)` | v-model 更新事件 |
-| change | `(value: boolean)` | 值变化时触发 |
+| change            | `(value: boolean)` | 值变化时触发     |
 
 ## Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明                                  |
+| ------- | ------------------------------------- |
 | default | 自定义标签内容，优先级高于 label prop |
 
 ## 样式说明
@@ -307,8 +291,8 @@ function handleUsePointChange(value: boolean) {
 <Checkbox v-model="agreed" label="我同意" />
 
 <!-- 复选框组 -->
-<FormCheckboxGroup 
-  v-model="selected" 
+<FormCheckboxGroup
+  v-model="selected"
   :options="[
     { label: '选项 1', value: '1' },
     { label: '选项 2', value: '2' },
@@ -321,13 +305,7 @@ function handleUsePointChange(value: boolean) {
 组件支持所有原生 checkbox 的属性，如 `name`, `id`, `required` 等：
 
 ```vue
-<Checkbox 
-  v-model="checked" 
-  name="agree"
-  id="agree-checkbox"
-  required
-  label="必填项"
-/>
+<Checkbox v-model="checked" name="agree" id="agree-checkbox" required label="必填项" />
 ```
 
 ## 组件结构
@@ -357,4 +335,3 @@ checkbox/
 - ✅ 支持 label 点击
 - ✅ 支持 disabled 状态
 - ✅ 支持 focus 视觉反馈
-

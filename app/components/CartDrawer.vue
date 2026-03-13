@@ -4,11 +4,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between px-4 py-6 sm:px-6 border-b border-gray-200">
         <h2 class="text-lg font-medium text-gray-900">Your cart</h2>
-        <button
-          type="button"
-          class="text-gray-400 hover:text-gray-500"
-          @click="closeCart"
-        >
+        <button type="button" class="text-gray-400 hover:text-gray-500" @click="closeCart">
           <span class="sr-only">Close panel</span>
           <UIcon name="i-heroicons-x-mark" class="h-6 w-6" />
         </button>
@@ -20,10 +16,13 @@
           <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-400" />
         </div>
 
-        <div v-else-if="cartStore.items.length === 0" class="flex flex-col items-center justify-center h-full text-gray-500">
+        <div
+          v-else-if="cartStore.items.length === 0"
+          class="flex flex-col items-center justify-center h-full text-gray-500"
+        >
           <UIcon name="i-heroicons-shopping-bag" class="h-12 w-12 mb-4 text-gray-300" />
           <p>Your cart is empty</p>
-          <button 
+          <button
             class="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-500"
             @click="closeCart"
           >
@@ -45,7 +44,9 @@
               <div>
                 <div class="flex justify-between text-base font-medium text-gray-900">
                   <h3>
-                    <NuxtLink :to="`/products/${item.productId}`" @click="closeCart">{{ item.productName }}</NuxtLink>
+                    <NuxtLink :to="`/products/${item.productId}`" @click="closeCart">{{
+                      item.productName
+                    }}</NuxtLink>
                   </h3>
                   <p class="ml-4">{{ item.price.display }}</p>
                 </div>
@@ -53,7 +54,7 @@
               </div>
               <div class="flex flex-1 items-end justify-between text-sm">
                 <div class="flex items-center border border-gray-300 rounded">
-                  <button 
+                  <button
                     type="button"
                     class="px-2 py-1 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                     :disabled="item.quantity.value <= 1 || cartUIStore.isActionLoading(item.id)"
@@ -61,8 +62,10 @@
                   >
                     −
                   </button>
-                  <span class="px-2 text-gray-900 min-w-[1.5rem] text-center">{{ item.quantity.value }}</span>
-                  <button 
+                  <span class="px-2 text-gray-900 min-w-[1.5rem] text-center">{{
+                    item.quantity.value
+                  }}</span>
+                  <button
                     type="button"
                     class="px-2 py-1 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                     :disabled="cartUIStore.isActionLoading(item.id)"
@@ -78,7 +81,11 @@
                   :disabled="cartUIStore.isActionLoading(item.id)"
                   @click="cartStore.removeItem(item.id)"
                 >
-                  <UIcon v-if="cartUIStore.isActionLoading(item.id)" name="i-heroicons-arrow-path" class="h-5 w-5 animate-spin" />
+                  <UIcon
+                    v-if="cartUIStore.isActionLoading(item.id)"
+                    name="i-heroicons-arrow-path"
+                    class="h-5 w-5 animate-spin"
+                  />
                   <UIcon v-else name="i-heroicons-trash" class="h-5 w-5" />
                 </button>
               </div>
@@ -93,7 +100,9 @@
           <p>Estimated total</p>
           <p>${{ cartStore.estimatedTotal.toFixed(2) }} USD</p>
         </div>
-        <p class="mt-0.5 text-sm text-gray-500">Taxes, discounts and shipping calculated at checkout.</p>
+        <p class="mt-0.5 text-sm text-gray-500">
+          Taxes, discounts and shipping calculated at checkout.
+        </p>
         <div class="mt-6">
           <NuxtLink
             to="/cart"
@@ -104,10 +113,12 @@
           </NuxtLink>
         </div>
         <div class="mt-3">
-           <button class="flex w-full items-center justify-center rounded-md bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-colors gap-2">
-             <UIcon name="i-simple-icons-google" class="w-4 h-4" />
-             Made with Genstore
-           </button>
+          <button
+            class="flex w-full items-center justify-center rounded-md bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-colors gap-2"
+          >
+            <UIcon name="i-simple-icons-google" class="w-4 h-4" />
+            Made with Genstore
+          </button>
         </div>
       </div>
     </div>
@@ -123,7 +134,7 @@ const isOpen = computed({
   set: (value) => {
     if (value) cartUIStore.open()
     else cartUIStore.close()
-  }
+  },
 })
 
 const closeCart = () => {

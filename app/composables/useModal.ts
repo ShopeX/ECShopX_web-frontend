@@ -23,10 +23,10 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     console.warn('useModal: 只能在客户端环境中使用')
     return {
-      show: () => { },
-      hide: () => { },
-      update: () => { },
-      destroy: () => { },
+      show: () => {},
+      hide: () => {},
+      update: () => {},
+      destroy: () => {},
     }
   }
 
@@ -46,7 +46,8 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
       width: options.width || '480px',
       showClose: options.showClose !== false,
       maskClosable: options.maskClosable !== false,
-      confirmText: options.confirmButton !== false ? options.confirmButton?.text || '确定' : undefined,
+      confirmText:
+        options.confirmButton !== false ? options.confirmButton?.text || '确定' : undefined,
       cancelText: options.cancelButton !== false ? options.cancelButton?.text || '取消' : undefined,
       showConfirm: options.confirmButton !== false,
       showCancel: options.cancelButton !== false,
@@ -59,7 +60,11 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
         if (options.onConfirm) {
           await options.onConfirm()
         }
-        if (options.confirmButton && typeof options.confirmButton === 'object' && options.confirmButton.onClick) {
+        if (
+          options.confirmButton &&
+          typeof options.confirmButton === 'object' &&
+          options.confirmButton.onClick
+        ) {
           await options.confirmButton.onClick()
         }
         hide()
@@ -68,7 +73,11 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
         if (options.onCancel) {
           await options.onCancel()
         }
-        if (options.cancelButton && typeof options.cancelButton === 'object' && options.cancelButton.onClick) {
+        if (
+          options.cancelButton &&
+          typeof options.cancelButton === 'object' &&
+          options.cancelButton.onClick
+        ) {
           await options.cancelButton.onClick()
         }
         hide()
@@ -149,9 +158,7 @@ export function useModal() {
    * 显示确认弹窗
    */
   const confirm = (options: IModalOptions | string): IModalInstance => {
-    const modalOptions: IModalOptions = typeof options === 'string'
-      ? { content: options }
-      : options
+    const modalOptions: IModalOptions = typeof options === 'string' ? { content: options } : options
 
     const instance = createModalInstance(modalOptions, appContext)
     instance.show()
@@ -162,9 +169,10 @@ export function useModal() {
    * 显示警告弹窗
    */
   const alert = (options: IModalOptions | string): IModalInstance => {
-    const modalOptions: IModalOptions = typeof options === 'string'
-      ? { content: options, cancelButton: false }
-      : { ...options, cancelButton: false }
+    const modalOptions: IModalOptions =
+      typeof options === 'string'
+        ? { content: options, cancelButton: false }
+        : { ...options, cancelButton: false }
 
     const instance = createModalInstance(modalOptions, appContext)
     instance.show()
@@ -204,4 +212,3 @@ export const modal = {
     return show(options)
   },
 }
-

@@ -1,14 +1,17 @@
 <!-- OPENSPEC:START -->
+
 # OpenSpec Instructions
 
 These instructions are for AI assistants working in this project.
 
 Always open `@/openspec/AGENTS.md` when the request:
+
 - Mentions planning or proposals (words like proposal, spec, change, plan)
 - Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
 - Sounds ambiguous and you need the authoritative spec before coding
 
 Use `@/openspec/AGENTS.md` to learn:
+
 - How to create and apply change proposals
 - Spec format and conventions
 - Project structure and guidelines
@@ -26,65 +29,19 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
 
 How to use skills:
+
 - Invoke: Bash("openskills read <skill-name>")
 - The skill content will load with detailed instructions on how to complete the task
 - Base directory provided in output for resolving bundled resources (references/, scripts/, assets/)
 
 Usage notes:
+
 - Only use skills listed in <available_skills> below
 - Do not invoke a skill that is already loaded in your context
 - Each skill invocation is stateless
-</usage>
+  </usage>
 
 <available_skills>
-
-<skill>
-<name>00-dev-workflow</name>
-<description>自动化开发工作流的唯一入口。覆盖需求分析、UI设计转码、API集成、代码提交、测试验证全流程。当用户提到"需求/PRD/设计稿/figma/API/apifox/开发/联调/提交/commit/测试/e2e/回归/发版"等关键词时触发此技能。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>01-spec</name>
-<description>设计与编码规范。包含 Tailwind 4 UI/UX 标准、TypeScript/Vue 编码规范、安全规范、可访问性（A11y）要求。当涉及样式规范、代码风格、安全要求、可访问性时触发。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>02-infra</name>
-<description>基础设施与架构规范。包含 API 请求层封装、Pinia 状态管理、性能优化策略、Mock 数据配置。当涉及 API 层、Store、状态管理、性能优化、Mock 联调时触发。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>03-testing</name>
-<description>自动化测试基础设施与质量门禁。包含 Playwright E2E、Vitest 单测、选择器规范、POM 模式、测试用例生成、门禁执行与结果分析。当涉及测试、E2E、单测、Playwright、Vitest、质量门禁、回归验证时触发。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>04-i18n</name>
-<description>多语言国际化的技术实现与交付流程。包含 Nuxt i18n 配置、RTL 布局适配、翻译管理规范、多语言同步交付流水线。当涉及国际化、多语言、i18n、翻译、RTL、阿拉伯语适配时触发。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>05-system</name>
-<description>项目骨架、Nuxt 4 目录结构、环境配置、Git 分支管理、Conventional Commits 提交规范。当涉及项目结构、目录规范、环境配置、Git 提交、分支管理、commit message 时触发。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>10-figma-to-code</name>
-<description>Figma 设计稿转代码的标准流程。包含设计分析、样式提取、组件拆分、页面组装、响应式适配。当涉及 Figma、设计稿、UI 转码、组件生成、样式提取时触发。</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>11-apifox-to-impl</name>
-<description>ApiFox 接口文档转前端实现的标准流程。包含接口检索、类型生成、API Client 封装、Transformer 实现、Mock 联调。当涉及 ApiFox、API 接口、接口文档、类型定义、Mock 联调时触发。</description>
-<location>project</location>
-</skill>
 
 <skill>
 <name>algorithmic-art</name>
@@ -189,6 +146,7 @@ Usage notes:
 </skill>
 
 </available_skills>
+
 <!-- SKILLS_TABLE_END -->
 
 </skills_system>

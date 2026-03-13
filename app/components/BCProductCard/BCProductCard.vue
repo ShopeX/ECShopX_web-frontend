@@ -22,9 +22,7 @@
         class="sp-product-card__info bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center"
       >
         <!-- 商品标题 -->
-        <h2
-          class="sp-product-card__title text-[#191a1d] text-sm font-medium leading-5 w-full"
-        >
+        <h2 class="sp-product-card__title text-[#191a1d] text-sm font-medium leading-5 w-full">
           {{ product.itemName }}
         </h2>
 
@@ -132,7 +130,7 @@ async function handleAddToCart(event: Event) {
     await addToCart({
       item_id: props.product.itemId,
       num: 1,
-      cart_type: 'cart'
+      cart_type: 'cart',
     })
   } catch (error: any) {
     toast.show(error.message || '添加失败，请重试')

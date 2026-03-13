@@ -9,7 +9,7 @@ export const useApp = () => {
 
     // 在这里可以进行应用初始化逻辑
     // 例如：用户认证检查、配置加载等
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     isInitialized.value = true
     console.log('应用初始化完成')
@@ -21,13 +21,13 @@ export const useApp = () => {
     initialized: isInitialized.value,
     isDev: process.dev,
     isClient: process.client,
-    isServer: process.server
+    isServer: process.server,
   }))
 
   return {
     isInitialized: readonly(isInitialized),
     appVersion: readonly(appVersion),
     config,
-    initializeApp
+    initializeApp,
   }
 }

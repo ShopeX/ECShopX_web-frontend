@@ -36,4 +36,3 @@ defineProps<Props>()
 <style scoped>
 /* Noto Sans SC 和 Inter 字体已在全局引入 */
 </style>
-

@@ -14,17 +14,17 @@ export enum BusinessErrorType {
 
 /**
  * 业务错误类
- * 
+ *
  * 用途：
  * - 表示业务逻辑错误
  * - 提供结构化的错误信息
  * - 便于错误处理和用户提示
- * 
+ *
  * @example
  * ```ts
  * // 使用工厂方法创建
  * throw BusinessError.validation('数量必须大于0', { quantity: -1 })
- * 
+ *
  * // 或直接创建
  * throw new BusinessError('库存不足', BusinessErrorType.INSUFFICIENT_STOCK)
  * ```
@@ -34,7 +34,12 @@ export class BusinessError extends Error {
   public readonly code: string
   public readonly details?: Record<string, any>
 
-  constructor(message: string, type: BusinessErrorType, code?: string, details?: Record<string, any>) {
+  constructor(
+    message: string,
+    type: BusinessErrorType,
+    code?: string,
+    details?: Record<string, any>
+  ) {
     super(message)
     this.name = 'BusinessError'
     this.type = type
@@ -51,7 +56,12 @@ export class BusinessError extends Error {
    * 创建验证错误
    */
   static validation(message: string, details?: Record<string, any>): BusinessError {
-    return new BusinessError(message, BusinessErrorType.VALIDATION_ERROR, 'VALIDATION_ERROR', details)
+    return new BusinessError(
+      message,
+      BusinessErrorType.VALIDATION_ERROR,
+      'VALIDATION_ERROR',
+      details
+    )
   }
 
   /**
@@ -70,24 +80,37 @@ export class BusinessError extends Error {
    * 创建资源不存在错误
    */
   static notFound(resource: string, id: string): BusinessError {
-    return new BusinessError(`${resource}不存在`, BusinessErrorType.NOT_FOUND, 'NOT_FOUND', { resource, id })
-  }
-
-  /**
-   * 创建资源已存在错误
-   */
-  static alreadyExists(resource: string, id: string): BusinessError {
-    return new BusinessError(`${resource}已存在`, BusinessErrorType.ALREADY_EXISTS, 'ALREADY_EXISTS', {
+    return new BusinessError(`${resource}不存在`, BusinessErrorType.NOT_FOUND, 'NOT_FOUND', {
       resource,
       id,
     })
   }
 
   /**
+   * 创建资源已存在错误
+   */
+  static alreadyExists(resource: string, id: string): BusinessError {
+    return new BusinessError(
+      `${resource}已存在`,
+      BusinessErrorType.ALREADY_EXISTS,
+      'ALREADY_EXISTS',
+      {
+        resource,
+        id,
+      }
+    )
+  }
+
+  /**
    * 创建无效操作错误
    */
   static invalidOperation(message: string, details?: Record<string, any>): BusinessError {
-    return new BusinessError(message, BusinessErrorType.INVALID_OPERATION, 'INVALID_OPERATION', details)
+    return new BusinessError(
+      message,
+      BusinessErrorType.INVALID_OPERATION,
+      'INVALID_OPERATION',
+      details
+    )
   }
 
   /**
@@ -140,4 +163,3 @@ export class BusinessError extends Error {
     }
   }
 }
-

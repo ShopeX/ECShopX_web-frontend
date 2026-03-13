@@ -123,7 +123,6 @@ export interface ILogoutResponse {
   message?: string
 }
 
-
 /**
  * 获取用户信息响应
  */
@@ -131,5 +130,3 @@ export interface IGetUserInfoResponse {
   /** 用户信息 */
   memberInfo: IUserInfo
 }
-
-

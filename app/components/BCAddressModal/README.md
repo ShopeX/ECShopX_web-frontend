@@ -96,32 +96,32 @@ function handleAddressSuccess(data: IAddressFormData) {
 
 ## Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| modelValue | `boolean` | `false` | 是否显示弹窗（用于 v-model） |
-| addressId | `string` | - | 地址 ID（编辑模式时传入） |
-| initialData | `IAddressFormData` | - | 初始数据（编辑模式时传入） |
+| 属性        | 类型               | 默认值  | 说明                         |
+| ----------- | ------------------ | ------- | ---------------------------- |
+| modelValue  | `boolean`          | `false` | 是否显示弹窗（用于 v-model） |
+| addressId   | `string`           | -       | 地址 ID（编辑模式时传入）    |
+| initialData | `IAddressFormData` | -       | 初始数据（编辑模式时传入）   |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-|--------|------|------|
-| update:modelValue | `(value: boolean)` | 更新显示状态 |
-| success | `(data: IAddressFormData)` | 保存成功时触发 |
-| close | - | 关闭弹窗时触发 |
+| 事件名            | 参数                       | 说明           |
+| ----------------- | -------------------------- | -------------- |
+| update:modelValue | `(value: boolean)`         | 更新显示状态   |
+| success           | `(data: IAddressFormData)` | 保存成功时触发 |
+| close             | -                          | 关闭弹窗时触发 |
 
 ## 类型定义
 
 ```typescript
 interface IAddressFormData {
-  name: string           // 收货人姓名
-  phone: string          // 手机号码
-  countryCode: string    // 区号
-  province: string       // 省份代码
-  city: string           // 城市代码
-  district: string       // 区县代码
-  detail: string         // 详细地址
-  isDefault: boolean     // 是否默认地址
+  name: string // 收货人姓名
+  phone: string // 手机号码
+  countryCode: string // 区号
+  province: string // 省份代码
+  city: string // 城市代码
+  district: string // 区县代码
+  detail: string // 详细地址
+  isDefault: boolean // 是否默认地址
 }
 ```
 
@@ -135,6 +135,7 @@ interface IAddressFormData {
 ## 省市区数据
 
 当前使用简化的省市区数据（`regionData.ts`），包含：
+
 - 北京市
 - 上海市
 - 广东省（广州、深圳）
@@ -142,6 +143,7 @@ interface IAddressFormData {
 - 江苏省（南京、苏州）
 
 **生产环境建议**：
+
 1. 从后端 API 动态获取完整的省市区数据
 2. 或使用完整的中国省市区 JSON 数据库
 
@@ -156,10 +158,7 @@ interface IAddressFormData {
     <button @click="showAddressModal = true">+ 添加新地址</button>
 
     <!-- 地址弹窗 -->
-    <AddressModal
-      v-model="showAddressModal"
-      @success="handleAddressAdded"
-    />
+    <AddressModal v-model="showAddressModal" @success="handleAddressAdded" />
   </div>
 </template>
 
@@ -193,11 +192,13 @@ address/
 ## 设计规范
 
 ### 尺寸
+
 - 弹窗宽度：598px
 - 输入框高度：40px
 - 文本域高度：80px（3行）
 
 ### 颜色
+
 - 背景色：`#ffffff`
 - 输入框背景：`#f3f4f6`
 - 主要文字：`#191a1d`
@@ -206,6 +207,7 @@ address/
 - 按钮背景：`#191a1d`
 
 ### 字体
+
 - 标签：12px / 16px line-height
 - 输入框：14px / 20px line-height
 - 按钮：14px / 20px line-height / medium weight
@@ -217,4 +219,3 @@ address/
 - [ ] 添加更多表单验证规则
 - [ ] 支持国际地址格式
 - [ ] 添加地址智能填充功能
-

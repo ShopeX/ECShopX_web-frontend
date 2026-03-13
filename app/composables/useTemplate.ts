@@ -85,7 +85,12 @@ export function getDefaultTemplateSync(templateName: string): ITemplateConfig | 
  * @param name - 模板名称
  */
 export const useTemplate = (name: string) => {
-  const { data: template, pending, error, refresh } = useAsyncData<ITemplateConfig>(
+  const {
+    data: template,
+    pending,
+    error,
+    refresh,
+  } = useAsyncData<ITemplateConfig>(
     `template-${name}`,
     async () => {
       try {
@@ -103,7 +108,7 @@ export const useTemplate = (name: string) => {
     },
     {
       lazy: false, // 页面关键数据，建议非懒加载，或者根据需求调整
-      server: true // 支持 SSR
+      server: true, // 支持 SSR
     }
   )
 
@@ -111,7 +116,7 @@ export const useTemplate = (name: string) => {
     template,
     pending,
     error,
-    refresh
+    refresh,
   }
 }
 
@@ -168,7 +173,9 @@ export const useTemplateWithFallback = async (name: string) => {
     if (defaultTemplate.value) {
       // 记录使用默认模板的原因（使用 info 级别，因为这是正常的降级行为）
       if (error.value) {
-        logger.info(`[useTemplate] ⚠ API request failed (${error.value.message}), using default template: ${name}`)
+        logger.info(
+          `[useTemplate] ⚠ API request failed (${error.value.message}), using default template: ${name}`
+        )
       } else if (!apiTemplate.value) {
         logger.info(`[useTemplate] ⚠ API returned null, using default template: ${name}`)
       } else if (Array.isArray(apiTemplate.value) && apiTemplate.value.length === 0) {
@@ -188,7 +195,6 @@ export const useTemplateWithFallback = async (name: string) => {
   return {
     template,
     pending,
-    error
+    error,
   }
 }
-

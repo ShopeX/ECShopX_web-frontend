@@ -51,7 +51,7 @@
 <script setup lang="ts">
 /**
  * 品牌筛选组件
- * 
+ *
  * 提供品牌多选功能
  */
 
@@ -68,7 +68,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:selectedBrandIds': [value: (string | number)[]]
-  'change': []
+  change: []
 }>()
 
 // 弹窗显示状态
@@ -104,4 +104,3 @@ function handleClear() {
   emit('change')
 }
 </script>
-

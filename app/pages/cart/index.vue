@@ -85,18 +85,16 @@
           <!-- 失效商品列表 -->
           <div v-if="cartUI.invalidItems.length > 0" class="w-full mt-8">
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
-              <h3 class="text-base font-medium text-gray-500">失效商品 ({{ cartUI.invalidItems.length }})</h3>
+              <h3 class="text-base font-medium text-gray-500">
+                失效商品 ({{ cartUI.invalidItems.length }})
+              </h3>
             </div>
             <div
               v-for="item in cartUI.invalidItems"
               :key="item.id"
               class="content-stretch flex flex-col items-start relative shrink-0 w-full mb-4"
             >
-              <BCCartItem
-                :item="item"
-                :loading="loading"
-                @remove="handleRemove"
-              />
+              <BCCartItem :item="item" :loading="loading" @remove="handleRemove" />
             </div>
           </div>
         </div>

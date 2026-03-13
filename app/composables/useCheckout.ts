@@ -1,11 +1,11 @@
 /**
  * 结算业务组合式函数
- * 
+ *
  * 职责：
  * - 管理结算页面状态和业务逻辑
  * - 封装订单计算、创建等业务规则
  * - 提供统一的 API 给视图层
- * 
+ *
  * 架构：方案 2（简化架构 - 无 Store）
  * - 不需要跨组件共享状态（结算页面是单页面流程）
  * - 不需要持久化（订单创建后跳转到支付页面）
@@ -13,7 +13,12 @@
  */
 
 import { orderApiClient, addressApiClient, couponApiClient } from '~/infrastructure/http/clients'
-import { OrderTransformer, type IOrderCalculateModel, type IAddressModel, type ICouponModel } from '~/infrastructure/transformers'
+import {
+  OrderTransformer,
+  type IOrderCalculateModel,
+  type IAddressModel,
+  type ICouponModel,
+} from '~/infrastructure/transformers'
 import { useCart } from './useCart'
 import { MoneyValueObject } from '~/shared/value-objects'
 import type { ICreateOrderRequest } from '~/infrastructure/http/clients/OrderApiClient'
@@ -21,7 +26,7 @@ import { HttpStatus } from '~/types/http'
 
 export interface ICheckoutForm {
   // 配送方式
-  receiptType: 'express' | 'ziti' | 'merchant'
+  receiptType: 'logistics' | 'express' | 'ziti' | 'merchant'
   // 地址信息
   selectedAddressId?: string
   // 优惠券
@@ -62,7 +67,7 @@ export function useCheckout() {
 
   // 表单数据
   const form = ref<ICheckoutForm>({
-    receiptType: 'express',
+    receiptType: 'logistics',
     notUseCoupon: true,
     usePoint: false,
     pointUse: 0,
@@ -81,7 +86,7 @@ export function useCheckout() {
       addresses.value = OrderTransformer.toAddressModelList(response)
 
       // 自动选择默认地址
-      const defaultAddress = addresses.value.find(addr => addr.isDefault)
+      const defaultAddress = addresses.value.find((addr) => addr.isDefault)
       if (defaultAddress) {
         selectedAddress.value = defaultAddress
         form.value.selectedAddressId = defaultAddress.id
@@ -103,7 +108,7 @@ export function useCheckout() {
    * 选择地址
    */
   const selectAddress = (addressId: string) => {
-    const address = addresses.value.find(addr => addr.id === addressId)
+    const address = addresses.value.find((addr) => addr.id === addressId)
     if (address) {
       selectedAddress.value = address
       form.value.selectedAddressId = addressId
@@ -180,18 +185,13 @@ export function useCheckout() {
    * 计算订单金额
    */
   const calculateOrderAmount = async () => {
-    if (!selectedAddress.value && form.value.receiptType === 'express') {
+    if (!selectedAddress.value && form.value.receiptType === 'logistics') {
       return
     }
 
     try {
       calculating.value = true
       error.value = null
-
-      const selectedItems = items.value.filter(item => item.selected)
-      if (selectedItems.length === 0) {
-        return
-      }
 
       // 构建计算参数
       const mode = (route.query.mode as string) || 'normal'
@@ -205,7 +205,7 @@ export function useCheckout() {
       }
 
       // 快递配送需要地址信息
-      if (form.value.receiptType === 'express' && selectedAddress.value) {
+      if (form.value.receiptType === 'logistics' && selectedAddress.value) {
         params.receiver_name = selectedAddress.value.name
         params.receiver_mobile = selectedAddress.value.phone
         params.receiver_state = selectedAddress.value.province
@@ -224,7 +224,9 @@ export function useCheckout() {
         params.coupon_discount = form.value.couponCode
       }
 
-      const response = await orderApiClient.calculateOrder(params, { skipErrorCodes: [HttpStatus.UNPROCESSABLE_ENTITY] })
+      const response = await orderApiClient.calculateOrder(params, {
+        skipErrorCodes: [HttpStatus.UNPROCESSABLE_ENTITY],
+      })
       calculateResult.value = OrderTransformer.toCalculateModel(response)
 
       // 如果开启了积分抵扣，更新最大可用积分
@@ -241,7 +243,7 @@ export function useCheckout() {
       if (isUnprocessableEntity(err)) {
         checkoutError.value = {
           code: HttpStatus.UNPROCESSABLE_ENTITY,
-          message: err.data?.message || err.message || '结算商品异常'
+          message: err.data?.message || err.message || '结算商品异常',
         }
       } else {
         error.value = err.message || '计算订单金额失败'
@@ -254,8 +256,10 @@ export function useCheckout() {
   /**
    * 创建订单
    */
-  const createOrder = async (payType: string): Promise<{ success: boolean; orderId?: string; error?: string }> => {
-    if (!selectedAddress.value && form.value.receiptType === 'express') {
+  const createOrder = async (
+    payType: string
+  ): Promise<{ success: boolean; orderId?: string; error?: string }> => {
+    if (!selectedAddress.value && form.value.receiptType === 'logistics') {
       return { success: false, error: '请选择收货地址' }
     }
 
@@ -263,11 +267,6 @@ export function useCheckout() {
       loading.value = true
       error.value = null
       checkoutError.value = null
-
-      const selectedItems = items.value.filter(item => item.selected)
-      if (selectedItems.length === 0) {
-        return { success: false, error: '请选择要结算的商品' }
-      }
 
       // 构建创建订单参数
       const mode = (route.query.mode as string) || 'normal'
@@ -282,7 +281,7 @@ export function useCheckout() {
       }
 
       // 快递配送需要地址信息
-      if (form.value.receiptType === 'express' && selectedAddress.value) {
+      if (form.value.receiptType === 'logistics' && selectedAddress.value) {
         params.receiver_name = selectedAddress.value.name
         params.receiver_mobile = selectedAddress.value.phone
         params.receiver_state = selectedAddress.value.province
@@ -301,13 +300,17 @@ export function useCheckout() {
         params.coupon_discount = form.value.couponCode
       }
 
-      // 发票
+      // 发票（Apifox 请求参数 invoice_content 为 string，对象需序列化）
       if (form.value.needInvoice && form.value.invoiceType) {
         params.invoice_type = form.value.invoiceType
-        params.invoice_content = form.value.invoiceContent
+        const raw = form.value.invoiceContent
+        params.invoice_content =
+          typeof raw === 'string' ? raw : raw != null ? JSON.stringify(raw) : undefined
       }
 
-      const response = await orderApiClient.createOrder(params, { skipErrorCodes: [HttpStatus.UNPROCESSABLE_ENTITY] })
+      const response = await orderApiClient.createOrder(params, {
+        skipErrorCodes: [HttpStatus.UNPROCESSABLE_ENTITY],
+      })
 
       return {
         success: true,
@@ -318,7 +321,7 @@ export function useCheckout() {
       if (isUnprocessableEntity(err)) {
         checkoutError.value = {
           code: HttpStatus.UNPROCESSABLE_ENTITY,
-          message: err.data?.message || err.message || '下单异常'
+          message: err.data?.message || err.message || '下单异常',
         }
         return { success: false, error: checkoutError.value.message }
       }
@@ -377,7 +380,7 @@ export function useCheckout() {
    * 计算商品数量
    */
   const itemCount = computed(() => {
-    return items.value.filter(item => item.selected).length
+    return items.value.filter((item) => item.selected).length
   })
 
   /**
@@ -388,7 +391,7 @@ export function useCheckout() {
       return calculateResult.value.totalItemNum
     }
     return items.value
-      .filter(item => item.selected)
+      .filter((item) => item.selected)
       .reduce((sum, item) => sum + item.quantity.value, 0)
   })
 
@@ -443,7 +446,7 @@ export function useCheckout() {
 function isUnprocessableEntity(err: any): boolean {
   // code: 业务错误码 (from createBusinessError)
   // status: HTTP 状态码 (from createHttpError)
-  return err.code === HttpStatus.UNPROCESSABLE_ENTITY ||
-    err.status === HttpStatus.UNPROCESSABLE_ENTITY
+  return (
+    err.code === HttpStatus.UNPROCESSABLE_ENTITY || err.status === HttpStatus.UNPROCESSABLE_ENTITY
+  )
 }
-

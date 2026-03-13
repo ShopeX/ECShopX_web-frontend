@@ -70,7 +70,7 @@
 <script setup lang="ts">
 /**
  * 购物车底部操作栏组件
- * 
+ *
  * 提供全选、批量操作、统计信息和结算功能
  */
 
@@ -104,14 +104,14 @@ interface Emits {
 
 withDefaults(defineProps<Props>(), {
   batchRemoving: false,
-  checking: false
+  checking: false,
 })
 
 defineEmits<Emits>()
 
 /**
  * 格式化价格
- * 
+ *
  * @param price - 价格（分）
  * @returns 格式化后的价格字符串
  */
@@ -119,4 +119,3 @@ function formatPrice(price: number): string {
   return (price / 100).toFixed(2)
 }
 </script>
-

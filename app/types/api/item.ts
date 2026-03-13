@@ -153,15 +153,16 @@ export interface ItemEvaluationListParams extends PaginationParams {
 }
 
 // 商品评价列表响应
-export interface ItemEvaluationListResponse extends PaginationResponse<{
-  rate_id: string
-  user_id: string
-  user_name: string
-  rate_content: string
-  rate_photos?: string[]
-  rate_type: 'good' | 'neutral' | 'bad'
-  created_time: string
-}> { }
+export interface ItemEvaluationListResponse
+  extends PaginationResponse<{
+    rate_id: string
+    user_id: string
+    user_name: string
+    rate_content: string
+    rate_photos?: string[]
+    rate_type: 'good' | 'neutral' | 'bad'
+    created_time: string
+  }> {}
 
 // 商品推荐请求参数
 export interface ItemRecommendParams extends PaginationParams {
@@ -170,7 +171,7 @@ export interface ItemRecommendParams extends PaginationParams {
 }
 
 // 商品推荐响应
-export interface ItemRecommendResponse extends PaginationResponse<IItem> { }
+export interface ItemRecommendResponse extends PaginationResponse<IItem> {}
 
 // 商品收藏相关类型
 export interface ItemFavParams {
@@ -183,11 +184,12 @@ export interface ItemGetReplyRateListParams extends PaginationParams {
 }
 
 // 获取回复评价列表响应
-export interface ItemGetReplyRateListResponse extends PaginationResponse<{
-  rate_id: string
-  reply_content: string
-  created_time: string
-}> { }
+export interface ItemGetReplyRateListResponse
+  extends PaginationResponse<{
+    rate_id: string
+    reply_content: string
+    created_time: string
+  }> {}
 
 // 附近店铺请求参数
 export interface ItemGetNearbyShopParams extends PaginationParams {
@@ -197,13 +199,13 @@ export interface ItemGetNearbyShopParams extends PaginationParams {
 }
 
 // 附近店铺响应
-export interface ItemGetNearbyShopResponse extends PaginationResponse<{
-  shop_id: string
-  shop_name: string
-  logo?: string
-  address: string
-  distance: number // 单位：米
-  latitude: number
-  longitude: number
-}> { }
-
+export interface ItemGetNearbyShopResponse
+  extends PaginationResponse<{
+    shop_id: string
+    shop_name: string
+    logo?: string
+    address: string
+    distance: number // 单位：米
+    latitude: number
+    longitude: number
+  }> {}

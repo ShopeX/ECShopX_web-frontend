@@ -22,9 +22,7 @@
     加载模板失败: {{ error.message }}
   </div>
   <!-- 没有模板也没有错误时显示空状态 -->
-  <div v-else class="p-4 text-center text-gray-400">
-    暂无模板
-  </div>
+  <div v-else class="p-4 text-center text-gray-400">暂无模板</div>
 </template>
 
 <script setup lang="ts">

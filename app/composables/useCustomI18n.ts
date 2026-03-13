@@ -1,23 +1,23 @@
 /**
  * 国际化（i18n）Composable
- * 
+ *
  * 功能：
  * - 多语言切换
  * - 翻译消息获取
  * - RTL 布局支持
  * - 货币和日期格式化
- * 
+ *
  * @example
  * ```vue
  * <script setup>
  * const { locale, t, switchLocale, formatCurrency, isRTL } = useI18n()
- * 
+ *
  * // 获取翻译
  * const title = t('cart.title') // "购物车"
- * 
+ *
  * // 切换语言
  * switchLocale('en-US')
- * 
+ *
  * // 格式化货币
  * const price = formatCurrency(99.99) // "¥99.99"
  * </script>
@@ -112,7 +112,7 @@ export function useCustomI18n() {
 
   /**
    * 获取翻译
-   * 
+   *
    * @param key - 翻译 key，格式：'section.key'
    * @param fallback - 备用文本
    * @returns 翻译后的文本
@@ -134,7 +134,7 @@ export function useCustomI18n() {
 
   /**
    * 格式化货币
-   * 
+   *
    * @param amount - 金额
    * @param showSymbol - 是否显示货币符号
    * @returns 格式化后的货币字符串
@@ -160,7 +160,7 @@ export function useCustomI18n() {
 
   /**
    * 格式化日期
-   * 
+   *
    * @param date - 日期对象或时间戳
    * @returns 格式化后的日期字符串
    */
@@ -177,7 +177,7 @@ export function useCustomI18n() {
 
   /**
    * 格式化时间
-   * 
+   *
    * @param date - 日期对象或时间戳
    * @returns 格式化后的时间字符串
    */
@@ -194,7 +194,7 @@ export function useCustomI18n() {
 
   /**
    * 格式化日期时间
-   * 
+   *
    * @param date - 日期对象或时间戳
    * @returns 格式化后的日期时间字符串
    */
@@ -226,4 +226,3 @@ export function useCustomI18n() {
     initLocale,
   }
 }
-

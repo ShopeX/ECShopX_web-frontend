@@ -40,10 +40,7 @@
             </div>
 
             <!-- 底部按钮 -->
-            <div
-              v-if="showFooter"
-              class="flex items-center justify-end gap-4 shrink-0"
-            >
+            <div v-if="showFooter" class="flex items-center justify-end gap-4 shrink-0">
               <!-- 取消按钮 -->
               <button
                 v-if="showCancelButton"
@@ -120,13 +117,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
-  'confirm': []
-  'cancel': []
-  'close': []
+  confirm: []
+  cancel: []
+  close: []
 }>()
 
 defineOptions({
-  name: 'Modal'
+  name: 'Modal',
 })
 
 // 内部可见状态
@@ -254,4 +251,3 @@ defineExpose({
   transform: scale(0.9);
 }
 </style>
-

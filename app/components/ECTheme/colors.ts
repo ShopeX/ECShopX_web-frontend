@@ -1,6 +1,6 @@
 /**
  * 主题颜色定义
- * 
+ *
  * 职责：
  * - 定义所有 UI 组件使用的颜色变体
  * - 保持颜色定义的一致性
@@ -12,7 +12,7 @@
 export const primary = {
   DEFAULT: '#b22420',
   light: '#d32f2f',
-  dark: '#8b1a17'
+  dark: '#8b1a17',
 }
 
 /**
@@ -31,8 +31,8 @@ export const neutral = {
     600: '#4b5563',
     700: '#374151',
     800: '#1f2937',
-    900: '#111827'
-  }
+    900: '#111827',
+  },
 }
 
 /**
@@ -42,7 +42,7 @@ export const functional = {
   success: '#10b981',
   error: '#ef4444',
   warning: '#f59e0b',
-  info: '#3b82f6'
+  info: '#3b82f6',
 }
 
 /**
@@ -51,7 +51,7 @@ export const functional = {
 export const border = {
   DEFAULT: '#ddd',
   light: '#e5e7eb',
-  dark: '#9ca3af'
+  dark: '#9ca3af',
 }
 
 /**
@@ -60,6 +60,5 @@ export const border = {
 export const background = {
   DEFAULT: '#ffffff',
   muted: '#f9fafb',
-  dark: '#111827'
+  dark: '#111827',
 }
-

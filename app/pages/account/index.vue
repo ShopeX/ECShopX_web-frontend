@@ -30,13 +30,7 @@
                       {{ pointTotal }}
                     </span>
                   </div>
-                  <button
-                    class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[4px] items-center justify-center relative cursor-pointer hover:opacity-80 transition-opacity"
-                    @click="handleViewAllPoints"
-                  >
-                    <span class="font-['Noto_Sans_SC:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[14px] text-[color:var(--color黑,#191a1d)] whitespace-nowrap">全部积分</span>
-                    <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
-                  </button>
+                  <!-- 移除跳转链接 -->
                 </div>
               </div>
             </div>
@@ -80,6 +74,17 @@
             <div v-else class="py-8 text-center text-gray-500 font-['Noto_Sans_SC:Regular',sans-serif] text-[14px]">
               暂无积分记录
             </div>
+
+            <!-- 首页分页组件 -->
+            <div v-if="totalPages > 1 && pointRecords.length > 0" class="flex justify-center pt-6 w-full">
+              <ECPagination
+                :total="totalCount"
+                :page-size="pageSize"
+                :current-page="pageNo"
+                data-testid="point-pagination"
+                @update:current-page="handlePageChange"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -104,11 +109,21 @@ const {
   pointTotal,
   list: pointRecords,
   init,
+  loadList,
   formatItemTime,
   formatItemPoint,
   loadingList,
   loadingInfo,
+  totalCount,
+  pageSize,
+  pageNo,
+  totalPages,
 } = useMemberPoint()
+
+function handlePageChange(page: number) {
+  pageNo.value = page
+  loadList(true)
+}
 
 // 当前激活的菜单项
 const activeMenu = ref('profile')
@@ -122,12 +137,5 @@ onMounted(() => {
  */
 function handleLogout() {
   console.log('用户已退出登录')
-}
-
-/**
- * 查看所有积分
- */
-function handleViewAllPoints() {
-  router.push('/account/points')
 }
 </script>

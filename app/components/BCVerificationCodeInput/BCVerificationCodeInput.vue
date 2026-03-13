@@ -16,9 +16,11 @@
       type="button"
       :disabled="isDisabled"
       class="px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all whitespace-nowrap"
-      :class="isDisabled 
-        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-        : 'bg-purple-600 text-white hover:bg-purple-700'"
+      :class="
+        isDisabled
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          : 'bg-purple-600 text-white hover:bg-purple-700'
+      "
       @click="handleSend"
     >
       {{ buttonText }}
@@ -44,12 +46,12 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   sending: false,
   countdown: 0,
-  disabled: false
+  disabled: false,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
-  'send': []
+  send: []
 }>()
 
 /**
@@ -101,4 +103,3 @@ function handleSend() {
   emit('send')
 }
 </script>
-

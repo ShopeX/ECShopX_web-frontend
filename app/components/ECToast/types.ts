@@ -19,5 +19,3 @@ export interface ToastInstance {
   /** 隐藏提示 */
   hide: () => void
 }
-
-

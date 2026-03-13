@@ -1,8 +1,8 @@
 /**
  * 通用分页 Composable
- * 
+ *
  * 提供分页状态管理和加载更多功能，适用于商品列表、订单列表等场景
- * 
+ *
  * @example
  * ```ts
  * const {
@@ -45,7 +45,10 @@ export interface IPaginationOptions<T> {
    * @param pageSize 每页大小
    * @returns 返回数据列表和总数
    */
-  fetchFn: (page: number, pageSize: number) => Promise<{
+  fetchFn: (
+    page: number,
+    pageSize: number
+  ) => Promise<{
     items: T[]
     total: number
   }>
@@ -118,12 +121,7 @@ export interface IPaginationResult<T> {
  * 通用分页 Hook
  */
 export function usePagination<T>(options: IPaginationOptions<T>): IPaginationResult<T> {
-  const {
-    pageSize = 20,
-    initialPage = 1,
-    fetchFn,
-    immediate = false,
-  } = options
+  const { pageSize = 20, initialPage = 1, fetchFn, immediate = false } = options
 
   // ========== 响应式状态 ==========
   const items = ref<T[]>([]) as Ref<T[]>
@@ -233,4 +231,3 @@ export function usePagination<T>(options: IPaginationOptions<T>): IPaginationRes
     loadPage,
   }
 }
-

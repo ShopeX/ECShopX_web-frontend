@@ -12,6 +12,9 @@ export enum OrderStatus {
   SHIPPED = 'shipped', // 待收货
   COMPLETED = 'completed', // 已完成
   CANCELLED = 'cancelled', // 已取消
+  PENDING_PICKUP = 'pending_pickup', // 待自提
+  AFTER_SALES = 'after_sales', // 售后
+  PENDING_REVIEW = 'pending_review', // 待评价
 }
 
 /**
@@ -19,11 +22,14 @@ export enum OrderStatus {
  */
 export interface IApiOrderItem {
   item_id: string
-  item_name: string
-  item_image: string
-  spec_name: string
+  item_name?: string
+  title?: string
+  item_image?: string
+  item_pic?: string
+  spec_name?: string
   quantity: number
   price: number // 单位:分
+  [key: string]: any
 }
 
 /**
@@ -31,28 +37,45 @@ export interface IApiOrderItem {
  */
 export interface IApiOrder {
   order_id: string
-  order_time: string
-  status: string
-  items: IApiOrderItem[]
-  total_amount: number // 单位:分
+  order_time?: string
+  create_time?: string | number
+  status?: string
+  order_status?: string
+  delivery_status?: string
+  cancel_status?: string
+  pay_status?: string
+  total_amount?: number // 单位:分
+  total_fee?: string | number
+  receiver_name?: string
+  receiver_mobile?: string
   shipping_address?: string
+  items?: IApiOrderItem[]
+  item_infos?: IApiOrderItem[]
+  [key: string]: any
 }
 
 /**
  * 订单列表请求参数
  */
 export interface IOrderListRequest {
-  status?: OrderStatus
+  status?: string
   page?: number
-  page_size?: number
+  pageSize?: number
+  order_id?: string
+  mobile?: string
+  order_type?: string
+  time_start_begin?: string
+  time_start_end?: string
+  is_rate?: string
 }
 
 /**
  * 订单列表响应
  */
 export interface IOrderListResponse {
-  orders: IApiOrder[]
-  total: number
-  page: number
-  page_size: number
+  list: IApiOrder[]
+  total_count?: number
+  page?: number
+  pageSize?: number
+  [key: string]: any
 }

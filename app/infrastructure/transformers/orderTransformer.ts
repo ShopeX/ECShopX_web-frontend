@@ -190,6 +190,9 @@ export class OrderTransformer {
       shipped: '待收货',
       completed: '已完成',
       cancelled: '已取消',
+      pending_pickup: '待自提',
+      after_sales: '售后中',
+      pending_review: '待评价',
     }
     return statusMap[status] || status
   }
@@ -201,9 +204,9 @@ export class OrderTransformer {
     const price = Number(apiItem.price || 0) / 100 // 分转元
     return {
       itemId: String(apiItem.item_id || ''),
-      itemName: apiItem.item_name || '',
-      itemImage: apiItem.item_image || '',
-      specName: apiItem.spec_name || '',
+      itemName: apiItem.item_name || apiItem.title || '',
+      itemImage: apiItem.item_image || apiItem.item_pic || apiItem.pic || '',
+      specName: apiItem.spec_name || apiItem.spec_info || '',
       quantity: Number(apiItem.quantity || 0),
       price,
       subtotal: price * Number(apiItem.quantity || 0),
@@ -214,21 +217,48 @@ export class OrderTransformer {
    * 转换订单
    */
   static toOrderModel(apiOrder: any) {
-    const status = apiOrder.status || ''
+    // 基础信息转换
+    const orderId = String(apiOrder.order_id || '')
+    const orderTime = apiOrder.create_time || apiOrder.order_time || ''
+    const totalAmount = Number(apiOrder.total_fee || apiOrder.total_amount || 0) / 100 // 分转元
+    const items = (apiOrder.item_infos || apiOrder.items || []).map(OrderTransformer.toOrderItemModel)
+
+    // 状态映射逻辑
+    let status = apiOrder.status || '' // 兼容旧接口
+    
+    // 如果有组合状态字段，进行逻辑映射
+    if (apiOrder.pay_status !== undefined) {
+      const payStatus = String(apiOrder.pay_status)
+      const deliveryStatus = String(apiOrder.delivery_status || '0')
+      const cancelStatus = String(apiOrder.cancel_status || '0')
+
+      if (cancelStatus !== '0') {
+        status = 'cancelled'
+      } else if (payStatus === '0') {
+        status = 'pending_payment'
+      } else if (deliveryStatus === '0') {
+        status = 'pending_shipment'
+      } else if (deliveryStatus === '1') {
+        status = 'shipped'
+      } else if (deliveryStatus === '2') {
+        status = 'completed'
+      }
+    }
 
     return {
-      orderId: String(apiOrder.order_id || ''),
-      orderTime: apiOrder.order_time || '',
+      orderId,
+      orderTime,
       status,
       statusText: OrderTransformer.getOrderStatusText(status),
-      items: (apiOrder.items || []).map(OrderTransformer.toOrderItemModel),
-      totalAmount: Number(apiOrder.total_amount || 0) / 100, // 分转元
+      items,
+      totalAmount,
       shippingAddress: apiOrder.shipping_address,
       // 根据订单状态判断可执行的操作
       canCancel: status === 'pending_payment',
       canPay: status === 'pending_payment',
       canConfirmReceipt: status === 'shipped',
       canDelete: status === 'cancelled',
+      canApplyAftersales: ['pending_shipment', 'shipped', 'completed'].includes(status),
     }
   }
 
@@ -236,12 +266,13 @@ export class OrderTransformer {
    * 批量转换订单列表
    */
   static toOrderListModel(response: any) {
-    const orders = response?.orders || response?.list || []
+    const data = response?.data || response
+    const orders = data?.list || data?.orders || []
     return {
       orders: orders.map(OrderTransformer.toOrderModel),
-      total: Number(response?.total || 0),
-      page: Number(response?.page || 1),
-      pageSize: Number(response?.page_size || 10),
+      total: Number(data?.total_count || data?.total || 0),
+      page: Number(data?.page || 1),
+      pageSize: Number(data?.pageSize || data?.page_size || 10),
     }
   }
 }

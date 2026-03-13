@@ -10,14 +10,7 @@
 import { ref, computed } from 'vue'
 import { orderApiClient } from '~/infrastructure/http/clients/OrderApiClient'
 import { OrderTransformer } from '~/infrastructure/transformers/orderTransformer'
-
-export type OrderStatus =
-  | 'all'
-  | 'pending_payment'
-  | 'pending_shipment'
-  | 'shipped'
-  | 'completed'
-  | 'cancelled'
+import { OrderStatus } from '~/types/api/order'
 
 export function useOrders() {
   const toast = useToastMessage()
@@ -27,7 +20,7 @@ export function useOrders() {
   const orders = ref<any[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const currentStatus = ref<OrderStatus>('all')
+  const currentStatus = ref<OrderStatus>(OrderStatus.ALL)
   const currentPage = ref(1)
   const pageSize = ref(10)
   const total = ref(0)
@@ -44,13 +37,39 @@ export function useOrders() {
   /**
    * 加载订单列表
    */
-  async function loadOrders(status: OrderStatus = 'all', page: number = 1) {
+  async function loadOrders(status: OrderStatus = OrderStatus.ALL, page: number = 1) {
     loading.value = true
     error.value = null
 
+    // 将前端状态映射为后端接口参数
+    // 根据 api-notes.md，可能需要映射到 order_type 或 is_rate 等
+    let apiStatus = ''
+    let isRate = ''
+    
+    switch (status) {
+      case OrderStatus.PENDING_PAYMENT:
+        apiStatus = 'WAIT_PAY'
+        break
+      case OrderStatus.SHIPPED:
+        apiStatus = 'WAIT_RECEIVE'
+        break
+      case OrderStatus.PENDING_PICKUP:
+        apiStatus = 'WAIT_SELF_PICKUP'
+        break
+      case OrderStatus.AFTER_SALES:
+        apiStatus = 'AFTER_SALES' // 假设
+        break
+      case OrderStatus.PENDING_REVIEW:
+        apiStatus = 'WAIT_RATE'
+        isRate = '0'
+        break
+      default:
+        apiStatus = ''
+    }
+
     try {
       const response = await orderApiClient.getOrderList({
-        status: status === 'all' ? '' : status,
+        status: apiStatus,
         page,
         page_size: pageSize.value,
       })
@@ -199,6 +218,10 @@ export function useOrders() {
     toast.show('功能开发中')
   }
 
+  const totalPages = computed(() => {
+    return Math.ceil(total.value / pageSize.value)
+  })
+
   return {
     // 状态
     orders,
@@ -206,7 +229,9 @@ export function useOrders() {
     error,
     currentStatus,
     currentPage,
+    pageSize,
     total,
+    totalPages,
     hasMore,
     isEmpty,
 

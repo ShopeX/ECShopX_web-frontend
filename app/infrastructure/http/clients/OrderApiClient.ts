@@ -182,12 +182,12 @@ export class OrderApiClient {
     page?: number
     page_size?: number
   }): Promise<any> {
-    return this.http('/order/list', {
+    return this.http('/wxapp/orders', {
       method: 'GET',
       params: {
-        status: params?.status || '',
+        order_type: params?.status || '',
         page: params?.page || 1,
-        page_size: params?.page_size || 10,
+        pageSize: params?.page_size || 10,
       },
     })
   }
@@ -196,7 +196,7 @@ export class OrderApiClient {
    * 取消订单
    */
   async cancelOrder(orderId: string): Promise<any> {
-    return this.http('/order/cancel', {
+    return this.http('/wxapp/order/cancel', {
       method: 'POST',
       body: { order_id: orderId },
     })
@@ -206,7 +206,7 @@ export class OrderApiClient {
    * 确认收货
    */
   async confirmReceipt(orderId: string): Promise<any> {
-    return this.http('/order/confirm', {
+    return this.http('/wxapp/order/confirmReceipt', {
       method: 'POST',
       body: { order_id: orderId },
     })
@@ -216,7 +216,7 @@ export class OrderApiClient {
    * 删除订单
    */
   async deleteOrder(orderId: string): Promise<any> {
-    return this.http('/order/delete', {
+    return this.http('/wxapp/order/delete', {
       method: 'POST',
       body: { order_id: orderId },
     })

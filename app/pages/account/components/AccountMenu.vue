@@ -1,104 +1,32 @@
 <template>
-  <div class="bg-white flex flex-col p-8 w-full">
-    <!-- 标题 -->
+  <div class="bg-[#f3f4f6] flex flex-col items-start p-[32px] relative self-stretch shrink-0 w-[256px]">
     <div class="mb-4">
-      <h2 class="text-2xl font-medium text-[#191a1d] leading-[48px]">我的账户</h2>
+      <h2 class="font-['Noto_Sans_SC:Medium',sans-serif] font-medium leading-[48px] relative shrink-0 text-[24px] text-[color:var(--color黑,#191a1d)] whitespace-nowrap">我的账户</h2>
     </div>
 
-    <!-- 菜单列表 -->
-    <nav class="flex flex-col">
-      <!-- 个人中心 -->
-      <div class="py-4">
+    <nav class="flex flex-col w-full">
+      <div v-for="item in menuItems" :key="item.key" class="py-[16px]">
         <button
-          :class="[
-            'w-full flex items-center justify-between p-4 transition-colors',
-            activeMenu === 'profile' ? 'bg-[#f3f4f6]' : 'hover:bg-gray-50',
-          ]"
-          @click="handleMenuClick('profile', '/account')"
+          type="button"
+          class="flex w-full items-center justify-between p-[16px] text-left transition-colors"
+          :class="item.key === activeMenu ? 'bg-white' : 'hover:bg-white/70'"
+          :data-testid="`account-menu-item-${item.key}`"
+          @click="handleMenuClick(item.key, item.path)"
         >
-          <span class="text-base font-medium text-[#364153]">个人中心</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
+          <span class="font-['Noto_Sans_SC:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[16px] text-[color:var(--color亚黑,#364153)] whitespace-nowrap">{{ item.label }}</span>
+          <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-[#364153]" />
         </button>
       </div>
 
-      <!-- 我的订单 -->
-      <div class="py-4">
+      <div class="py-[16px]">
         <button
-          :class="[
-            'w-full flex items-center justify-between p-4 transition-colors',
-            activeMenu === 'orders' ? 'bg-[#f3f4f6]' : 'hover:bg-gray-50',
-          ]"
-          @click="handleMenuClick('orders', '/account/orders')"
-        >
-          <span class="text-base font-medium text-[#364153]">我的订单</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
-        </button>
-      </div>
-
-      <!-- 优惠券 -->
-      <div class="py-4">
-        <button
-          :class="[
-            'w-full flex items-center justify-between p-4 transition-colors',
-            activeMenu === 'coupons' ? 'bg-[#f3f4f6]' : 'hover:bg-gray-50',
-          ]"
-          @click="handleMenuClick('coupons', '/account/coupons')"
-        >
-          <span class="text-base font-medium text-[#364153]">优惠券</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
-        </button>
-      </div>
-
-      <!-- 我的收藏 -->
-      <div class="py-4">
-        <button
-          :class="[
-            'w-full flex items-center justify-between p-4 transition-colors',
-            activeMenu === 'favorites' ? 'bg-[#f3f4f6]' : 'hover:bg-gray-50',
-          ]"
-          @click="handleMenuClick('favorites', '/account/favorites')"
-        >
-          <span class="text-base font-medium text-[#364153]">我的收藏</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
-        </button>
-      </div>
-
-      <!-- 收货地址 -->
-      <div class="py-4">
-        <button
-          :class="[
-            'w-full flex items-center justify-between p-4 transition-colors',
-            activeMenu === 'address' ? 'bg-[#f3f4f6]' : 'hover:bg-gray-50',
-          ]"
-          @click="handleMenuClick('address', '/account/address')"
-        >
-          <span class="text-base font-medium text-[#364153]">收货地址</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
-        </button>
-      </div>
-
-      <!-- 我的评价 -->
-      <div class="py-4">
-        <button
-          :class="[
-            'w-full flex items-center justify-between p-4 transition-colors',
-            activeMenu === 'reviews' ? 'bg-[#f3f4f6]' : 'hover:bg-gray-50',
-          ]"
-          @click="handleMenuClick('reviews', '/account/reviews')"
-        >
-          <span class="text-base font-medium text-[#364153]">我的评价</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
-        </button>
-      </div>
-
-      <!-- 退出登录 -->
-      <div class="py-4">
-        <button
-          class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          type="button"
+          class="flex w-full items-center justify-between p-[16px] text-left transition-colors hover:bg-white/70"
+          data-testid="account-menu-item-logout"
           @click="handleLogout"
         >
-          <span class="text-base font-medium text-[#364153]">退出登录</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
+          <span class="font-['Noto_Sans_SC:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[16px] text-[color:var(--color亚黑,#364153)] whitespace-nowrap">退出登录</span>
+          <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-[#364153]" />
         </button>
       </div>
     </nav>
@@ -136,6 +64,16 @@ const route = useRoute()
 const { logout } = useAuth()
 const { confirm } = useModal()
 
+const menuItems = [
+  { key: 'profile', label: '个人中心', path: '/account' },
+  { key: 'points', label: '我的积分', path: '/account/points' },
+  { key: 'orders', label: '我的订单', path: '/account/orders' },
+  { key: 'coupons', label: '我的优惠券', path: '/account/coupons' },
+  { key: 'favorites', label: '我的收藏', path: '/account/favorites' },
+  { key: 'address', label: '收货地址', path: '/account/address' },
+  { key: 'reviews', label: '我的评价', path: '/account/reviews' },
+] as const
+
 // 当前激活的菜单
 const activeMenu = computed({
   get: () => props.modelValue,
@@ -148,7 +86,6 @@ const activeMenu = computed({
 function handleMenuClick(menuKey: string, path: string) {
   activeMenu.value = menuKey
 
-  // 如果不在当前路由，则跳转
   if (route.path !== path) {
     router.push(path)
   }

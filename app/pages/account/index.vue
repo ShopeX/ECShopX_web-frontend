@@ -1,57 +1,83 @@
 <template>
-  <div class="bg-[#f3f4f6] min-h-screen">
-    <div class="container mx-auto px-32 py-8">
-      <div class="flex gap-8">
+  <div class="bg-white min-h-screen">
+    <div class="content-stretch flex items-start justify-center px-[128px] py-[32px] relative shrink-0 w-full">
+      <div class="content-stretch flex flex-[1_0_0] gap-[64px] items-start min-h-px min-w-px relative">
         <!-- 左侧菜单 -->
         <div class="w-64 shrink-0">
           <AccountMenu v-model="activeMenu" @logout="handleLogout" />
         </div>
 
         <!-- 右侧内容区域 -->
-        <div class="flex-1 flex flex-col gap-8">
+        <div class="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px relative">
           <!-- 积分卡片 -->
-          <div class="bg-white p-8 flex flex-col gap-4">
-            <div class="pb-4">
-              <h2 class="text-base font-medium text-[#101828] leading-5">个人中心</h2>
-            </div>
-            <div class="border border-[#e5e7eb] flex items-center justify-between px-4 py-8">
-              <div class="flex items-center gap-4">
-                <span class="text-sm text-[#4a5565] leading-5">可用积分</span>
-                <span class="text-4xl font-medium text-[#191a1d] leading-9">{{
-                  availablePoints
-                }}</span>
+          <div class="bg-white content-stretch flex flex-col gap-[16px] items-center relative shrink-0 w-full">
+            <div class="relative shrink-0 w-full">
+              <div class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center relative w-full">
+                <h2 class="font-['Noto_Sans_SC:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[#101828] text-[16px] whitespace-nowrap">个人中心</h2>
               </div>
-              <button
-                class="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
-                @click="handleViewAllPoints"
-              >
-                <span class="text-sm text-[#191a1d] leading-5">全部积分</span>
-                <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 transform" />
-              </button>
+            </div>
+            <div class="relative shrink-0 w-full">
+              <div class="border border-[#e5e7eb] border-solid content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px px-[17px] py-[33px] relative">
+                <div class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-between relative w-full">
+                  <div class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[16px] items-center justify-center relative whitespace-nowrap">
+                    <span class="font-['Noto_Sans_SC:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[14px] text-[color:var(--color次亚黑,#4a5565)]">可用积分</span>
+                    <USkeleton v-if="loadingInfo" class="h-9 w-20" />
+                    <span
+                      v-else
+                      class="font-['Inter:Medium',sans-serif] font-medium leading-[36px] not-italic relative shrink-0 text-[36px] text-[color:var(--color黑,#191a1d)]"
+                      data-testid="point-total"
+                    >
+                      {{ pointTotal }}
+                    </span>
+                  </div>
+                  <button
+                    class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[4px] items-center justify-center relative cursor-pointer hover:opacity-80 transition-opacity"
+                    @click="handleViewAllPoints"
+                  >
+                    <span class="font-['Noto_Sans_SC:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[14px] text-[color:var(--color黑,#191a1d)] whitespace-nowrap">全部积分</span>
+                    <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- 积分明细 -->
-          <div class="bg-white p-8 flex flex-col gap-4">
-            <div class="pb-4">
-              <h2 class="text-base font-medium text-[#191a1d] leading-5">积分明细（近一年内）</h2>
+          <div class="bg-white content-stretch flex flex-col gap-[16px] items-center py-[32px] relative shrink-0 w-full">
+            <div class="relative shrink-0 w-full">
+              <div class="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-between relative w-full">
+                <h2 class="font-['Inter:Medium','Noto_Sans_SC:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium leading-[20px] not-italic relative shrink-0 text-[16px] text-[color:var(--color黑,#191a1d)] whitespace-nowrap">
+                  积分明细（近一年内）
+                </h2>
+              </div>
+            </div>
+
+            <!-- 加载中骨架屏 -->
+            <div v-if="loadingList" class="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+              <div v-for="i in 3" :key="i" class="content-stretch flex flex-col gap-[8px] items-start relative w-full">
+                <USkeleton class="h-5 w-32" />
+                <div class="flex items-center justify-between w-full">
+                  <USkeleton class="h-5 w-48" />
+                  <USkeleton class="h-5 w-12" />
+                </div>
+              </div>
             </div>
 
             <!-- 积分记录列表 -->
-            <div class="flex flex-col gap-6">
-              <div v-for="(record, index) in pointRecords" :key="index" class="flex flex-col gap-2">
-                <div class="text-base font-medium text-[#191a1d] leading-5">
-                  {{ record.date }}
+            <div v-else-if="pointRecords.length > 0" class="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+              <div v-for="(record, index) in pointRecords" :key="index" class="content-stretch flex flex-col gap-[8px] items-start relative w-full">
+                <div class="font-['Noto_Sans_SC:Medium',sans-serif] font-medium leading-[20px] relative shrink-0 text-[16px] text-[color:var(--color黑,#191a1d)] whitespace-nowrap">
+                  {{ formatItemTime(record) }}
                 </div>
-                <div class="flex items-center justify-between text-sm leading-5">
-                  <span class="text-[#4a5565]">{{ record.description }}</span>
-                  <span class="font-medium text-[#191a1d]">{{ record.points }}</span>
+                <div class="content-stretch flex items-center justify-between leading-[20px] relative shrink-0 text-[14px] w-full whitespace-nowrap">
+                  <span class="font-['Noto_Sans_SC:Regular',sans-serif] font-normal relative shrink-0 text-[color:var(--color次亚黑,#4a5565)]">{{ record.point_desc || record.description }}</span>
+                  <span class="font-['Noto_Sans_SC:Medium',sans-serif] font-medium relative shrink-0 text-[color:var(--color黑,#191a1d)]">{{ formatItemPoint(record) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- 空状态 -->
-            <div v-if="pointRecords.length === 0" class="py-8 text-center text-gray-500">
+            <div v-else class="py-8 text-center text-gray-500 font-['Noto_Sans_SC:Regular',sans-serif] text-[14px]">
               暂无积分记录
             </div>
           </div>
@@ -62,9 +88,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AccountMenu from './components/AccountMenu.vue'
+import { useMemberPoint } from '~/composables/useMemberPoint'
 
 // 设置页面元信息
 definePageMeta({
@@ -73,45 +100,22 @@ definePageMeta({
 
 const router = useRouter()
 
+const {
+  pointTotal,
+  list: pointRecords,
+  init,
+  formatItemTime,
+  formatItemPoint,
+  loadingList,
+  loadingInfo,
+} = useMemberPoint()
+
 // 当前激活的菜单项
 const activeMenu = ref('profile')
 
-// 可用积分
-const availablePoints = ref(100)
-
-// 积分记录（模拟数据）
-const pointRecords = ref([
-  {
-    date: '2025-10-30 23:34:23',
-    description: '购物扣减积分，当前剩余积分：99',
-    points: '-1',
-  },
-  {
-    date: '2025-10-30 23:34:23',
-    description: '购物扣减积分，当前剩余积分：99',
-    points: '-1',
-  },
-  {
-    date: '2025-10-30 23:34:23',
-    description: '购物扣减积分，当前剩余积分：99',
-    points: '-1',
-  },
-  {
-    date: '2025-10-30 23:34:23',
-    description: '购物扣减积分，当前剩余积分：99',
-    points: '-1',
-  },
-  {
-    date: '2025-10-30 23:34:23',
-    description: '购物扣减积分，当前剩余积分：99',
-    points: '-1',
-  },
-  {
-    date: '2025-10-30 23:34:23',
-    description: '购物扣减积分，当前剩余积分：99',
-    points: '-1',
-  },
-])
+onMounted(() => {
+  init()
+})
 
 /**
  * 处理退出登录
@@ -124,7 +128,6 @@ function handleLogout() {
  * 查看所有积分
  */
 function handleViewAllPoints() {
-  // 这里可以跳转到积分详情页或打开弹窗
-  console.log('查看所有积分')
+  router.push('/account/points')
 }
 </script>

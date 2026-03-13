@@ -76,7 +76,7 @@
             </div>
 
             <!-- 首页分页组件 -->
-            <div v-if="totalPages > 1 && pointRecords.length > 0" class="flex justify-center pt-6 w-full">
+            <div v-if="totalPages > 1 && pointRecords.length > 0" class="w-full">
               <ECPagination
                 :total="totalCount"
                 :page-size="pageSize"

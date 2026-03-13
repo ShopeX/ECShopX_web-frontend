@@ -60,24 +60,25 @@ const handlePageChange = (page: number | string) => {
 </script>
 
 <template>
-  <div v-if="totalPages > 1" class="flex items-center justify-end gap-2">
+  <div v-if="totalPages > 1" class="border-t border-[#f3f4f6] flex items-center justify-center gap-1 pt-[17px] pb-[16px] w-full">
     <button
-      class="px-3 py-1 border rounded text-sm text-gray-600 hover:border-primary-500 hover:text-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="flex h-8 w-8 items-center justify-center text-[#191a1d] transition-opacity hover:opacity-70 disabled:opacity-30 disabled:cursor-not-allowed"
       :disabled="currentPage === 1"
       @click="handlePageChange(currentPage - 1)"
     >
-      &lt;
+      <UIcon name="i-heroicons-chevron-left" class="h-4 w-4" />
     </button>
 
     <button
       v-for="(page, index) in pages"
       :key="index"
-      class="px-3 py-1 border rounded text-sm transition-colors"
+      class="flex h-8 w-8 items-center justify-center font-['Inter'] text-[12px] leading-4 transition-colors"
       :class="[
         page === currentPage
-          ? 'bg-primary-500 border-primary-500 text-white'
-          : 'text-gray-600 hover:border-primary-500 hover:text-primary-500',
-        page === '...' ? 'border-none hover:border-none cursor-default' : '',
+          ? 'bg-[#141414] text-white'
+          : page === '...'
+            ? 'cursor-default text-[#4a5565]'
+            : 'text-[#4a5565] hover:bg-gray-100',
       ]"
       @click="handlePageChange(page)"
     >
@@ -85,11 +86,11 @@ const handlePageChange = (page: number | string) => {
     </button>
 
     <button
-      class="px-3 py-1 border rounded text-sm text-gray-600 hover:border-primary-500 hover:text-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="flex h-8 w-8 items-center justify-center text-[#191a1d] transition-opacity hover:opacity-70 disabled:opacity-30 disabled:cursor-not-allowed"
       :disabled="currentPage === totalPages"
       @click="handlePageChange(currentPage + 1)"
     >
-      &gt;
+      <UIcon name="i-heroicons-chevron-right" class="h-4 w-4" />
     </button>
   </div>
 </template>

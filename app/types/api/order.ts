@@ -58,12 +58,11 @@ export interface IApiOrder {
  * 订单列表请求参数
  */
 export interface IOrderListRequest {
-  status?: string
+  status?: string | number
   page?: number
   pageSize?: number
   order_id?: string
   mobile?: string
-  order_type?: string
   time_start_begin?: string
   time_start_end?: string
   is_rate?: string

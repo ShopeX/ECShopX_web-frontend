@@ -42,29 +42,30 @@ export function useOrders() {
     error.value = null
 
     // 将前端状态映射为后端接口参数
-    // 根据 api-notes.md，可能需要映射到 order_type 或 is_rate 等
-    let apiStatus = ''
-    let isRate = ''
+    // 0：全部，5：待付款，1：待收货，4：待自提，3：待评价
+    let apiStatus: string | number = 0
     
     switch (status) {
+      case OrderStatus.ALL:
+        apiStatus = 0
+        break
       case OrderStatus.PENDING_PAYMENT:
-        apiStatus = 'WAIT_PAY'
+        apiStatus = 5
         break
       case OrderStatus.SHIPPED:
-        apiStatus = 'WAIT_RECEIVE'
+        apiStatus = 1
         break
       case OrderStatus.PENDING_PICKUP:
-        apiStatus = 'WAIT_SELF_PICKUP'
-        break
-      case OrderStatus.AFTER_SALES:
-        apiStatus = 'AFTER_SALES' // 假设
+        apiStatus = 4
         break
       case OrderStatus.PENDING_REVIEW:
-        apiStatus = 'WAIT_RATE'
-        isRate = '0'
+        apiStatus = 3
+        break
+      case OrderStatus.AFTER_SALES:
+        apiStatus = 'AFTER_SALES' // 假设售后有单独的标记或单独接口
         break
       default:
-        apiStatus = ''
+        apiStatus = 0
     }
 
     try {

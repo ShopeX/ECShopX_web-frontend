@@ -37,11 +37,11 @@
 
 | 位置 | 参数名 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- | --- |
+| Query | `status` | integer/string | 否 | 订单状态（0：全部，5：待付款，1：待收货，4：待自提，3：待评价） |
 | Query | `page` | integer | 否 | 当前页，从 1 开始 |
 | Query | `pageSize` | integer | 否 | 每页数量，最大 50 |
 | Query | `order_id` | string | 否 | 订单号 |
 | Query | `mobile` | string | 否 | 手机号 |
-| Query | `order_type` | string | 否 | 订单类型 |
 | Query | `time_start_begin` | string | 否 | 查询开始时间 |
 | Query | `time_start_end` | string | 否 | 查询结束时间 |
 | Query | `is_rate` | string | 否 | 是否评价 |
@@ -50,11 +50,11 @@
 
 ```ts
 interface GetUserOrdersParams {
+  status?: string | number
   page?: number
   pageSize?: number
   order_id?: string
   mobile?: string
-  order_type?: string
   time_start_begin?: string
   time_start_end?: string
   is_rate?: string

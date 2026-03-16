@@ -178,14 +178,14 @@ export class OrderApiClient {
    * 获取订单列表
    */
   async getOrderList(params?: {
-    status?: string
+    status?: string | number
     page?: number
     page_size?: number
   }): Promise<any> {
     return this.http('/wxapp/orders', {
       method: 'GET',
       params: {
-        order_type: params?.status || '',
+        status: params?.status !== undefined ? params?.status : 0,
         page: params?.page || 1,
         pageSize: params?.page_size || 10,
       },

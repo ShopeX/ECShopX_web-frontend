@@ -180,8 +180,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { OrderStatus } from '~/types/api/order'
 import { useOrders } from '~/composables/useOrders'
+import AccountMenu from './components/AccountMenu.vue'
 
 definePageMeta({
   layout: 'default',

@@ -67,7 +67,7 @@ export class AuthApiClient {
    * ```
    */
   async login(params: ILoginRequest): Promise<ILoginResponse> {
-    return this.http('/login', {
+    return this.http('/wxapp/login', {
       method: 'POST',
       body: params,
       // ✅ company_id 和 Content-Type 由 HTTP 插件统一处理
@@ -90,7 +90,7 @@ export class AuthApiClient {
    * ```
    */
   async loginWithPhone(params: IPhoneLoginRequest): Promise<ILoginResponse> {
-    return this.http('/auth/login/phone', {
+    return this.http('/wxapp/auth/login/phone', {
       method: 'POST',
       body: params,
     })
@@ -110,7 +110,7 @@ export class AuthApiClient {
    * ```
    */
   async getCaptcha(params: ICaptchaRequest): Promise<{ data: ICaptchaResponse }> {
-    return this.http('/member/image/code', {
+    return this.http('/wxapp/member/image/code', {
       method: 'GET',
       params: params,
       cache: 'no-cache', // 验证码不缓存
@@ -135,7 +135,7 @@ export class AuthApiClient {
    * ```
    */
   async sendSmsCode(params: ISmsCodeRequest): Promise<{ data: ISmsCodeResponseData }> {
-    return this.http('/member/sms/code', {
+    return this.http('/wxapp/member/sms/code', {
       method: 'GET',
       params: params,
     })
@@ -153,7 +153,7 @@ export class AuthApiClient {
    * ```
    */
   async logout(params?: ILogoutRequest): Promise<ILogoutResponse> {
-    return this.http('/auth/logout', {
+    return this.http('/wxapp/auth/logout', {
       method: 'POST',
       body: params,
     })
@@ -170,7 +170,7 @@ export class AuthApiClient {
    * ```
    */
   async getUserInfo(): Promise<IGetUserInfoResponse> {
-    return this.http('/member', {
+    return this.http('/wxapp/member', {
       method: 'GET',
       cache: 'default',
     })
@@ -189,7 +189,7 @@ export class AuthApiClient {
    * ```
    */
   async refreshToken(refreshToken: string): Promise<ILoginResponse> {
-    return this.http('/auth/refresh', {
+    return this.http('/wxapp/auth/refresh', {
       method: 'POST',
       body: { refreshToken },
     })

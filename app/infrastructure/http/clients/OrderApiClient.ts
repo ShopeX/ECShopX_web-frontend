@@ -153,7 +153,7 @@ export class OrderApiClient {
    * @returns 原始 API 响应
    */
   async calculateOrder(params: ICalculateOrderRequest, options?: any): Promise<any> {
-    return this.http('/getFreightFee', {
+    return this.http('/wxapp/getFreightFee', {
       method: 'POST',
       body: params,
       ...options,
@@ -167,7 +167,7 @@ export class OrderApiClient {
    * @returns 创建订单 API 响应
    */
   async createOrder(params: ICreateOrderRequest, options?: any): Promise<ICreateOrderResponse> {
-    return this.http('/order_new', {
+    return this.http('/wxapp/order_new', {
       method: 'POST',
       body: params,
       ...options,

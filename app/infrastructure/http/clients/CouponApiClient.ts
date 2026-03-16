@@ -37,7 +37,7 @@ export class CouponApiClient {
    * @returns 原始 API 响应
    */
   async getCouponList(params?: IGetCouponListParams): Promise<any> {
-    return this.http('/user/newGetCardList', {
+    return this.http('/wxapp/user/newGetCardList', {
       method: 'GET',
       query: params,
     })

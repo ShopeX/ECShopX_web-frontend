@@ -71,7 +71,7 @@ export class ItemApiClient {
       ...(params.keywords && { keywords: params.keywords }),
     }
 
-    return this.http('/goods/items', {
+    return this.http('/wxapp/goods/items', {
       method: 'GET',
       query: apiParams,
       cache: 'default',
@@ -90,7 +90,7 @@ export class ItemApiClient {
    * ```
    */
   async getItemDetail(params: IItemDetailParams): Promise<any> {
-    return this.http(`/goods/items/${params.id}`, {
+    return this.http(`/wxapp/goods/items/${params.id}`, {
       method: 'GET',
       cache: 'default',
     })
@@ -105,7 +105,7 @@ export class ItemApiClient {
    * @returns 原始 API 响应
    */
   async searchItems(keyword: string, page: string = '1', pageSize: string = '20'): Promise<any> {
-    return this.http('/goods/items/search', {
+    return this.http('/wxapp/goods/items/search', {
       method: 'GET',
       query: { keyword, page, pageSize },
       cache: 'default',
@@ -121,7 +121,7 @@ export class ItemApiClient {
    * @returns 原始 API 响应
    */
   async getItemReviews(itemId: string, page: string = '1', pageSize: string = '20'): Promise<any> {
-    return this.http(`/goods/items/${itemId}/reviews`, {
+    return this.http(`/wxapp/goods/items/${itemId}/reviews`, {
       method: 'GET',
       query: { page, pageSize },
       cache: 'default',
@@ -136,7 +136,7 @@ export class ItemApiClient {
    * @returns 原始 API 响应
    */
   async getRecommendedItems(itemId?: string, limit: number = 10): Promise<any> {
-    return this.http('/goods/items/recommended', {
+    return this.http('/wxapp/goods/items/recommended', {
       method: 'GET',
       query: { item_id: itemId, limit },
       cache: 'default',

@@ -32,7 +32,7 @@ export class TemplateApiClient {
    * @returns 模板配置数据
    */
   async getTemplateConfig(name: string): Promise<any> {
-    return this.http('/getPageConfig', {
+    return this.http('/wxapp/getPageConfig', {
       method: 'GET',
       query: { name },
       cache: 'default',

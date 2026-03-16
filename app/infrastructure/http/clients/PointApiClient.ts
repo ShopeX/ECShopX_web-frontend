@@ -75,7 +75,7 @@ export class PointApiClient {
    * GET /point/member/info
    */
   async getPointMemberInfo(): Promise<IGetPointMemberInfoResponse> {
-    return this.http('/point/member/info', {
+    return this.http('/wxapp/point/member/info', {
       method: 'GET',
     })
   }
@@ -92,7 +92,7 @@ export class PointApiClient {
     if (params?.page_no != null) query.page_no = params.page_no
     if (params?.page_size != null) query.page_size = params.page_size
     if (params?.outin_type) query.outin_type = params.outin_type
-    return this.http('/point/member', {
+    return this.http('/wxapp/point/member', {
       method: 'GET',
       query,
     })

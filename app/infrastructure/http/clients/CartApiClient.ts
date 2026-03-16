@@ -45,7 +45,7 @@ export class CartApiClient {
    * @returns 原始 API 响应
    */
   async getCartList(): Promise<any> {
-    return this.http('/cart/list', {
+    return this.http('/wxapp/cart/list', {
       method: 'GET',
       cache: 'default',
     })
@@ -67,7 +67,7 @@ export class CartApiClient {
    * ```
    */
   async addToCart(params: IAddCartRequest): Promise<any> {
-    return this.http('/cart', {
+    return this.http('/wxapp/cart', {
       method: 'POST',
       body: params,
     })
@@ -81,7 +81,7 @@ export class CartApiClient {
    * @returns 更新结果
    */
   async updateCartItem(cartId: string, num: number): Promise<void> {
-    return this.http('/cartupdate/num', {
+    return this.http('/wxapp/cartupdate/num', {
       method: 'PUT',
       query: {
         cart_id: cartId,
@@ -102,7 +102,7 @@ export class CartApiClient {
    * ```
    */
   async removeCartItem(itemId: string): Promise<void> {
-    return this.http('/cartdel', {
+    return this.http('/wxapp/cartdel', {
       method: 'DELETE',
       query: {
         cart_id: itemId,
@@ -124,7 +124,7 @@ export class CartApiClient {
    * ```
    */
   async batchRemoveItems(params: IBatchRemoveCartRequest): Promise<void> {
-    return this.http('/api/cart/batch-remove', {
+    return this.http('/wxapp/api/cart/batch-remove', {
       method: 'POST',
       body: params,
     })
@@ -136,7 +136,7 @@ export class CartApiClient {
    * @returns 删除结果
    */
   async removeSelectedItems(): Promise<void> {
-    return this.http('/api/cart/selected', {
+    return this.http('/wxapp/api/cart/selected', {
       method: 'DELETE',
     })
   }
@@ -149,7 +149,7 @@ export class CartApiClient {
    * @returns 更新结果
    */
   async updateCartItemChecked(cartId: string, isChecked: boolean): Promise<void> {
-    return this.http('/cartupdate/checkstatus', {
+    return this.http('/wxapp/cartupdate/checkstatus', {
       method: 'PUT',
       query: {
         cart_id: cartId,
@@ -174,7 +174,7 @@ export class CartApiClient {
     })
     queryParams.append('is_checked', isChecked ? 'true' : 'false')
 
-    return this.http(`/cartupdate/checkstatus?${queryParams.toString()}`, {
+    return this.http(`/wxapp/cartupdate/checkstatus?${queryParams.toString()}`, {
       method: 'PUT',
     })
   }
@@ -190,7 +190,7 @@ export class CartApiClient {
    * ```
    */
   async clearCart(): Promise<void> {
-    return this.http('/api/cart/clear', {
+    return this.http('/wxapp/api/cart/clear', {
       method: 'DELETE',
     })
   }
@@ -204,7 +204,7 @@ export class CartApiClient {
     valid: boolean
     errors: string[]
   }> {
-    return this.http('/api/cart/validate', {
+    return this.http('/wxapp/api/cart/validate', {
       method: 'POST',
     })
   }

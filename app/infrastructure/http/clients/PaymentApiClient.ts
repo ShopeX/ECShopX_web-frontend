@@ -92,7 +92,7 @@ export class PaymentApiClient {
     const query: Record<string, string> = {
       platform: params?.platform ?? 'pc',
     }
-    return this.http('/trade/payment/list', {
+    return this.http('/wxapp/trade/payment/list', {
       method: 'GET',
       query,
     })
@@ -110,7 +110,7 @@ export class PaymentApiClient {
     const query: Record<string, string> = {
       pay_type: params?.pay_type ?? '',
     }
-    return this.http(`/order_new/${orderId}`, {
+    return this.http(`/wxapp/order_new/${orderId}`, {
       method: 'GET',
       query,
     })
@@ -125,7 +125,7 @@ export class PaymentApiClient {
     body: IOrderPaymentInfoRequest,
     options?: any
   ): Promise<IOrderPaymentInfoResponse> {
-    return this.http('/payment', {
+    return this.http('/wxapp/payment', {
       method: 'POST',
       body: {
         order_id: body.order_id,

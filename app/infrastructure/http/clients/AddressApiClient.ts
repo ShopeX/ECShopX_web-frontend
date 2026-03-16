@@ -60,7 +60,7 @@ export class AddressApiClient {
    * @returns 原始 API 响应
    */
   async getAddressList() {
-    return this.http('/member/addresslist', {
+    return this.http('/wxapp/member/addresslist', {
       method: 'GET',
     })
   }
@@ -71,7 +71,7 @@ export class AddressApiClient {
    * @returns 原始 API 响应
    */
   async getRegionList() {
-    return this.http('/espier/address', {
+    return this.http('/wxapp/espier/address', {
       method: 'GET',
     })
   }
@@ -83,7 +83,7 @@ export class AddressApiClient {
    * @returns 原始 API 响应
    */
   async createAddress(data: ICreateAddressRequest) {
-    return this.http('/member/address', {
+    return this.http('/wxapp/member/address', {
       method: 'POST',
       body: data,
     })
@@ -97,7 +97,7 @@ export class AddressApiClient {
    * @returns 原始 API 响应
    */
   async updateAddress(addressId: string, data: IUpdateAddressRequest) {
-    return this.http(`/member/address/${addressId}`, {
+    return this.http(`/wxapp/member/address/${addressId}`, {
       method: 'PUT',
       body: data,
     })
@@ -110,7 +110,7 @@ export class AddressApiClient {
    * @returns 原始 API 响应
    */
   async deleteAddress(addressId: string) {
-    return this.http(`/member/address/${addressId}`, {
+    return this.http(`/wxapp/member/address/${addressId}`, {
       method: 'DELETE',
     })
   }

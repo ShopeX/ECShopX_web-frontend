@@ -1,23 +1,10 @@
 <template>
   <div class="bg-white min-h-screen">
     <!-- H5 头部 (仅移动端显示) -->
-    <div class="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <button class="text-gray-900" @click="router.back()">
-          <UIcon name="i-heroicons-chevron-left" class="w-6 h-6" />
-        </button>
-        <div class="flex items-center gap-1" @click="toggleMobileMenu">
-          <h1 class="text-base font-medium text-gray-900">我的订单</h1>
-          <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-500" />
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <button class="text-gray-600">
-          <UIcon name="i-heroicons-magnifying-glass" class="w-5 h-5" />
-        </button>
-        <button class="text-gray-600">
-          <UIcon name="i-heroicons-bars-3" class="w-6 h-6" />
-        </button>
+    <div class="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-100 p-4 flex items-center justify-between">
+      <div class="flex items-center gap-2 cursor-pointer" @click="toggleMobileMenu">
+        <h1 class="text-base font-medium text-gray-900">我的订单</h1>
+        <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-900" />
       </div>
     </div>
 
@@ -49,18 +36,17 @@
         <div class="flex-1 flex flex-col min-w-0">
           <!-- 状态 Tabs -->
           <div class="bg-white sticky top-[49px] lg:static lg:top-0 z-10 border-b border-gray-100 lg:border-none">
-            <div class="flex overflow-x-auto no-scrollbar gap-8 px-4 lg:px-0">
-              <button
-                v-for="tab in tabs"
-                :key="tab.key"
-                class="py-4 whitespace-nowrap text-sm transition-colors relative"
-                :class="currentStatus === tab.key ? 'text-black font-medium' : 'text-gray-500 hover:text-gray-800'"
-                @click="changeStatus(tab.key)"
-              >
-                {{ tab.label }}
-                <!-- 激活态下划线 -->
-                <div v-if="currentStatus === tab.key" class="absolute bottom-0 left-0 right-0 h-0.5 bg-black"></div>
-              </button>
+            <div class="flex overflow-x-auto no-scrollbar items-center px-4 py-2 lg:px-0">
+              <template v-for="(tab, index) in tabs" :key="tab.key">
+                <button
+                  class="py-2 whitespace-nowrap text-sm transition-colors relative"
+                  :class="currentStatus === tab.key ? 'text-black font-medium' : 'text-gray-500 hover:text-gray-800'"
+                  @click="changeStatus(tab.key)"
+                >
+                  {{ tab.label }}
+                </button>
+                <div v-if="index < tabs.length - 1" class="h-4 w-px bg-gray-300 mx-3 lg:mx-6 shrink-0"></div>
+              </template>
             </div>
           </div>
 
@@ -90,75 +76,75 @@
             </div>
 
             <!-- 列表内容 -->
-            <div v-else class="space-y-6 pt-6">
-              <div v-for="order in orders" :key="order.orderId" class="border border-gray-100 lg:border-gray-50 p-4 lg:p-6 rounded-lg hover:shadow-sm transition-shadow">
+            <div v-else class="pt-6">
+              <div v-for="order in orders" :key="order.orderId" class="border-b border-gray-100 py-6 lg:py-8 lg:px-0 hover:bg-gray-50/50 transition-colors">
                 <!-- 订单头 -->
-                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                <div class="flex flex-col mb-4">
+                  <div class="text-base font-medium mb-4" :class="getStatusColorClass(order.status)">
+                    {{ order.statusText }}
+                  </div>
                   <div class="flex items-center gap-2">
                     <UIcon name="i-heroicons-building-storefront" class="w-5 h-5 text-gray-400" />
                     <span class="text-sm font-medium text-gray-900">店铺名称</span>
                   </div>
-                  <span class="text-sm font-medium" :class="getStatusColorClass(order.status)">
-                    {{ order.statusText }}
-                  </span>
                 </div>
 
                 <!-- 商品列表 -->
-                <div class="space-y-4">
-                  <div v-for="item in order.items" :key="item.itemId" class="flex gap-4">
-                    <img :src="item.itemImage" class="w-20 h-20 object-cover rounded bg-gray-50" />
-                    <div class="flex-1 min-w-0">
-                      <div class="flex justify-between">
-                        <h3 class="text-sm text-gray-900 truncate pr-4">{{ item.itemName }}</h3>
-                        <span class="text-sm text-gray-900 font-medium whitespace-nowrap">¥ {{ item.price.toFixed(2) }}</span>
+                <div class="space-y-4 border-b border-gray-100 pb-4">
+                  <div v-for="item in order.items" :key="item.itemId" class="flex gap-4 items-start">
+                    <img :src="item.itemImage" class="w-24 h-24 lg:w-[96px] lg:h-[96px] object-cover rounded bg-gray-50 shrink-0" />
+                    <div class="flex-1 flex flex-col h-24 justify-between min-w-0">
+                      <div class="flex justify-between items-start">
+                        <h3 class="text-sm font-medium text-gray-900 truncate pr-4 max-w-[70%]">{{ item.itemName }}</h3>
+                        <span class="text-sm text-gray-900 whitespace-nowrap">¥ {{ item.price.toFixed(2) }}</span>
                       </div>
-                      <div class="flex justify-between mt-1">
-                        <p class="text-xs text-gray-500">{{ item.specName }}</p>
-                        <span class="text-xs text-gray-400">x{{ item.quantity }}</span>
+                      <div class="flex justify-between items-end mt-auto">
+                        <p class="text-xs text-gray-500 truncate max-w-[70%]">{{ item.specName }}</p>
+                        <span class="text-sm text-gray-900">数量:{{ item.quantity }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- 订单汇总与操作 -->
-                <div class="mt-6 pt-4 border-t border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div class="text-sm text-gray-600">
-                    共 {{ getTotalQuantity(order) }} 件商品，合计: 
-                    <span class="text-lg font-semibold text-black ml-1">¥ {{ order.totalAmount.toFixed(2) }}</span>
+                <div class="mt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div class="flex items-center justify-end lg:justify-start gap-4 text-sm text-gray-600">
+                    <span>数量: {{ getTotalQuantity(order) }}</span>
+                    <span>总计: <span class="text-base font-medium text-black">¥ {{ order.totalAmount.toFixed(2) }}</span></span>
                   </div>
                   
-                  <div class="flex flex-wrap gap-3 justify-end">
+                  <div class="flex gap-3 justify-end w-full lg:w-auto">
                     <button 
                       v-if="order.canCancel" 
-                      class="px-5 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors"
+                      class="flex-1 lg:flex-none lg:min-w-[120px] px-4 py-3 border border-black text-xs font-medium text-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors"
                       @click="cancelOrder(order.orderId)"
                     >
                       取消订单
                     </button>
                     <button 
                       v-if="order.canPay" 
-                      class="px-5 py-2 text-sm bg-black text-white rounded hover:bg-gray-800 transition-colors"
+                      class="flex-1 lg:flex-none lg:min-w-[120px] px-4 py-3 bg-black text-xs font-medium text-white flex items-center justify-center hover:bg-gray-800 transition-colors"
                       @click="payNow(order.orderId)"
                     >
                       立即支付
                     </button>
                     <button 
                       v-if="order.canConfirmReceipt" 
-                      class="px-5 py-2 text-sm bg-black text-white rounded hover:bg-gray-800 transition-colors"
+                      class="flex-1 lg:flex-none lg:min-w-[120px] px-4 py-3 bg-black text-xs font-medium text-white flex items-center justify-center hover:bg-gray-800 transition-colors"
                       @click="confirmReceipt(order.orderId)"
                     >
                       确认收货
                     </button>
                     <button 
                       v-if="order.canDelete" 
-                      class="px-5 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors"
+                      class="flex-1 lg:flex-none lg:min-w-[120px] px-4 py-3 border border-black text-xs font-medium text-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors"
                       @click="deleteOrder(order.orderId)"
                     >
                       删除订单
                     </button>
                     <button 
                       v-if="order.canApplyAftersales" 
-                      class="px-5 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors"
+                      class="flex-1 lg:flex-none lg:min-w-[120px] px-4 py-3 border border-black text-xs font-medium text-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors"
                       @click="applyAftersales(order.orderId)"
                     >
                       申请售后

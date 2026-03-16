@@ -188,6 +188,7 @@ export class OrderApiClient {
         status: params?.status !== undefined ? params?.status : 0,
         page: params?.page || 1,
         pageSize: params?.page_size || 10,
+        order_type: 'normal'
       },
     })
   }

@@ -67,7 +67,7 @@ const { confirm } = useModal()
 const menuItems = [
   { key: 'profile', label: '个人中心', path: '/account' },
   { key: 'orders', label: '我的订单', path: '/account/orders' },
-  { key: 'coupons', label: '我的优惠券', path: '/account/coupons' },
+  { key: 'coupons', label: '优惠券', path: '/account/coupons' },
   { key: 'favorites', label: '我的收藏', path: '/account/favorites' },
   { key: 'address', label: '收货地址', path: '/account/address' },
   { key: 'reviews', label: '我的评价', path: '/account/reviews' },

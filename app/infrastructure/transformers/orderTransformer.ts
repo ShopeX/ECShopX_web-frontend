@@ -198,7 +198,7 @@ export class OrderTransformer {
   }
 
   /**
-   * 转换订单商品项
+   * 转换订单商品项（含款号/款式/尺寸，用于订单列表与 Figma 对齐）
    */
   static toOrderItemModel(apiItem: any) {
     const price = Number(apiItem.price || 0) / 100 // 分转元
@@ -207,6 +207,9 @@ export class OrderTransformer {
       itemName: apiItem.item_name || apiItem.title || '',
       itemImage: apiItem.item_image || apiItem.item_pic || apiItem.pic || '',
       specName: apiItem.spec_name || apiItem.spec_info || '',
+      skuNo: apiItem.sku_no ?? apiItem.item_no ?? '',
+      style: apiItem.spec_style ?? apiItem.style ?? '',
+      size: apiItem.spec_size ?? apiItem.size ?? '',
       quantity: Number(apiItem.quantity || 0),
       price,
       subtotal: price * Number(apiItem.quantity || 0),

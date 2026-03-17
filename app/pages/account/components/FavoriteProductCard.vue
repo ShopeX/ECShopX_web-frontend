@@ -21,10 +21,11 @@
         ￥{{ formatPrice(product.price) }}
       </p>
 
-      <!-- 移出收藏按钮 -->
+      <!-- 移出收藏按钮（S1 仅列表展示时不展示） -->
       <button
+        v-if="showRemoveButton"
         class="border border-[#0f0f10] px-8 py-2 hover:bg-[#0f0f10] hover:text-white transition-colors"
-        @click="handleRemove"
+        @click.stop="handleRemove"
       >
         <span class="text-xs font-medium text-[#0f0f10] hover:text-white leading-4">
           移出收藏
@@ -44,13 +45,17 @@ interface Product {
 
 interface Props {
   product: Product
+  /** 是否展示「移出收藏」按钮，默认 true；收藏页 S1 仅列表展示时传 false */
+  showRemoveButton?: boolean
 }
 
 defineOptions({
   name: 'FavoriteProductCard',
 })
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showRemoveButton: true,
+})
 
 const emit = defineEmits<{
   remove: [productId: string | number]

@@ -1,5 +1,8 @@
 {
   "permissions": {
-    "allow": ["Bash(claude mcp add --transport http figma-remote-mcp https://mcp.figma.com/mcp)"]
+    "allow": [
+      "Bash(claude mcp add --transport http figma-remote-mcp https://mcp.figma.com/mcp)",
+      "Bash(echo:*)"
+    ]
   }
 }

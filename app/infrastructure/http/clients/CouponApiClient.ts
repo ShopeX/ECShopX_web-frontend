@@ -12,6 +12,16 @@ export interface IGetCouponListParams {
   total_fee?: number
 }
 
+export interface IGetUserCardListParams {
+  status?: string
+  cart_type?: string
+  page?: number
+  pageSize?: number
+  scope_type?: string
+  source_type?: string
+  source_id?: number
+}
+
 export class CouponApiClient {
   private $api: any
 
@@ -38,6 +48,19 @@ export class CouponApiClient {
    */
   async getCouponList(params?: IGetCouponListParams): Promise<any> {
     return this.http('/wxapp/user/newGetCardList', {
+      method: 'GET',
+      query: params,
+    })
+  }
+
+  /**
+   * 获取用户优惠券列表
+   *
+   * @param params - 查询参数
+   * @returns 原始 API 响应
+   */
+  async getUserCardList(params?: IGetUserCardListParams): Promise<any> {
+    return this.http('/wxapp/user/getUserCardList', {
       method: 'GET',
       query: params,
     })

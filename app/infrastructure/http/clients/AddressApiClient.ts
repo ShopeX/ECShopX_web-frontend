@@ -66,6 +66,18 @@ export class AddressApiClient {
   }
 
   /**
+   * 获取地址详情
+   *
+   * @param addressId - 地址 ID
+   * @returns 原始 API 响应
+   */
+  async getAddressDetail(addressId: string) {
+    return this.http(`/wxapp/member/address/${addressId}`, {
+      method: 'GET',
+    })
+  }
+
+  /**
    * 获取省市区列表
    *
    * @returns 原始 API 响应

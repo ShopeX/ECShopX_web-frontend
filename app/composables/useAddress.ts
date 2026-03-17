@@ -222,6 +222,33 @@ export function useAddress() {
     }
   }
 
+  /**
+   * 获取地址详情（供编辑回填）
+   */
+  async function getAddressDetail(addressId: string) {
+    try {
+      loading.value = true
+      error.value = null
+
+      const response = await addressApiClient.getAddressDetail(addressId)
+      const formData = transformFromApiFormat(response as IAddressItem)
+
+      return {
+        success: true,
+        data: formData,
+      }
+    } catch (err: any) {
+      error.value = err.message || '获取地址详情失败'
+      console.error('获取地址详情失败:', err)
+      return {
+        success: false,
+        error: error.value,
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // 状态
     loading,
@@ -233,6 +260,7 @@ export function useAddress() {
     saveAddress,
     deleteAddress,
     getAddressList,
+    getAddressDetail,
 
     // 转换方法（暴露给外部使用）
     transformToApiFormat,

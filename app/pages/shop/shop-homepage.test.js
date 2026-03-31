@@ -23,3 +23,7 @@ const shopPageSource = existsSync(shopPagePath)
 test('IItemListParams has optional distributor_id field', () => {
   assert.match(itemTypesSource, /distributor_id\?:\s*string/)
 })
+
+test('ItemApiClient.getItemList passes distributor_id query param when provided', () => {
+  assert.match(itemClientSource, /distributor_id.*params\.distributor_id/)
+})

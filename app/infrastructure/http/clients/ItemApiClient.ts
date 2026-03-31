@@ -69,6 +69,7 @@ export class ItemApiClient {
       ...(params.start_price && { start_price: params.start_price }),
       ...(params.end_price && { end_price: params.end_price }),
       ...(params.keywords && { keywords: params.keywords }),
+      ...(params.distributor_id && { distributor_id: params.distributor_id }),
     }
 
     return this.http('/wxapp/goods/items', {
@@ -139,6 +140,17 @@ export class ItemApiClient {
     return this.http('/wxapp/goods/items/recommended', {
       method: 'GET',
       query: { item_id: itemId, limit },
+      cache: 'default',
+    })
+  }
+
+  /**
+   * 获取猜你喜欢商品列表
+   */
+  async getRecommendLikeItems(page: string = '1', pageSize: string = '40'): Promise<any> {
+    return this.http('/wxapp/promotions/recommendlike', {
+      method: 'GET',
+      query: { page, pageSize },
       cache: 'default',
     })
   }

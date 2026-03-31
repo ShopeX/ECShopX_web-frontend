@@ -1,6 +1,18 @@
 <template>
   <NuxtLayout name="default">
     <div class="min-h-screen bg-white">
+      <!-- BBC Store Header -->
+      <BCShopHeader
+        :distributor-id="distributorId"
+        :logo="shopInfo.logo"
+        :name="shopInfo.name"
+        :tagline="shopInfo.tagline"
+        :categories="shopInfo.categories"
+        :followed="shopInfo.followed"
+        @follow="onFollow"
+        @contact="onContact"
+      />
+
       <!-- 1. Hero Banner Section -->
       <WCHeroBanner v-if="heroItems.length > 0" :items="heroItems" />
 
@@ -63,16 +75,29 @@
 import WCHeroBanner from '~/components/WCHeroBanner/WCHeroBanner.vue'
 import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
 import BCNewsCard from '~/components/BCNewsCard/BCNewsCard.vue'
+import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
 import { useHomeData } from '~/composables/useHomeData'
 
 const route = useRoute()
 const distributorId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
-const { products, pending, fetchHomeData } = useHomeData(distributorId)
+// Read search keyword from URL query param
+const keywords = computed(() => route.query.q as string | undefined)
+
+const { products, pending, fetchHomeData } = useHomeData(distributorId, keywords.value)
 
 definePageMeta({
   layout: false,
 })
+
+// Mock store info — replace with API data when available
+const shopInfo = {
+  logo: 'https://www.figma.com/api/mcp/asset/efb28441-c97e-49ad-b4ff-9c178ed5ac6e',
+  name: '小米京东自营商城',
+  tagline: '精选镇店好物，快来逛逛',
+  categories: ['耳机', '数码产品', '电脑', '笔记本'],
+  followed: false,
+}
 
 const heroItems = [
   {
@@ -118,7 +143,27 @@ const brandNews = [
 const popularProducts = computed(() => products.value.slice(0, 4))
 const newArrivals = computed(() => products.value.slice(4, 12))
 
+// Watch for q query param changes and re-fetch
+watch(
+  () => route.query.q,
+  async (newQ) => {
+    if (newQ !== undefined) {
+      await fetchHomeData()
+    }
+  }
+)
+
 onMounted(() => {
   fetchHomeData()
 })
+
+function onFollow(isFollowed: boolean) {
+  // TODO: call follow/unfollow API with distributorId
+  console.log('[shop] follow toggled:', isFollowed)
+}
+
+function onContact() {
+  // TODO: open customer service chat
+  console.log('[shop] contact customer service')
+}
 </script>

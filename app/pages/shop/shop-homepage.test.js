@@ -38,7 +38,7 @@ test('useHomeData passes distributor_id to loadProducts', () => {
 
 test('shop page uses route.params.id as distributorId', () => {
   assert.match(shopPageSource, /route\.params\.id/)
-  assert.match(shopPageSource, /useHomeData\(distributorId\)/)
+  assert.match(shopPageSource, /useHomeData\(distributorId,/)
 })
 
 test('shop page renders hero banner, popular products, new arrivals and brand news sections', () => {

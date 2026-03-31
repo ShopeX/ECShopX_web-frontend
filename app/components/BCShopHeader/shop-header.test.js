@@ -58,3 +58,13 @@ test('useHomeData accepts optional keywords parameter', () => {
 test('useHomeData passes keywords to loadProducts', () => {
   assert.match(homeDataSource, /keywords:\s*keywords/)
 })
+
+test('shop/[id].vue includes BCShopHeader component', () => {
+  assert.match(shopPageSource, /BCShopHeader/)
+  assert.match(shopPageSource, /:distributor-id="distributorId"/)
+})
+
+test('shop/[id].vue passes q query param as keywords to useHomeData', () => {
+  assert.match(shopPageSource, /route\.query\.q/)
+  assert.match(shopPageSource, /useHomeData\(distributorId,/)
+})

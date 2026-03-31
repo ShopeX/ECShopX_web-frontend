@@ -35,3 +35,15 @@ test('useHomeData accepts optional distributorId parameter', () => {
 test('useHomeData passes distributor_id to loadProducts', () => {
   assert.match(homeDataSource, /distributor_id:\s*distributorId/)
 })
+
+test('shop page uses route.params.id as distributorId', () => {
+  assert.match(shopPageSource, /route\.params\.id/)
+  assert.match(shopPageSource, /useHomeData\(distributorId\)/)
+})
+
+test('shop page renders hero banner, popular products, new arrivals and brand news sections', () => {
+  assert.match(shopPageSource, /data-testid="home-popular-section"/)
+  assert.match(shopPageSource, /data-testid="home-new-arrival-section"/)
+  assert.match(shopPageSource, /data-testid="home-brand-news-section"/)
+  assert.match(shopPageSource, /WCHeroBanner/)
+})

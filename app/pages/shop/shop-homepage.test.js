@@ -27,3 +27,11 @@ test('IItemListParams has optional distributor_id field', () => {
 test('ItemApiClient.getItemList passes distributor_id query param when provided', () => {
   assert.match(itemClientSource, /distributor_id.*params\.distributor_id/)
 })
+
+test('useHomeData accepts optional distributorId parameter', () => {
+  assert.match(homeDataSource, /function useHomeData\s*\(\s*distributorId\?/)
+})
+
+test('useHomeData passes distributor_id to loadProducts', () => {
+  assert.match(homeDataSource, /distributor_id:\s*distributorId/)
+})

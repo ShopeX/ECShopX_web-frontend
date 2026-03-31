@@ -1,7 +1,7 @@
 import { templateApiClient } from '~/infrastructure/http/clients/TemplateApiClient'
 import { useProduct } from './useProduct'
 
-export function useHomeData() {
+export function useHomeData(distributorId?: string) {
   const { loadProducts, products, listLoading: productsLoading } = useProduct()
 
   const pageConfig = ref<any>(null)
@@ -13,7 +13,6 @@ export function useHomeData() {
     error.value = null
 
     try {
-      // Parallel fetch for better performance
       const [configRes] = await Promise.all([
         templateApiClient.getTemplateConfig('index'),
         loadProducts({
@@ -23,6 +22,7 @@ export function useHomeData() {
           main_category: '0',
           is_tdk: '0',
           type: 'all',
+          ...(distributorId && { distributor_id: distributorId }),
         }),
       ])
 
@@ -37,7 +37,6 @@ export function useHomeData() {
     }
   }
 
-  // SSR Support
   const fetchWithSSR = () => {
     return useAsyncData('home-data', async () => {
       await fetchHomeData()

@@ -27,3 +27,26 @@ test('BCShopHeaderProps defines required fields', () => {
   assert.match(typesSource, /categories:\s*string\[\]/)
   assert.match(typesSource, /followed\?:\s*boolean/)
 })
+
+test('BCShopHeader declares correct emits', () => {
+  assert.match(vueSource, /emit\(['"]follow['"]/)
+  assert.match(vueSource, /emit\(['"]contact['"]/)
+})
+
+test('BCShopHeader has required data-testid attributes', () => {
+  assert.match(vueSource, /data-testid="shop-header"/)
+  assert.match(vueSource, /data-testid="shop-header-search"/)
+  assert.match(vueSource, /data-testid="shop-header-follow"/)
+  assert.match(vueSource, /data-testid="shop-header-contact"/)
+})
+
+test('BCShopHeader follow button toggles isFollowed and emits', () => {
+  assert.match(vueSource, /isFollowed\.value\s*=\s*!isFollowed\.value/)
+  assert.match(vueSource, /emit\(['"]follow['"],\s*isFollowed\.value\)/)
+})
+
+test('BCShopHeader search navigates to shop page with q param', () => {
+  assert.match(vueSource, /router\.replace/)
+  assert.match(vueSource, /router\.push/)
+  assert.match(vueSource, /props\.distributorId/)
+})

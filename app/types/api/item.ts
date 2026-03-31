@@ -80,6 +80,7 @@ export interface IItemListParams {
   start_price?: number
   end_price?: number
   keywords?: string
+  distributor_id?: string
 }
 
 // 原始 API 响应结构

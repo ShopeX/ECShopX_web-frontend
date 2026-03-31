@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
 
@@ -15,13 +15,10 @@ const homeDataSource = readFileSync(
   path.resolve(process.cwd(), 'app/composables/useHomeData.ts'),
   'utf8'
 )
-let shopPageSource = ''
-try {
-  shopPageSource = readFileSync(
-    path.resolve(process.cwd(), 'app/pages/shop/[id].vue'),
-    'utf8'
-  )
-} catch (_) {}
+const shopPagePath = path.resolve(process.cwd(), 'app/pages/shop/[id].vue')
+const shopPageSource = existsSync(shopPagePath)
+  ? readFileSync(shopPagePath, 'utf8')
+  : ''
 
 test('IItemListParams has optional distributor_id field', () => {
   assert.match(itemTypesSource, /distributor_id\?:\s*string/)

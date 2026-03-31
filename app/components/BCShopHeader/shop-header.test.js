@@ -50,3 +50,11 @@ test('BCShopHeader search navigates to shop page with q param', () => {
   assert.match(vueSource, /router\.push/)
   assert.match(vueSource, /props\.distributorId/)
 })
+
+test('useHomeData accepts optional keywords parameter', () => {
+  assert.match(homeDataSource, /function useHomeData\s*\(\s*distributorId\?[^)]*keywords\?/)
+})
+
+test('useHomeData passes keywords to loadProducts', () => {
+  assert.match(homeDataSource, /keywords:\s*keywords/)
+})

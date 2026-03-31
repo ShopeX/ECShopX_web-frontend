@@ -1,7 +1,7 @@
 import { templateApiClient } from '~/infrastructure/http/clients/TemplateApiClient'
 import { useProduct } from './useProduct'
 
-export function useHomeData(distributorId?: string) {
+export function useHomeData(distributorId?: string, keywords?: string) {
   const { loadProducts, products, listLoading: productsLoading } = useProduct()
 
   const pageConfig = ref<any>(null)
@@ -24,6 +24,7 @@ export function useHomeData(distributorId?: string) {
           is_tdk: '0',
           type: 'all',
           ...(distributorId && { distributor_id: distributorId }),
+          ...(keywords && { keywords: keywords }),
         }),
       ])
 
@@ -38,6 +39,7 @@ export function useHomeData(distributorId?: string) {
     }
   }
 
+  // SSR Support
   const fetchWithSSR = () => {
     const cacheKey = distributorId ? `home-data-${distributorId}` : 'home-data'
     return useAsyncData(cacheKey, async () => {

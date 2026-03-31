@@ -38,9 +38,9 @@ export function useHomeData(distributorId?: string) {
     }
   }
 
-  // SSR Support
   const fetchWithSSR = () => {
-    return useAsyncData('home-data', async () => {
+    const cacheKey = distributorId ? `home-data-${distributorId}` : 'home-data'
+    return useAsyncData(cacheKey, async () => {
       await fetchHomeData()
       return {
         pageConfig: pageConfig.value,

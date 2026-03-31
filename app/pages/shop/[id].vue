@@ -66,7 +66,7 @@ import BCNewsCard from '~/components/BCNewsCard/BCNewsCard.vue'
 import { useHomeData } from '~/composables/useHomeData'
 
 const route = useRoute()
-const distributorId = route.params.id as string
+const distributorId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 const { products, pending, fetchHomeData } = useHomeData(distributorId)
 

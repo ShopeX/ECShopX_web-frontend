@@ -13,6 +13,7 @@ export function useHomeData(distributorId?: string) {
     error.value = null
 
     try {
+      // Parallel fetch for better performance
       const [configRes] = await Promise.all([
         templateApiClient.getTemplateConfig('index'),
         loadProducts({
@@ -37,6 +38,7 @@ export function useHomeData(distributorId?: string) {
     }
   }
 
+  // SSR Support
   const fetchWithSSR = () => {
     return useAsyncData('home-data', async () => {
       await fetchHomeData()

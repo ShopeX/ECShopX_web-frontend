@@ -1,12 +1,25 @@
 <template>
   <div class="bg-white">
+    <!-- BBC 店铺 Header（仅在携带 shopid 参数时展示） -->
+    <BCShopHeader
+      v-if="shopId"
+      :distributor-id="shopId"
+      :logo="shopInfo.logo"
+      :name="shopInfo.name"
+      :tagline="shopInfo.tagline"
+      :categories="shopInfo.categories"
+      :followed="shopInfo.followed"
+      @follow="onShopFollow"
+      @contact="onShopContact"
+    />
+
     <!-- 加载状态 -->
     <div v-if="detailLoading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
         <div
           class="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"
         ></div>
-        <p class="text-gray-600">{{ $t('product.loading') }}</p>
+        <p class="text-gray-600">{{ $t('464b6330.26b5bd') }}</p>
       </div>
     </div>
 
@@ -18,7 +31,7 @@
           class="px-6 py-2 bg-gray-900 text-white rounded hover:bg-gray-800"
           @click="$router.back()"
         >
-          {{ $t('common.back') }}
+          {{ $t('464b6330.5f4112') }}
         </button>
       </div>
     </div>
@@ -144,8 +157,12 @@
                 ¥{{ product.price.toLocaleString() }}
               </div>
             </div>
-            <button class="w-6 h-6 shrink-0" @click="toggleFavorite">
-              <UIcon name="i-heroicons-heart" class="w-6 h-6 text-gray-900" />
+            <button class="w-6 h-6 shrink-0" :aria-pressed="isFavorite" @click="toggleFavorite">
+              <UIcon
+                :name="favoriteIconName"
+                class="w-6 h-6"
+                :class="isFavorite ? 'text-[#e11d48]' : 'text-gray-900'"
+              />
             </button>
           </div>
 
@@ -215,13 +232,13 @@
                 name="i-heroicons-arrow-path"
                 class="w-5 h-5 animate-spin"
               />
-              {{ isAddingToCart ? $t('product.adding') : $t('product.addToCart') }}
+              {{ isAddingToCart ? $t('464b6330.49ac5f') : $t('464b6330.fb4e7c') }}
             </button>
             <button
               class="w-full px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 transition-colors"
               @click="buyNow"
             >
-              {{ $t('product.buyNow') }}
+              {{ $t('464b6330.5fd2f9') }}
             </button>
           </div>
 
@@ -234,7 +251,7 @@
                   class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('details')"
                 >
-                  <span>{{ $t('product.details') }}</span>
+                  <span>{{ $t('464b6330.b4f5db') }}</span>
                   <UIcon
                     name="i-heroicons-chevron-down"
                     class="w-4 h-4 transition-transform"
@@ -250,34 +267,34 @@
               </div>
 
               <!-- Additional Info Accordion 1 -->
-              <div class="border-b border-[#e5e7eb]">
+              <!-- <div class="border-b border-[#e5e7eb]">
                 <button
                   class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('info1')"
                 >
-                  <span>{{ $t('product.deliveryInfo') }}</span>
+                  <span>{{ $t('464b6330.d4327c') }}</span>
                   <UIcon
                     name="i-heroicons-chevron-down"
                     class="w-4 h-4 transition-transform"
                     :class="openAccordion === 'info1' ? 'rotate-180' : ''"
                   />
                 </button>
-              </div>
+              </div> -->
 
               <!-- Additional Info Accordion 2 -->
-              <div class="border-b border-[#e5e7eb]">
+              <!-- <div class="border-b border-[#e5e7eb]">
                 <button
                   class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
                   @click="toggleAccordion('info2')"
                 >
-                  <span>{{ $t('product.deliveryInfo') }}</span>
+                  <span>{{ $t('464b6330.d4327c') }}</span>
                   <UIcon
                     name="i-heroicons-chevron-down"
                     class="w-4 h-4 transition-transform"
                     :class="openAccordion === 'info2' ? 'rotate-180' : ''"
                   />
                 </button>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -286,8 +303,10 @@
 
     <!-- 推荐商品区域 -->
     <BCProductRecommendations
+      v-if="recommendedProducts.length > 0"
       :recommended-products="recommendedProducts"
       :recent-products="recentProducts"
+      :show-recent-tab="false"
     />
 
     <!-- 移动端底部操作栏 (sticky) -->
@@ -307,13 +326,13 @@
           @click="addToCart"
         >
           <UIcon v-if="isAddingToCart" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
-          {{ isAddingToCart ? $t('product.adding') : $t('product.addToCart') }}
+          {{ isAddingToCart ? $t('464b6330.49ac5f') : $t('464b6330.fb4e7c') }}
         </button>
         <button
           class="flex-1 px-0 py-4 text-sm font-medium leading-5 text-[#191a1d] bg-white border border-[#0f0f10] hover:bg-gray-50 active:bg-gray-100 transition-colors"
           @click="buyNow"
         >
-          {{ $t('product.buyNow') }}
+          {{ $t('464b6330.5fd2f9') }}
         </button>
       </div>
     </div>
@@ -322,12 +341,21 @@
 
 <script setup lang="ts">
 import BCProductRecommendations from '~/components/BCProductRecommendations/BCProductRecommendations.vue'
+import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
+import type { ProductRecommendation } from '~/components/BCProductRecommendations/types'
+import { collectApiClient } from '~/infrastructure/http/clients/CollectApiClient'
+import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
+import { RecommendLikeTransformer } from '~/infrastructure/transformers/recommendLikeTransformer'
 import type { IItem } from '~/types/api/item'
 import { logger } from '~/utils/log'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+
+// BBC 店铺上下文：有 shopid query 参数时展示店铺 Header
+const shopId = computed(() => route.query.shopid as string | undefined)
+const localePath = useLocalePath()
 const id = String((route.params as { id: string }).id || '')
 const toast = useToastMessage()
 
@@ -344,10 +372,10 @@ const {
 // 错误处理
 const detailError = computed(() => {
   if (fetchError.value) {
-    return t('product.loadError')
+    return t('464b6330.dc2359')
   }
   if (!rawProductData.value && !detailLoading.value) {
-    return t('product.notFound')
+    return t('464b6330.997875')
   }
   return null
 })
@@ -373,6 +401,7 @@ const currentImageIndex = ref(0) // 当前显示的大图索引
 const thumbnailStartIndex = ref(0) // 缩略图开始显示的索引
 const imageTransitionName = ref<'slide-left' | 'slide-right'>('slide-right') // 图片切换动画方向
 const isAddingToCart = ref(false) // 加入购物车 loading 状态
+const isFavorite = ref(false)
 
 // 触摸滑动支持
 const touchStartX = ref(0)
@@ -385,8 +414,12 @@ const MAX_VISIBLE_THUMBNAILS = 5
 const selectedSpecs = ref<Record<string, number>>({})
 
 const cartUI = useCartUIStore()
-const { requireAuth } = useAuthGuard()
+const { requireAuth, isLoggedIn } = useAuthGuard()
 const { addToCart: addToCartAction } = useCart()
+
+const favoriteIconName = computed(() => {
+  return isFavorite.value ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'
+})
 
 // 计算可见的缩略图（最多5个）
 const visibleThumbnails = computed(() => {
@@ -443,7 +476,7 @@ const product = computed(() => {
   return {
     title: data.itemName,
     price: data.price / 100, // 转换为元
-    description: data.brief || (data as any).intro || '暂无商品描述',
+    description: data.brief || (data as any).intro || t('464b6330.415547'),
     images: data.pics || [],
     specs,
   }
@@ -477,15 +510,43 @@ const selectSpecValue = (specName: string, specValueId: number) => {
   selectedSpecs.value[specName] = specValueId
 }
 
+const syncFavoriteStatus = async () => {
+  if (!isLoggedIn.value) {
+    isFavorite.value = false
+    return
+  }
+
+  try {
+    const response = await collectApiClient.getCollectItemList()
+    const currentData = response?.data ?? response ?? {}
+    const currentList = Array.isArray(currentData.list) ? currentData.list : []
+    isFavorite.value = currentList.some((item: any) => {
+      const currentItemId = String(
+        item.id ?? item.item_id ?? item.goods_id ?? item.collect_id ?? ''
+      )
+      return currentItemId === id
+    })
+  } catch (error) {
+    logger.warn('[product-detail] sync favorite status failed', error)
+    isFavorite.value = false
+  }
+}
+
 const toggleFavorite = async () => {
   // 使用 requireAuth 包装需要登录的操作
   await requireAuth(
     async () => {
-      // TODO: 调用收藏 API
-      toast.show('已添加到收藏')
+      if (isFavorite.value) {
+        await collectApiClient.removeCollectItems([id])
+        toast.show(t('464b6330.b46077'))
+      } else {
+        await collectApiClient.addCollectItem(id)
+        toast.show(t('464b6330.9e9a9a'))
+      }
+      isFavorite.value = !isFavorite.value
     },
     {
-      loginMessage: '请先登录后再收藏商品',
+      loginMessage: t('464b6330.39bf36'),
       redirectAfterLogin: true,
     }
   )
@@ -658,7 +719,7 @@ const addToCart = async () => {
         // - 自动重新加载购物车数据
       },
       {
-        loginMessage: t('product.loginRequired'),
+        loginMessage: t('464b6330.39bf36'),
         redirectAfterLogin: true,
       }
     )
@@ -688,7 +749,7 @@ const buyNow = async () => {
         if (result.success) {
           // 使用 navigateTo 替代 router.push，更好地集成 Nuxt 路由系统
           // navigateTo 会自动触发加载指示器，但我们已经手动启动了，所以会继续显示
-          await navigateTo('/checkout?mode=fastbuy')
+          await navigateTo(localePath({ path: '/checkout', query: { mode: 'fastbuy' } }))
         } else {
           // 如果失败，停止加载指示器
           loadingIndicator.finish()
@@ -700,88 +761,45 @@ const buyNow = async () => {
       }
     },
     {
-      loginMessage: '请先登录后再购买',
+      loginMessage: t('464b6330.b60a26'),
       redirectAfterLogin: true,
     }
   )
 }
 
-// Mock 推荐商品数据
-const recommendedProducts = ref([
-  {
-    id: '1',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '2',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '3',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1545127398-14699f92334b?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '4',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '5',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=600&auto=format&fit=crop',
-  },
-])
+const recommendedProducts = ref<ProductRecommendation[]>([])
+const recentProducts = ref<ProductRecommendation[]>([])
 
-const recentProducts = ref([
-  {
-    id: '6',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '7',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1528148343865-51218c4a13e6?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '8',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '9',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: '10',
-    name: '明基大包套耳机',
-    price: 1999.0,
-    image:
-      'https://images.unsplash.com/photo-1491927570842-0261e477d937?q=80&w=600&auto=format&fit=crop',
-  },
-])
+const loadRecommendedProducts = async () => {
+  try {
+    const response = await itemApiClient.getRecommendLikeItems('1', '10')
+    recommendedProducts.value = RecommendLikeTransformer.toRecommendationList(response)
+  } catch (error) {
+    logger.warn('[product-detail] load recommendations failed', error)
+    recommendedProducts.value = []
+  }
+}
+
+onMounted(async () => {
+  await Promise.allSettled([syncFavoriteStatus(), loadRecommendedProducts()])
+})
+
+// BBC 店铺信息（mock，后续对接 API）
+const shopInfo = {
+  logo: 'https://www.figma.com/api/mcp/asset/efb28441-c97e-49ad-b4ff-9c178ed5ac6e',
+  name: '小米京东自营商城',
+  tagline: '精选镇店好物，快来逛逛',
+  categories: ['耳机', '数码产品', '电脑', '笔记本'],
+  followed: false,
+}
+
+function onShopFollow(isFollowed: boolean) {
+  console.log('[product-detail] shop follow toggled:', isFollowed)
+}
+
+function onShopContact() {
+  console.log('[product-detail] contact customer service')
+}
 </script>
 
 <style scoped>

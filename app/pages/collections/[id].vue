@@ -1,5 +1,18 @@
 <template>
   <div class="min-h-screen bg-gray-50" data-testid="collections-page">
+    <!-- BBC 店铺 Header（仅在携带 shopid 参数时展示） -->
+    <BCShopHeader
+      v-if="shopId"
+      :distributor-id="shopId"
+      :logo="shopInfo.logo"
+      :name="shopInfo.name"
+      :tagline="shopInfo.tagline"
+      :categories="shopInfo.categories"
+      :followed="shopInfo.followed"
+      @follow="onShopFollow"
+      @contact="onShopContact"
+    />
+
     <!-- 集合封面头部 -->
     <img src="~/assets/images/banners/banner.png" class="w-full object-cover" />
 
@@ -46,9 +59,9 @@
               />
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">加载失败</h3>
-          <p class="text-gray-600 mb-4">{{ error.message || '网络错误，请稍后重试' }}</p>
-          <UButton @click="refresh()">重新加载</UButton>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('c52ec334.866b79') }}</h3>
+          <p class="text-gray-600 mb-4">{{ error.message || t('c52ec334.f70894') }}</p>
+          <UButton @click="refresh()">{{ t('c52ec334.64ca9b') }}</UButton>
         </div>
 
         <!-- 空状态 -->
@@ -67,8 +80,8 @@
               />
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">暂无商品</h3>
-          <p class="text-gray-600">请尝试调整筛选条件</p>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('c52ec334.e3a720') }}</h3>
+          <p class="text-gray-600">{{ t('c52ec334.cbcf4f') }}</p>
         </div>
 
         <!-- 商品展示 -->
@@ -100,7 +113,7 @@
               data-testid="collections-loading-more"
             >
               <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
-              <span class="text-gray-500 text-sm">加载中...</span>
+              <span class="text-gray-500 text-sm">{{ t('c52ec334.26b5bd') }}</span>
             </div>
           </div>
 
@@ -110,7 +123,7 @@
             class="text-center pt-8 pb-4"
             data-testid="collections-end-message"
           >
-            <p class="text-gray-400 text-sm">— 到底了 —</p>
+            <p class="text-gray-400 text-sm">{{ t('c52ec334.942d1f') }}</p>
           </div>
         </div>
       </div>
@@ -121,6 +134,7 @@
 <script setup lang="ts">
 import BCProductFilter from '~/components/BCProductFilter/BCProductFilter.vue'
 import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
+import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
 import type { IProduct } from '~/components/BCProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
 import type { ICategory } from '~/components/BCItemFilter/BCItemFilter.vue'
@@ -130,6 +144,8 @@ import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 
+const { t, locale } = useI18n()
+
 // 启用页面缓存
 definePageMeta({
   keepalive: true,
@@ -137,34 +153,34 @@ definePageMeta({
 
 // SEO 元数据配置
 useSeoMeta({
-  title: '商品列表 - ECSHOPX',
-  description: '浏览我们精选的商品，发现您喜欢的产品。支持品牌筛选、价格区间筛选和多种排序方式。',
-  keywords: '商品列表,电商,购物,品牌筛选,价格筛选,ECSHOPX',
+  title: () => t('c52ec334.833a3d'),
+  description: () => t('c52ec334.bb6714'),
+  keywords: () => 'ECSHOPX,products,e-commerce,shopping,brand filter,price filter',
   author: 'ECSHOPX',
   robots: 'index,follow',
-  ogTitle: '商品列表 - ECSHOPX',
-  ogDescription: '浏览我们精选的商品，发现您喜欢的产品。支持品牌筛选、价格区间筛选和多种排序方式。',
+  ogTitle: () => t('c52ec334.833a3d'),
+  ogDescription: () => t('c52ec334.bb6714'),
   ogType: 'website',
   ogUrl: 'https://ecshopx.com/item/list',
   ogImage: '/images/og-product-list.jpg',
   twitterCard: 'summary_large_image',
-  twitterTitle: '商品列表 - ECSHOPX',
-  twitterDescription: '浏览我们精选的商品，发现您喜欢的产品',
+  twitterTitle: () => t('c52ec334.833a3d'),
+  twitterDescription: () => t('c52ec334.bdeb79'),
   twitterImage: '/images/twitter-product-list.jpg',
 })
 
 // 分类列表状态
-const categories = ref<ICategory[]>([
-  { id: '1', name: '笔记本' },
-  { id: '2', name: '游戏本' },
-  { id: '3', name: '工作站' },
-  { id: '4', name: '台式机' },
-  { id: '5', name: '服务器' },
-  { id: '6', name: '一体机' },
-  { id: '7', name: '平板电脑' },
-  { id: '8', name: '平板电脑配件' },
-  { id: '9', name: '笔记本配件' },
-  { id: '10', name: '阅览机' },
+const categories = computed<ICategory[]>(() => [
+  { id: '1', name: t('c52ec334.1873ea') },
+  { id: '2', name: t('c52ec334.2565d0') },
+  { id: '3', name: t('c52ec334.909250') },
+  { id: '4', name: t('c52ec334.760805') },
+  { id: '5', name: t('c52ec334.c566ca') },
+  { id: '6', name: t('c52ec334.464add') },
+  { id: '7', name: t('c52ec334.e7e7de') },
+  { id: '8', name: t('c52ec334.97aabd') },
+  { id: '9', name: t('c52ec334.0c34e3') },
+  { id: '10', name: t('c52ec334.b5134f') },
 ])
 
 // 品牌列表状态
@@ -198,7 +214,7 @@ const showFilterPanel = ref(false)
 const filterGroups = computed<IFilterGroup[]>(() => [
   {
     key: 'category',
-    label: '分类',
+    label: t('c52ec334.d0771a'),
     multiple: false,
     options: categories.value.map((cat) => ({
       id: cat.id,
@@ -208,56 +224,56 @@ const filterGroups = computed<IFilterGroup[]>(() => [
   },
   {
     key: 'series',
-    label: '系列',
+    label: t('c52ec334.966e7c'),
     multiple: true,
     options: [
-      { id: '1', label: '经典系列', value: '1' },
-      { id: '2', label: '时尚系列', value: '2' },
-      { id: '3', label: '运动系列', value: '3' },
+      { id: '1', label: t('c52ec334.a6f127'), value: '1' },
+      { id: '2', label: t('c52ec334.0f8115'), value: '2' },
+      { id: '3', label: t('c52ec334.2e1317'), value: '3' },
     ],
   },
   {
     key: 'colors',
-    label: '颜色',
+    label: t('c52ec334.6b36c6'),
     multiple: true,
     options: [
-      { id: '1', label: '黑色', value: 'black' },
-      { id: '2', label: '白色', value: 'white' },
-      { id: '3', label: '灰色', value: 'gray' },
-      { id: '4', label: '棕色', value: 'brown' },
+      { id: '1', label: t('c52ec334.9d2d1f'), value: 'black' },
+      { id: '2', label: t('c52ec334.2fc96b'), value: 'white' },
+      { id: '3', label: t('c52ec334.fca97e'), value: 'gray' },
+      { id: '4', label: t('c52ec334.3ef2c0'), value: 'brown' },
     ],
   },
   {
     key: 'materials',
-    label: '材质',
+    label: t('c52ec334.e36233'),
     multiple: true,
     options: [
-      { id: '1', label: '皮革', value: 'leather' },
-      { id: '2', label: '帆布', value: 'canvas' },
-      { id: '3', label: '尼龙', value: 'nylon' },
+      { id: '1', label: t('c52ec334.f7a056'), value: 'leather' },
+      { id: '2', label: t('c52ec334.0a3866'), value: 'canvas' },
+      { id: '3', label: t('c52ec334.7c79fb'), value: 'nylon' },
     ],
   },
   {
     key: 'sizes',
-    label: '尺寸',
+    label: t('c52ec334.c8339f'),
     multiple: true,
     options: [
-      { id: '1', label: '小号', value: 'S' },
-      { id: '2', label: '中号', value: 'M' },
-      { id: '3', label: '大号', value: 'L' },
+      { id: '1', label: t('c52ec334.85533e'), value: 'S' },
+      { id: '2', label: t('c52ec334.b36ce9'), value: 'M' },
+      { id: '3', label: t('c52ec334.996841'), value: 'L' },
     ],
   },
   {
     key: 'priceRange',
-    label: '价格区间',
+    label: t('c52ec334.8d8376'),
     multiple: false,
     options: [
-      { id: '1', label: '¥500及以下', value: '0-500' },
-      { id: '2', label: '¥500-¥1000', value: '500-1000' },
-      { id: '3', label: '¥1000-¥3000', value: '1000-3000' },
-      { id: '4', label: '¥3000-¥5000', value: '3000-5000' },
-      { id: '5', label: '¥5000-¥10000', value: '5000-10000' },
-      { id: '6', label: '¥10000以上', value: '10000-' },
+      { id: '1', label: t('c52ec334.99e15d'), value: '0-500' },
+      { id: '2', label: t('c52ec334.3eaff3'), value: '500-1000' },
+      { id: '3', label: t('c52ec334.12b5b6'), value: '1000-3000' },
+      { id: '4', label: t('c52ec334.db4ffd'), value: '3000-5000' },
+      { id: '5', label: t('c52ec334.811623'), value: '5000-10000' },
+      { id: '6', label: t('c52ec334.3c3d08'), value: '10000-' },
     ],
   },
 ])
@@ -284,7 +300,11 @@ watch(
 )
 
 // 构建 API 参数
-const buildApiParams = (page: number, pageSize: number): IItemListParams => {
+const buildApiParams = (
+  page: number,
+  pageSize: number,
+  sourceFilters: typeof filterParams.value = filterParams.value
+): IItemListParams => {
   return {
     page: page.toString(),
     pageSize: pageSize.toString(),
@@ -293,12 +313,12 @@ const buildApiParams = (page: number, pageSize: number): IItemListParams => {
     is_tdk: '1',
     type: '0',
     company_id: '1',
-    ...(filterParams.value.categoryId && { category_id: filterParams.value.categoryId }),
-    ...(filterParams.value.brandId && { brand_id: filterParams.value.brandId }),
-    ...(filterParams.value.sort !== 'default' && { sort: filterParams.value.sort }),
-    ...(filterParams.value.startPrice && { start_price: filterParams.value.startPrice }),
-    ...(filterParams.value.endPrice && { end_price: filterParams.value.endPrice }),
-    ...(filterParams.value.keyword && { keywords: filterParams.value.keyword }),
+    ...(sourceFilters.categoryId && { category_id: sourceFilters.categoryId }),
+    ...(sourceFilters.brandId && { brand_id: sourceFilters.brandId }),
+    ...(sourceFilters.sort !== 'default' && { sort: sourceFilters.sort }),
+    ...(sourceFilters.startPrice && { start_price: sourceFilters.startPrice }),
+    ...(sourceFilters.endPrice && { end_price: sourceFilters.endPrice }),
+    ...(sourceFilters.keyword && { keywords: sourceFilters.keyword }),
   }
 }
 
@@ -341,7 +361,7 @@ const {
 
 // 动态更新页面标题（基于筛选条件）
 const dynamicTitle = computed(() => {
-  let title = '商品列表'
+  let title = t('c52ec334.437974')
 
   if (filterParams.value.categoryId) {
     const category = categories.value.find((c) => c.id === filterParams.value.categoryId)
@@ -359,8 +379,12 @@ const dynamicTitle = computed(() => {
 
   if (filterParams.value.startPrice || filterParams.value.endPrice) {
     const priceRange = []
-    if (filterParams.value.startPrice) priceRange.push(`${filterParams.value.startPrice}元起`)
-    if (filterParams.value.endPrice) priceRange.push(`${filterParams.value.endPrice}元内`)
+    if (filterParams.value.startPrice) {
+      priceRange.push(`${filterParams.value.startPrice}${t('c52ec334.317763')}`)
+    }
+    if (filterParams.value.endPrice) {
+      priceRange.push(`${filterParams.value.endPrice}${t('c52ec334.c19ea9')}`)
+    }
     if (priceRange.length > 0) {
       title += ` - ${priceRange.join('')}`
     }
@@ -388,6 +412,9 @@ watch(
 // 路由和查询参数
 const route = useRoute()
 const router = useRouter()
+
+// BBC 店铺上下文：有 shopid query 参数时展示店铺 Header
+const shopId = computed(() => route.query.shopid as string | undefined)
 
 // 避免重复请求的标志
 const isInternalUrlUpdate = ref(false)
@@ -479,18 +506,22 @@ const getFilterParamsFromUrl = () => {
 }
 
 // SSR 数据预取
+const initialDataKey = computed(
+  () => `item-list-initial:${route.path}:${route.fullPath}:${locale.value}`
+)
+
 const {
   data: initialData,
   pending: initialPending,
   error: initialError,
 } = await useLazyAsyncData(
-  'item-list-initial',
+  initialDataKey,
   async () => {
     // 从 URL 恢复筛选状态（使用独立函数）
     const urlParams = getFilterParamsFromUrl()
 
     // 构建 API 参数
-    const params = buildApiParams(1, 20)
+    const params = buildApiParams(1, 20, urlParams)
 
     // 使用 HTTP Client 获取数据
     const data = await itemApiClient.getItemList(params)
@@ -674,4 +705,30 @@ watch(
   },
   { deep: true }
 )
+
+// 语言切换时，主动刷新商品数据（country_code 由 HTTP 插件按 locale 自动注入）
+watch(
+  () => locale.value,
+  (newLocale, oldLocale) => {
+    if (!oldLocale || newLocale === oldLocale) return
+    refresh()
+  }
+)
+
+// BBC 店铺信息（mock，后续对接 API）
+const shopInfo = {
+  logo: 'https://www.figma.com/api/mcp/asset/efb28441-c97e-49ad-b4ff-9c178ed5ac6e',
+  name: '小米京东自营商城',
+  tagline: '精选镇店好物，快来逛逛',
+  categories: ['耳机', '数码产品', '电脑', '笔记本'],
+  followed: false,
+}
+
+function onShopFollow(isFollowed: boolean) {
+  console.log('[collections] shop follow toggled:', isFollowed)
+}
+
+function onShopContact() {
+  console.log('[collections] contact customer service')
+}
 </script>

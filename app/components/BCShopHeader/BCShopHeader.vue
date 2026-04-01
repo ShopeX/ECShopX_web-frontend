@@ -1,8 +1,93 @@
 <template>
-  <!-- PC store header — H5 layout to be added when design is provided -->
+  <!-- H5 store header -->
+  <div
+    class="flex lg:hidden w-full bg-[#f3f4f6] flex-col gap-4 p-4"
+    data-testid="shop-header"
+  >
+    <!-- Row 1: Store info + Follow/Contact -->
+    <div class="flex items-center justify-between">
+      <!-- Left: Logo + Name + Tagline -->
+      <div class="flex items-center gap-4">
+        <img :src="props.logo" :alt="props.name" class="w-9 h-9 object-cover shrink-0" />
+        <div class="flex flex-col gap-1">
+          <p class="text-[14px] font-medium text-[#191A1D] leading-5 whitespace-nowrap">
+            {{ props.name }}
+          </p>
+          <p class="text-[12px] text-[#99A1AF] leading-4 whitespace-nowrap">
+            {{ props.tagline }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Follow + Contact (icon above text) -->
+      <div class="flex items-start gap-4">
+        <button
+          class="flex flex-col items-center gap-1 py-2"
+          data-testid="shop-header-follow"
+          @click="toggleFollow"
+        >
+          <UIcon
+            :name="isFollowed ? 'i-heroicons-check' : 'i-heroicons-heart'"
+            class="w-4 h-4 text-[#191A1D]"
+          />
+          <span class="text-[12px] font-medium text-[#191A1D] leading-4 whitespace-nowrap">
+            {{ isFollowed ? '已关注' : '关注店铺' }}
+          </span>
+        </button>
+
+        <button
+          class="flex flex-col items-center gap-1 py-2"
+          data-testid="shop-header-contact"
+          @click="emit('contact')"
+        >
+          <UIcon name="i-heroicons-phone" class="w-4 h-4 text-[#191A1D]" />
+          <span class="text-[12px] font-medium text-[#191A1D] leading-4 whitespace-nowrap">联系客服</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Row 2: Search box + Category nav -->
+    <div class="flex flex-col gap-2">
+      <!-- Search Box -->
+      <div
+        class="flex items-center justify-between w-full h-10 bg-white border border-[#E5E7EB] pl-[9px] pr-[5px] py-[5px]"
+        data-testid="shop-header-search"
+      >
+        <div class="flex items-center gap-[10px] min-w-0">
+          <UIcon name="i-heroicons-magnifying-glass" class="w-5 h-5 text-[#99A1AF] shrink-0" />
+          <input
+            v-model="searchKeyword"
+            type="text"
+            :placeholder="searchPlaceholder"
+            class="bg-transparent text-[14px] text-[#99A1AF] leading-5 outline-none min-w-0 flex-1"
+            @keyup.enter="onSearch"
+          />
+        </div>
+        <button
+          class="flex items-center justify-center px-2 py-1 bg-[#0F0F10] h-full shrink-0"
+          @click="onSearch"
+        >
+          <span class="text-[12px] text-white leading-4 whitespace-nowrap">搜本店</span>
+        </button>
+      </div>
+
+      <!-- Category Nav -->
+      <div class="flex gap-4 items-center">
+        <button
+          v-for="cat in props.categories"
+          :key="cat"
+          class="text-[12px] text-[#4A5565] leading-4"
+          @click="onCategoryClick(cat)"
+        >
+          {{ cat }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PC store header -->
   <div
     class="hidden lg:flex w-full bg-[#f6f6f6] items-center justify-center px-4"
-    data-testid="shop-header"
   >
     <div class="flex flex-1 items-center justify-between py-6">
       <!-- Left: Store Info -->

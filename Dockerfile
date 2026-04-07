@@ -48,7 +48,7 @@ ENV NUXT_PUBLIC_CACHE_TTL=${NUXT_PUBLIC_CACHE_TTL}
 
 RUN pnpm build
 
-FROM node:20-alpine AS runner
+FROM reg.ishopex.cn/paiops-lang-base/nodejs-alpine:20.19 AS runner
 
 WORKDIR /app
 

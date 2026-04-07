@@ -2,7 +2,7 @@ import { defineNuxtPlugin, useNuxtApp, useRuntimeConfig, navigateTo } from 'nuxt
 import type { ApiResponse, HttpError } from '~/types/http'
 import { ErrorType } from '~/types/http'
 import { useUserStore } from '~/stores/user'
-import { getApiCountryCodeByLocale } from '../../shared/localeConfig'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 
 export default defineNuxtPlugin({
   name: 'http',

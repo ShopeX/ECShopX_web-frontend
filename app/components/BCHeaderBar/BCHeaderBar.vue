@@ -115,7 +115,7 @@
  */
 
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { LOCALE_DEFINITIONS } from '../../../shared/localeConfig'
+import { LOCALE_DEFINITIONS } from '~/shared/localeConfig'
 
 const router = useRouter()
 const route = useRoute()

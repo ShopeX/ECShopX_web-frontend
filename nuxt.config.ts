@@ -4,7 +4,13 @@ import {
   DEFAULT_LOCALE_CODE,
   getApiCountryCodeByLocale,
   LOCALE_DEFINITIONS,
-} from './shared/localeConfig'
+} from './app/shared/localeConfig'
+
+const buildEnvLog = Object.fromEntries(
+  Object.entries(process.env).filter(([key]) => key.startsWith('NUXT_'))
+)
+
+console.log('[Nuxt Config] Build env:', buildEnvLog)
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({

@@ -1,4 +1,4 @@
-import { NON_DEFAULT_LOCALE_CODES } from '../../shared/localeConfig'
+import { NON_DEFAULT_LOCALE_CODES } from '~/shared/localeConfig'
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

@@ -118,7 +118,7 @@ const { getAddressList, getAddressDetail, deleteAddress, saveAddress, transformF
 const activeMenu = ref('address')
 const showMobileMenu = ref(false)
 const loading = ref(true)
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 const addressList = ref<
   Array<{
     id: string

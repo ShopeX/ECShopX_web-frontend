@@ -124,7 +124,7 @@ export default defineNuxtConfig({
       defaultCountryCode:
         process.env.NUXT_PUBLIC_DEFAULT_COUNTRY_CODE ||
         getApiCountryCodeByLocale(DEFAULT_LOCALE_CODE),
-      businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // b2b 或 b2c
+      businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // bbc 或 b2c
     },
   },
 

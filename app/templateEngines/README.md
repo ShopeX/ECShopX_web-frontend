@@ -15,7 +15,7 @@ TemplateEngine 是一个支持 CMS 装修的模板引擎组件，可以从 API �
 ### 2. **默认模板回退**
 
 - API 请求失败时自动使用本地默认配置
-- 根据业务模式（b2b/b2c）加载对应模板
+- 根据业务模式（bbc/b2c）加载对应模板
 - 确保页面基础功能始终可用
 
 ### 3. **业务模式支持**
@@ -31,7 +31,7 @@ TemplateEngine 是一个支持 CMS 装修的模板引擎组件，可以从 API �
 在项目根目录的 `.env` 文件中配置：
 
 ```bash
-# 业务模式：b2b 或 b2c
+# 业务模式：bbc 或 b2c
 NUXT_PUBLIC_BUSINESS_MODE=b2c
 ```
 
@@ -46,7 +46,7 @@ app/templateEngines/templates/
 │   ├── footer.ts     # 底部模板
 │   ├── index.ts      # 首页模板
 │   └── cart.ts       # 购物车模板
-└── b2b/              # B2B 模式默认模板
+└── bbc/              # BBC 模式默认模板
     ├── header.ts
     ├── footer.ts
     └── ...
@@ -244,12 +244,12 @@ const props = defineProps<{
 ## 注意事项
 
 1. **默认模板必须存在**
-   - 确保在 `templates/b2c/` 或 `templates/b2b/` 目录下有对应的默认模板文件
+   - 确保在 `templates/b2c/` 或 `templates/bbc/` 目录下有对应的默认模板文件
    - 如果默认模板也不存在，页面可能显示空白
 
 2. **业务模式配置**
    - 确保在 `.env` 文件中正确配置 `NUXT_PUBLIC_BUSINESS_MODE`
-   - 只支持 `b2b` 和 `b2c` 两种模式
+   - 只支持 `bbc` 和 `b2c` 两种模式
 
 3. **组件注册**
    - 使用的组件类型必须在 `sectionComponents` 中注册

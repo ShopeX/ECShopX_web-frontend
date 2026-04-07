@@ -14,14 +14,14 @@ const accountFilterBarSource = readFileSync(
 
 test('account menu gates follow stores entry to bbc mode only', () => {
   assert.match(accountMenuSource, /getBusinessMode/)
-  assert.match(accountMenuSource, /===\s*'b2b'/)
+  assert.match(accountMenuSource, /===\s*'bbc'/)
   assert.match(accountMenuSource, /key:\s*'followStores'/)
   assert.match(accountMenuSource, /localePath\('\/account\/follow-stores'\)/)
 })
 
 test('account h5 filter bar gates follow stores entry to bbc mode only', () => {
   assert.match(accountFilterBarSource, /getBusinessMode/)
-  assert.match(accountFilterBarSource, /===\s*'b2b'/)
+  assert.match(accountFilterBarSource, /===\s*'bbc'/)
   assert.match(accountFilterBarSource, /key:\s*'followStores'/)
   assert.match(accountFilterBarSource, /localePath\('\/account\/follow-stores'\)/)
 })

@@ -75,8 +75,8 @@ const props = withDefaults(defineProps<Props>(), {
 const localePath = useLocalePath()
 const { t } = useI18n()
 
-// BBC 模式判断（NUXT_PUBLIC_BUSINESS_MODE=b2b 时为 BBC 模式）
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+// BBC 模式判断（NUXT_PUBLIC_BUSINESS_MODE=bbc 时为 BBC 模式）
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 // 懒加载动画
 const cardRef = ref<HTMLElement | null>(null)

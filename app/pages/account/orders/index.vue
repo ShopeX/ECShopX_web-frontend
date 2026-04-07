@@ -435,7 +435,7 @@ const { reasonOptions, loadReasonOptions } = useAftersalesReasonOptions()
 // 状态定义
 const activeMenu = ref('orders')
 const showMobileMenu = ref(false)
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 const tabs = computed(() => [
   { key: OrderStatus.ALL, label: t('de8076e6.dbb4d8') },

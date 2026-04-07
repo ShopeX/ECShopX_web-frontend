@@ -135,7 +135,7 @@ const {
 
 const activeMenu = ref('aftersales')
 const showMobileMenu = ref(false)
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 const tabs = computed<{ key: AftersalesTabKey; label: string }[]>(() => [
   { key: 'all', label: t('account.aftersalesAll') },

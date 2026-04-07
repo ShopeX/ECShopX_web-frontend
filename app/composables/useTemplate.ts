@@ -3,12 +3,13 @@ import type { ITemplateConfig } from '~/types/api/template'
 import { logger } from '~/utils/log'
 
 /**
- * 获取业务模式（b2b 或 b2c）
+ * 获取业务模式（bbc 或 b2c）
+ * 兼容历史上的 b2b 旧值，统一归一化为 bbc。
  */
-export function getBusinessMode(): 'b2b' | 'b2c' {
+export function getBusinessMode(): 'bbc' | 'b2c' {
   const runtimeConfig = useRuntimeConfig()
   const mode = runtimeConfig.public.businessMode || 'b2c'
-  return mode as 'b2b' | 'b2c'
+  return (mode === 'b2b' ? 'bbc' : mode) as 'bbc' | 'b2c'
 }
 
 /**

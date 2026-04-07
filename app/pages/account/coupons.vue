@@ -428,7 +428,7 @@ const userStore = useUserStore()
 const cartStore = useCartStore()
 const activeMenu = ref('coupons')
 const showMobileMenu = ref(false)
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 const mobileMenuItems = computed(() => {
   const items = [

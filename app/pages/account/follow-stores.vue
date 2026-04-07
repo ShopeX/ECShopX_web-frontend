@@ -99,7 +99,7 @@ const localePath = useLocalePath()
 
 const { stores, loading, errorMessage, isEmpty, loadFollowedStores } = useFollowedStores()
 
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 const activeMenu = ref('followStores')
 const showMobileMenu = ref(false)
 

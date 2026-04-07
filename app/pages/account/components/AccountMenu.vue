@@ -78,7 +78,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const { logout } = useAuth()
 const { confirm } = useModal()
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 const menuItems = computed(() => {
   const items = [

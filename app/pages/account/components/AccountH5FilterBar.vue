@@ -115,7 +115,7 @@ const localePath = useLocalePath()
 const { logout } = useAuth()
 const { confirm } = useModal()
 const innerExpanded = ref(props.modelValue)
-const isBBC = computed(() => getBusinessMode() === 'b2b')
+const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 const defaultMenuItems = computed<FilterMenuItem[]>(() => {
   const items: FilterMenuItem[] = [

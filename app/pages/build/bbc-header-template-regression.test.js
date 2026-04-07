@@ -4,15 +4,15 @@ import path from 'node:path'
 import test from 'node:test'
 
 const repoRoot = process.cwd()
-const b2bHeaderTemplatePath = path.resolve(
+const bbcHeaderTemplatePath = path.resolve(
   repoRoot,
-  'app/templateEngines/templates/b2b/header.ts'
+  'app/templateEngines/templates/bbc/header.ts'
 )
 
-test('b2b mode ships a local default header template for fallback rendering', () => {
-  assert.equal(existsSync(b2bHeaderTemplatePath), true)
+test('bbc mode ships a local default header template for fallback rendering', () => {
+  assert.equal(existsSync(bbcHeaderTemplatePath), true)
 
-  const source = readFileSync(b2bHeaderTemplatePath, 'utf8')
+  const source = readFileSync(bbcHeaderTemplatePath, 'utf8')
 
   assert.match(source, /sections:\s*\{/)
   assert.match(source, /header:\s*\{/)

@@ -41,12 +41,6 @@ cp .env.example .env.development
 - `NUXT_PUBLIC_SAAS`: 是否启用 SaaS 模式
 - `NUXT_PUBLIC_COMPANY_ID`: 公司 ID（非 SaaS 模式使用）
 
-#### Cookie 配置
-
-- `NUXT_COOKIE_SECRET`: Cookie 加密密钥
-- `NUXT_COOKIE_NAME_TOKEN`: 认证 Token Cookie 名称
-- `NUXT_COOKIE_NAME_COMPANY`: 公司 ID Cookie 名称
-
 #### 上传配置
 
 - `NUXT_PUBLIC_UPLOAD_URL`: 上传接口地址
@@ -56,11 +50,6 @@ cp .env.example .env.development
 #### 缓存配置
 
 - `NUXT_PUBLIC_CACHE_TTL`: 缓存有效期（秒）
-
-#### 调试配置
-
-- `NUXT_PUBLIC_DEBUG`: 是否启用调试模式
-- `NUXT_PUBLIC_API_MOCK`: 是否启用 API Mock
 
 ## 开发
 

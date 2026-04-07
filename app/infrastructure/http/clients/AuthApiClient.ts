@@ -109,10 +109,9 @@ export class AuthApiClient {
    * const { imageData, imageToken } = response.data
    * ```
    */
-  async getCaptcha(params: ICaptchaRequest): Promise<{ data: ICaptchaResponse }> {
-    return this.http('/wxapp/member/image/code', {
+  async getCaptcha(_params: ICaptchaRequest): Promise<{ data: ICaptchaResponse }> {
+    return this.http('/wxapp/distributor/image/code', {
       method: 'GET',
-      params: params,
       cache: 'no-cache', // 验证码不缓存
     })
   }

@@ -1,34 +1,44 @@
 <template>
   <div class="flex flex-col overflow-hidden">
     <!-- 商品图片 -->
-    <div class="aspect-square w-full relative">
+    <button
+      type="button"
+      class="relative aspect-square w-full"
+      :aria-label="t('c771fc84.aa2f89', { name: product.name })"
+      @click="handleSelect"
+    >
       <img
         :src="product.image"
         :alt="product.name"
-        class="absolute inset-0 w-full h-full object-cover"
+        class="absolute inset-0 h-full w-full object-cover"
       />
-    </div>
+    </button>
 
     <!-- 商品信息 -->
-    <div class="bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8">
+    <div class="flex flex-col items-center gap-3 bg-[#f6f6f6] px-6 py-8">
       <!-- 商品名称 -->
-      <h2 class="text-sm font-medium text-[#191a1d] text-center leading-5 w-full">
+      <h2
+        class="w-full text-center font-['Noto_Sans_SC',sans-serif] text-sm font-medium leading-5 text-[#191a1d]"
+      >
         {{ product.name }}
       </h2>
 
       <!-- 价格 -->
-      <p class="text-sm text-[#191a1d] text-center h-6 flex items-center justify-center">
+      <p
+        class="flex h-6 items-center justify-center text-center font-['Inter',sans-serif] text-sm leading-[14px] text-[#191a1d]"
+      >
         ￥{{ formatPrice(product.price) }}
       </p>
 
-      <!-- 移出收藏按钮（S1 仅列表展示时不展示） -->
+      <!-- 移出收藏按钮：可仅保留视觉，不接删除逻辑 -->
       <button
         v-if="showRemoveButton"
-        class="border border-[#0f0f10] px-8 py-2 hover:bg-[#0f0f10] hover:text-white transition-colors"
-        @click.stop="handleRemove"
+        type="button"
+        class="border border-[#0f0f10] px-8 py-2 text-[#0f0f10] transition-colors"
+        @click.stop.prevent="handleRemove"
       >
-        <span class="text-xs font-medium text-[#0f0f10] hover:text-white leading-4">
-          移出收藏
+        <span class="font-['Noto_Sans_SC',sans-serif] text-xs font-medium leading-4 text-current">
+          {{ t('c771fc84.c92447') }}
         </span>
       </button>
     </div>
@@ -45,8 +55,10 @@ interface Product {
 
 interface Props {
   product: Product
-  /** 是否展示「移出收藏」按钮，默认 true；收藏页 S1 仅列表展示时传 false */
+  /** 是否展示「移出收藏」按钮 */
   showRemoveButton?: boolean
+  /** 是否启用按钮行为，默认 true；仅做 UI 还原时可关闭 */
+  enableRemoveAction?: boolean
 }
 
 defineOptions({
@@ -55,10 +67,13 @@ defineOptions({
 
 const props = withDefaults(defineProps<Props>(), {
   showRemoveButton: true,
+  enableRemoveAction: true,
 })
+const { t } = useI18n()
 
 const emit = defineEmits<{
   remove: [productId: string | number]
+  select: []
 }>()
 
 /**
@@ -68,16 +83,17 @@ function formatPrice(price: number): string {
   return price.toFixed(2)
 }
 
+function handleSelect() {
+  emit('select')
+}
+
 /**
  * 处理移出收藏
  */
 function handleRemove() {
+  if (!props.enableRemoveAction) {
+    return
+  }
   emit('remove', props.product.id)
 }
 </script>
-
-<style scoped>
-button:hover span {
-  color: white;
-}
-</style>

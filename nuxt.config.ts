@@ -1,10 +1,21 @@
 import { resolve } from 'path'
 import { defineNuxtConfig } from 'nuxt/config'
+import {
+  DEFAULT_LOCALE_CODE,
+  getApiCountryCodeByLocale,
+  LOCALE_DEFINITIONS,
+} from './shared/localeConfig'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // 开发模式配置
   devtools: { enabled: true },
+
+  // 开发服务器配置
+  devServer: {
+    host: '0.0.0.0',
+    port: 3000,
+  },
 
   // Nitro 配置
   nitro: {
@@ -80,24 +91,8 @@ export default defineNuxtConfig({
   i18n: {
     lazy: true,
     langDir: '../app/locales',
-    locales: [
-      {
-        code: 'en',
-        file: 'en-US.json',
-        name: 'English',
-      },
-      {
-        code: 'zh',
-        file: 'zh-CN.json',
-        name: '简体中文',
-      },
-      {
-        code: 'ar',
-        file: 'ar.json',
-        name: 'العربية',
-      },
-    ],
-    defaultLocale: 'zh',
+    locales: LOCALE_DEFINITIONS,
+    defaultLocale: DEFAULT_LOCALE_CODE,
     strategy: 'prefix_except_default',
     detectBrowserLanguage: {
       useCookie: true,
@@ -120,7 +115,9 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
       companyId: process.env.NUXT_PUBLIC_COMPANY_ID,
-      countryCode: process.env.NUXT_PUBLIC_COUNTRY_CODE, // 未设置时由 HTTP 插件用 i18n cookie 或默认 zh-CN
+      defaultCountryCode:
+        process.env.NUXT_PUBLIC_DEFAULT_COUNTRY_CODE ||
+        getApiCountryCodeByLocale(DEFAULT_LOCALE_CODE),
       businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // b2b 或 b2c
     },
   },

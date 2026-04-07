@@ -5,7 +5,7 @@
       class="content-stretch flex items-center px-[16px] lg:px-[128px] py-[16px] relative w-full"
     >
       <p class="font-['Noto_Sans_SC'] font-medium leading-[48px] text-[24px] text-[#191a1d]">
-        购物袋
+        {{ t('b4f35314.53754b') }}
       </p>
     </div>
 
@@ -36,13 +36,13 @@
             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
           />
         </svg>
-        <p class="text-xl text-gray-600 mb-2">您的购物袋是空的</p>
-        <p class="text-sm text-gray-400 mb-6">快去选购心仪的商品吧</p>
+        <p class="text-xl text-gray-600 mb-2">{{ t('b4f35314.fa0a45') }}</p>
+        <p class="text-sm text-gray-400 mb-6">{{ t('b4f35314.723c28') }}</p>
         <NuxtLink
-          to="/products"
+          :to="localePath('/products')"
           class="px-8 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors"
         >
-          开始购物
+          {{ t('b4f35314.c8e79c') }}
         </NuxtLink>
       </div>
 
@@ -62,7 +62,7 @@
             <ECCheckbox
               :checked="cartUI.isAllSelected && cartUI.itemCount > 0"
               size="sm"
-              label="全选"
+              :label="t('79fdede9.66eeac')"
               @change="handleToggleAll"
             />
           </div>
@@ -86,7 +86,7 @@
           <div v-if="cartUI.invalidItems.length > 0" class="w-full mt-8">
             <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
               <h3 class="text-base font-medium text-gray-500">
-                失效商品 ({{ cartUI.invalidItems.length }})
+                {{ t('b4f35314.6fd47f') }} ({{ cartUI.invalidItems.length }})
               </h3>
             </div>
             <div
@@ -101,7 +101,7 @@
 
         <!-- 右侧：订单汇总 - 桌面端显示 -->
         <div class="hidden lg:block lg:w-auto lg:sticky lg:top-4 h-fit">
-          <OrderSummary
+          <BCOrderSummary
             :selected-count="cartUI.selectedCount"
             :subtotal-display="cartUI.cartTotalDisplay"
             :discount-display="cartUI.discountFeeDisplay"
@@ -130,7 +130,7 @@
             <ECCheckbox
               :checked="cartUI.isAllSelected && cartUI.itemCount > 0"
               size="sm"
-              label="全选"
+              :label="t('79fdede9.66eeac')"
               @change="handleToggleAll"
             />
           </div>
@@ -144,7 +144,7 @@
                 v-if="cartStore.discountFee > 0"
                 class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex font-['Noto_Sans_SC'] font-normal items-center leading-[20px] relative text-[14px] text-[#d0112f] text-nowrap"
               >
-                <p class="relative shrink-0">优惠：</p>
+                <p class="relative shrink-0">{{ t('b60e45d1.dd2fd1') }}</p>
                 <p class="relative shrink-0">{{ cartUI.discountFeeDisplay }}</p>
               </div>
             </div>
@@ -153,7 +153,7 @@
                 class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-end leading-[20px] relative text-[#191a1d] text-nowrap w-full"
               >
                 <p class="font-['Noto_Sans_SC'] font-normal relative shrink-0 text-[14px]">
-                  商品总计：
+                  {{ t('b4f35314.e2c2bc') }}
                 </p>
                 <p class="font-['Inter'] font-medium not-italic relative shrink-0 text-[16px]">
                   {{ cartUI.finalTotalDisplay }}
@@ -177,7 +177,7 @@
                 <p
                   class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-white"
                 >
-                  {{ loading ? '处理中...' : '前往结算' }}
+                  {{ loading ? t('b4f35314.2fb90b') : t('b4f35314.f7f353') }}
                 </p>
               </div>
             </button>
@@ -202,6 +202,8 @@ definePageMeta({
 })
 
 const router = useRouter()
+const localePath = useLocalePath()
+const { t } = useI18n()
 const cartStore = useCartStore()
 const {
   cartUI,
@@ -266,7 +268,6 @@ async function handleRemoveSelected() {
  */
 function handleCheckout() {
   if (!cartUI.value.canCheckout) return
-  // TODO: 跳转到结算页面
-  router.push('/checkout')
+  router.push(localePath('/checkout'))
 }
 </script>

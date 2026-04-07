@@ -16,7 +16,9 @@
       <div class="p-8 flex flex-col h-full">
         <!-- 标题栏 -->
         <div class="flex items-center justify-between py-4 mb-8">
-          <h2 class="text-[20px] font-medium text-[#191a1d] leading-5">注册</h2>
+          <h2 class="text-[20px] font-medium text-[#191a1d] leading-5">
+            {{ t('5a21f3db.fe0e8b') }}
+          </h2>
           <button
             type="button"
             class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
@@ -29,7 +31,7 @@
         <!-- 说明文字 -->
         <div class="mb-8">
           <p class="text-[14px] text-[#364153] leading-5">
-            注册成为会员，享受更多优惠和便捷的购物体验。
+            {{ t('5a21f3db.199a9d') }}
           </p>
         </div>
 
@@ -40,7 +42,7 @@
             <input
               v-model="registerForm.phone"
               type="tel"
-              placeholder="手机号码"
+              :placeholder="t('5a21f3db.92448a')"
               class="w-full py-4 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
           </div>
@@ -50,7 +52,7 @@
             <input
               v-model="registerForm.code"
               type="text"
-              placeholder="短信验证码"
+              :placeholder="t('5a21f3db.eb76c0')"
               class="flex-1 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
             <button
@@ -59,9 +61,11 @@
               :disabled="!canSend || isSending"
               @click="handleSendCode"
             >
-              <template v-if="isSending">发送中...</template>
-              <template v-else-if="countdown > 0">{{ countdown }}秒后重试</template>
-              <template v-else>获取验证码</template>
+              <template v-if="isSending">{{ t('5a21f3db.ba1a3a') }}</template>
+              <template v-else-if="countdown > 0">
+                {{ t('5a21f3db.5a9c8a', { count: countdown }) }}
+              </template>
+              <template v-else>{{ t('5a21f3db.d369f4') }}</template>
             </button>
           </div>
 
@@ -70,7 +74,7 @@
             <input
               v-model="registerForm.password"
               :type="showPassword ? 'text' : 'password'"
-              placeholder="设置密码"
+              :placeholder="t('5a21f3db.f114c7')"
               class="flex-1 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
             <button
@@ -90,7 +94,7 @@
             <input
               v-model="registerForm.confirmPassword"
               :type="showConfirmPassword ? 'text' : 'password'"
-              placeholder="确认密码"
+              :placeholder="t('5a21f3db.3fbdde')"
               class="flex-1 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
             <button
@@ -125,19 +129,19 @@
               class="w-full py-4 bg-[#0f0f10] text-white text-[14px] font-medium leading-5 transition-all hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="isLoading"
             >
-              {{ isLoading ? '注册中...' : '注册' }}
+              {{ isLoading ? t('5a21f3db.2f4891') : t('5a21f3db.fe0e8b') }}
             </button>
           </div>
 
           <!-- 登录链接 -->
           <div class="flex items-center justify-center py-4">
-            <span class="text-[14px] text-[#4a5565] mr-2">已有账号？</span>
+            <span class="text-[14px] text-[#4a5565] mr-2">{{ t('5a21f3db.c3b432') }}</span>
             <button
               type="button"
               class="text-[14px] text-[#191a1d] leading-5 underline hover:text-gray-600 transition-colors"
               @click="goToLogin"
             >
-              立即登录
+              {{ t('5a21f3db.ed2ff8') }}
             </button>
           </div>
         </form>
@@ -157,6 +161,8 @@ definePageMeta({
 })
 
 const router = useRouter()
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 // 使用 Composables
 const {
@@ -201,12 +207,12 @@ async function handleSendCode() {
 
   // 验证手机号
   if (!registerForm.phone) {
-    error.value = '请输入手机号码'
+    error.value = t('5a21f3db.ff95a4')
     return
   }
 
   if (!/^1[3-9]\d{9}$/.test(registerForm.phone)) {
-    error.value = '请输入正确的手机号码'
+    error.value = t('5a21f3db.18d771')
     return
   }
 
@@ -222,7 +228,7 @@ async function handleSendCode() {
     console.log('验证码已发送')
   } else {
     // 显示发送错误
-    error.value = smsError.value || '发送验证码失败，请稍后重试'
+    error.value = smsError.value || t('5a21f3db.227b10')
   }
 }
 
@@ -235,37 +241,37 @@ async function handleRegister() {
 
   // 表单验证
   if (!registerForm.phone) {
-    error.value = '请输入手机号码'
+    error.value = t('5a21f3db.ff95a4')
     return
   }
 
   if (!/^1[3-9]\d{9}$/.test(registerForm.phone)) {
-    error.value = '请输入正确的手机号码'
+    error.value = t('5a21f3db.18d771')
     return
   }
 
   if (!registerForm.code) {
-    error.value = '请输入验证码'
+    error.value = t('5a21f3db.d0c06a')
     return
   }
 
   if (!registerForm.password) {
-    error.value = '请输入密码'
+    error.value = t('5a21f3db.e39ffe')
     return
   }
 
   if (registerForm.password.length < 6) {
-    error.value = '密码长度至少6位'
+    error.value = t('5a21f3db.72ace4')
     return
   }
 
   if (!registerForm.confirmPassword) {
-    error.value = '请确认密码'
+    error.value = t('5a21f3db.a0fcd6')
     return
   }
 
   if (registerForm.password !== registerForm.confirmPassword) {
-    error.value = '两次输入的密码不一致'
+    error.value = t('5a21f3db.6046d6')
     return
   }
 
@@ -282,14 +288,14 @@ async function handleRegister() {
     // 模拟注册成功
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    successMessage.value = '注册成功！即将跳转到登录页面...'
+    successMessage.value = t('5a21f3db.d3f909')
 
     // 延迟跳转到登录页
     setTimeout(() => {
-      router.push('/account/login')
+      router.push(localePath('/account/login'))
     }, 1500)
   } catch (err: any) {
-    error.value = err.message || '注册失败，请稍后重试'
+    error.value = err.message || t('5a21f3db.bd5372')
     console.error('Register error:', err)
   } finally {
     isLoading.value = false
@@ -300,7 +306,7 @@ async function handleRegister() {
  * 前往登录页面
  */
 function goToLogin() {
-  router.push('/account/login')
+  router.push(localePath('/account/login'))
 }
 
 /**

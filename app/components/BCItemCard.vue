@@ -17,7 +17,7 @@
         v-if="item.discount"
         class="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded"
       >
-        {{ item.discount }}折
+        {{ item.discount }}{{ t('b672aabb.96c015') }}
       </div>
     </div>
 
@@ -37,7 +37,7 @@
       </div>
 
       <!-- 销量 -->
-      <div class="text-xs text-gray-500">已售 {{ item.sales }}</div>
+      <div class="text-xs text-gray-500">{{ t('b672aabb.b45fa4') }} {{ item.sales }}</div>
     </div>
   </div>
 </template>
@@ -58,6 +58,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   click: [item: ItemData]

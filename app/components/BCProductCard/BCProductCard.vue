@@ -1,10 +1,10 @@
 <template>
   <div
     ref="cardRef"
-    class="sp-product-card block group relative opacity-0 translate-y-4"
+    class="sp-product-card h-full block group relative opacity-0 translate-y-4"
     :class="{ 'sp-product-card--visible': isVisible }"
   >
-    <NuxtLink :to="`/products/${product.itemId}`" class="flex flex-col">
+    <NuxtLink :to="localePath(`/products/${product.itemId}`)" class="flex flex-col h-full">
       <!-- 商品图片容器 - 正方形 1:1 -->
       <div class="sp-product-card__image relative overflow-hidden aspect-square w-full">
         <!-- 商品图片 -->
@@ -19,10 +19,17 @@
 
       <!-- 商品信息区域 - 带灰色背景 -->
       <div
-        class="sp-product-card__info bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center"
+        class="sp-product-card__info bg-[#f6f6f6] flex flex-col gap-3 items-center px-6 py-8 w-full text-center grow"
       >
         <!-- 商品标题 -->
-        <h2 class="sp-product-card__title text-[#191a1d] text-sm font-medium leading-5 w-full">
+        <h2 
+          class="sp-product-card__title text-[#191a1d] text-sm font-medium leading-5 w-full"
+          :style="{
+            '-webkit-line-clamp': titleLines,
+            'line-clamp': titleLines,
+            'height': `calc(1.25rem * ${titleLines})`
+          }"
+        >
           {{ product.itemName }}
         </h2>
 
@@ -35,6 +42,14 @@
             amount-class="text-sm font-normal leading-5"
           />
         </div>
+
+        <!-- 店铺名称（BBC 模式下展示） -->
+        <div
+          v-if="isBBC && product.storeName"
+          class="sp-product-card__store w-full text-sm font-medium leading-5 text-[#99a1af]"
+        >
+          {{ product.storeName }}
+        </div>
       </div>
     </NuxtLink>
   </div>
@@ -46,12 +61,22 @@ import type { IProduct } from './types'
 import { useToastMessage } from '~/composables/useToastMessage'
 import { useCart } from '~/composables/useCart'
 import { useIntersectionObserver } from '@vueuse/core'
+import { getBusinessMode } from '~/composables/useTemplate'
 
 interface Props {
   product: IProduct
+  /** 商品名称最大行数 */
+  titleLines?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  titleLines: 2,
+})
+const localePath = useLocalePath()
+const { t } = useI18n()
+
+// BBC 模式判断（NUXT_PUBLIC_BUSINESS_MODE=b2b 时为 BBC 模式）
+const isBBC = computed(() => getBusinessMode() === 'b2b')
 
 // 懒加载动画
 const cardRef = ref<HTMLElement | null>(null)
@@ -133,7 +158,7 @@ async function handleAddToCart(event: Event) {
       cart_type: 'cart',
     })
   } catch (error: any) {
-    toast.show(error.message || '添加失败，请重试')
+    toast.show(error.message || t('94614ea6.2127b3'))
   }
 }
 </script>
@@ -156,8 +181,6 @@ async function handleAddToCart(event: Event) {
 .sp-product-card__title {
   /* 标题多行省略 */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;

@@ -28,7 +28,9 @@
       class="px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-sm"
       @click="handlePriceSort"
     >
-      <span :class="isPriceSortActive ? 'text-red-500' : 'text-gray-500'"> 价格 </span>
+      <span :class="isPriceSortActive ? 'text-red-500' : 'text-gray-500'">
+        {{ t('21fa0a50.0e9fd9') }}
+      </span>
       <div class="ml-1 flex flex-col">
         <UIcon
           name="i-heroicons-chevron-up"
@@ -63,16 +65,18 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const { t } = useI18n()
+
 const emit = defineEmits<{
   'update:sort': [value: string]
 }>()
 
 // 排序选项
-const sortOptions = [
-  { label: '综合', value: 'default' },
-  { label: '销量', value: 'sales_desc' },
-  { label: '评论数', value: 'rating_desc' },
-]
+const sortOptions = computed(() => [
+  { label: t('21fa0a50.88e7de'), value: 'default' },
+  { label: t('21fa0a50.44e7eb'), value: 'sales_desc' },
+  { label: t('c5c4da86.26bad5'), value: 'rating_desc' },
+])
 
 // 价格排序方向
 const priceSortDirection = ref<'asc' | 'desc'>('asc')

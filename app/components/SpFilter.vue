@@ -3,7 +3,7 @@
   <div class="flex items-center justify-between px-4 py-3 bg-white">
     <!-- 左侧排序选项 -->
     <div class="flex items-center gap-6">
-      <span class="text-base text-[#333333]">排序：</span>
+      <span class="text-base text-[#333333]">{{ t('21fa0a50.899c0c') }}</span>
 
       <!-- 排序选项列表 -->
       <div class="flex items-center gap-5">
@@ -14,7 +14,7 @@
           :class="sortClass(EFilterSort.COMPREHENSIVE)"
           @click="handleSortChange(EFilterSort.COMPREHENSIVE)"
         >
-          综合
+          {{ t('21fa0a50.88e7de') }}
         </ECButton>
 
         <!-- 销量 -->
@@ -24,7 +24,7 @@
           :class="sortClass(EFilterSort.SALES)"
           @click="handleSortChange(EFilterSort.SALES)"
         >
-          销量
+          {{ t('21fa0a50.44e7eb') }}
         </ECButton>
 
         <!-- 上新 -->
@@ -34,7 +34,7 @@
           :class="sortClass(EFilterSort.NEW)"
           @click="handleSortChange(EFilterSort.NEW)"
         >
-          上新
+          {{ t('21fa0a50.314ef5') }}
         </ECButton>
 
         <!-- 价格排序 -->
@@ -44,7 +44,7 @@
           :class="[sortClass(EFilterSort.PRICE), 'flex items-center gap-1']"
           @click="handlePriceSortChange"
         >
-          价格
+          {{ t('21fa0a50.0e9fd9') }}
           <div class="flex flex-col gap-[2px]">
             <div
               class="w-0 h-0 border-4 border-transparent border-b-current transition-colors"
@@ -65,7 +65,7 @@
             v-model="minPrice"
             type="number"
             size="sm"
-            placeholder="最低价"
+            :placeholder="t('21fa0a50.3d3297')"
             class="w-[80px] pl-6 pr-2"
             @input="handlePriceInput"
           />
@@ -77,21 +77,22 @@
             v-model="maxPrice"
             type="number"
             size="sm"
-            placeholder="最高价"
+            :placeholder="t('21fa0a50.dab19a')"
             class="w-[80px] pl-6 pr-2"
             @input="handlePriceInput"
           />
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[#999]">¥</span>
         </div>
         <ECButton variant="solid" size="sm" class="px-4" @click="handlePriceConfirm">
-          确定
+          {{ t('21fa0a50.38cf16') }}
         </ECButton>
       </div>
     </div>
 
     <!-- 右侧商品总数 -->
     <div class="text-sm text-[#666]">
-      共 <span class="text-[#b22420]">{{ total }}</span> 件商品
+      {{ t('21fa0a50.fbd2b1') }} <span class="text-[#b22420]">{{ total }}</span>
+      {{ t('21fa0a50.777ba9') }}
     </div>
   </div>
 </template>
@@ -108,6 +109,8 @@ const emit = defineEmits<{
   (e: 'update:params', params: IFilterParams): void
   (e: 'change', params: IFilterParams): void
 }>()
+
+const { t } = useI18n()
 
 // 价格输入框的值
 const minPrice = ref<string>('')

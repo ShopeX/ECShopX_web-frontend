@@ -2,7 +2,7 @@
   <div class="flex items-center gap-4 px-8 py-1">
     <!-- 标签 -->
     <div class="flex-shrink-0">
-      <span class="text-sm font-medium text-gray-700">品牌</span>
+      <span class="text-sm font-medium text-gray-700">{{ t('7aa9bfcf.09307c') }}</span>
     </div>
 
     <!-- 品牌列表 -->
@@ -30,7 +30,7 @@
           size="sm"
           class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
         >
-          更多
+          {{ t('7aa9bfcf.0ec9ea') }}
           <UIcon
             name="i-lucide-chevron-down"
             :class="['ml-1 h-3 w-3 transition-transform', isMoreOpen && 'rotate-180']"
@@ -41,13 +41,15 @@
           <div class="w-80 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
             <!-- 标题 -->
             <div class="mb-4 flex items-center justify-between">
-              <h4 class="m-0 text-base font-semibold text-gray-900">选择品牌</h4>
+              <h4 class="m-0 text-base font-semibold text-gray-900">
+                {{ t('7aa9bfcf.41b90f') }}
+              </h4>
               <button
                 v-if="selectedBrandIds.length > 0"
                 class="text-sm text-red-600 hover:text-red-700"
                 @click="handleClearAll"
               >
-                清空
+                {{ t('7aa9bfcf.288f0c') }}
               </button>
             </div>
 
@@ -79,7 +81,9 @@
 
             <!-- 操作按钮 -->
             <div class="flex justify-end gap-2">
-              <UButton variant="outline" size="sm" @click="isMoreOpen = false"> 完成 </UButton>
+              <UButton variant="outline" size="sm" @click="isMoreOpen = false">
+                {{ t('7aa9bfcf.769d88') }}
+              </UButton>
             </div>
           </div>
         </template>
@@ -109,6 +113,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   maxDisplay: 8,
 })
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:selectedBrandIds': [value: (string | number)[]]

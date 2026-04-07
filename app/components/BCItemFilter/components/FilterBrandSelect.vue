@@ -6,7 +6,9 @@
       size="sm"
       class="px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-sm"
     >
-      <span :class="isOpen ? 'text-red-500' : 'text-gray-500'"> 品牌 </span>
+      <span :class="isOpen ? 'text-red-500' : 'text-gray-500'">
+        {{ t('7aa9bfcf.09307c') }}
+      </span>
       <UIcon
         name="i-lucide-chevron-down"
         :class="isOpen ? 'text-red-500' : 'text-gray-500'"
@@ -18,7 +20,7 @@
       <div class="w-72 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
         <!-- 标题 -->
         <div class="mb-4">
-          <h4 class="m-0 text-base font-semibold text-gray-900">选择品牌</h4>
+          <h4 class="m-0 text-base font-semibold text-gray-900">{{ t('7aa9bfcf.41b90f') }}</h4>
         </div>
 
         <!-- 品牌列表 -->
@@ -34,14 +36,20 @@
               class="px-3 py-2 rounded-md transition-colors duration-200 hover:bg-gray-50"
             />
             -->
-            <div class="text-sm text-gray-500 text-center py-4">品牌选择功能待完善</div>
+            <div class="text-sm text-gray-500 text-center py-4">
+              {{ t('ddcfaf00.b2c73b') }}
+            </div>
           </div>
         </div>
 
         <!-- 操作按钮 -->
         <div class="flex justify-end gap-2">
-          <UButton variant="outline" size="sm" @click="handleClear"> 清空 </UButton>
-          <UButton color="primary" size="sm" @click="handleConfirm"> 确定 </UButton>
+          <UButton variant="outline" size="sm" @click="handleClear">
+            {{ t('7aa9bfcf.288f0c') }}
+          </UButton>
+          <UButton color="primary" size="sm" @click="handleConfirm">
+            {{ t('21fa0a50.38cf16') }}
+          </UButton>
         </div>
       </div>
     </template>
@@ -65,6 +73,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:selectedBrandIds': [value: (string | number)[]]

@@ -18,7 +18,7 @@
               <p
                 class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[20px] text-[#191a1d] text-nowrap"
               >
-                购物袋 ({{ cartUI.itemCount }})
+                {{ t('b60e45d1.346eab', { count: cartUI.itemCount }) }}
               </p>
             </div>
           </div>
@@ -58,8 +58,8 @@
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <p class="text-base text-gray-600 mb-2">您的购物袋是空的</p>
-            <p class="text-sm text-gray-400">快去选购心仪的商品吧</p>
+            <p class="text-base text-gray-600 mb-2">{{ t('b60e45d1.fa0a45') }}</p>
+            <p class="text-sm text-gray-400">{{ t('b60e45d1.723c28') }}</p>
           </div>
 
           <!-- 商品列表 -->
@@ -118,7 +118,7 @@
               <p
                 class="font-['Noto_Sans_SC'] font-normal leading-[20px] relative shrink-0 text-[14px] text-[#191a1d] text-nowrap"
               >
-                全选
+                {{ t('b60e45d1.66eeac') }}
               </p>
             </div>
           </div>
@@ -133,7 +133,7 @@
             <div
               class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex font-['Noto_Sans_SC'] font-normal items-center leading-[20px] relative text-[14px] text-[#d0112f] text-nowrap w-full"
             >
-              <p class="relative shrink-0">优惠：</p>
+              <p class="relative shrink-0">{{ t('b60e45d1.dd2fd1') }}</p>
               <p class="relative shrink-0">{{ cartUI.discountFeeDisplay }}</p>
             </div>
           </div>
@@ -143,7 +143,7 @@
               class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-end leading-[20px] relative text-[#191a1d] text-nowrap w-full"
             >
               <p class="font-['Noto_Sans_SC'] font-normal relative shrink-0 text-[14px]">
-                商品总计：
+                {{ t('b60e45d1.e2c2bc') }}
               </p>
               <p class="font-['Inter'] font-medium not-italic relative shrink-0 text-[16px]">
                 {{ cartUI.finalTotalDisplay }}
@@ -168,7 +168,7 @@
               <p
                 class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-white"
               >
-                前往结算
+                {{ t('b60e45d1.f7f353') }}
               </p>
             </div>
           </button>
@@ -184,7 +184,7 @@
               <p
                 class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-[#191a1d] text-center text-nowrap"
               >
-                查看购物袋
+                {{ t('b60e45d1.f67520') }}
               </p>
             </div>
           </button>
@@ -226,6 +226,8 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const localePath = useLocalePath()
+const { t } = useI18n()
 const { cartUI, loading, loadCart, toggleItemSelection, toggleAllSelection, updateQuantity } =
   useCart()
 
@@ -281,7 +283,7 @@ async function handleQuantityChange(itemId: string, quantity: number) {
 function handleCheckout() {
   if (!cartUI.value.canCheckout) return
   handleClose()
-  router.push('/checkout')
+  router.push(localePath('/checkout'))
 }
 
 /**
@@ -289,7 +291,7 @@ function handleCheckout() {
  */
 function handleViewCart() {
   handleClose()
-  router.push('/cart')
+  router.push(localePath('/cart'))
 }
 </script>
 

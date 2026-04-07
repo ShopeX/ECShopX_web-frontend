@@ -110,8 +110,11 @@ export class AuthTransformer {
    * @param apiResponse - API 返回的图形验证码响应
    * @returns 图形验证码响应模型
    */
-  static toCaptchaModel(apiResponse: { data: ICaptchaResponse }): ICaptchaResponse {
-    const data = apiResponse.data
+  static toCaptchaModel(apiResponse: { data: ICaptchaResponse } | ICaptchaResponse): ICaptchaResponse {
+    const data =
+      apiResponse && typeof apiResponse === 'object' && 'data' in apiResponse
+        ? apiResponse.data
+        : apiResponse
 
     // 验证必需字段
     if (!data.imageData || !data.imageToken) {

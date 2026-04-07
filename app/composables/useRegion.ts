@@ -19,6 +19,7 @@ const loadedCache = ref(false)
 export function useRegion() {
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const { t } = useI18n()
 
   /**
    * 获取省市区数据
@@ -56,7 +57,7 @@ export function useRegion() {
 
       return []
     } catch (err: any) {
-      error.value = err.message || '加载省市区数据失败'
+      error.value = err.message || t('ad65e9c3.25facd')
       console.error('加载省市区数据失败:', err)
       throw err
     } finally {

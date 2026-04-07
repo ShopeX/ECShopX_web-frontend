@@ -13,55 +13,68 @@
         <Transition name="modal-scale">
           <div
             v-if="visible"
-            class="relative bg-white border border-black/10 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] flex flex-col gap-8 p-8 max-h-[90vh] overflow-auto"
-            :style="{ width: modalWidth }"
+            class="relative bg-white border border-black/10 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] flex flex-col gap-8 max-h-[90vh] overflow-auto px-4 py-8 md:px-8 md:py-8 w-full max-w-[min(480px,calc(100vw-2rem))]"
+            :style="modalInlineStyle"
           >
-            <!-- 头部 -->
-            <div class="flex items-center justify-between shrink-0">
-              <h2 class="text-xl font-medium text-[#191a1d] leading-5">
-                {{ title }}
+            <!-- 头部：Figma 2951:5013 标题 20px Medium #191a1d，关闭 24px -->
+            <div class="flex items-center justify-between shrink-0 w-full">
+              <h2
+                class="font-['Noto_Sans_SC',sans-serif] font-medium text-[20px] leading-5 text-[#191a1d] whitespace-nowrap"
+              >
+                {{ displayTitle }}
               </h2>
               <button
                 v-if="showClose"
-                class="w-6 h-6 flex items-center justify-center hover:opacity-70 transition-opacity"
+                type="button"
+                class="size-6 shrink-0 flex items-center justify-center hover:opacity-70 transition-opacity"
+                :aria-label="t('3e6ed17a.b15d91')"
                 @click="handleClose"
               >
-                <UIcon name="i-heroicons-x-mark" class="w-6 h-6 text-[#4a5565]" />
+                <UIcon name="i-heroicons-x-mark" class="size-6 text-[#191a1d]" />
               </button>
             </div>
 
-            <!-- 内容区域 -->
-            <div class="flex-1 shrink-0">
+            <!-- 内容：Figma 16 Regular #4a5565 leading-[24px] -->
+            <div class="flex-1 shrink-0 w-full">
               <slot>
-                <p class="text-base text-[#4a5565] leading-6">
+                <p
+                  class="font-['Noto_Sans_SC',sans-serif] font-normal text-[16px] leading-6 text-[#4a5565]"
+                >
                   {{ content }}
                 </p>
               </slot>
             </div>
 
-            <!-- 底部按钮 -->
-            <div v-if="showFooter" class="flex items-center justify-end gap-4 shrink-0">
-              <!-- 取消按钮 -->
+            <!-- 底部按钮：Figma gap-[16px] justify-end，14px Medium -->
+            <div
+              v-if="showFooter"
+              class="flex flex-wrap items-center justify-end gap-4 shrink-0 w-full"
+            >
               <button
                 v-if="showCancelButton"
-                class="bg-white border border-[#0f0f10] px-8 py-4 hover:bg-gray-50 transition-colors"
+                type="button"
+                class="bg-white border border-[#0f0f10] px-8 py-4 hover:bg-gray-50 transition-colors shrink-0"
                 :disabled="cancelLoading"
                 @click="handleCancel"
               >
-                <span class="text-sm font-medium text-[#191a1d] leading-5">
+                <span
+                  class="font-['Noto_Sans_SC',sans-serif] font-medium text-[14px] text-[#191a1d] leading-5 text-center whitespace-nowrap"
+                >
                   {{ cancelButtonText }}
                 </span>
               </button>
 
-              <!-- 确认按钮 -->
               <button
                 v-if="showConfirmButton"
-                class="bg-[#0f0f10] px-8 py-4 hover:bg-[#0f0f10]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                type="button"
+                class="bg-[#0f0f10] px-8 py-4 hover:bg-[#0f0f10]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                 :disabled="confirmLoading"
                 @click="handleConfirm"
               >
-                <span class="text-sm font-medium text-white leading-5">
-                  {{ confirmLoading ? '加载中...' : confirmButtonText }}
+                <span
+                  class="font-['Noto_Sans_SC',sans-serif] font-medium text-[14px] text-white leading-5 text-center whitespace-nowrap"
+                >
+                  {{ confirmLoading ? t('3e6ed17a.2fb90b') : confirmButtonText }}
                 </span>
               </button>
             </div>
@@ -83,7 +96,7 @@ interface Props {
   title?: string
   /** 弹窗内容 */
   content?: string
-  /** 宽度 */
+  /** 宽度（不传则 H5 使用 min(480px, 100vw-2rem)，与 Figma 2951:5013 一致） */
   width?: string | number
   /** 是否显示关闭按钮 */
   showClose?: boolean
@@ -103,13 +116,12 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
-  title: '提示',
+  title: undefined,
   content: '',
-  width: '480px',
   showClose: true,
   maskClosable: true,
-  confirmText: '确定',
-  cancelText: '取消',
+  confirmText: undefined,
+  cancelText: undefined,
   showConfirm: true,
   showCancel: true,
   showFooter: true,
@@ -125,6 +137,7 @@ const emit = defineEmits<{
 defineOptions({
   name: 'Modal',
 })
+const { t } = useI18n()
 
 // 内部可见状态
 const visible = ref(props.modelValue)
@@ -146,12 +159,13 @@ watch(visible, (val) => {
   emit('update:modelValue', val)
 })
 
-// 计算宽度
-const modalWidth = computed(() => {
-  if (typeof props.width === 'number') {
-    return `${props.width}px`
+// 自定义宽度时覆盖 max-width（未传 width 时由 Tailwind 响应式 max-w 控制 H5/PC）
+const modalInlineStyle = computed(() => {
+  if (props.width === undefined || props.width === null || props.width === '') {
+    return undefined
   }
-  return props.width
+  const w = typeof props.width === 'number' ? `${props.width}px` : props.width
+  return { maxWidth: w, width: '100%' }
 })
 
 // 显示取消按钮
@@ -164,14 +178,18 @@ const showConfirmButton = computed(() => {
   return props.showConfirm && props.showFooter
 })
 
+const displayTitle = computed(() => {
+  return props.title || t('3e6ed17a.02d981')
+})
+
 // 取消按钮文本
 const cancelButtonText = computed(() => {
-  return props.cancelText
+  return props.cancelText || t('3e6ed17a.625fb2')
 })
 
 // 确认按钮文本
 const confirmButtonText = computed(() => {
-  return props.confirmText
+  return props.confirmText || t('3e6ed17a.38cf16')
 })
 
 /**

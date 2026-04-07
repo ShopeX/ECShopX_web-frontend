@@ -27,6 +27,8 @@ export function useAuthGuard() {
   const router = useRouter()
   const route = useRoute()
   const toast = useToastMessage()
+  const localePath = useLocalePath()
+  const { t } = useI18n()
 
   /**
    * 检查用户是否已登录
@@ -73,7 +75,7 @@ export function useAuthGuard() {
 
     // 未登录，提示并跳转到登录页
     const {
-      loginMessage = '请先登录',
+      loginMessage = t('d97b9964.8d2433'),
       redirectAfterLogin = true,
       loginPath = '/account/login',
     } = options || {}
@@ -86,7 +88,7 @@ export function useAuthGuard() {
 
     // 跳转到登录页
     await router.push({
-      path: loginPath,
+      path: localePath(loginPath),
       query: redirectPath ? { redirect: redirectPath } : undefined,
     })
 
@@ -109,7 +111,7 @@ export function useAuthGuard() {
     }
 
     const {
-      loginMessage = '请先登录',
+      loginMessage = t('d97b9964.8d2433'),
       redirectToLogin = false,
       loginPath = '/account/login',
     } = options || {}
@@ -121,7 +123,7 @@ export function useAuthGuard() {
     if (redirectToLogin) {
       const redirectPath = route.fullPath
       router.push({
-        path: loginPath,
+        path: localePath(loginPath),
         query: { redirect: redirectPath },
       })
     }
@@ -147,18 +149,18 @@ export function useAuthGuard() {
     }
   ) => {
     if (!isLoggedIn.value) {
-      const { loginMessage = '请先登录', loginPath = '/account/login' } = options || {}
+      const { loginMessage = t('d97b9964.8d2433'), loginPath = '/account/login' } = options || {}
 
       toast.show(loginMessage)
 
       router.push({
-        path: loginPath,
+        path: localePath(loginPath),
         query: { redirect: targetPath },
       })
       return false
     }
 
-    router.push(targetPath)
+    router.push(localePath(targetPath))
     return true
   }
 

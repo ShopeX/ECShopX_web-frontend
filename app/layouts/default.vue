@@ -1,7 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50" :style="layoutCssVars">
     <!-- 头部导航栏 - 支持 CMS 装修，API 失败时自动使用默认模板 -->
-    <div class="header-container sticky top-0 z-50 bg-white">
+    <div
+      ref="headerContainerRef"
+      class="header-container sticky top-0 z-50 bg-white"
+      :class="hideMobileHeader ? 'hidden lg:block' : ''"
+    >
       <TemplateEngine template="header">
         <template #header>
           <BCHeaderBar
@@ -19,7 +23,9 @@
     </main>
 
     <!-- Footer 区域 -->
-    <BCFooter />
+    <div :class="hideMobileFooter ? 'hidden lg:block' : ''">
+      <BCFooter />
+    </div>
 
     <!-- 全局搜索抽屉 - 使用 USlideover 包裹，和分类导航一致 -->
     <USlideover v-model:open="showSearchDrawer" side="left">
@@ -55,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import BCHeaderBar from '~/components/BCHeaderBar/BCHeaderBar.vue'
 import BCFooter from '~/components/BCFooter/BCFooter.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
@@ -65,6 +71,15 @@ import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
 // 默认布局组件 - 使用完整的电商头部
 
 const router = useRouter()
+const route = useRoute()
+
+const hideMobileHeader = computed(() => Boolean(route.meta.hideMobileHeader))
+const hideMobileFooter = computed(() => Boolean(route.meta.hideMobileFooter))
+const headerContainerRef = ref<HTMLElement | null>(null)
+const headerHeight = ref(0)
+const layoutCssVars = computed(() => ({
+  '--layout-header-height': `${headerHeight.value}px`,
+}))
 
 // 分类导航侧边栏状态
 const showCategoryNav = ref(false)
@@ -75,6 +90,11 @@ const showSearchDrawer = ref(false)
 
 // 热门搜索关键词
 const hotKeywords = ref(['手袋', '双十二', '新品', '手表', '香水彩妆', '珠宝腕表', '手提袋'])
+let headerResizeObserver: ResizeObserver | null = null
+
+const updateHeaderHeight = () => {
+  headerHeight.value = headerContainerRef.value?.offsetHeight ?? 0
+}
 
 // 手动处理打开分类导航
 const handleOpenCategoryNav = () => {
@@ -126,4 +146,19 @@ const handleChangeRegion = () => {
   console.log('更改配送地区')
   // TODO: 实现地区选择逻辑，例如打开地区选择弹窗
 }
+
+onMounted(() => {
+  updateHeaderHeight()
+  window.addEventListener('resize', updateHeaderHeight)
+
+  if (headerContainerRef.value && typeof ResizeObserver !== 'undefined') {
+    headerResizeObserver = new ResizeObserver(updateHeaderHeight)
+    headerResizeObserver.observe(headerContainerRef.value)
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateHeaderHeight)
+  headerResizeObserver?.disconnect()
+})
 </script>

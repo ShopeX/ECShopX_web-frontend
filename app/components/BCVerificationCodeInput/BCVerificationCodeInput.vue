@@ -4,7 +4,7 @@
     <input
       :value="modelValue"
       type="text"
-      placeholder="请输入验证码"
+      :placeholder="t('618c6b6f.d0c06a')"
       maxlength="6"
       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
       @input="handleInput"
@@ -48,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
   countdown: 0,
   disabled: false,
 })
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -66,12 +67,12 @@ const isDisabled = computed(() => {
  */
 const buttonText = computed(() => {
   if (props.sending) {
-    return '发送中...'
+    return t('618c6b6f.ba1a3a')
   }
   if (props.countdown > 0) {
-    return `${props.countdown}秒后重发`
+    return `${props.countdown}${t('618c6b6f.2135fc')}`
   }
-  return '发送验证码'
+  return t('618c6b6f.c5c358')
 })
 
 /**

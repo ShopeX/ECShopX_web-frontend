@@ -22,6 +22,7 @@
           ></div>
         </button>
         <button
+          v-if="showRecentTab"
           class="flex flex-col items-center justify-center pb-2 relative"
           @click="activeTab = 'recent'"
         >
@@ -123,16 +124,27 @@ import type { ProductRecommendation } from './types'
 interface Props {
   recommendedProducts?: ProductRecommendation[]
   recentProducts?: ProductRecommendation[]
+  showRecentTab?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   recommendedProducts: () => [],
   recentProducts: () => [],
+  showRecentTab: true,
 })
 
 const activeTab = ref<'recommended' | 'recent'>('recommended')
+const canShowRecentTab = computed(() => props.showRecentTab)
 
 const displayProducts = computed(() => {
+  if (!canShowRecentTab.value && activeTab.value === 'recent') {
+    activeTab.value = 'recommended'
+  }
+
+  if (!canShowRecentTab.value) {
+    return props.recommendedProducts.slice(0, 5)
+  }
+
   const products =
     activeTab.value === 'recommended' ? props.recommendedProducts : props.recentProducts
 

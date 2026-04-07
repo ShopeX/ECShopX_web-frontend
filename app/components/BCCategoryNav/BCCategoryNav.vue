@@ -17,7 +17,7 @@
         <input
           v-model="searchKeyword"
           type="text"
-          placeholder="甄选手袋礼品"
+          :placeholder="t('df37674e.0a24c0')"
           class="flex-1 text-sm text-[#99a1af] outline-none border-none bg-transparent"
           @input="handleSearch"
         />
@@ -28,7 +28,7 @@
         <NuxtLink
           v-for="category in categories"
           :key="category.id"
-          :to="category.link"
+          :to="localePath(category.link)"
           class="text-base font-medium text-[#191a1d] leading-5 hover:opacity-70 transition-opacity"
           @click="handleClose"
         >
@@ -39,10 +39,10 @@
       <!-- 底部固定信息 -->
       <div class="mt-auto flex flex-col gap-4">
         <NuxtLink
-          to="/customer-service"
+          :to="localePath('/customer-service')"
           class="text-sm text-[#191a1d] leading-5 underline hover:opacity-70 transition-opacity"
         >
-          客户服务
+          {{ t('df37674e.2039ae') }}
         </NuxtLink>
         <a
           href="tel:400-333-2222"
@@ -54,7 +54,7 @@
           class="text-sm text-[#191a1d] leading-5 underline hover:opacity-70 transition-opacity text-left"
           @click="handleChangeRegion"
         >
-          配送至：中国大陆
+          {{ t('df37674e.821fe3') }}
         </button>
       </div>
     </div>
@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 defineOptions({
   name: 'CategoryNav',
@@ -77,6 +77,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
 })
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 // Emits
 const emit = defineEmits<{
@@ -94,16 +96,16 @@ interface Category {
 }
 
 // 分类列表
-const categories = ref<Category[]>([
-  { id: 1, name: '全新系列', link: '/collections/new' },
-  { id: 2, name: '手袋', link: '/collections/bags' },
-  { id: 3, name: '女士', link: '/collections/women' },
-  { id: 4, name: '男士', link: '/collections/men' },
-  { id: 5, name: '童装', link: '/collections/kids' },
-  { id: 6, name: '旅行', link: '/collections/travel' },
-  { id: 7, name: '珠宝与腕表', link: '/collections/jewelry-watches' },
-  { id: 8, name: '香水与彩妆', link: '/collections/fragrance-makeup' },
-  { id: 9, name: '家居生活', link: '/collections/home-living' },
+const categories = computed<Category[]>(() => [
+  { id: 1, name: t('df37674e.7c85ce'), link: '/collections/new' },
+  { id: 2, name: t('df37674e.6e4493'), link: '/collections/bags' },
+  { id: 3, name: t('df37674e.7eff9d'), link: '/collections/women' },
+  { id: 4, name: t('df37674e.6f340b'), link: '/collections/men' },
+  { id: 5, name: t('df37674e.7a502d'), link: '/collections/kids' },
+  { id: 6, name: t('df37674e.874834'), link: '/collections/travel' },
+  { id: 7, name: t('df37674e.7035b2'), link: '/collections/jewelry-watches' },
+  { id: 8, name: t('df37674e.8cf901'), link: '/collections/fragrance-makeup' },
+  { id: 9, name: t('df37674e.259752'), link: '/collections/home-living' },
 ])
 
 // 搜索关键词

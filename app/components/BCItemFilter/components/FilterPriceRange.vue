@@ -6,7 +6,9 @@
       size="sm"
       class="px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:transform hover:-translate-y-0.5 hover:shadow-sm"
     >
-      <span :class="isOpen ? 'text-red-500' : 'text-gray-500'"> 价格区间 </span>
+      <span :class="isOpen ? 'text-red-500' : 'text-gray-500'">
+        {{ t('c8abcbfa.8d8376') }}
+      </span>
       <UIcon
         name="i-lucide-chevron-down"
         :class="isOpen ? 'text-red-500' : 'text-gray-500'"
@@ -18,7 +20,7 @@
       <div class="w-80 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
         <!-- 标题和关闭按钮 -->
         <div class="flex items-center justify-between mb-4">
-          <h4 class="m-0 text-base font-semibold text-gray-900">请输入价格区间</h4>
+          <h4 class="m-0 text-base font-semibold text-gray-900">{{ t('c8abcbfa.e6930c') }}</h4>
           <button
             @click="isOpen = false"
             class="text-gray-400 hover:text-gray-600 transition-colors"
@@ -39,7 +41,7 @@
               <UInput
                 v-model="localStartPrice"
                 type="number"
-                placeholder="最低价"
+                :placeholder="t('21fa0a50.3d3297')"
                 size="sm"
                 class="border-none outline-none px-3 py-2 min-w-20 focus:shadow-none"
                 @blur="handleInputBlur"
@@ -55,7 +57,7 @@
               <UInput
                 v-model="localEndPrice"
                 type="number"
-                placeholder="最高价"
+                :placeholder="t('21fa0a50.dab19a')"
                 size="sm"
                 class="border-none outline-none px-3 py-2 min-w-20 focus:shadow-none"
                 @blur="handleInputBlur"
@@ -79,15 +81,21 @@
               @click="selectPriceRange(option)"
             >
               <div class="font-semibold text-sm">{{ option.label }}</div>
-              <div class="text-xs text-gray-500 mt-1">{{ option.percentage }}%的选择</div>
+              <div class="text-xs text-gray-500 mt-1">
+                {{ option.percentage }}{{ t('c8abcbfa.5e5ba5') }}
+              </div>
             </button>
           </div>
         </div>
 
         <!-- 操作按钮 -->
         <div class="flex justify-end gap-2">
-          <UButton variant="outline" size="sm" @click="handleReset"> 重置 </UButton>
-          <UButton color="primary" size="sm" @click="handleConfirm"> 确定 </UButton>
+          <UButton variant="outline" size="sm" @click="handleReset">
+            {{ t('c8abcbfa.4b9c32') }}
+          </UButton>
+          <UButton color="primary" size="sm" @click="handleConfirm">
+            {{ t('21fa0a50.38cf16') }}
+          </UButton>
         </div>
       </div>
     </template>
@@ -115,6 +123,8 @@ const emit = defineEmits<{
   'update:endPrice': [value: number | undefined]
   change: []
 }>()
+
+const { t } = useI18n()
 
 // 弹窗显示状态
 const isOpen = ref(false)

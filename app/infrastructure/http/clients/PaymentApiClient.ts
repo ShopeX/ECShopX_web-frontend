@@ -35,10 +35,12 @@ export interface IGetOrderInfoParams {
 export interface IGetOrderInfoResponseData {
   order_id: string
   total_fee: string
+  total_amount?: string | number
   payStatus?: string
   orderInfo?: {
     order_status?: string
     total_fee?: string
+    total_amount?: string | number
     auto_cancel_time?: string
     auto_cancel_seconds?: number
     [key: string]: any
@@ -46,9 +48,9 @@ export interface IGetOrderInfoResponseData {
   [key: string]: any
 }
 
-/** 查询订单信息 - 200 响应 */
-export interface IGetOrderInfoResponse {
-  data: IGetOrderInfoResponseData
+/** 查询订单信息 - 200 响应（HTTP 插件可能已解包 data） */
+export type IGetOrderInfoResponse = IGetOrderInfoResponseData & {
+  data?: IGetOrderInfoResponseData
 }
 
 /** 查询订单支付信息 - Body（company_id、country_code 由 HTTP 插件全局注入） */
@@ -62,13 +64,43 @@ export interface IOrderPaymentInfoRequest {
 /** 查询订单支付信息 - 200 响应 data */
 export interface IOrderPaymentInfoResponseData {
   code_url?: string
+  payment?: string
+  mweb_url?: string
+  h5_url?: string
+  redirect_url?: string
+  pay_url?: string
+  appId?: string
+  timeStamp?: string
+  nonceStr?: string
+  package?: string
+  signType?: string
+  paySign?: string
   [key: string]: any
 }
 
-/** 查询订单支付信息 - 200 响应 */
-export interface IOrderPaymentInfoResponse {
-  data: IOrderPaymentInfoResponseData
+/** 查询订单支付信息 - 200 响应（HTTP 插件可能已解包 data） */
+export type IOrderPaymentInfoResponse = IOrderPaymentInfoResponseData & {
+  data?: IOrderPaymentInfoResponseData
 }
+
+/** 线下转账收款账户项 */
+export interface IOfflineBankAccountItem {
+  id?: string | number
+  account_id?: string | number
+  account_name?: string
+  bank_name?: string
+  account_number?: string
+  [key: string]: any
+}
+
+/** 线下转账收款账户响应 */
+export type IOfflineBankAccountsResponse =
+  | IOfflineBankAccountItem[]
+  | {
+      data?: IOfflineBankAccountItem[] | IOfflineBankAccountItem | Record<string, any>
+      list?: IOfflineBankAccountItem[]
+      [key: string]: any
+    }
 
 export class PaymentApiClient {
   private $api: any
@@ -133,6 +165,17 @@ export class PaymentApiClient {
         return_url: body.return_url,
         pay_channel: body.pay_channel,
       },
+      ...options,
+    } as any)
+  }
+
+  /**
+   * 获取线下转账收款账户
+   * GET /order/offline/backaccount
+   */
+  async getOfflineBankAccounts(options?: any): Promise<IOfflineBankAccountsResponse> {
+    return this.http('/wxapp/order/offline/backaccount', {
+      method: 'GET',
       ...options,
     } as any)
   }

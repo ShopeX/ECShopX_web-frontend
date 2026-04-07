@@ -12,6 +12,10 @@ export interface IGetCollectItemListParams {
   pageSize?: number
 }
 
+export interface IAddCollectItemParams {
+  itemType?: string
+}
+
 export class CollectApiClient {
   private $api: any
 
@@ -35,6 +39,29 @@ export class CollectApiClient {
     return this.http('/wxapp/member/collect/item', {
       method: 'GET',
       query: params,
+    })
+  }
+
+  async addCollectItem(itemId: string | number, params?: IAddCollectItemParams): Promise<any> {
+    return this.http(`/wxapp/member/collect/item/${itemId}`, {
+      method: 'POST',
+      body: {
+        item_id: String(itemId),
+        item_type: params?.itemType ?? 'normal',
+      },
+    })
+  }
+
+  async removeCollectItems(
+    itemIds: Array<string | number>,
+    isEmpty: boolean = false
+  ): Promise<any> {
+    return this.http('/wxapp/member/collect/item', {
+      method: 'DELETE',
+      body: {
+        item_ids: itemIds.map((itemId) => String(itemId)).join(','),
+        is_empty: String(isEmpty),
+      },
     })
   }
 }

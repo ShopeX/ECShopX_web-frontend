@@ -48,11 +48,13 @@ export interface IAddressItem {
   city: string
   county: string
   adrdetail: string
-  is_def: 0 | 1
+  is_def: 0 | 1 | '0' | '1' | boolean
+  is_default?: 0 | 1 | '0' | '1' | boolean
   receiver_zip?: string
 }
 
 export function useAddress() {
+  const { t } = useI18n()
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -100,7 +102,10 @@ export function useAddress() {
       district: apiData.county,
       tmp_code: [], // API doesn't return this in IAddressItem, so we use empty array
       detail: apiData.adrdetail,
-      isDefault: apiData.is_def === 1,
+      isDefault:
+        Number((apiData.is_def ?? apiData.is_default) || 0) === 1
+        || apiData.is_def === true
+        || apiData.is_default === true,
       receiver_zip: apiData.receiver_zip,
     }
   }
@@ -121,7 +126,7 @@ export function useAddress() {
         data: response,
       }
     } catch (err: any) {
-      error.value = err.message || '新增地址失败'
+      error.value = err.message || t('fa9beefa.38f43d')
       console.error('新增地址失败:', err)
       return {
         success: false,
@@ -148,7 +153,7 @@ export function useAddress() {
         data: response,
       }
     } catch (err: any) {
-      error.value = err.message || '更新地址失败'
+      error.value = err.message || t('fa9beefa.edae2b')
       console.error('更新地址失败:', err)
       return {
         success: false,
@@ -185,7 +190,7 @@ export function useAddress() {
         data: response,
       }
     } catch (err: any) {
-      error.value = err.message || '删除地址失败'
+      error.value = err.message || t('fa9beefa.25b23e')
       console.error('删除地址失败:', err)
       return {
         success: false,
@@ -211,7 +216,7 @@ export function useAddress() {
         data: response,
       }
     } catch (err: any) {
-      error.value = err.message || '获取地址列表失败'
+      error.value = err.message || t('fa9beefa.2f5ba4')
       console.error('获取地址列表失败:', err)
       return {
         success: false,
@@ -238,7 +243,7 @@ export function useAddress() {
         data: formData,
       }
     } catch (err: any) {
-      error.value = err.message || '获取地址详情失败'
+      error.value = err.message || t('fa9beefa.b5c976')
       console.error('获取地址详情失败:', err)
       return {
         success: false,

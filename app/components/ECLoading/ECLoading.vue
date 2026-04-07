@@ -3,7 +3,7 @@
     <svg class="loading-spinner" viewBox="0 0 50 50">
       <circle class="loading-circle" cx="25" cy="25" r="20"></circle>
     </svg>
-    <p v-if="showText" class="loading-text">{{ text }}</p>
+    <p v-if="showText" class="loading-text">{{ displayText }}</p>
   </div>
 </template>
 
@@ -15,10 +15,12 @@ interface Props {
   text?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   showText: false,
-  text: '加载中',
+  text: undefined,
 })
+const { t } = useI18n()
+const displayText = computed(() => props.text || t('73a71897.f013ea'))
 </script>
 
 <style scoped>

@@ -128,6 +128,11 @@ export interface ICreateOrderResponse {
   total_fee: number
 }
 
+export interface IGetOrderLogisticsParams {
+  orderId: string
+  orderType?: string
+}
+
 export class OrderApiClient {
   private $api: any
 
@@ -180,15 +185,17 @@ export class OrderApiClient {
   async getOrderList(params?: {
     status?: string | number
     page?: number
-    page_size?: number
+    pageSize?: number
+    is_rate?: string
   }): Promise<any> {
     return this.http('/wxapp/orders', {
       method: 'GET',
-      params: {
+      query: {
         status: params?.status !== undefined ? params?.status : 0,
         page: params?.page || 1,
-        pageSize: params?.page_size || 10,
-        order_type: 'normal'
+        pageSize: params?.pageSize || 10,
+        order_type: 'normal',
+        ...(params?.is_rate && { is_rate: params.is_rate }),
       },
     })
   }
@@ -220,6 +227,29 @@ export class OrderApiClient {
     return this.http('/wxapp/order/delete', {
       method: 'POST',
       body: { order_id: orderId },
+    })
+  }
+
+  /**
+   * 获取订单详情
+   */
+  async getOrderDetail(orderId: string): Promise<any> {
+    return this.http(`/wxapp/order/${orderId}`, {
+      method: 'GET',
+    })
+  }
+
+  /**
+   * 查询订单物流轨迹
+   */
+  async getOrderLogistics(params: IGetOrderLogisticsParams, options?: any): Promise<any> {
+    return this.http('/wxapp/trackerpull', {
+      method: 'POST',
+      query: {
+        order_type: params.orderType || 'normal',
+        order_id: params.orderId,
+      },
+      ...options,
     })
   }
 }

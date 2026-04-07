@@ -1,5 +1,6 @@
 import { logger } from '~/utils/log'
 import { useUserStore } from '~/stores/user'
+import { stripLocalePrefix } from '~/utils/localeRoute'
 
 // 需要登录才能访问的路由路径前缀
 const protectedRoutes = [
@@ -11,10 +12,12 @@ const protectedRoutes = [
 
 // 全局中间件 - 每个路由都会执行
 export default defineNuxtRouteMiddleware((to, from) => {
+  const localePath = useLocalePath()
   logger.info(`[AuthMiddleware] 路由导航: ${from?.path || '/'} -> ${to.path}`)
 
   // 检查是否是需要登录的路由
-  const requiresAuth = protectedRoutes.some((route) => to.path.startsWith(route))
+  const normalizedPath = stripLocalePrefix(to.path)
+  const requiresAuth = protectedRoutes.some((route) => normalizedPath.startsWith(route))
 
   if (requiresAuth) {
     // 获取用户登录状态
@@ -25,7 +28,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
       logger.warn(`[AuthMiddleware] 未登录访问受保护路由: ${to.path}`)
 
       return navigateTo({
-        path: '/account/login',
+        path: localePath('/account/login'),
         query: {
           redirect: to.fullPath,
         },

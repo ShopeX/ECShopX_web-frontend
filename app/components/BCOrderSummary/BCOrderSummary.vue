@@ -22,7 +22,7 @@
                   <p
                     class="font-['Noto_Sans_SC'] font-normal leading-[20px] relative shrink-0 text-[14px] text-[#4a5565] text-nowrap"
                   >
-                    {{ selectedCount }} 件商品
+                    {{ t('a3060bb4.26b6eb', { count: selectedCount }) }}
                   </p>
                 </div>
               </div>
@@ -38,7 +38,7 @@
                 <p
                   class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] text-nowrap"
                 >
-                  商品总计
+                  {{ t('a3060bb4.de8e9a') }}
                 </p>
               </div>
               <div class="relative shrink-0">
@@ -60,14 +60,14 @@
                 <p
                   class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] text-nowrap"
                 >
-                  运费
+                  {{ t('a3060bb4.9a935b') }}
                 </p>
               </div>
               <div class="relative shrink-0">
                 <p
                   class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#191a1d] text-nowrap"
                 >
-                  {{ shippingFee === 0 ? '免费' : shippingDisplay }}
+                  {{ shippingFee === 0 ? t('ab027ee5.aa2c91') : shippingDisplay }}
                 </p>
               </div>
             </div>
@@ -82,7 +82,7 @@
                 <p
                   class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] text-nowrap"
                 >
-                  优惠
+                  {{ t('a3060bb4.f06ebf') }}
                 </p>
               </div>
               <div class="relative shrink-0">
@@ -108,7 +108,7 @@
                   v-if="discountAmount > 0"
                   class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex font-['Noto_Sans_SC'] font-normal items-center leading-[20px] relative text-[14px] text-[#d0112f] text-nowrap"
                 >
-                  <p class="relative shrink-0">优惠：</p>
+                  <p class="relative shrink-0">{{ t('a3060bb4.dd2fd1') }}</p>
                   <p class="relative shrink-0">{{ discountDisplay }}</p>
                 </div>
               </div>
@@ -120,7 +120,7 @@
                     <p
                       class="font-['Noto_Sans_SC'] font-normal leading-[20px] relative shrink-0 text-[14px] text-[#191a1d] text-nowrap"
                     >
-                      商品总计：
+                      {{ t('a3060bb4.e2c2bc') }}
                     </p>
                   </div>
                   <div class="content-stretch flex items-center relative shrink-0">
@@ -149,7 +149,7 @@
               <p
                 class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-white"
               >
-                {{ loading ? '处理中...' : '去结算' }}
+                {{ loading ? t('a3060bb4.2fb90b') : t('a3060bb4.01e5a3') }}
               </p>
             </div>
           </button>
@@ -165,6 +165,8 @@
  *
  * 按照 Figma 设计实现，用于 PC 端购物车页面侧边栏
  */
+
+const { t } = useI18n()
 
 interface Props {
   /** 选中商品数量 */
@@ -189,7 +191,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   shippingFee: 0,
-  shippingDisplay: '免费',
+  shippingDisplay: '',
   disabled: false,
   loading: false,
   discountAmount: 0,

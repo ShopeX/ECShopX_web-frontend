@@ -173,9 +173,9 @@
                   <div
                     class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-[24px]"
                   >
-                    <!-- 订单汇总（Figma: gap-32 + PC 左对齐，总计 16px medium） -->
+                    <!-- 订单汇总（Figma: gap-32 + PC 左学齐，总计 16px medium） -->
                     <div
-                      class="flex w-full items-center justify-start gap-[32px] text-[14px] text-[#364153] lg:w-auto"
+                      class="flex w-full items-baseline justify-start gap-[32px] text-[14px] text-[#364153] lg:w-auto"
                     >
                       <span>{{ t('ee3264ed.0bf60b') }}: {{ getTotalQuantity(order) }}</span>
                       <span
@@ -187,102 +187,161 @@
                     </div>
 
                     <!-- 操作按钮（Figma: gap-16，主按钮 #0f0f10，次按钮描边） -->
-                    <div
-                      class="flex w-full flex-wrap items-center justify-end gap-[16px] lg:w-auto lg:justify-start"
-                    >
-                      <button
-                        v-if="order.canCancel"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center border border-[#0f0f10] px-4 lg:px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] hover:bg-gray-50 transition-colors"
-                        @click.stop="cancelOrder(order.orderId)"
+                    <div class="w-full lg:w-auto">
+                      <!-- H5：左侧更多 + 右侧主操作（按 Figma 交互） -->
+                      <div class="flex w-full min-h-[34px] items-center lg:hidden">
+                        <UPopover
+                          v-if="getMobileMoreActions(order).length > 0"
+                          v-model:open="mobileMoreOpenMap[order.orderId]"
+                        >
+                          <button
+                            type="button"
+                            class="flex items-center text-[12px] font-normal leading-[16px] text-[#364153] whitespace-nowrap"
+                            @click.stop
+                          >
+                            <span class="text-center">{{ t('7aa9bfcf.0ec9ea') }}</span>
+                            <UIcon
+                              name="i-lucide-chevron-down"
+                              class="size-[16px] text-[#364153]"
+                            />
+                          </button>
+
+                          <template #content>
+                            <div
+                              class="w-[128px] overflow-hidden rounded-[8px] border border-[#e5e7eb] bg-white py-[4px] shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+                            >
+                              <button
+                                v-for="action in getMobileMoreActions(order)"
+                                :key="`${order.orderId}-${action}`"
+                                type="button"
+                                :disabled="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                                class="flex h-[34px] w-full items-center px-3 text-left text-[12px] leading-4 text-[#191a1d] hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60"
+                                @click.stop="handleMobileMoreAction(action, order)"
+                              >
+                                <UIcon
+                                  v-if="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                                  name="i-lucide-loader-circle"
+                                  class="mr-1 size-4 animate-spin"
+                                />
+                                {{ getMobileActionLabel(action) }}
+                              </button>
+                            </div>
+                          </template>
+                        </UPopover>
+
+                        <div
+                          v-if="getMobileVisibleActions(order).length > 0"
+                          class="ml-auto flex items-center gap-[8px]"
+                        >
+                          <button
+                            v-for="action in getMobileVisibleActions(order)"
+                            :key="`${order.orderId}-${action}`"
+                            type="button"
+                            :disabled="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                            :class="[
+                              'flex h-[34px] items-center justify-center text-[12px] font-medium leading-4 transition-colors',
+                              isMobilePrimaryAction(action)
+                                ? 'bg-[#0f0f10] px-[16px] text-white transition-opacity hover:opacity-90'
+                                : 'border border-[#0f0f10] px-[17px] text-[#191a1d] hover:bg-gray-50',
+                              action === 'aftersales' && isOpeningAftersales(order.orderId)
+                                ? 'cursor-not-allowed opacity-60'
+                                : '',
+                            ]"
+                            @click.stop="handleMobileAction(action, order)"
+                          >
+                            <UIcon
+                              v-if="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                              name="i-lucide-loader-circle"
+                              class="mr-1 size-4 animate-spin"
+                            />
+                            {{ getMobileActionLabel(action) }}
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- PC：保留全部操作按钮 -->
+                      <div
+                        class="hidden lg:flex lg:w-auto lg:flex-wrap lg:items-center lg:justify-start lg:gap-[16px]"
                       >
-                        {{ t('de8076e6.b21b5e') }}
-                      </button>
-                      <button
-                        v-if="order.canPay"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center bg-[#0f0f10] px-8 text-[12px] font-medium leading-4 text-white hover:opacity-90 transition-opacity"
-                        @click.stop="payNow(order.orderId)"
-                      >
-                        {{ t('de8076e6.747349') }}
-                      </button>
-                      <button
-                        v-if="order.canConfirmReceipt"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center bg-[#0f0f10] px-8 text-[12px] font-medium leading-4 text-white hover:opacity-90 transition-opacity"
-                        @click.stop="confirmReceipt(order.orderId)"
-                      >
-                        {{ t('de8076e6.775b01') }}
-                      </button>
-                      <button
-                        v-if="order.canDelete"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center border border-[#0f0f10] px-4 lg:px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] hover:bg-gray-50 transition-colors"
-                        @click.stop="deleteOrder(order.orderId)"
-                      >
-                        {{ t('de8076e6.09936f') }}
-                      </button>
-                      <button
-                        v-if="order.canInvoice"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center border border-[#0f0f10] px-4 lg:px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] hover:bg-gray-50 transition-colors"
-                        @click.stop="applyInvoice(order.orderId)"
-                      >
-                        {{ t('de8076e6.63dd82') }}
-                      </button>
-                      <button
-                        v-if="order.canApplyAftersales"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center border border-[#0f0f10] px-4 lg:px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] hover:bg-gray-50 transition-colors"
-                        data-testid="btn-apply-aftersales"
-                        @click.stop="openAftersales(order)"
-                      >
-                        {{ t('de8076e6.45eb0c') }}
-                      </button>
-                      <button
-                        v-if="order.canViewLogistics"
-                        data-testid="btn-view-logistics"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center border border-[#0f0f10] px-4 lg:px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] hover:bg-gray-50 transition-colors"
-                        @click.stop="viewLogistics(order.orderId)"
-                      >
-                        {{ t('de8076e6.edf4b2') }}
-                      </button>
-                      <button
-                        v-if="order.canReview"
-                        data-testid="btn-review"
-                        type="button"
-                        class="w-[calc(50%-8px)] lg:w-auto flex-none flex h-[50px] items-center justify-center bg-[#0f0f10] px-8 text-[12px] font-medium leading-4 text-white hover:opacity-90 transition-opacity"
-                        @click.stop="openReview(order)"
-                      >
-                        {{ t('de8076e6.606120') }}
-                      </button>
+                        <button
+                          v-if="order.canCancel"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
+                          @click.stop="cancelOrder(order.orderId)"
+                        >
+                          {{ t('de8076e6.b21b5e') }}
+                        </button>
+                        <button
+                          v-if="order.canPay"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center bg-[#0f0f10] px-8 text-[12px] font-medium leading-4 text-white transition-opacity hover:opacity-90"
+                          @click.stop="payNow(order.orderId)"
+                        >
+                          {{ t('de8076e6.747349') }}
+                        </button>
+                        <button
+                          v-if="order.canConfirmReceipt"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center bg-[#0f0f10] px-8 text-[12px] font-medium leading-4 text-white transition-opacity hover:opacity-90"
+                          @click.stop="confirmReceipt(order.orderId)"
+                        >
+                          {{ t('de8076e6.775b01') }}
+                        </button>
+                        <button
+                          v-if="order.canDelete"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
+                          @click.stop="deleteOrder(order.orderId)"
+                        >
+                          {{ t('de8076e6.09936f') }}
+                        </button>
+                        <button
+                          v-if="order.canApplyAftersales"
+                          type="button"
+                          :disabled="isOpeningAftersales(order.orderId)"
+                          :aria-busy="isOpeningAftersales(order.orderId)"
+                          class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          data-testid="btn-apply-aftersales"
+                          @click.stop="openAftersales(order)"
+                        >
+                          <UIcon
+                            v-if="isOpeningAftersales(order.orderId)"
+                            name="i-lucide-loader-circle"
+                            class="mr-1 size-4 animate-spin"
+                          />
+                          {{ t('de8076e6.45eb0c') }}
+                        </button>
+                        <button
+                          v-if="order.canViewLogistics"
+                          data-testid="btn-view-logistics"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
+                          @click.stop="viewLogistics(order.orderId)"
+                        >
+                          {{ t('de8076e6.edf4b2') }}
+                        </button>
+                        <button
+                          v-if="order.canReview"
+                          data-testid="btn-review"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center bg-[#0f0f10] px-8 text-[12px] font-medium leading-4 text-white transition-opacity hover:opacity-90"
+                          @click.stop="openReview(order)"
+                        >
+                          {{ t('de8076e6.606120') }}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- 分页 (PC) -->
-              <div v-if="totalPages > 1 && !loading" class="hidden lg:flex justify-end mt-10">
+              <div v-if="totalPages > 1 && !loading" class="mt-10 w-full">
                 <ECPagination
                   :total="total"
                   :page-size="pageSize"
                   :current-page="currentPage"
                   @update:current-page="handlePageChange"
                 />
-              </div>
-
-              <!-- 加载更多 (H5) -->
-              <div v-if="hasMore && !loading" class="lg:hidden py-8 flex justify-center">
-                <button @click="loadMore" class="text-sm text-gray-400">
-                  {{ t('96a0d248.772815') }}
-                </button>
-              </div>
-              <div
-                v-else-if="loading && orders.length > 0"
-                class="lg:hidden py-8 flex justify-center"
-              >
-                <UIcon name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin text-gray-300" />
               </div>
             </div>
           </div>
@@ -309,11 +368,11 @@
       @submitted="onReviewSubmitted"
     />
 
-    <AftersalesModal
+    <AftersalesPanel
       :visible="aftersalesVisible"
       :order-id="aftersalesItem.orderId"
-      :item-id="aftersalesItem.itemId"
-      :item-detail="aftersalesItem.itemDetail"
+      :items="aftersalesItem.items"
+      :reason-options="reasonOptions"
       @close="aftersalesVisible = false"
       @submitted="loadOrders(currentStatus, currentPage)"
     />
@@ -323,13 +382,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAftersalesReasonOptions } from '~/composables/useAftersalesReasonOptions'
+import { getBusinessMode } from '~/composables/useTemplate'
+import { orderApiClient } from '~/infrastructure/http/clients/OrderApiClient'
+import { OrderTransformer } from '~/infrastructure/transformers/orderTransformer'
 import { OrderStatus } from '~/types/api/order'
 import { useOrders } from '~/composables/useOrders'
 import AccountMenu from '../components/AccountMenu.vue'
 import AccountH5FilterBar from '../components/AccountH5FilterBar.vue'
 import OrderLogisticsDialog from '../components/OrderLogisticsDialog.vue'
 import OrderReviewModal from '../components/OrderReviewModal.vue'
-import AftersalesModal from '../components/AftersalesModal.vue'
+import AftersalesPanel from '../components/AftersalesPanel.vue'
+import type { AftersalesPanelItem } from '../components/AftersalesFormContent.vue'
 
 definePageMeta({
   layout: 'default',
@@ -338,6 +402,7 @@ definePageMeta({
 const router = useRouter()
 const { t } = useI18n()
 const localePath = useLocalePath()
+const toast = useToastMessage()
 
 const {
   orders,
@@ -348,7 +413,6 @@ const {
   pageSize,
   total,
   totalPages,
-  hasMore,
   isEmpty,
   logisticsDialogVisible,
   logisticsLoading,
@@ -358,7 +422,6 @@ const {
   logisticsTraces,
   loadOrders,
   changeStatus,
-  loadMore,
   cancelOrder,
   confirmReceipt,
   deleteOrder,
@@ -367,27 +430,158 @@ const {
   retryLogistics,
 } = useOrders()
 
+const { reasonOptions, loadReasonOptions } = useAftersalesReasonOptions()
+
 // 状态定义
 const activeMenu = ref('orders')
 const showMobileMenu = ref(false)
+const isBBC = computed(() => getBusinessMode() === 'b2b')
 
 const tabs = computed(() => [
   { key: OrderStatus.ALL, label: t('de8076e6.dbb4d8') },
   { key: OrderStatus.PENDING_PAYMENT, label: t('de8076e6.9246fe') },
   { key: OrderStatus.SHIPPED, label: t('de8076e6.4933ca') },
   { key: OrderStatus.PENDING_PICKUP, label: t('de8076e6.25d532') },
-  { key: OrderStatus.AFTER_SALES, label: t('de8076e6.59bd68') },
   { key: OrderStatus.PENDING_REVIEW, label: t('de8076e6.a48b28') },
 ])
 
-const menuItems = computed(() => [
-  { key: 'profile', label: t('96a0d248.4f7a2a'), path: localePath('/account') },
-  { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
-  { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
-  { key: 'favorites', label: t('8b2de97c.975ff6'), path: localePath('/account/favorites') },
-  { key: 'address', label: t('ee3264ed.748ea9'), path: localePath('/account/address') },
-  { key: 'reviews', label: t('8b2de97c.b3bf09'), path: localePath('/account/reviews') },
-])
+const menuItems = computed(() => {
+  const items = [
+    { key: 'profile', label: t('96a0d248.4f7a2a'), path: localePath('/account') },
+    { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
+    {
+      key: 'aftersales',
+      label: t('account.aftersalesOrders'),
+      path: localePath('/account/aftersales'),
+    },
+    { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
+    { key: 'favorites', label: t('8b2de97c.975ff6'), path: localePath('/account/favorites') },
+  ]
+
+  if (isBBC.value) {
+    items.push({
+      key: 'followStores',
+      label: t('account.followStores'),
+      path: localePath('/account/follow-stores'),
+    })
+  }
+
+  items.push(
+    { key: 'address', label: t('ee3264ed.748ea9'), path: localePath('/account/address') },
+    { key: 'reviews', label: t('8b2de97c.b3bf09'), path: localePath('/account/reviews') }
+  )
+
+  return items
+})
+
+type MobileOrderAction =
+  | 'pay'
+  | 'confirmReceipt'
+  | 'review'
+  | 'cancel'
+  | 'delete'
+  | 'aftersales'
+  | 'logistics'
+
+const mobileMoreOpenMap = ref<Record<string, boolean>>({})
+const openingAftersalesOrderIds = ref<Record<string, boolean>>({})
+
+function getMobilePrimaryAction(order: any): MobileOrderAction | null {
+  if (order.canPay) return 'pay'
+  if (order.canConfirmReceipt) return 'confirmReceipt'
+  if (order.canReview) return 'review'
+  return null
+}
+
+function isMobilePrimaryAction(action: MobileOrderAction): boolean {
+  return action === 'pay' || action === 'confirmReceipt' || action === 'review'
+}
+
+function getMobileSecondaryActions(order: any): MobileOrderAction[] {
+  const actions: MobileOrderAction[] = []
+  if (order.canCancel) actions.push('cancel')
+  if (order.canApplyAftersales) actions.push('aftersales')
+  if (order.canViewLogistics) actions.push('logistics')
+  if (order.canDelete) actions.push('delete')
+  return actions
+}
+
+function getMobileVisibleActions(order: any): MobileOrderAction[] {
+  const primary = getMobilePrimaryAction(order)
+  const secondary = getMobileSecondaryActions(order)
+  if (primary) {
+    return [...secondary.slice(0, 2), primary]
+  }
+  return secondary.slice(0, 3)
+}
+
+function getMobileMoreActions(order: any): MobileOrderAction[] {
+  const primary = getMobilePrimaryAction(order)
+  const secondary = getMobileSecondaryActions(order)
+  const visibleSecondaryCount = primary ? 2 : 3
+  const overflowSecondary = secondary.slice(visibleSecondaryCount)
+  return overflowSecondary
+}
+
+function getMobileActionLabel(action: MobileOrderAction): string {
+  switch (action) {
+    case 'pay':
+      return t('de8076e6.747349')
+    case 'confirmReceipt':
+      return t('de8076e6.775b01')
+    case 'review':
+      return t('de8076e6.606120')
+    case 'cancel':
+      return t('de8076e6.b21b5e')
+    case 'delete':
+      return t('de8076e6.09936f')
+    case 'aftersales':
+      return t('de8076e6.45eb0c')
+    case 'logistics':
+      return t('de8076e6.edf4b2')
+  }
+}
+
+function isOpeningAftersales(orderId: string) {
+  return Boolean(openingAftersalesOrderIds.value[orderId])
+}
+
+function handleMobileAction(action: MobileOrderAction, order: any) {
+  switch (action) {
+    case 'pay':
+      payNow(order.orderId)
+      break
+    case 'confirmReceipt':
+      confirmReceipt(order.orderId)
+      break
+    case 'review':
+      openReview(order)
+      break
+    case 'cancel':
+      cancelOrder(order.orderId)
+      break
+    case 'delete':
+      deleteOrder(order.orderId)
+      break
+    case 'aftersales':
+      openAftersales(order)
+      break
+    case 'logistics':
+      viewLogistics(order.orderId)
+      break
+  }
+}
+
+async function handleMobileMoreAction(action: MobileOrderAction, order: any) {
+  if (action === 'aftersales') {
+    await openAftersales(order)
+    mobileMoreOpenMap.value[order.orderId] = false
+    return
+  }
+
+  mobileMoreOpenMap.value[order.orderId] = false
+  handleMobileAction(action, order)
+}
 
 function getOrderTabClass(status: OrderStatus, index: number) {
   const isActive = currentStatus.value === status
@@ -420,24 +614,61 @@ function handleLogout() {
   console.log('用户已退出登录')
 }
 
-function applyInvoice(orderId: string) {
-  const toast = useToastMessage()
-  toast.show(t('de8076e6.27ac0e'))
-}
-
 // 售后弹窗
 const aftersalesVisible = ref(false)
-const aftersalesItem = ref({ orderId: '', itemId: '', itemDetail: '' })
+const aftersalesItem = ref<{ orderId: string; items: AftersalesPanelItem[] }>({
+  orderId: '',
+  items: [],
+})
 
-function openAftersales(order: any) {
-  const firstItem = order.items?.[0]
-  if (!firstItem) return
-  aftersalesItem.value = {
-    orderId: order.orderId,
-    itemId: firstItem.itemId,
-    itemDetail: [firstItem.itemName, firstItem.specName].filter(Boolean).join(' '),
+function mapAftersalesItems(items: any[] = []) {
+  return items.map((item: any) => ({
+    detailId: item.detailId,
+    itemId: item.itemId,
+    itemName: item.itemName,
+    itemImage: item.itemImage,
+    skuNo: item.skuNo,
+    style: item.style,
+    size: item.size,
+    specName: item.specName,
+    quantity: item.quantity,
+    leftAftersalesNum: item.leftAftersalesNum,
+    price: item.price,
+  }))
+}
+
+async function openAftersales(order: any) {
+  if (isOpeningAftersales(order.orderId)) return
+
+  openingAftersalesOrderIds.value = {
+    ...openingAftersalesOrderIds.value,
+    [order.orderId]: true,
   }
-  aftersalesVisible.value = true
+
+  try {
+    const [detailResponse] = await Promise.all([
+      orderApiClient.getOrderDetail(order.orderId),
+      loadReasonOptions(),
+    ])
+    const detailModel = OrderTransformer.toOrderDetailModel(
+      detailResponse?.orderInfo || detailResponse
+    )
+    const items = mapAftersalesItems(detailModel.items ?? [])
+    if (items.length === 0) return
+
+    aftersalesItem.value = {
+      orderId: order.orderId,
+      items,
+    }
+    aftersalesVisible.value = true
+  } catch (error: any) {
+    toast.show(error?.message || error?.data?.message || t('9233eff9.bd87f5'))
+  } finally {
+    openingAftersalesOrderIds.value = {
+      ...openingAftersalesOrderIds.value,
+      [order.orderId]: false,
+    }
+  }
 }
 
 // 评价弹窗

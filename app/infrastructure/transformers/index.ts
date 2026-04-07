@@ -19,4 +19,14 @@ export { AuthTransformer, type ILoginModel } from './authTransformer'
 export { OrderTransformer } from './orderTransformer'
 export { UserCardTransformer, type IUserCardModel } from './userCardTransformer'
 export { CollectItemTransformer, type IFavoriteProduct } from './collectItemTransformer'
-export type { IOrderCalculateModel, IAddressModel, ICouponModel } from './orderTransformer'
+export {
+  CollectDistributionTransformer,
+  type IFollowedStoreCard,
+  type IFollowedStorePreviewItem,
+} from './collectDistributionTransformer'
+export {
+  CouponDisplayTransformer,
+  type ICouponModel,
+  type CouponCardType,
+} from './couponDisplayTransformer'
+export type { IOrderCalculateModel, IAddressModel } from './orderTransformer'

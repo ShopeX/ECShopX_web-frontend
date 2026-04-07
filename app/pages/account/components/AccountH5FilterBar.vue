@@ -82,6 +82,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 import { useModal } from '~/composables/useModal'
+import { getBusinessMode } from '~/composables/useTemplate'
 
 interface FilterMenuItem {
   key: string
@@ -109,19 +110,74 @@ const props = withDefaults(
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
+const localePath = useLocalePath()
 const { logout } = useAuth()
 const { confirm } = useModal()
 const innerExpanded = ref(props.modelValue)
+const isBBC = computed(() => getBusinessMode() === 'b2b')
 
-const defaultMenuItems: FilterMenuItem[] = [
-  { key: 'profile', label: '个人中心', path: '/account', nodeId: '2905:6314' },
-  { key: 'orders', label: '我的订单', path: '/account/orders', nodeId: '2910:6315' },
-  { key: 'coupons', label: '优惠券', path: '/account/coupons', nodeId: '2910:6318' },
-  { key: 'favorites', label: '我的收藏', path: '/account/favorites', nodeId: '2910:6321' },
-  { key: 'address', label: '收货地址', path: '/account/address', nodeId: '2910:6324' },
-  { key: 'reviews', label: '我的评价', path: '/account/reviews', nodeId: '2910:6327' },
-  { key: 'logout', label: '退出登录', action: 'logout', nodeId: '2910:6330' },
-]
+const defaultMenuItems = computed<FilterMenuItem[]>(() => {
+  const items: FilterMenuItem[] = [
+    {
+      key: 'profile',
+      label: t('96a0d248.4f7a2a'),
+      path: localePath('/account'),
+      nodeId: '2905:6314',
+    },
+    {
+      key: 'orders',
+      label: t('de8076e6.a73872'),
+      path: localePath('/account/orders'),
+      nodeId: '2910:6315',
+    },
+    {
+      key: 'aftersales',
+      label: t('account.aftersalesOrders'),
+      path: localePath('/account/aftersales'),
+      nodeId: '2910:6315-aftersales',
+    },
+    {
+      key: 'coupons',
+      label: t('ee3264ed.2f3635'),
+      path: localePath('/account/coupons'),
+      nodeId: '2910:6318',
+    },
+    {
+      key: 'favorites',
+      label: t('d53094c8.975ff6'),
+      path: localePath('/account/favorites'),
+      nodeId: '2910:6321',
+    },
+  ]
+
+  if (isBBC.value) {
+    items.push({
+      key: 'followStores',
+      label: t('account.followStores'),
+      path: localePath('/account/follow-stores'),
+      nodeId: '2910:6321-follow-stores',
+    })
+  }
+
+  items.push(
+    {
+      key: 'address',
+      label: t('ee3264ed.748ea9'),
+      path: localePath('/account/address'),
+      nodeId: '2910:6324',
+    },
+    {
+      key: 'reviews',
+      label: t('d53094c8.b3bf09'),
+      path: localePath('/account/reviews'),
+      nodeId: '2910:6327',
+    },
+    { key: 'logout', label: t('d53094c8.44efd1'), action: 'logout', nodeId: '2910:6330' }
+  )
+
+  return items
+})
 
 const emit = defineEmits<{
   back: []
@@ -137,10 +193,12 @@ watch(
   }
 )
 
-const resolvedMenuItems = computed(() => (props.menuItems.length > 0 ? props.menuItems : defaultMenuItems))
+const resolvedMenuItems = computed(() =>
+  props.menuItems.length > 0 ? props.menuItems : defaultMenuItems.value
+)
 
 const activeRouteKey = computed(() => {
-  const match = defaultMenuItems.find((item) => item.path && route.path === item.path)
+  const match = resolvedMenuItems.value.find((item) => item.path && route.path === item.path)
   return match?.key ?? 'profile'
 })
 
@@ -161,11 +219,11 @@ async function handleSelect(item: FilterMenuItem) {
 
   if (item.action === 'logout') {
     confirm({
-      title: '退出登录',
-      content: '您是否确定退出？',
+      title: t('d53094c8.44efd1'),
+      content: t('d53094c8.75c78d'),
       onConfirm: async () => {
         await logout()
-        router.push('/account/login')
+        router.push(localePath('/account/login'))
       },
     })
     return

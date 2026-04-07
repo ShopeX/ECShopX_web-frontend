@@ -3,22 +3,24 @@
     <div class="container mx-auto h-full flex items-center justify-between px-4">
       <!-- 左侧导航 -->
       <div class="flex items-center space-x-4">
-        <NuxtLink to="/" class="text-sm">首页</NuxtLink>
+        <NuxtLink :to="localePath('/')" class="text-sm">{{ t('367cb4ca.db1c89') }}</NuxtLink>
         <div class="flex items-center space-x-2">
-          <img src="/icons/qrcode.svg" alt="二维码" class="w-4 h-4" />
-          <span class="text-sm text-secondary">手机逛</span>
+          <img src="/icons/qrcode.svg" :alt="t('367cb4ca.22b03c')" class="w-4 h-4" />
+          <span class="text-sm text-secondary">{{ t('367cb4ca.d03699') }}</span>
         </div>
       </div>
 
       <!-- 右侧导航 -->
       <div class="flex items-center space-x-6">
-        <NuxtLink to="/login" class="text-sm">登录/注册</NuxtLink>
-        <NuxtLink to="/coupons" class="text-sm">领券中心</NuxtLink>
-        <NuxtLink to="/member" class="text-sm">会员中心</NuxtLink>
-        <NuxtLink to="/merchant" class="text-sm">商家入驻</NuxtLink>
+        <NuxtLink :to="localePath('/login')" class="text-sm">{{ t('367cb4ca.68e6e3') }}</NuxtLink>
+        <NuxtLink :to="localePath('/coupons')" class="text-sm">{{ t('367cb4ca.9c356b') }}</NuxtLink>
+        <NuxtLink :to="localePath('/member')" class="text-sm">{{ t('367cb4ca.12688a') }}</NuxtLink>
+        <NuxtLink :to="localePath('/merchant')" class="text-sm">{{
+          t('367cb4ca.1107a8')
+        }}</NuxtLink>
         <div class="flex items-center bg-red-500 px-4 h-full">
-          <img src="/icons/cart.svg" alt="购物车" class="w-5 h-5 mr-2" />
-          <span class="text-sm">我的购物车</span>
+          <img src="/icons/cart.svg" :alt="t('367cb4ca.c017be')" class="w-5 h-5 mr-2" />
+          <span class="text-sm">{{ t('367cb4ca.335c2a') }}</span>
         </div>
       </div>
     </div>
@@ -27,4 +29,6 @@
 
 <script setup lang="ts">
 // 顶部导航栏组件逻辑
+const localePath = useLocalePath()
+const { t } = useI18n()
 </script>

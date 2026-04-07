@@ -1,10 +1,10 @@
 <template>
   <ECModal
     v-model="visible"
-    title="提示"
+    :title="t('7afcb19c.02d981')"
     :content="errorMessage"
-    confirm-text="去购物车"
-    cancel-text="继续购物"
+    :confirm-text="t('7afcb19c.c41da8')"
+    :cancel-text="t('7afcb19c.3a2c9f')"
     @confirm="handleGoToCart"
     @cancel="handleContinueShopping"
   />
@@ -22,7 +22,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
-  errorMessage: '结算异常，请返回购物车重试',
+  errorMessage: undefined,
 })
 
 const emit = defineEmits<{
@@ -35,14 +35,17 @@ const visible = computed({
 })
 
 const router = useRouter()
+const localePath = useLocalePath()
+const { t } = useI18n()
+const errorMessage = computed(() => props.errorMessage || t('7afcb19c.b40d5e'))
 
 function handleGoToCart() {
   visible.value = false
-  router.push('/cart')
+  router.push(localePath('/cart'))
 }
 
 function handleContinueShopping() {
   visible.value = false
-  router.push('/')
+  router.push(localePath('/'))
 }
 </script>

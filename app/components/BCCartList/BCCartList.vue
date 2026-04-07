@@ -14,11 +14,11 @@
         />
       </div>
       <div class="flex-shrink-0 w-20"></div>
-      <div class="flex-1">商品信息</div>
-      <div class="flex-shrink-0 w-24 text-center">单价</div>
-      <div class="flex-shrink-0 w-32 text-center">数量</div>
-      <div class="flex-shrink-0 w-24 text-center">合计</div>
-      <div class="flex-shrink-0 w-20 text-center">操作</div>
+      <div class="flex-1">{{ t('24083f1c.b433e6') }}</div>
+      <div class="flex-shrink-0 w-24 text-center">{{ t('24083f1c.da4abd') }}</div>
+      <div class="flex-shrink-0 w-32 text-center">{{ t('ee3264ed.0bf60b') }}</div>
+      <div class="flex-shrink-0 w-24 text-center">{{ t('24083f1c.450efd') }}</div>
+      <div class="flex-shrink-0 w-20 text-center">{{ t('24083f1c.2b6bc0') }}</div>
     </div>
 
     <!-- 商品列表 -->
@@ -45,13 +45,13 @@
           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
         ></path>
       </svg>
-      <p class="text-lg">购物车是空的</p>
-      <p class="text-sm mt-2">快去选购商品吧~</p>
+      <p class="text-lg">{{ t('24083f1c.0769c6') }}</p>
+      <p class="text-sm mt-2">{{ t('24083f1c.5eaa50') }}</p>
       <NuxtLink
-        to="/item/list"
+        :to="localePath('/item/list')"
         class="mt-6 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
       >
-        去逛逛
+        {{ t('24083f1c.678df9') }}
       </NuxtLink>
     </div>
   </div>
@@ -92,6 +92,8 @@ interface Emits {
 defineProps<Props>()
 
 const emit = defineEmits<Emits>()
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 /**
  * 处理全选/取消全选

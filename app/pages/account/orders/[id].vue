@@ -5,7 +5,7 @@
       <button
         type="button"
         class="flex items-center gap-[4px] lg:gap-[8px] text-[#191a1d] hover:opacity-70 transition-opacity"
-        @click="router.back()"
+        @click="handleBack"
       >
         <UIcon name="i-heroicons-chevron-left" class="w-5 h-5 lg:w-6 lg:h-6 shrink-0" />
         <span class="font-medium text-[16px] lg:text-[24px] leading-[20px] lg:leading-[48px]">
@@ -188,17 +188,10 @@
         <!-- 商品列表 -->
         <OrderDetailItems :items="order.items" />
 
-        <!-- 物流轨迹（已发货/已完成时展示） -->
-        <OrderDetailLogistics
-          v-if="order.canViewLogistics || order.logisticsTraces.length > 0"
-          :company="order.logisticsCompany"
-          :tracking-no="order.logisticsNo"
-          :traces="order.logisticsTraces"
-        />
 
         <!-- PC：汇总行 + 操作按钮 -->
         <div class="hidden lg:flex items-center justify-between pb-[32px]">
-          <div class="flex gap-[32px] text-[14px] text-[#364153]">
+          <div class="flex items-baseline gap-[32px] text-[14px] text-[#364153] whitespace-nowrap shrink-0">
             <span>{{ t('ee3264ed.0bf60b') }}: {{ totalQuantity }}</span>
             <span>
               {{ t('de8076e6.450efd') }}:
@@ -213,7 +206,6 @@
             @cancel="cancelOrder"
             @pay="payNow"
             @confirm-receipt="confirmReceipt"
-            @invoice="applyInvoice"
             @aftersales="openAftersales"
             @logistics="handleViewLogistics"
             @review="openReview"
@@ -363,7 +355,7 @@
       class="fixed bottom-0 left-0 right-0 z-10 bg-white border-t border-[#e5e7eb] px-4 pt-[16px] pb-[32px] flex flex-col gap-[16px] lg:hidden"
     >
       <!-- 汇总行 -->
-      <div class="flex items-center justify-between text-[14px] text-[#364153]">
+      <div class="flex items-baseline justify-between text-[14px] text-[#364153]">
         <span>{{ t('ee3264ed.0bf60b') }}: {{ totalQuantity }}</span>
         <span>
           {{ t('ee3264ed.de8e9a') }}：
@@ -378,7 +370,6 @@
         @cancel="cancelOrder"
         @pay="payNow"
         @confirm-receipt="confirmReceipt"
-        @invoice="applyInvoice"
         @aftersales="openAftersales"
         @logistics="handleViewLogistics"
         @review="openReview"
@@ -404,23 +395,13 @@
       @submitted="onReviewSubmitted"
     />
 
-    <AftersalesModal
+    <AftersalesPanel
       :visible="aftersalesVisible"
       :order-id="aftersalesItem.orderId"
-      :item-id="aftersalesItem.itemId"
-      :item-detail="aftersalesItem.itemDetail"
+      :items="aftersalesItem.items"
+      :reason-options="reasonOptions"
       @close="aftersalesVisible = false"
       @submitted="fetchOrderDetail(orderId)"
-    />
-
-    <BCInvoiceModal
-      v-model="invoiceDialogVisible"
-      :initial-data="invoiceData"
-      :loading="invoiceLoading"
-      :submit-error="invoiceSubmitError"
-      @submit="handleInvoiceSubmit"
-      @close="closeInvoiceDialog"
-      @cancel="closeInvoiceDialog"
     />
   </div>
 </template>
@@ -428,16 +409,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import BCInvoiceModal from '~/components/BCInvoiceModal/BCInvoiceModal.vue'
-import type { IInvoiceFormData } from '~/components/BCInvoiceModal/types'
+import { useAftersalesReasonOptions } from '~/composables/useAftersalesReasonOptions'
 import OrderDetailAddress from '../components/OrderDetailAddress.vue'
 import OrderDetailItems from '../components/OrderDetailItems.vue'
 import OrderDetailInfo from '../components/OrderDetailInfo.vue'
-import OrderDetailLogistics from '../components/OrderDetailLogistics.vue'
 import OrderDetailActions from '../components/OrderDetailActions.vue'
 import OrderLogisticsDialog from '../components/OrderLogisticsDialog.vue'
 import OrderReviewModal from '../components/OrderReviewModal.vue'
-import AftersalesModal from '../components/AftersalesModal.vue'
+import AftersalesPanel from '../components/AftersalesPanel.vue'
+import type { AftersalesPanelItem } from '../components/AftersalesFormContent.vue'
 
 definePageMeta({
   layout: 'default',
@@ -446,7 +426,19 @@ definePageMeta({
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
+const localePath = useLocalePath()
+
+function handleBack() {
+  if (window.history.state && window.history.state.back) {
+    router.back()
+  } else {
+    router.replace(localePath('/account/orders'))
+  }
+}
+
+const toast = useToastMessage()
 const orderId = String((route.params as Record<string, string>).id || '')
+const { reasonOptions, loadReasonOptions } = useAftersalesReasonOptions()
 
 const {
   order,
@@ -457,18 +449,10 @@ const {
   logisticsLoading,
   logisticsError,
   logisticsTraces,
-  invoiceDialogVisible,
-  invoiceLoading,
-  invoiceSubmitError,
-  invoiceData,
   displayInvoiceInfo,
   fetchOrderDetail,
   cancelOrder,
   confirmReceipt,
-  applyAftersales,
-  applyInvoice,
-  submitOrderInvoice,
-  closeInvoiceDialog,
   payNow,
   viewLogistics,
   retryLogistics,
@@ -494,10 +478,6 @@ function formatAmount(amount: number) {
 
 function handleViewLogistics() {
   viewLogistics()
-}
-
-async function handleInvoiceSubmit(data: IInvoiceFormData) {
-  await submitOrderInvoice(data)
 }
 
 // 评价弹窗
@@ -537,17 +517,37 @@ function onReviewSubmitted() {
 
 // 售后弹窗
 const aftersalesVisible = ref(false)
-const aftersalesItem = ref({ orderId: '', itemId: '', itemDetail: '' })
+const aftersalesItem = ref<{ orderId: string; items: AftersalesPanelItem[] }>({
+  orderId: '',
+  items: [],
+})
 
-function openAftersales() {
-  const firstItem = order.value?.items?.[0]
-  if (!firstItem) return
-  aftersalesItem.value = {
-    orderId: orderId,
-    itemId: firstItem.itemId,
-    itemDetail: [firstItem.itemName, firstItem.specName].filter(Boolean).join(' '),
+async function openAftersales() {
+  try {
+    await loadReasonOptions()
+    const items = (order.value?.items ?? []).map((item: any) => ({
+      detailId: item.detailId,
+      itemId: item.itemId,
+      itemName: item.itemName,
+      itemImage: item.itemImage,
+      skuNo: item.skuNo,
+      style: item.style,
+      size: item.size,
+      specName: item.specName,
+      quantity: item.quantity,
+      leftAftersalesNum: item.leftAftersalesNum,
+      price: item.price,
+    }))
+    if (items.length === 0) return
+
+    aftersalesItem.value = {
+      orderId: orderId,
+      items,
+    }
+    aftersalesVisible.value = true
+  } catch (error: any) {
+    toast.show(error?.message || error?.data?.message || t('9233eff9.bd87f5'))
   }
-  aftersalesVisible.value = true
 }
 
 onMounted(() => {

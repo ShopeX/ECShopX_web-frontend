@@ -24,6 +24,7 @@ import type { ILoginRequest, IPhoneLoginRequest, ICaptchaResponse } from '~/type
  */
 export function useAuth() {
   const userStore = useUserStore()
+  const { t } = useI18n()
 
   // 状态管理
   const isLoading = ref(false)
@@ -51,7 +52,7 @@ export function useAuth() {
 
       return true
     } catch (err: any) {
-      error.value = err.message || '获取验证码失败'
+      error.value = err.message || t('211553ea.cd6c78')
       console.error('Get captcha error:', err)
       return false
     } finally {
@@ -78,13 +79,13 @@ export function useAuth() {
       const result = await userStore.login(params)
 
       if (!result.success) {
-        error.value = result.error || '登录失败'
+        error.value = result.error || t('211553ea.b6076a')
         return false
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message || '登录失败，请稍后重试'
+      error.value = err.message || t('211553ea.5b8c6c')
       console.error('Login error:', err)
       return false
     } finally {
@@ -104,13 +105,13 @@ export function useAuth() {
       const result = await userStore.loginWithPhone(params)
 
       if (!result.success) {
-        error.value = result.error || '登录失败'
+        error.value = result.error || t('211553ea.b6076a')
         return false
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message || '登录失败，请稍后重试'
+      error.value = err.message || t('211553ea.5b8c6c')
       console.error('Phone login error:', err)
       return false
     } finally {
@@ -130,13 +131,13 @@ export function useAuth() {
       const result = await userStore.logout()
 
       if (!result.success) {
-        error.value = result.error || '登出失败'
+        error.value = result.error || t('211553ea.3d7c93')
         return false
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message || '登出失败'
+      error.value = err.message || t('211553ea.3d7c93')
       console.error('Logout error:', err)
       return false
     } finally {
@@ -155,13 +156,13 @@ export function useAuth() {
       const result = await userStore.fetchUserInfo()
 
       if (!result.success) {
-        error.value = result.error || '获取用户信息失败'
+        error.value = result.error || t('211553ea.dc486e')
         return false
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message || '获取用户信息失败'
+      error.value = err.message || t('211553ea.dc486e')
       console.error('Fetch user info error:', err)
       return false
     } finally {

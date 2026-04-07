@@ -1,7 +1,7 @@
 <template>
-  <div class="flex h-screen w-full">
+  <div class="flex min-h-screen w-full bg-white lg:h-screen">
     <!-- 左侧：产品展示背景 -->
-    <div class="flex-1 relative overflow-hidden">
+    <div class="relative hidden flex-1 overflow-hidden lg:block">
       <div class="absolute inset-0 flex items-center p-8">
         <img
           src="/assets/images/login-bg.png"
@@ -12,11 +12,16 @@
     </div>
 
     <!-- 右侧：手机号登录表单面板 -->
-    <div v-if="loginMode === 'phone'" class="w-[560px] bg-white shadow-2xl flex flex-col">
-      <div class="p-8 flex flex-col h-full">
+    <div
+      v-if="loginMode === 'phone'"
+      class="flex min-h-screen w-full flex-col bg-white lg:w-[560px] lg:shadow-2xl"
+    >
+      <div class="flex h-full flex-col p-6 lg:p-8">
         <!-- 标题栏 -->
-        <div class="flex items-center justify-between py-4 mb-8">
-          <h2 class="text-[20px] font-medium text-[#191a1d] leading-5">验证码登录</h2>
+        <div class="mb-6 flex items-center justify-between py-4 lg:mb-8">
+          <h2 class="text-[20px] font-medium text-[#191a1d] leading-5">
+            {{ t('bbf44084.4bc8be') }}
+          </h2>
           <button
             type="button"
             class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
@@ -27,14 +32,14 @@
         </div>
 
         <!-- 说明文字 -->
-        <div class="mb-8">
+        <div class="mb-6 lg:mb-8">
           <p class="text-[14px] text-[#364153] leading-5">
-            已注册会员请登录结算，未注册会员短信验证码登录后即可成为会员。登录后可加快结算流程，并保存购买记录。
+            {{ t('bbf44084.a2e4f4') }}
           </p>
         </div>
 
         <!-- 登录表单 -->
-        <form @submit.prevent="handlePhoneLogin" class="flex flex-col gap-8" autocomplete="off">
+        <form @submit.prevent="handlePhoneLogin" class="flex flex-col gap-6 lg:gap-8" autocomplete="off">
           <!-- 手机号输入框 -->
           <div class="border-b border-[#e5e7eb]">
             <input
@@ -44,9 +49,43 @@
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
-              placeholder="手机号码"
+              :placeholder="t('bbf44084.92448a')"
               class="w-full py-4 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
+          </div>
+
+          <!-- 图片验证码 -->
+          <div class="border-b border-[#e5e7eb] flex items-center justify-between gap-4 pb-4 pt-4">
+            <!-- 图片验证码 -->
+            <input
+              v-model="phoneForm.captchaCode"
+              type="text"
+              name="image-captcha"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              :placeholder="t('bbf44084.983f59')"
+              class="min-w-0 flex-1 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
+            />
+            <button
+              type="button"
+              class="h-10 w-[108px] shrink-0 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="captchaLoading"
+              @click="handleRefreshCaptcha"
+            >
+              <img
+                v-if="captcha?.imageData"
+                :src="captcha?.imageData"
+                :alt="t('bbf44084.983f59')"
+                class="h-full w-full object-cover"
+              />
+              <span
+                v-else
+                class="flex h-full w-full items-center justify-center px-2 text-[12px] text-[#4a5565]"
+              >
+                {{ captchaLoading ? t('bbf44084.ba1a3a') : t('bbf44084.a41d43') }}
+              </span>
+            </button>
           </div>
 
           <!-- 短信验证码输入框 -->
@@ -56,7 +95,7 @@
               type="text"
               name="sms-code"
               autocomplete="one-time-code"
-              placeholder="短信验证码"
+              :placeholder="t('bbf44084.eb76c0')"
               class="flex-1 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
             <button
@@ -65,23 +104,12 @@
               :disabled="!canSend || isSending"
               @click="handleSendCode"
             >
-              <template v-if="isSending">发送中...</template>
-              <template v-else-if="countdown > 0">{{ countdown }}秒后重试</template>
-              <template v-else>获取验证码</template>
+              <template v-if="isSending">{{ t('bbf44084.ba1a3a') }}</template>
+              <template v-else-if="countdown > 0">
+                {{ t('bbf44084.5a9c8a', { count: countdown }) }}
+              </template>
+              <template v-else>{{ t('bbf44084.d369f4') }}</template>
             </button>
-          </div>
-
-          <!-- 1年内免登录 -->
-          <div class="flex items-center gap-2">
-            <input
-              id="remember"
-              v-model="phoneForm.remember"
-              type="checkbox"
-              class="w-4 h-4 border border-[#191a1d] rounded-none appearance-none checked:bg-[#191a1d] checked:border-[#191a1d] cursor-pointer relative"
-            />
-            <label for="remember" class="text-[12px] text-[#4a5565] leading-4 cursor-pointer">
-              1年内免登录
-            </label>
           </div>
 
           <!-- 错误提示 -->
@@ -96,14 +124,14 @@
               class="w-full py-4 bg-[#0f0f10] text-white text-[14px] font-medium leading-5 transition-all hover:bg-opacity-90"
               :disabled="isLoading"
             >
-              {{ isLoading ? '登录中...' : '登录' }}
+              {{ isLoading ? t('bbf44084.04c8f7') : t('bbf44084.402d19') }}
             </button>
             <button
               type="button"
               class="w-full py-4 bg-white border border-[#0f0f10] text-[#191a1d] text-[14px] font-medium leading-5 transition-all hover:bg-gray-50"
               @click="goToRegister"
             >
-              注册
+              {{ t('bbf44084.fe0e8b') }}
             </button>
           </div>
 
@@ -114,7 +142,7 @@
               class="text-[14px] text-[#191a1d] leading-5 underline hover:text-gray-600 transition-colors"
               @click="switchToAccountLogin"
             >
-              账号登录
+              {{ t('bbf44084.efae77') }}
             </button>
           </div>
         </form>
@@ -122,11 +150,16 @@
     </div>
 
     <!-- 右侧：账号登录表单面板 -->
-    <div v-if="loginMode === 'account'" class="w-[560px] bg-white shadow-2xl flex flex-col">
-      <div class="p-8 flex flex-col h-full">
+    <div
+      v-if="loginMode === 'account'"
+      class="flex min-h-screen w-full flex-col bg-white lg:w-[560px] lg:shadow-2xl"
+    >
+      <div class="flex h-full flex-col p-6 lg:p-8">
         <!-- 标题栏 -->
-        <div class="flex items-center justify-between py-4 mb-8">
-          <h2 class="text-[20px] font-medium text-[#191a1d] leading-5">账号登录</h2>
+        <div class="mb-6 flex items-center justify-between py-4 lg:mb-8">
+          <h2 class="text-[20px] font-medium text-[#191a1d] leading-5">
+            {{ t('bbf44084.efae77') }}
+          </h2>
           <button
             type="button"
             class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
@@ -137,14 +170,18 @@
         </div>
 
         <!-- 说明文字 -->
-        <div class="mb-8">
+        <div class="mb-6 lg:mb-8">
           <p class="text-[14px] text-[#364153] leading-5">
-            已注册会员请登录结算，未注册会员短信验证码登录后即可成为会员。登录后可加快结算流程，并保存购买记录。
+            {{ t('bbf44084.a2e4f4') }}
           </p>
         </div>
 
         <!-- 登录表单 -->
-        <form @submit.prevent="handleAccountLogin" class="flex flex-col gap-8" autocomplete="off">
+        <form
+          @submit.prevent="handleAccountLogin"
+          class="flex flex-col gap-6 lg:gap-8"
+          autocomplete="off"
+        >
           <!-- 隐藏的假输入框，用于欺骗浏览器自动填充 -->
           <input type="text" name="fake-username" style="display: none" />
           <input type="password" name="fake-password" style="display: none" />
@@ -159,7 +196,7 @@
               autocorrect="off"
               autocapitalize="off"
               spellcheck="false"
-              placeholder="手机号"
+              :placeholder="t('bbf44084.8098e2')"
               class="w-full py-4 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
           </div>
@@ -171,7 +208,7 @@
               :type="showPassword ? 'text' : 'password'"
               name="password"
               autocomplete="new-password"
-              placeholder="密码"
+              :placeholder="t('bbf44084.a81052')"
               class="flex-1 text-[14px] text-[#4a5565] leading-5 outline-none bg-transparent placeholder-[#4a5565]"
             />
             <button
@@ -214,14 +251,14 @@
               class="w-full py-4 bg-[#0f0f10] text-white text-[14px] font-medium leading-5 transition-all hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="isLoading"
             >
-              {{ isLoading ? '登录中...' : '登录' }}
+              {{ isLoading ? t('bbf44084.04c8f7') : t('bbf44084.402d19') }}
             </button>
             <button
               type="button"
               class="w-full py-4 bg-white border border-[#0f0f10] text-[#191a1d] text-[14px] font-medium leading-5 transition-all hover:bg-gray-50"
               @click="goToRegister"
             >
-              注册
+              {{ t('bbf44084.fe0e8b') }}
             </button>
           </div>
 
@@ -232,7 +269,7 @@
               class="text-[14px] text-[#191a1d] leading-5 underline hover:text-gray-600 transition-colors"
               @click="switchToPhoneLogin"
             >
-              验证码登录
+              {{ t('bbf44084.4bc8be') }}
             </button>
           </div>
         </form>
@@ -242,7 +279,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 import { useSmsCode } from '~/composables/useSmsCode'
@@ -253,6 +290,8 @@ definePageMeta({
 })
 
 const router = useRouter()
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 // 使用 Composables
 const {
@@ -279,6 +318,7 @@ const {
 // 手机验证码登录表单
 const phoneForm = reactive({
   phone: '',
+  captchaCode: '',
   code: '',
   remember: false,
 })
@@ -305,12 +345,12 @@ async function handleSendCode() {
 
   // 验证手机号
   if (!phoneForm.phone) {
-    error.value = '请输入手机号码'
+    error.value = t('bbf44084.ff95a4')
     return
   }
 
   if (!/^1[3-9]\d{9}$/.test(phoneForm.phone)) {
-    error.value = '请输入正确的手机号码'
+    error.value = t('bbf44084.18d771')
     return
   }
 
@@ -318,15 +358,20 @@ async function handleSendCode() {
   if (!captcha.value) {
     const captchaSuccess = await getCaptcha('login')
     if (!captchaSuccess) {
-      error.value = '获取图形验证码失败，请稍后重试'
+      error.value = t('bbf44084.81340f')
       return
     }
+  }
+
+  if (!phoneForm.captchaCode) {
+    error.value = t('bbf44084.6ca28f')
+    return
   }
 
   // 调用发送验证码 API
   const success = await sendSmsCode(
     phoneForm.phone,
-    '', // 图形验证码值（需要用户输入）
+    phoneForm.captchaCode,
     captcha.value?.imageToken || ''
   )
 
@@ -335,8 +380,13 @@ async function handleSendCode() {
     console.log('验证码已发送')
   } else {
     // 显示发送错误
-    error.value = smsError.value || '发送验证码失败，请稍后重试'
+    error.value = smsError.value || t('bbf44084.227b10')
   }
+}
+
+async function handleRefreshCaptcha() {
+  phoneForm.captchaCode = ''
+  await refreshCaptcha()
 }
 
 /**
@@ -347,17 +397,17 @@ async function handlePhoneLogin() {
 
   // 简单验证
   if (!phoneForm.phone) {
-    error.value = '请输入手机号码'
+    error.value = t('bbf44084.ff95a4')
     return
   }
 
   if (!/^1[3-9]\d{9}$/.test(phoneForm.phone)) {
-    error.value = '请输入正确的手机号码'
+    error.value = t('bbf44084.18d771')
     return
   }
 
   if (!phoneForm.code) {
-    error.value = '请输入验证码'
+    error.value = t('bbf44084.d0c06a')
     return
   }
 
@@ -371,7 +421,7 @@ async function handlePhoneLogin() {
     await fetchUserInfo()
     // 登录成功，跳转到首页或来源页
     const redirect = router.currentRoute.value.query.redirect as string
-    router.push(redirect || '/')
+    router.push(redirect || localePath('/'))
   }
 }
 
@@ -383,12 +433,12 @@ async function handleAccountLogin() {
 
   // 简单验证
   if (!accountForm.username) {
-    error.value = '请输入账号'
+    error.value = t('bbf44084.f821a7')
     return
   }
 
   if (!accountForm.password) {
-    error.value = '请输入密码'
+    error.value = t('bbf44084.e39ffe')
     return
   }
 
@@ -403,7 +453,7 @@ async function handleAccountLogin() {
     await fetchUserInfo()
     // 登录成功，跳转到首页或来源页
     const redirect = router.currentRoute.value.query.redirect as string
-    router.push(redirect || '/')
+    router.push(redirect || localePath('/'))
   }
 }
 
@@ -421,13 +471,16 @@ function switchToAccountLogin() {
 function switchToPhoneLogin() {
   loginMode.value = 'phone'
   clearError()
+  if (!captcha.value) {
+    void getCaptcha('login')
+  }
 }
 
 /**
  * 前往注册页面
  */
 function goToRegister() {
-  router.push('/account/register')
+  router.push(localePath('/account/register'))
 }
 
 /**
@@ -437,6 +490,12 @@ function handleClose() {
   // 返回上一页或首页
   router.back()
 }
+
+onMounted(() => {
+  if (loginMode.value === 'phone' && !captcha.value) {
+    void getCaptcha('login')
+  }
+})
 </script>
 
 <style scoped>

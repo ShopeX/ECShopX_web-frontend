@@ -1,62 +1,86 @@
 <template>
   <div
-    class="w-full border border-solid p-[17px] flex flex-col gap-[16px] border-[#e5e7eb]"
-    :class="[isDefault && layout === 'h5' ? 'border-[#191a1d]!' : '']"
+    class="flex w-full flex-col gap-[16px] border border-solid border-[#e5e7eb] p-[17px]"
     data-testid="address-card"
   >
-    <!-- 默认标签 + 头部：姓名和编辑（Figma: 14px Medium #191a1d, 编辑 12px Regular #4a5565 underline）-->
-    <div class="flex items-center justify-between gap-2 min-h-5">
-      <div class="flex items-center gap-2 flex-wrap min-w-0">
+    <!-- 顶部信息行：默认标签 + 姓名 + 手机 -->
+    <div class="flex items-center">
+      <div class="flex min-w-0 items-center gap-[8px]">
         <span
           v-if="isDefault"
-          class="text-xs font-medium leading-4 px-2 py-0.5 rounded bg-[#f3f4f6] text-[#191a1d] shrink-0"
+          class="inline-flex items-center justify-center bg-[#0f0f10] px-[4px] text-[10px] font-normal leading-[16px] text-white shrink-0 whitespace-nowrap"
         >
-          默认
+          {{ t('ee3264ed.18c634') }}
         </span>
-        <p class="font-['Noto_Sans_SC',sans-serif] font-medium text-[14px] leading-5 text-[#191a1d]">
+        <p class="truncate text-[16px] font-medium leading-[20px] text-[#191a1d] whitespace-nowrap">
           {{ address.name }}{{ address.gender ? ` ${address.gender}` : '' }}
         </p>
+        <p class="min-w-0 truncate text-[16px] font-medium leading-[20px] text-[#191a1d] whitespace-nowrap">
+          {{ address.phone }}
+        </p>
       </div>
-      <button
-        type="button"
-        class="font-['Noto_Sans_SC',sans-serif] font-normal text-[12px] leading-4 text-[#4a5565] underline hover:text-[#191a1d] transition-colors shrink-0"
-        data-testid="address-edit-btn"
-        @click="handleEdit"
-      >
-        编辑
-      </button>
     </div>
 
-    <!-- 地址信息（Figma: 14px Regular #4a5565, gap-4）-->
-    <div class="flex flex-col gap-[4px]">
-      <p class="font-['Noto_Sans_SC',sans-serif] font-normal text-[14px] leading-5 text-[#4a5565]">
-        {{ address.phone }}
-      </p>
-      <p class="font-['Noto_Sans_SC',sans-serif] font-normal text-[14px] leading-5 text-[#4a5565]">
+    <!-- 地址信息 -->
+    <div>
+      <p class="text-[14px] font-normal leading-[20px] text-[#4a5565]">
         {{ address.fullAddress }}
       </p>
     </div>
 
-    <!-- 删除、设为默认（H5 显示，PC 可选保留）-->
-    <div
-      v-if="layout === 'h5'"
-      class="flex items-center gap-4 pt-1 border-t border-[#e5e7eb]"
-    >
-      <button
-        type="button"
-        class="text-xs text-[#4a5565] leading-4 hover:text-[#191a1d] transition-colors"
-        @click="handleDelete"
-      >
-        删除
-      </button>
+    <!-- 底部操作行：默认状态 + 删除/编辑 -->
+    <div class="flex items-center justify-between">
       <button
         v-if="!isDefault"
         type="button"
-        class="text-xs text-[#4a5565] leading-4 hover:text-[#191a1d] transition-colors"
+        class="flex items-center gap-[4px] text-[14px] font-normal leading-[20px] text-[#4a5565] hover:text-[#191a1d] transition-colors"
         @click="handleSetDefault"
       >
-        设为默认
+        <svg
+          viewBox="0 0 16 16"
+          class="size-[16px] shrink-0"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <circle cx="8" cy="8" r="7" fill="#D1D5DB" />
+          <path d="M5 8.25L7 10.25L11 6.25" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {{ t('41c7a0f8.1af3ec') }}
       </button>
+      <div v-else class="flex items-center gap-[4px] text-[14px] font-normal leading-[20px] text-[#4a5565]">
+        <svg
+          viewBox="0 0 16 16"
+          class="size-[16px] shrink-0"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <circle cx="8" cy="8" r="7" fill="#191a1d" />
+          <path d="M5 8.25L7 10.25L11 6.25" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>{{ t('a3f584d1.57e5b1') }}</span>
+      </div>
+
+      <div class="flex items-center gap-[32px]">
+        <button
+          type="button"
+          class="flex items-center gap-[4px] text-[14px] font-normal text-[#4a5565] hover:text-[#191a1d] transition-colors"
+          @click="handleDelete"
+        >
+          <UIcon name="i-heroicons-trash" class="size-[16px]" />
+          <span>{{ t('41c7a0f8.2f4aad') }}</span>
+        </button>
+        <button
+          type="button"
+          class="flex items-center gap-[4px] text-[14px] font-normal text-[#4a5565] hover:text-[#191a1d] transition-colors"
+          data-testid="address-edit-btn"
+          @click="handleEdit"
+        >
+          <UIcon name="i-heroicons-pencil-square" class="size-[16px]" />
+          <span>{{ t('ee3264ed.95b351') }}</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -73,8 +97,6 @@ interface Address {
 interface Props {
   address: Address
   isDefault?: boolean
-  /** pc: 两列卡片样式（与 Figma PC 一致）；h5: 单列含删除/设为默认 */
-  layout?: 'pc' | 'h5'
 }
 
 defineOptions({
@@ -83,8 +105,8 @@ defineOptions({
 
 const props = withDefaults(defineProps<Props>(), {
   isDefault: false,
-  layout: 'h5',
 })
+const { t } = useI18n()
 
 const emit = defineEmits<{
   edit: [addressId: string | number]

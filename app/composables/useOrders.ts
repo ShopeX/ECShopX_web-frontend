@@ -10,20 +10,29 @@
 import { ref, computed } from 'vue'
 import { orderApiClient } from '~/infrastructure/http/clients/OrderApiClient'
 import { OrderTransformer } from '~/infrastructure/transformers/orderTransformer'
-import { OrderStatus } from '~/types/api/order'
+import { OrderStatus, type ILogisticsTrace } from '~/types/api/order'
 
 export function useOrders() {
   const toast = useToastMessage()
   const { confirm } = useModal()
+  const { t } = useI18n()
 
   // 状态
   const orders = ref<any[]>([])
   const loading = ref(false)
+  const hasLoaded = ref(false)
   const error = ref<string | null>(null)
   const currentStatus = ref<OrderStatus>(OrderStatus.ALL)
   const currentPage = ref(1)
   const pageSize = ref(10)
   const total = ref(0)
+  const logisticsDialogVisible = ref(false)
+  const logisticsLoading = ref(false)
+  const logisticsError = ref<string | null>(null)
+  const logisticsOrderId = ref('')
+  const logisticsTrackingNo = ref('')
+  const logisticsCompany = ref('')
+  const logisticsTraces = ref<ILogisticsTrace[]>([])
 
   // 计算属性
   const hasMore = computed(() => {
@@ -31,8 +40,31 @@ export function useOrders() {
   })
 
   const isEmpty = computed(() => {
-    return !loading.value && orders.value.length === 0
+    return hasLoaded.value && !loading.value && orders.value.length === 0
   })
+
+  function getOrderStatusText(status: string) {
+    switch (status) {
+      case OrderStatus.PENDING_PAYMENT:
+        return t('de8076e6.9246fe')
+      case OrderStatus.PENDING_SHIPMENT:
+        return t('de8076e6.d8476e')
+      case OrderStatus.SHIPPED:
+        return t('de8076e6.4933ca')
+      case OrderStatus.COMPLETED:
+        return t('de8076e6.fad522')
+      case OrderStatus.CANCELLED:
+        return t('de8076e6.2111cc')
+      case OrderStatus.PENDING_PICKUP:
+        return t('de8076e6.25d532')
+      case OrderStatus.AFTER_SALES:
+        return t('f62e8236.a19124')
+      case OrderStatus.PENDING_REVIEW:
+        return t('de8076e6.a48b28')
+      default:
+        return t('de8076e6.a8b0c2')
+    }
+  }
 
   /**
    * 加载订单列表
@@ -44,7 +76,7 @@ export function useOrders() {
     // 将前端状态映射为后端接口参数
     // 0：全部，5：待付款，1：待收货，4：待自提，3：待评价
     let apiStatus: string | number = 0
-    
+
     switch (status) {
       case OrderStatus.ALL:
         apiStatus = 0
@@ -72,24 +104,30 @@ export function useOrders() {
       const response = await orderApiClient.getOrderList({
         status: apiStatus,
         page,
-        page_size: pageSize.value,
+        pageSize: pageSize.value,
       })
 
       const result = OrderTransformer.toOrderListModel(response)
 
+      const localizedOrders = result.orders.map((order) => ({
+        ...order,
+        statusText: getOrderStatusText(order.status),
+      }))
+
       if (page === 1) {
-        orders.value = result.orders
+        orders.value = localizedOrders
       } else {
-        orders.value = [...orders.value, ...result.orders]
+        orders.value = [...orders.value, ...localizedOrders]
       }
 
       total.value = result.total
       currentPage.value = page
       currentStatus.value = status
     } catch (err: any) {
-      error.value = err.message || '加载订单失败'
-      toast.show(error.value || '加载订单失败')
+      error.value = err.message || t('f62e8236.a1f439')
+      toast.show(error.value || t('f62e8236.a1f439'))
     } finally {
+      hasLoaded.value = true
       loading.value = false
     }
   }
@@ -123,16 +161,16 @@ export function useOrders() {
   async function cancelOrder(orderId: string) {
     return new Promise<boolean>((resolve) => {
       confirm({
-        title: '取消订单',
-        content: '确定要取消这个订单吗?',
+        title: t('de8076e6.b21b5e'),
+        content: t('f62e8236.2baf23'),
         onConfirm: async () => {
           try {
             await orderApiClient.cancelOrder(orderId)
-            toast.show('订单已取消')
+            toast.show(t('f62e8236.5af500'))
             await refresh()
             resolve(true)
           } catch (err: any) {
-            toast.show(err.message || '取消订单失败')
+            toast.show(err.message || t('f62e8236.c623f1'))
             resolve(false)
           }
         },
@@ -149,16 +187,16 @@ export function useOrders() {
   async function confirmReceipt(orderId: string) {
     return new Promise<boolean>((resolve) => {
       confirm({
-        title: '确认收货',
-        content: '确定已收到商品吗?',
+        title: t('de8076e6.775b01'),
+        content: t('f62e8236.98a7e2'),
         onConfirm: async () => {
           try {
             await orderApiClient.confirmReceipt(orderId)
-            toast.show('确认收货成功')
+            toast.show(t('f62e8236.867b41'))
             await refresh()
             resolve(true)
           } catch (err: any) {
-            toast.show(err.message || '确认收货失败')
+            toast.show(err.message || t('f62e8236.637833'))
             resolve(false)
           }
         },
@@ -175,16 +213,16 @@ export function useOrders() {
   async function deleteOrder(orderId: string) {
     return new Promise<boolean>((resolve) => {
       confirm({
-        title: '删除订单',
-        content: '确定要删除这个订单吗?删除后无法恢复。',
+        title: t('de8076e6.09936f'),
+        content: t('f62e8236.33a363'),
         onConfirm: async () => {
           try {
             await orderApiClient.deleteOrder(orderId)
-            toast.show('订单已删除')
+            toast.show(t('f62e8236.a579ae'))
             await refresh()
             resolve(true)
           } catch (err: any) {
-            toast.show(err.message || '删除订单失败')
+            toast.show(err.message || t('f62e8236.3acb3f'))
             resolve(false)
           }
         },
@@ -208,15 +246,67 @@ export function useOrders() {
    */
   function buyAgain(orderId: string) {
     // TODO: 实现再次购买逻辑
-    toast.show('功能开发中')
+    toast.show(t('f62e8236.4c9a4a'))
+  }
+
+  function applyLogisticsDetail(raw: any) {
+    const detailModel = OrderTransformer.toOrderDetailModel(raw?.orderInfo || raw)
+    logisticsTrackingNo.value = detailModel.logisticsNo || ''
+    logisticsCompany.value = detailModel.logisticsCompany || ''
+    return detailModel
   }
 
   /**
    * 查看物流
    */
-  function viewLogistics(orderId: string) {
-    // TODO: 实现查看物流逻辑
-    toast.show('功能开发中')
+  async function viewLogistics(orderId: string) {
+    logisticsOrderId.value = orderId
+    logisticsDialogVisible.value = true
+    logisticsLoading.value = true
+    logisticsError.value = null
+    logisticsTrackingNo.value = ''
+    logisticsCompany.value = ''
+    logisticsTraces.value = []
+
+    try {
+      const [detailResult, logisticsResult] = await Promise.allSettled([
+        orderApiClient.getOrderDetail(orderId),
+        orderApiClient.getOrderLogistics(
+          { orderId, orderType: 'normal' },
+          { skipErrorCodes: [400, 401, 403, 404, 422, 500, 502, 503, 504] }
+        ),
+      ])
+
+      let fallbackTraces: ILogisticsTrace[] = []
+
+      if (detailResult.status === 'fulfilled') {
+        const detailModel = applyLogisticsDetail(detailResult.value)
+        fallbackTraces = detailModel.logisticsTraces || []
+      }
+
+      if (logisticsResult.status === 'fulfilled') {
+        const traces = OrderTransformer.toTrackerPullTraces(logisticsResult.value)
+        logisticsTraces.value = traces.length > 0 ? traces : fallbackTraces
+      } else {
+        logisticsTraces.value = fallbackTraces
+        if (fallbackTraces.length === 0) {
+          throw logisticsResult.reason
+        }
+      }
+    } catch (err: any) {
+      logisticsError.value = err?.message || t('de8076e6.3c2a32')
+    } finally {
+      logisticsLoading.value = false
+    }
+  }
+
+  function closeLogisticsDialog() {
+    logisticsDialogVisible.value = false
+  }
+
+  async function retryLogistics() {
+    if (!logisticsOrderId.value) return
+    await viewLogistics(logisticsOrderId.value)
   }
 
   const totalPages = computed(() => {
@@ -227,6 +317,7 @@ export function useOrders() {
     // 状态
     orders,
     loading,
+    hasLoaded,
     error,
     currentStatus,
     currentPage,
@@ -235,6 +326,12 @@ export function useOrders() {
     totalPages,
     hasMore,
     isEmpty,
+    logisticsDialogVisible,
+    logisticsLoading,
+    logisticsError,
+    logisticsTrackingNo,
+    logisticsCompany,
+    logisticsTraces,
 
     // 方法
     loadOrders,
@@ -247,5 +344,7 @@ export function useOrders() {
     payNow,
     buyAgain,
     viewLogistics,
+    closeLogisticsDialog,
+    retryLogistics,
   }
 }

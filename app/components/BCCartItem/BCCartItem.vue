@@ -34,34 +34,36 @@
               <p
                 class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#364153]"
               >
-                款号: {{ item.productId }}
+                {{ t('9864a2ba.fe930f') }} {{ item.productId }}
               </p>
             </div>
             <div v-if="item.specName" class="relative shrink-0 w-full">
               <p
                 class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#364153]"
               >
-                款式: {{ item.specName }}
+                {{ t('9864a2ba.a74053') }} {{ item.specName }}
               </p>
             </div>
             <div class="relative shrink-0 w-full">
               <p
                 class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#364153]"
               >
-                尺寸: {{ '默认' }}
+                {{ t('9864a2ba.1bbfef') }} {{ t('9864a2ba.18c634') }}
               </p>
             </div>
             <div class="relative shrink-0 mt-2">
               <p
                 class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[#364153] text-[14px]"
               >
-                价格 :
+                {{ t('9864a2ba.b388f8') }}
                 <span class="font-['Inter'] font-medium text-[16px] ml-1">{{
                   item.priceDisplay
                 }}</span>
               </p>
             </div>
-            <div v-if="!item.canBePurchased" class="text-xs text-red-500 mt-1">(暂不可售)</div>
+            <div v-if="!item.canBePurchased" class="text-xs text-red-500 mt-1">
+              {{ t('9864a2ba.502a91') }}
+            </div>
           </div>
         </div>
 
@@ -136,12 +138,12 @@
               >
                 <button
                   class="relative shrink-0 hover:text-red-600 transition-colors"
-                  @click="$emit('remove', item.id)"
+                  @click="showConfirm = true"
                 >
                   <p
                     class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#191a1d] hover:text-inherit"
                   >
-                    删除
+                    {{ t('9864a2ba.2f4aad') }}
                   </p>
                 </button>
               </div>
@@ -151,6 +153,15 @@
       </div>
     </div>
   </div>
+
+  <!-- 删除确认弹窗 -->
+  <ECModal
+    v-model="showConfirm"
+    :title="t('9864a2ba.2f4aad')"
+    :content="t('9864a2ba.3e3483')"
+    :confirm-text="t('9864a2ba.2f4aad')"
+    @confirm="handleConfirmRemove"
+  />
 </template>
 
 <script setup lang="ts">
@@ -162,11 +173,19 @@ interface Props {
   loading?: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+const { t } = useI18n()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'toggle-selection', itemId: string): void
   (e: 'quantity-change', itemId: string, quantity: number): void
   (e: 'remove', itemId: string): void
 }>()
+
+const showConfirm = ref(false)
+
+function handleConfirmRemove() {
+  showConfirm.value = false
+  emit('remove', props.item.id)
+}
 </script>

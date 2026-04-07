@@ -84,6 +84,8 @@
 import { useUserStore } from '~/stores/user'
 
 const router = useRouter()
+const route = useRoute()
+const localePath = useLocalePath()
 const userStore = useUserStore()
 
 // 主导航
@@ -112,14 +114,26 @@ const handleCartClick = () => {
   router.push('/cart')
 }
 
-const handleUserClick = () => {
+const redirectToLogin = async () => {
+  await router.push({
+    path: localePath('/account/login'),
+    query: { redirect: route.fullPath },
+  })
+}
+
+const handleUserClick = async () => {
+  if (userStore.token && !userStore.userInfo) {
+    const result = await userStore.fetchUserInfo()
+    if (!result.success) {
+      await redirectToLogin()
+      return
+    }
+  }
+
   if (userStore.isLoggedIn) {
-    router.push('/member')
+    await router.push(localePath('/member'))
   } else {
-    router.push({
-      path: '/account/login',
-      query: { redirect: '/member' },
-    })
+    await redirectToLogin()
   }
 }
 </script>

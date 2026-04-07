@@ -1,18 +1,24 @@
-import { defineNuxtPlugin, useRuntimeConfig, navigateTo } from 'nuxt/app'
+import { defineNuxtPlugin, useNuxtApp, useRuntimeConfig, navigateTo } from 'nuxt/app'
 import type { ApiResponse, HttpError } from '~/types/http'
 import { ErrorType } from '~/types/http'
 import { useUserStore } from '~/stores/user'
+import { getApiCountryCodeByLocale } from '../../shared/localeConfig'
 
 export default defineNuxtPlugin({
   name: 'http',
   setup() {
     const config = useRuntimeConfig()
+    const nuxtApp = useNuxtApp()
     const userStore = useUserStore()
     const countryCodeCookie = useCookie<string>('i18n_redirected')
+    const localePath = useLocalePath()
 
-    /** 全局参数 country_code：优先 runtimeConfig，其次 i18n cookie，默认 zh-CN */
-    const getCountryCode = (): string =>
-      (config.public.countryCode as string) ?? countryCodeCookie.value ?? 'zh-CN'
+    /** 全局参数 country_code：按当前 locale 映射接口值，未命中时回退默认值 */
+    const getCountryCode = (): string => {
+      const currentLocale = (nuxtApp.$i18n as any)?.locale?.value || countryCodeCookie.value
+      const countryCode = getApiCountryCodeByLocale(currentLocale)
+      return countryCode || (config.public.defaultCountryCode as string) || 'zh-CN'
+    }
 
     // ============ 辅助函数 ============
 
@@ -201,6 +207,12 @@ export default defineNuxtPlugin({
             // 有 status_code 字段，检查是否为错误
             const statusCode = Number(data.status_code)
             if (statusCode >= 400) {
+              // 特殊处理：业务 401 跳转登录页（仅客户端）
+              if (statusCode === 401 && import.meta.client) {
+                await navigateTo(localePath('/account/login'))
+                return
+              }
+
               // 业务错误：创建并抛出错误
               const error = createBusinessError({
                 message: data.message || '请求失败',
@@ -230,6 +242,7 @@ export default defineNuxtPlugin({
       },
 
       async onResponseError({ response, error, options }) {
+        debugger
         // 错误日志
         console.error(`[API Error] ${response?.status || 'Network'} ${response?.url || ''}`)
 
@@ -250,7 +263,8 @@ export default defineNuxtPlugin({
 
           // 特殊处理：401 跳转登录页（仅客户端）
           if (response.status === 401 && import.meta.client) {
-            navigateTo('/login')
+            await navigateTo(localePath('/account/login'))
+            return
           }
         } else if (error?.message?.includes('timeout')) {
           // 超时错误

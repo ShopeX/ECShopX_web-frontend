@@ -27,7 +27,12 @@ export interface IApiOrderItem {
   item_image?: string
   item_pic?: string
   spec_name?: string
-  quantity: number
+  quantity?: number
+  num?: number
+  buy_num?: number
+  goods_num?: number
+  item_num?: number
+  product_num?: number
   price: number // 单位:分
   [key: string]: any
 }
@@ -76,5 +81,81 @@ export interface IOrderListResponse {
   total_count?: number
   page?: number
   pageSize?: number
+  pager?: {
+    count?: number
+    page_no?: number
+    page_size?: number
+  }
   [key: string]: any
+}
+
+/**
+ * 物流轨迹节点(前端模型)
+ */
+export interface ILogisticsTrace {
+  time: string
+  content: string
+}
+
+export interface IApiTrackerPullTrace {
+  AcceptTime?: string
+  AcceptStation?: string
+}
+
+export interface ITrackerPullResponse {
+  data?: IApiTrackerPullTrace[]
+  [key: string]: any
+}
+
+/**
+ * 订单详情 API 响应
+ */
+export interface IApiOrderDetail extends IApiOrder {
+  item_fee?: number
+  freight_fee?: number
+  discount_fee?: number
+  point_fee?: number
+  logistics_no?: string
+  logistics_company?: string
+  logistics_traces?: Array<{ time: string; content: string }>
+  pay_time?: string | number
+  receipt_type?: string
+  invoice_type?: string
+  invoice_info?: string
+  store_name?: string
+  shop_name?: string
+}
+
+/**
+ * 订单详情前端展示模型
+ */
+export interface IOrderDetailModel {
+  orderId: string
+  orderTime: string
+  status: string
+  statusText: string
+  items: any[]
+  totalAmount: number
+  receiverName: string
+  receiverMobile: string
+  shippingAddress: string
+  itemFee: string
+  freightFee: string
+  discountFee: string
+  pointFee: string
+  totalFee: string
+  logisticsNo: string
+  logisticsCompany: string
+  logisticsTraces: ILogisticsTrace[]
+  payTime: string
+  shippingMethod: string
+  invoiceInfo: string
+  storeName: string
+  canCancel: boolean
+  canPay: boolean
+  canConfirmReceipt: boolean
+  canInvoice: boolean
+  canDelete: boolean
+  canApplyAftersales: boolean
+  canViewLogistics: boolean
 }

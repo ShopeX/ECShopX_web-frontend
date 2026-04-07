@@ -1,94 +1,166 @@
 <template>
   <div
-    class="border border-[#e5e7eb] border-solid content-stretch flex flex-col items-start p-px relative shrink-0 w-full"
+    class="border border-solid bg-white content-stretch flex flex-col items-start relative shrink-0 w-full transition-colors"
+    :class="cardClass"
+    :data-testid="testId"
+    :role="isCheckoutVariant ? 'button' : undefined"
+    :tabindex="isCheckoutVariant ? 0 : undefined"
+    @click="handleCardClick"
+    @keydown.enter.prevent="handleCardClick"
+    @keydown.space.prevent="handleCardClick"
   >
-    <!-- 优惠券内容区域 -->
-    <div class="relative shrink-0 w-full">
-      <div
-        class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-between px-[16px] py-[32px] relative w-full"
-      >
-        <!-- 左侧：金额 -->
-        <div class="relative shrink-0">
+    <template v-if="showAction">
+      <div class="flex grow min-h-[136px] w-full items-stretch">
+        <div
+          class="flex w-[140px] shrink-0 flex-col items-center justify-center gap-2 px-4 py-6"
+          :class="leftPanelClass"
+        >
           <div
-            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex font-['Inter'] font-medium gap-[4px] items-center justify-center not-italic relative text-[#191a1d] text-nowrap"
+            class="flex items-end justify-center gap-1 font-['Inter'] font-medium text-[#191a1d]"
+            :class="coupon.cardType === 'gift' ? 'text-[24px] leading-[30px]' : ''"
           >
-            <p class="leading-[20px] relative shrink-0 text-[16px]">¥</p>
-            <p class="leading-[36px] relative shrink-0 text-[36px]">
-              {{ discountDisplay }}
-            </p>
+            <span v-if="coupon.displayPrefix" class="text-base leading-5">{{
+              coupon.displayPrefix
+            }}</span>
+            <span :class="valueClass">{{ coupon.displayValue }}</span>
+            <span v-if="coupon.displaySuffix" class="text-base leading-5">
+              {{ coupon.displaySuffix }}
+            </span>
           </div>
+          <p class="text-xs leading-4 text-[#4a5565]">{{ coupon.typeLabel }}</p>
         </div>
 
-        <!-- 右侧：满减条件和说明 -->
-        <div class="relative shrink-0">
-          <div
-            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[8px] items-start justify-center relative"
-          >
-            <!-- 满减条件 -->
-            <div class="content-stretch flex items-center justify-end relative shrink-0 w-full">
-              <p
-                class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-[#4a5565] text-nowrap"
-              >
-                {{ conditionText }}
-              </p>
-            </div>
-            <!-- 使用说明 -->
-            <div class="content-stretch flex items-center justify-end relative shrink-0 w-full">
-              <p
-                class="font-['Noto_Sans_SC'] font-normal leading-[16px] relative shrink-0 text-[12px] text-[#4a5565] text-nowrap"
-              >
-                {{ description }}
-              </p>
-            </div>
+        <div class="flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-4">
+          <p class="truncate text-sm font-medium leading-5 text-[#191a1d]">{{ coupon.title }}</p>
+          <div class="flex items-start gap-2 text-xs leading-4 text-[#4a5565]">
+            <span class="shrink-0 text-[#99a1af]">{{ t('29b38e7b.011009') }}</span>
+            <span class="min-w-0 flex-1 break-words">{{ coupon.usageTimeText }}</span>
+          </div>
+          <div class="flex items-start gap-2 text-xs leading-4 text-[#4a5565]">
+            <span class="shrink-0 text-[#99a1af]">{{ t('29b38e7b.602ab6') }}</span>
+            <span class="min-w-0 flex-1 break-words">{{ coupon.ruleText }}</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 底部：领取/使用按钮 -->
-    <div class="relative shrink-0 w-full">
-      <div
-        class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col items-start relative w-full"
-      >
-        <button
-          v-if="!isSelected"
-          class="bg-[#0f0f10] relative shrink-0 w-full hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="loading"
-          @click="handleClaim"
+      <!-- 底部：领取/使用按钮 -->
+      <div class="relative shrink-0 w-full">
+        <div
+          class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col items-start relative w-full"
         >
-          <div
-            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center px-0 py-[16px] relative w-full"
+          <button
+            v-if="!isSelected"
+            class="bg-[#0f0f10] relative shrink-0 w-full hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="loading"
+            @click="handleClaim"
           >
-            <p
-              class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-white"
+            <div
+              class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center px-0 py-[16px] relative w-full"
             >
-              领取优惠券
-            </p>
-          </div>
-        </button>
-        <button
-          v-else
-          class="bg-gray-100 relative shrink-0 w-full hover:bg-gray-200 transition-colors"
-          @click="handleUnselect"
-        >
-          <div
-            class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center px-0 py-[16px] relative w-full"
+              <p
+                class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-white"
+              >
+                {{ t('29b38e7b.d09c38') }}
+              </p>
+            </div>
+          </button>
+          <button
+            v-else
+            class="bg-gray-100 relative shrink-0 w-full hover:bg-gray-200 transition-colors"
+            @click="handleUnselect"
           >
-            <p
-              class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-[#191a1d]"
+            <div
+              class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex items-center justify-center px-0 py-[16px] relative w-full"
             >
-              已选择
-            </p>
-          </div>
-        </button>
+              <p
+                class="font-['Noto_Sans_SC'] font-medium leading-[20px] relative shrink-0 text-[14px] text-center text-nowrap text-[#191a1d]"
+              >
+                {{ t('29b38e7b.f08afd') }}
+              </p>
+            </div>
+          </button>
+        </div>
       </div>
-    </div>
+    </template>
+
+    <template v-else>
+      <div class="flex grow min-h-[107px] w-full items-stretch">
+        <div
+          class="flex w-[140px] shrink-0 flex-col items-center justify-center gap-1 bg-[#f3f4f6] px-8 py-6"
+        >
+          <div
+            class="flex items-center justify-center gap-1 font-['Inter'] font-medium text-[#191a1d]"
+            :class="coupon.cardType === 'gift' ? 'text-[24px] leading-[30px]' : ''"
+          >
+            <span v-if="coupon.displayPrefix" class="text-base leading-5">{{
+              coupon.displayPrefix
+            }}</span>
+            <span :class="valueClass">{{ coupon.displayValue }}</span>
+            <span v-if="coupon.displaySuffix" class="text-base leading-5">
+              {{ coupon.displaySuffix }}
+            </span>
+          </div>
+          <p class="text-xs leading-4 text-[#99a1af]">{{ displayAmountHint }}</p>
+        </div>
+
+        <div class="flex min-w-0 flex-1 items-center">
+          <div class="flex min-w-0 flex-1 flex-col justify-center gap-2 px-4">
+            <p class="truncate text-sm font-medium leading-5" :class="displayTitleClass">
+              {{ coupon.title }}
+            </p>
+            <p class="text-xs leading-4 text-[#4a5565]">{{ coupon.ruleText }}</p>
+            <div class="flex items-center gap-1 text-xs leading-4 text-[#99a1af]">
+              <svg
+                class="size-3 shrink-0 text-[#99a1af]"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <circle cx="6" cy="6" r="5.25" stroke="currentColor" stroke-width="1.5" />
+                <path
+                  d="M6 5.25V8.25"
+                  stroke="currentColor"
+                  stroke-width="1.25"
+                  stroke-linecap="round"
+                />
+                <circle cx="6" cy="3.5" r="0.75" fill="currentColor" />
+              </svg>
+              <span class="min-w-0 flex-1 break-words">{{ displayValidityText }}</span>
+            </div>
+          </div>
+
+          <div v-if="isCheckoutVariant" class="flex shrink-0 items-center pr-4">
+            <span
+              class="flex size-6 items-center justify-center rounded-full border border-solid transition-colors"
+              :class="selectionIndicatorClass"
+              aria-hidden="true"
+            >
+              <svg
+                v-if="isSelected"
+                class="size-3 text-white"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.5 6.25L4.75 8.5L9.5 3.75"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { ICouponModel } from '~/infrastructure/transformers'
-import { MoneyValueObject } from '~/shared/value-objects'
 
 defineOptions({
   name: 'CouponCard',
@@ -99,13 +171,25 @@ interface Props {
   coupon: ICouponModel
   /** 是否已选中 */
   isSelected?: boolean
+  /** 卡片展示变体 */
+  variant?: 'default' | 'checkout'
   /** 加载状态 */
   loading?: boolean
+  /** 是否显示操作区 */
+  showAction?: boolean
+  /** H5 展示态 */
+  mobileDisplay?: boolean
+  /** 测试标识 */
+  testId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isSelected: false,
+  variant: 'default',
   loading: false,
+  showAction: true,
+  mobileDisplay: false,
+  testId: undefined,
 })
 
 const emit = defineEmits<{
@@ -113,35 +197,87 @@ const emit = defineEmits<{
   (e: 'select', coupon: ICouponModel): void
   (e: 'unselect'): void
 }>()
+const { t } = useI18n()
 
-/**
- * 优惠金额显示
- */
-const discountDisplay = computed(() => {
-  return Math.round(props.coupon.discount).toString()
+const isCheckoutVariant = computed(() => props.variant === 'checkout' && !props.showAction)
+
+const cardClass = computed(() => {
+  if (!isCheckoutVariant.value) {
+    return 'border-[#e5e7eb]'
+  }
+
+  return props.isSelected
+    ? 'cursor-pointer border-[#0f0f10] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f0f10]/20'
+    : 'cursor-pointer border-[#e5e7eb] hover:border-[#191a1d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f0f10]/20'
 })
 
-/**
- * 满减条件文本
- */
-const conditionText = computed(() => {
+const leftPanelClass = computed(() => {
+  const classMap: Record<string, string> = {
+    discount: 'bg-[#f4f6ff]',
+    cash: 'bg-[#fff4eb]',
+    gift: 'bg-[#eefbf3]',
+  }
+
+  return classMap[props.coupon.cardType] || 'bg-[#f3f4f6]'
+})
+
+const valueClass = computed(() => {
+  if (props.coupon.cardType === 'gift') {
+    return 'text-[24px] leading-[30px]'
+  }
+
+  return 'text-[36px] leading-[36px]'
+})
+
+const displayAmountHint = computed(() => {
+  if (props.coupon.cardType === 'gift') {
+    return props.coupon.minFee > 0
+      ? t('29b38e7b.72206b', { amount: formatDisplayNumber(props.coupon.minFee) })
+      : props.coupon.typeLabel
+  }
+
   if (props.coupon.minFee > 0) {
-    return `满${Math.round(props.coupon.minFee)}减${Math.round(props.coupon.discount)}`
+    return t('29b38e7b.2f0fb2', { amount: formatDisplayNumber(props.coupon.minFee) })
   }
-  return `减${Math.round(props.coupon.discount)}`
+
+  return t('29b38e7b.cb9ba4')
 })
 
-/**
- * 使用说明
- */
-const description = computed(() => {
-  // 如果有标题，优先使用标题
-  if (props.coupon.title) {
-    return props.coupon.title
+const displayTitleClass = computed(() =>
+  props.mobileDisplay ? 'text-[#4a5565]' : 'text-[#191a1d]'
+)
+
+const selectionIndicatorClass = computed(() =>
+  props.isSelected ? 'border-[#0f0f10] bg-[#0f0f10]' : 'border-[#d2d6db] bg-white'
+)
+
+const displayValidityText = computed(() => {
+  const usageText = props.coupon.usageTimeText.trim()
+  if (!usageText) return t('29b38e7b.ba47c8')
+
+  if (!props.mobileDisplay) {
+    return t('29b38e7b.17e8e9', { value: usageText.replace(/\s*-\s*/g, '-') })
   }
-  // 否则使用默认说明
-  return '全场无门槛使用'
+
+  if (usageText.includes(' - ')) {
+    const parts = usageText.split(' - ')
+    return t('29b38e7b.1aabae', { value: parts[parts.length - 1] })
+  }
+
+  if (usageText.startsWith('至 ')) {
+    return t('29b38e7b.e14669', { value: usageText })
+  }
+
+  return t('29b38e7b.33f8b1', { value: usageText })
 })
+
+function formatDisplayNumber(value: number): string {
+  if (!Number.isFinite(value)) return '0'
+  return value
+    .toFixed(2)
+    .replace(/\.00$/, '')
+    .replace(/(\.\d)0$/, '$1')
+}
 
 /**
  * 处理领取优惠券
@@ -157,5 +293,16 @@ function handleClaim() {
  */
 function handleUnselect() {
   emit('unselect')
+}
+
+function handleCardClick() {
+  if (!isCheckoutVariant.value) return
+
+  if (props.isSelected) {
+    emit('unselect')
+    return
+  }
+
+  emit('select', props.coupon)
 }
 </script>

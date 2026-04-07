@@ -12,7 +12,7 @@
             class="w-5 h-5 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             @change="$emit('toggle-all')"
           />
-          <span class="text-sm text-gray-700">全选</span>
+          <span class="text-sm text-gray-700">{{ t('79fdede9.66eeac') }}</span>
         </label>
 
         <!-- 批量操作 -->
@@ -23,7 +23,7 @@
             class="text-sm text-gray-600 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             @click="$emit('batch-remove')"
           >
-            {{ batchRemoving ? '删除中...' : '删除' }}
+            {{ batchRemoving ? t('79fdede9.09f2fb') : t('79fdede9.2f4aad') }}
           </button>
           <button
             type="button"
@@ -31,7 +31,7 @@
             class="text-sm text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             @click="$emit('batch-favorite')"
           >
-            收藏
+            {{ t('79fdede9.ae336c') }}
           </button>
         </div>
       </div>
@@ -40,14 +40,14 @@
       <div class="flex items-center gap-8">
         <!-- 已选商品统计 -->
         <div class="text-sm text-gray-600">
-          已选商品
+          {{ t('79fdede9.c0b8b1') }}
           <span class="text-primary font-semibold">{{ selectedCount }}</span>
-          件
+          {{ t('79fdede9.f7edf5') }}
         </div>
 
         <!-- 合计 -->
         <div class="flex items-baseline gap-2">
-          <span class="text-sm text-gray-600">合计:</span>
+          <span class="text-sm text-gray-600">{{ t('79fdede9.0304c1') }}</span>
           <span class="text-2xl font-semibold text-red-600">
             ¥{{ formatPrice(selectedTotal) }}
           </span>
@@ -60,7 +60,7 @@
           class="px-8 py-3 bg-red-600 text-white text-base font-medium rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           @click="$emit('checkout')"
         >
-          {{ checking ? '处理中...' : '结算' }}
+          {{ checking ? t('79fdede9.2fb90b') : t('79fdede9.89159f') }}
         </button>
       </div>
     </div>
@@ -108,6 +108,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 defineEmits<Emits>()
+const { t } = useI18n()
 
 /**
  * 格式化价格

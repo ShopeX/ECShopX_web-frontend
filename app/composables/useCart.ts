@@ -95,6 +95,7 @@ export interface ICartUI {
 export function useCart() {
   // ✅ 使用自定义 Toast 消息提示
   const toast = useToastMessage()
+  const { t } = useI18n()
 
   // ✅ Pinia Store 完全支持 SSR，可以直接调用
   const cartStore = useCartStore()
@@ -284,7 +285,7 @@ export function useCart() {
     try {
       await cartStore.loadCart(options)
     } catch (err: any) {
-      error.value = err.message || '加载购物车失败'
+      error.value = err.message || t('5e601ea3.87cb99')
       throw err
     }
   }
@@ -317,11 +318,11 @@ export function useCart() {
         cart_type: params.cart_type ?? 'cart',
       })
 
-      params.cart_type === 'cart' && toast.show('已添加到购物车')
+      params.cart_type === 'cart' && toast.show(t('5e601ea3.ba20ce'))
 
       return { success: true }
     } catch (err: any) {
-      const errorMsg = err.message || '添加失败'
+      const errorMsg = err.message || t('5e601ea3.6452a0')
       toast.show(errorMsg)
       return { success: false, error: errorMsg }
     }
@@ -339,7 +340,7 @@ export function useCart() {
       return { success: true }
     } catch (err: any) {
       // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
-      const errorMsg = err.message || '更新失败'
+      const errorMsg = err.message || t('5e601ea3.930442')
       return { success: false, error: errorMsg }
     }
   }
@@ -355,7 +356,7 @@ export function useCart() {
       return { success: true }
     } catch (err: any) {
       // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
-      const errorMsg = err.message || '切换失败'
+      const errorMsg = err.message || t('5e601ea3.2d5fba')
       return { success: false, error: errorMsg }
     }
   }
@@ -371,7 +372,7 @@ export function useCart() {
       return { success: true }
     } catch (err: any) {
       // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
-      const errorMsg = err.message || '全选失败'
+      const errorMsg = err.message || t('5e601ea3.197197')
       return { success: false, error: errorMsg }
     }
   }
@@ -383,11 +384,11 @@ export function useCart() {
     try {
       await cartStore.removeSelectedItems()
       // ✅ 只有成功时才显示成功消息
-      toast.show('已删除选中商品')
+      toast.show(t('5e601ea3.d38be8'))
       return { success: true }
     } catch (err: any) {
       // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
-      const errorMsg = err.message || '删除失败'
+      const errorMsg = err.message || t('5e601ea3.acf066')
       return { success: false, error: errorMsg }
     }
   }
@@ -399,11 +400,11 @@ export function useCart() {
     try {
       await cartStore.removeItem(itemId)
       // ✅ 只有成功时才显示成功消息
-      toast.show('已删除商品')
+      toast.show(t('5e601ea3.450d0f'))
       return { success: true }
     } catch (err: any) {
       // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
-      const errorMsg = err.message || '删除失败'
+      const errorMsg = err.message || t('5e601ea3.acf066')
       return { success: false, error: errorMsg }
     }
   }
@@ -415,11 +416,11 @@ export function useCart() {
     try {
       await cartStore.clearCart()
       // ✅ 只有成功时才显示成功消息
-      toast.show('已清空购物车')
+      toast.show(t('5e601ea3.f8b666'))
       return { success: true }
     } catch (err: any) {
       // ❌ HTTP 插件已经显示过错误消息，这里不再重复显示
-      const errorMsg = err.message || '清空失败'
+      const errorMsg = err.message || t('5e601ea3.ec25de')
       return { success: false, error: errorMsg }
     }
   }

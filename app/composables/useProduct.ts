@@ -44,6 +44,7 @@ import { logger } from '~/utils/log'
  * 商品业务组合式函数
  */
 export function useProduct() {
+  const { t } = useI18n()
   // ==================== 列表状态 ====================
 
   const products = ref<IProduct[]>([])
@@ -106,7 +107,7 @@ export function useProduct() {
       return { success: true }
     } catch (err: any) {
       logger.error('[useProduct] Load products error:', err)
-      listError.value = err.message || '加载商品列表失败'
+      listError.value = err.message || t('246098af.f045d6')
 
       products.value = []
       totalCount.value = 0
@@ -131,7 +132,7 @@ export function useProduct() {
     error?: string
   }> => {
     if (listLoading.value) {
-      return { success: false, error: '正在加载中' }
+      return { success: false, error: t('246098af.c40ee4') }
     }
 
     listLoading.value = true
@@ -153,7 +154,7 @@ export function useProduct() {
       return { success: true }
     } catch (err: any) {
       logger.error('[useProduct] Load more products error:', err)
-      listError.value = err.message || '加载更多商品失败'
+      listError.value = err.message || t('246098af.d64f97')
       return { success: false, error: listError.value || undefined }
     } finally {
       listLoading.value = false
@@ -204,12 +205,12 @@ export function useProduct() {
 
       // 如果没有数据
       product.value = null
-      detailError.value = '商品不存在'
+      detailError.value = t('246098af.997875')
 
       return { success: false, error: detailError.value }
     } catch (err: any) {
       console.error('Load product error:', err)
-      detailError.value = err.message || '加载商品详情失败'
+      detailError.value = err.message || t('246098af.83c591')
 
       product.value = null
 

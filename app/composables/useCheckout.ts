@@ -12,7 +12,7 @@
  * - 有复杂的业务逻辑（需要 Composable）
  */
 
-import { orderApiClient, addressApiClient, couponApiClient } from '~/infrastructure/http/clients'
+import { orderApiClient, addressApiClient, couponApiClient, storeApiClient } from '~/infrastructure/http/clients'
 import {
   OrderTransformer,
   type IOrderCalculateModel,
@@ -22,13 +22,27 @@ import {
 import { useCart } from './useCart'
 import { MoneyValueObject } from '~/shared/value-objects'
 import type { ICreateOrderRequest } from '~/infrastructure/http/clients/OrderApiClient'
+import type { IStoreItem } from '~/infrastructure/http/clients/StoreApiClient'
 import { HttpStatus } from '~/types/http'
+
+export interface IPickupStore {
+  id: string
+  name: string
+  address: string
+  phone: string
+}
 
 export interface ICheckoutForm {
   // 配送方式
   receiptType: 'logistics' | 'express' | 'ziti' | 'merchant'
   // 地址信息
   selectedAddressId?: string
+  // 自提信息
+  pickupName: string
+  pickupPhone: string
+  pickupProvince: string
+  pickupCity: string
+  selectedStoreId?: string
   // 优惠券
   couponCode?: string
   notUseCoupon: boolean
@@ -38,11 +52,12 @@ export interface ICheckoutForm {
   useFullPoint: boolean
   // 发票
   needInvoice: boolean
-  invoiceType?: string
+  invoiceType?: 'individual' | 'enterprise'
   invoiceContent?: any
 }
 
 export function useCheckout() {
+  const { t } = useI18n()
   const route = useRoute()
   const { cartUI, items } = useCart()
 
@@ -60,6 +75,11 @@ export function useCheckout() {
   const coupons = ref<ICouponModel[]>([])
   const selectedCoupon = ref<ICouponModel | null>(null)
 
+  // 门店/自提点
+  const stores = ref<IPickupStore[]>([])
+  const selectedStore = ref<IPickupStore | null>(null)
+  const storesLoading = ref(false)
+
   // 订单计算结果
   const calculateResult = ref<IOrderCalculateModel | null>(null)
   // 结算错误
@@ -68,6 +88,10 @@ export function useCheckout() {
   // 表单数据
   const form = ref<ICheckoutForm>({
     receiptType: 'logistics',
+    pickupName: '',
+    pickupPhone: '',
+    pickupProvince: '',
+    pickupCity: '',
     notUseCoupon: true,
     usePoint: false,
     pointUse: 0,
@@ -96,7 +120,7 @@ export function useCheckout() {
         form.value.selectedAddressId = firstAddress.id
       }
     } catch (err: any) {
-      error.value = err.message || '加载地址列表失败'
+      error.value = err.message || t('ab027ee5.7d8904')
       throw err
     } finally {
       loading.value = false
@@ -155,6 +179,48 @@ export function useCheckout() {
   }
 
   /**
+   * 查询门店列表
+   */
+  const searchStores = async () => {
+    try {
+      storesLoading.value = true
+      const response = await storeApiClient.getStoreList({
+        province: form.value.pickupProvince || undefined,
+        city: form.value.pickupCity || undefined,
+      })
+
+      const rawList = Array.isArray(response) ? response : (response?.list || response?.data || [])
+      stores.value = rawList.map((item: IStoreItem) => ({
+        id: item.store_id,
+        name: item.store_name,
+        address: item.address,
+        phone: item.telephone,
+      }))
+
+      // 自动选中第一个
+      if (stores.value.length > 0 && !selectedStore.value) {
+        selectStore(stores.value[0]!.id)
+      }
+    } catch (err: any) {
+      console.error('查询门店失败:', err)
+      stores.value = []
+    } finally {
+      storesLoading.value = false
+    }
+  }
+
+  /**
+   * 选择门店
+   */
+  const selectStore = (storeId: string) => {
+    const store = stores.value.find((s) => s.id === storeId)
+    if (store) {
+      selectedStore.value = store
+      form.value.selectedStoreId = storeId
+    }
+  }
+
+  /**
    * 切换积分使用
    */
   const toggleUsePoint = () => {
@@ -185,16 +251,12 @@ export function useCheckout() {
    * 计算订单金额
    */
   const calculateOrderAmount = async () => {
-    if (!selectedAddress.value && form.value.receiptType === 'logistics') {
-      return
-    }
-
     try {
       calculating.value = true
       error.value = null
 
       // 构建计算参数
-      const mode = (route.query.mode as string) || 'normal'
+      const mode = (route.query.mode as string) || 'cart'
       const params: any = {
         distributor_id: '0', // TODO: 从配置或用户信息获取
         cart_type: mode,
@@ -215,8 +277,10 @@ export function useCheckout() {
       }
 
       // 自提需要自提点信息
-      if (form.value.receiptType === 'ziti') {
-        // TODO: 需要选择自提点
+      if (form.value.receiptType === 'ziti' && selectedStore.value) {
+        params.pickup_location = selectedStore.value.id
+        params.receiver_name = form.value.pickupName
+        params.receiver_mobile = form.value.pickupPhone
       }
 
       // 优惠券
@@ -243,10 +307,10 @@ export function useCheckout() {
       if (isUnprocessableEntity(err)) {
         checkoutError.value = {
           code: HttpStatus.UNPROCESSABLE_ENTITY,
-          message: err.data?.message || err.message || '结算商品异常',
+          message: err.data?.message || err.message || t('ab027ee5.0d5a59'),
         }
       } else {
-        error.value = err.message || '计算订单金额失败'
+        error.value = err.message || t('ab027ee5.a4d7e0')
       }
     } finally {
       calculating.value = false
@@ -260,7 +324,7 @@ export function useCheckout() {
     payType: string
   ): Promise<{ success: boolean; orderId?: string; error?: string }> => {
     if (!selectedAddress.value && form.value.receiptType === 'logistics') {
-      return { success: false, error: '请选择收货地址' }
+      return { success: false, error: t('ab027ee5.4a0460') }
     }
 
     try {
@@ -269,7 +333,7 @@ export function useCheckout() {
       checkoutError.value = null
 
       // 构建创建订单参数
-      const mode = (route.query.mode as string) || 'normal'
+      const mode = (route.query.mode as string) || 'cart'
       const params: ICreateOrderRequest = {
         distributor_id: '0', // TODO: 从配置或用户信息获取
         cart_type: mode as any,
@@ -291,8 +355,10 @@ export function useCheckout() {
       }
 
       // 自提需要自提点信息
-      if (form.value.receiptType === 'ziti') {
-        // TODO: 需要选择自提点
+      if (form.value.receiptType === 'ziti' && selectedStore.value) {
+        params.pickup_location = selectedStore.value.id
+        params.receiver_name = form.value.pickupName
+        params.receiver_mobile = form.value.pickupPhone
       }
 
       // 优惠券
@@ -321,12 +387,12 @@ export function useCheckout() {
       if (isUnprocessableEntity(err)) {
         checkoutError.value = {
           code: HttpStatus.UNPROCESSABLE_ENTITY,
-          message: err.data?.message || err.message || '下单异常',
+          message: err.data?.message || err.message || t('ab027ee5.9d9cf9'),
         }
         return { success: false, error: checkoutError.value.message }
       }
 
-      error.value = err.message || '创建订单失败'
+      error.value = err.message || t('ab027ee5.04f73e')
       return { success: false, error: error.value || undefined }
     } finally {
       loading.value = false
@@ -340,7 +406,7 @@ export function useCheckout() {
     if (calculateResult.value) {
       return MoneyValueObject.of(calculateResult.value.itemFeeNew).display
     }
-    return cartUI.value.selectedTotal
+    return '--'
   })
 
   /**
@@ -349,11 +415,11 @@ export function useCheckout() {
   const freightDisplay = computed(() => {
     if (calculateResult.value) {
       if (calculateResult.value.freightFee === 0) {
-        return '免费'
+        return t('ab027ee5.aa2c91')
       }
       return MoneyValueObject.of(calculateResult.value.freightFee).display
     }
-    return '免费'
+    return '--'
   })
 
   /**
@@ -363,7 +429,7 @@ export function useCheckout() {
     if (calculateResult.value) {
       return MoneyValueObject.of(calculateResult.value.discountFee).display
     }
-    return '¥ 0.00'
+    return '--'
   })
 
   /**
@@ -373,14 +439,14 @@ export function useCheckout() {
     if (calculateResult.value) {
       return MoneyValueObject.of(calculateResult.value.totalFee).display
     }
-    return cartUI.value.selectedTotal
+    return '--'
   })
 
   /**
    * 计算商品数量
    */
   const itemCount = computed(() => {
-    return items.value.filter((item) => item.selected).length
+    return checkoutItems.value.length
   })
 
   /**
@@ -390,9 +456,7 @@ export function useCheckout() {
     if (calculateResult.value) {
       return calculateResult.value.totalItemNum
     }
-    return items.value
-      .filter((item) => item.selected)
-      .reduce((sum, item) => sum + item.quantity.value, 0)
+    return 0
   })
 
   /**
@@ -409,14 +473,17 @@ export function useCheckout() {
     calculating: readonly(calculating),
     error: readonly(error),
     checkoutError: readonly(checkoutError),
+    storesLoading: readonly(storesLoading),
 
     // 数据
     addresses: readonly(addresses),
     selectedAddress: readonly(selectedAddress),
     coupons: readonly(coupons),
     selectedCoupon: readonly(selectedCoupon),
+    stores: readonly(stores),
+    selectedStore: readonly(selectedStore),
     calculateResult: readonly(calculateResult),
-    checkoutItems, // 暴露结算商品列表
+    checkoutItems,
     form,
 
     // 计算属性
@@ -433,6 +500,8 @@ export function useCheckout() {
     loadCoupons,
     selectCoupon,
     unselectCoupon,
+    searchStores,
+    selectStore,
     toggleUsePoint,
     toggleUseFullPoint,
     calculateOrderAmount,

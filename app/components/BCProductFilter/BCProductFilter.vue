@@ -7,16 +7,16 @@
         class="flex flex-col font-medium justify-center leading-none w-full text-2xl text-[#191a1d] mb-2 lg:mb-8"
         data-testid="filter-title"
       >
-        <h2 class="block leading-[48px]">{{ $t('filter.title') }}</h2>
+        <h2 class="block leading-[48px]">{{ t('9e569ba6.794a4e') }}</h2>
       </div>
 
       <!-- 筛选栏：排序和筛选按钮 -->
       <div class="flex h-[42px] items-center justify-between w-full lg:mb-8">
         <!-- 左侧：排序选择器 -->
         <div class="relative flex items-center gap-2">
-          <span class="text-sm text-[#99a1af] font-normal leading-5">{{
-            $t('filter.sortLabel')
-          }}</span>
+          <span class="text-sm text-[#99a1af] font-normal leading-5">
+            {{ t('9e569ba6.899c0c') }}
+          </span>
           <button
             class="flex items-center gap-2 text-sm font-medium leading-5 text-[#191a1d] hover:opacity-80 transition-opacity"
             data-testid="filter-sort-button"
@@ -67,7 +67,7 @@
           data-testid="filter-toggle-button"
           @click="toggleFilterPanel"
         >
-          <span>{{ $t('filter.filterButton') }}</span>
+          <span>{{ t('9e569ba6.c2fe62') }}</span>
           <UIcon name="i-heroicons-funnel" class="size-4" />
         </button>
       </div>
@@ -135,7 +135,7 @@
                 class="text-sm font-medium leading-5 text-right whitespace-nowrap"
                 :class="isAllSelected(group.key) ? 'text-[#191a1d]' : 'text-[#99a1af]'"
               >
-                {{ $t('filter.all') }}
+                {{ t('9e569ba6.a8b0c2') }}
               </p>
             </div>
 
@@ -220,7 +220,7 @@
                     class="text-sm font-medium leading-5"
                     :class="isAllSelected(group.key) ? 'text-[#191a1d]' : 'text-[#99a1af]'"
                   >
-                    {{ $t('filter.all') }}
+                    {{ t('9e569ba6.a8b0c2') }}
                   </p>
                 </div>
 
@@ -289,16 +289,16 @@ const { t } = useI18n()
 
 // 排序选项（按 Figma 设计调整顺序和名称）
 const sortOptions = computed(() => [
-  { value: ESortOption.SALES, label: t('filter.sort.sales') },
-  { value: ESortOption.NEW, label: t('filter.sort.new') },
-  { value: ESortOption.PRICE_DESC, label: t('filter.sort.priceDesc') },
-  { value: ESortOption.PRICE_ASC, label: t('filter.sort.priceAsc') },
+  { value: ESortOption.SALES, label: t('9e569ba6.44e7eb') },
+  { value: ESortOption.NEW, label: t('9e569ba6.314ef5') },
+  { value: ESortOption.PRICE_DESC, label: t('9e569ba6.166f85') },
+  { value: ESortOption.PRICE_ASC, label: t('9e569ba6.2d1887') },
 ])
 
 // 当前排序标签
 const currentSortLabel = computed(() => {
   const option = sortOptions.value.find((opt) => opt.value === localValue.value.sort)
-  return option?.label || t('filter.sort.default')
+  return option?.label || t('9e569ba6.88e7de')
 })
 
 /**

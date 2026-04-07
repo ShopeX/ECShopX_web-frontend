@@ -4,7 +4,7 @@
     <input
       :value="modelValue"
       type="text"
-      placeholder="请输入验证码"
+      :placeholder="t('6ca28f37.d0c06a')"
       maxlength="4"
       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
       @input="handleInput"
@@ -16,19 +16,24 @@
       class="relative w-32 h-10 border border-gray-300 rounded-lg overflow-hidden cursor-pointer hover:border-purple-500 transition-all group"
       @click="handleRefresh"
     >
-      <img v-if="image" :src="image" alt="验证码" class="w-full h-full object-cover" />
+      <img
+        v-if="image"
+        :src="image"
+        :alt="t('6ca28f37.983f59')"
+        class="w-full h-full object-cover"
+      />
       <div
         v-else
         class="w-full h-full flex items-center justify-center text-xs text-gray-400 bg-gray-50"
       >
-        点击获取验证码
+        {{ t('6ca28f37.a41d43') }}
       </div>
 
       <!-- 刷新提示 -->
       <div
         class="absolute inset-0 bg-black bg-opacity-50 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        点击刷新
+        {{ t('6ca28f37.68bf43') }}
       </div>
     </div>
   </div>
@@ -46,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   image: '',
 })
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]

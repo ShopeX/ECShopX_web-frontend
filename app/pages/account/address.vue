@@ -1,108 +1,89 @@
 <template>
   <div class="bg-white min-h-screen" data-testid="address-page">
-    <ClientOnly>
-      <!-- H5 端布局（DOM 顺序靠前，便于 E2E 在小视口下匹配到可见元素）-->
-      <div class="flex flex-col min-h-screen md:hidden">
-        <div
-          class="bg-white flex items-center justify-between px-4 py-4 shrink-0 border-b border-[#e5e7eb]"
-        >
-          <button type="button" class="p-1 -ml-1" aria-label="返回" @click="router.back()">
-            <Icon name="ph:caret-left" class="w-6 h-6 text-[#191a1d]" />
-          </button>
-          <span class="text-base font-medium text-[#191a1d] leading-5">收货地址</span>
-          <div class="w-6 shrink-0" />
-        </div>
-        <div class="px-4 py-4 flex items-center justify-between border-b border-[#e5e7eb]">
-          <h2 class="text-base font-medium text-[#191a1d] leading-5">收货地址</h2>
-          <button
-            type="button"
-            class="border border-[#e5e7eb] px-[17px] py-2 text-xs font-medium text-[#191a1d] leading-4 hover:bg-gray-50 transition-colors"
-            data-testid="address-add-btn"
-            @click="openAddModal"
-          >
-            + 添加新地址
-          </button>
-        </div>
-        <div class="flex-1 p-4 overflow-y-auto">
-          <div v-if="loading" class="py-16 text-center text-[#4a5565] text-sm">加载中...</div>
-          <div
-            v-else-if="addressList.length > 0"
-            class="flex flex-col gap-4"
-            data-testid="address-list"
-          >
-            <AddressCard
-              v-for="item in addressList"
-              :key="item.id"
-              data-testid="address-card"
-              :address="item"
-              :is-default="item.isDefault"
-              layout="h5"
-              @edit="handleEdit"
-              @delete="handleDelete"
-              @set-default="handleSetDefault"
-            />
-          </div>
-          <div
-            v-else
-            class="py-16 text-center text-[#4a5565] text-sm"
-            data-testid="address-empty"
-          >
-            暂无收货地址
-          </div>
-        </div>
-      </div>
+    <div class="lg:hidden sticky top-0 z-10 shrink-0">
+      <AccountH5FilterBar
+        v-model="showMobileMenu"
+        :title="t('ee3264ed.748ea9')"
+        :show-back="true"
+        :active-key="activeMenu"
+        :menu-items="menuItems"
+        @back="router.back()"
+      />
+    </div>
 
-      <!-- PC 端布局：与 Figma 2507-5039 一致，左侧菜单 + 右侧收货地址 -->
-      <div class="hidden md:flex md:flex-col">
-        <div class="flex items-start justify-center px-[128px] py-[32px] w-full">
-          <div class="flex flex-[1_0_0] gap-[64px] items-start min-w-0 max-w-[1440px] w-full">
-            <div class="w-64 shrink-0">
-              <AccountMenu v-model="activeMenu" @logout="handleLogout" />
+    <div class="w-full px-4 pb-8 pt-4 lg:px-[128px] lg:py-[32px]">
+      <div class="flex w-full items-start lg:gap-[64px]">
+        <div
+          class="hidden lg:block w-64 shrink-0 lg:self-start lg:sticky lg:top-[var(--layout-header-height,68px)]"
+        >
+          <AccountMenu v-model="activeMenu" @logout="handleLogout" />
+        </div>
+
+        <div class="flex min-w-0 flex-1 flex-col">
+          <div class="w-full lg:max-w-[864px]">
+            <div class="flex h-[34px] items-center justify-between">
+              <h2 class="text-[16px] font-medium leading-5 text-[#191a1d]">
+                {{ t('ee3264ed.748ea9') }}
+              </h2>
+              <button
+                type="button"
+                class="flex h-[34px] min-w-[97px] items-center justify-center border border-[#e5e7eb] bg-white px-[17px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
+                data-testid="address-add-btn"
+                @click="openAddModal"
+              >
+                {{ t('ee3264ed.dd4bb4') }}
+              </button>
             </div>
-            <div class="flex-1 min-w-0 flex flex-col gap-4">
-              <div class="flex items-center justify-between w-full">
-                <h2 class="font-['Noto_Sans_SC',sans-serif] font-medium text-[16px] leading-5 text-[#191a1d]">
-                  收货地址
-                </h2>
-                <button
-                  type="button"
-                  class="bg-white border border-[#e5e7eb] px-[17px] py-[9px] text-[12px] font-medium leading-4 text-[#191a1d] hover:bg-gray-50 transition-colors"
-                  data-testid="address-add-btn-pc"
-                  @click="openAddModal"
-                >
-                  + 添加新地址
-                </button>
+
+            <div
+              v-if="loading"
+              class="grid w-full grid-cols-1 gap-[16px] pt-[16px] lg:grid-cols-2"
+              data-testid="address-skeleton"
+            >
+              <div v-for="i in 4" :key="i" class="border border-[#e5e7eb] p-[16px] animate-pulse">
+                <div class="h-[20px] w-[80px] rounded bg-[#e5e7eb]" />
+                <div class="mt-[12px] h-[16px] w-[120px] rounded bg-[#e5e7eb]" />
+                <div class="mt-[8px] h-[16px] w-full max-w-[260px] rounded bg-[#e5e7eb]" />
+                <div class="mt-[16px] flex items-center gap-[16px]">
+                  <div class="h-[16px] w-[60px] rounded bg-[#e5e7eb]" />
+                  <div class="h-[16px] w-[40px] rounded bg-[#e5e7eb]" />
+                  <div class="h-[16px] w-[60px] rounded bg-[#e5e7eb]" />
+                </div>
               </div>
-              <div v-if="loading" class="py-16 text-center text-[14px] text-[#4a5565]">加载中...</div>
-              <div
-                v-else-if="addressList.length > 0"
-                class="grid grid-cols-2 gap-4 w-full"
-                data-testid="address-list-pc"
-              >
-                <AddressCard
-                  v-for="item in addressList"
-                  :key="item.id"
-                  data-testid="address-card"
-                  :address="item"
-                  :is-default="item.isDefault"
-                  layout="pc"
-                  @edit="handleEdit"
-                  @delete="handleDelete"
-                  @set-default="handleSetDefault"
-                />
-              </div>
-              <div
-                v-else
-                class="py-16 text-center text-[14px] text-[#4a5565]"
-                data-testid="address-empty-pc"
-              >
-                暂无收货地址
-              </div>
+            </div>
+
+            <div
+              v-else-if="addressList.length > 0"
+              class="grid w-full grid-cols-1 gap-[16px] pt-[16px] lg:grid-cols-2"
+              data-testid="address-list"
+            >
+              <AddressCard
+                v-for="item in addressList"
+                :key="item.id"
+                :address="{
+                  id: item.id,
+                  name: item.name,
+                  phone: item.phone,
+                  fullAddress: item.fullAddress,
+                }"
+                :is-default="item.isDefault"
+                @edit="handleEdit"
+                @delete="handleDelete"
+                @set-default="handleSetDefault"
+              />
+            </div>
+
+            <div
+              v-else
+              class="w-full py-16 text-center text-[14px] text-[#4a5565]"
+              data-testid="address-empty"
+            >
+              {{ t('7993a4bb.c6c436') }}
             </div>
           </div>
         </div>
       </div>
-    </ClientOnly>
+    </div>
 
     <BCAddressModal
       v-model="modalVisible"
@@ -114,30 +95,93 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { IAddressItem, IAddressFormData } from '~/composables/useAddress'
+import type { IAddressItem } from '~/composables/useAddress'
+import AccountMenu from './components/AccountMenu.vue'
+import AccountH5FilterBar from './components/AccountH5FilterBar.vue'
+import AddressCard from './components/AddressCard.vue'
+import { getBusinessMode } from '~/composables/useTemplate'
 
 definePageMeta({
   layout: 'default',
 })
 
 const router = useRouter()
-const { getAddressList, getAddressDetail, deleteAddress, updateAddress } = useAddress()
+const localePath = useLocalePath()
+const { t } = useI18n()
+const { confirm } = useModal()
+const toast = useToastMessage()
+const { getAddressList, getAddressDetail, deleteAddress, saveAddress, transformFromApiFormat } =
+  useAddress()
 
 const activeMenu = ref('address')
-const loading = ref(false)
-const addressList = ref<Array<{
-  id: string
-  name: string
-  phone: string
-  fullAddress: string
-  isDefault: boolean
-}>>([])
+const showMobileMenu = ref(false)
+const loading = ref(true)
+const isBBC = computed(() => getBusinessMode() === 'b2b')
+const addressList = ref<
+  Array<{
+    id: string
+    name: string
+    phone: string
+    fullAddress: string
+    isDefault: boolean
+  }>
+>([])
 
 const modalVisible = ref(false)
 const editingAddressId = ref<string | undefined>(undefined)
-const modalInitialData = ref<IAddressFormData | undefined>(undefined)
+const modalInitialData = ref<ReturnType<typeof transformFromApiFormat> | undefined>(undefined)
+const settingDefaultId = ref<string | null>(null)
+const rawAddressMap = ref<Map<string, IAddressItem>>(new Map())
+
+const menuItems = computed(() => {
+  const items = [
+    { key: 'profile', label: t('96a0d248.4f7a2a'), path: localePath('/account') },
+    { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
+    {
+      key: 'aftersales',
+      label: t('account.aftersalesOrders'),
+      path: localePath('/account/aftersales'),
+    },
+    { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
+    { key: 'favorites', label: t('8b2de97c.975ff6'), path: localePath('/account/favorites') },
+  ]
+
+  if (isBBC.value) {
+    items.push({
+      key: 'followStores',
+      label: t('account.followStores'),
+      path: localePath('/account/follow-stores'),
+    })
+  }
+
+  items.push(
+    { key: 'address', label: t('ee3264ed.748ea9'), path: localePath('/account/address') },
+    { key: 'reviews', label: t('8b2de97c.b3bf09'), path: localePath('/account/reviews') }
+  )
+
+  return items
+})
+
+function toDefaultFlag(value: unknown): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true'
+  return Number(value || 0) === 1
+}
+
+function mapAddressItem(item: IAddressItem) {
+  const defaultFlag =
+    (item as { is_def?: unknown; is_default?: unknown }).is_def ??
+    (item as { is_def?: unknown; is_default?: unknown }).is_default
+  return {
+    id: item.address_id,
+    name: item.username,
+    phone: item.telephone,
+    fullAddress: [item.province, item.city, item.county, item.adrdetail].filter(Boolean).join(' '),
+    isDefault: toDefaultFlag(defaultFlag),
+  }
+}
 
 function normalizeList(data: unknown): IAddressItem[] {
   if (Array.isArray(data)) return data as IAddressItem[]
@@ -152,20 +196,23 @@ function normalizeList(data: unknown): IAddressItem[] {
   return []
 }
 
+function markDefaultAddress(addressId: string) {
+  addressList.value = addressList.value.map((item) => ({
+    ...item,
+    isDefault: item.id === addressId,
+  }))
+}
+
 async function fetchList() {
   loading.value = true
   try {
     const res = await getAddressList()
     if (res.success && res.data != null) {
       const raw = normalizeList(res.data)
-      addressList.value = raw.map((item: IAddressItem) => ({
-        id: item.address_id,
-        name: item.username,
-        phone: item.telephone,
-        fullAddress: [item.province, item.city, item.county, item.adrdetail].filter(Boolean).join(' '),
-        isDefault: item.is_def === 1,
-      }))
+      rawAddressMap.value = new Map(raw.map((item) => [item.address_id, item]))
+      addressList.value = raw.map(mapAddressItem)
     } else {
+      rawAddressMap.value = new Map()
       addressList.value = []
     }
   } catch {
@@ -191,20 +238,57 @@ async function handleEdit(addressId: string | number) {
   }
 }
 
-function handleDelete(addressId: string | number) {
-  if (!confirm('确定要删除该收货地址吗？')) return
-  deleteAddress(String(addressId)).then((res) => {
-    if (res.success) fetchList()
+async function handleDelete(addressId: string | number) {
+  const id = String(addressId)
+  confirm({
+    title: t('41c7a0f8.2f4aad'),
+    content: t('a3f584d1.9b0d37'),
+    onConfirm: async () => {
+      const res = await deleteAddress(id)
+      if (res.success) {
+        await fetchList()
+      }
+    },
   })
 }
 
 async function handleSetDefault(addressId: string | number) {
   const id = String(addressId)
-  const res = await getAddressDetail(id)
-  if (!res.success || !res.data) return
-  const formData = { ...res.data, isDefault: true }
-  const updateRes = await updateAddress(id, formData)
-  if (updateRes.success) fetchList()
+  if (settingDefaultId.value) return
+
+  const previousList = addressList.value.map((item) => ({ ...item }))
+  if (!previousList.some((item) => item.id === id)) return
+
+  markDefaultAddress(id)
+  settingDefaultId.value = id
+
+  try {
+    const cachedRaw = rawAddressMap.value.get(id)
+    let formData
+    if (cachedRaw) {
+      formData = transformFromApiFormat(cachedRaw)
+    } else {
+      const detailRes = await getAddressDetail(id)
+      if (!detailRes.success || !detailRes.data) {
+        throw new Error(detailRes.error || t('fa9beefa.b5c976'))
+      }
+      formData = detailRes.data
+    }
+
+    const saveRes = await saveAddress({ ...formData, isDefault: true }, id)
+    if (!saveRes.success) {
+      throw new Error(saveRes.error || t('fa9beefa.edae2b'))
+    }
+
+    markDefaultAddress(id)
+  } catch (error) {
+    addressList.value = previousList
+    const fallbackMessage = t('fa9beefa.edae2b')
+    const errorMessage = error instanceof Error && error.message ? error.message : fallbackMessage
+    toast.show(errorMessage)
+  } finally {
+    settingDefaultId.value = null
+  }
 }
 
 function onModalSuccess() {

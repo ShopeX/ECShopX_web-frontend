@@ -1,153 +1,79 @@
 <template>
+  <!-- PC 端：弹窗 -->
   <ECModal
+    v-if="isDesktop"
     v-model="visible"
-    :title="isEdit ? '编辑地址' : '添加地址'"
+    :title="isEdit ? t('78c41987.c2fff4') : t('78c41987.4a1065')"
     :width="598"
     :show-footer="false"
     @close="handleClose"
   >
     <div data-testid="address-modal">
-      <form class="flex flex-col gap-8" data-testid="address-form" @submit.prevent="handleSubmit">
-      <!-- 收货人 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">收货人</label>
-        <div class="flex flex-col gap-1">
-          <input
-            v-model="formData.name"
-            type="text"
-            placeholder="请输入收货人姓名"
-            class="h-10 px-4 bg-[#f3f4f6] border text-sm text-[#191a1d] leading-5 focus:outline-none focus:border-[#191a1d] transition-colors"
-            :class="errors.name ? 'border-[#d0112f]' : 'border-transparent'"
-          />
-          <p v-if="errors.name" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.name }}
-          </p>
-        </div>
-      </div>
-
-      <!-- 手机号码 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">手机号码</label>
-        <div class="flex gap-4">
-          <!-- 区号选择 -->
-          <!-- <ECSelect
-            v-model="formData.countryCode"
-            :options="countryCodeOptions"
-            class="w-[180px]"
-            size="md"
-          /> -->
-
-          <!-- 手机号输入 -->
-          <div class="flex-1 flex flex-col gap-1">
-            <input
-              v-model="formData.phone"
-              type="tel"
-              placeholder="请输入手机号码"
-              class="h-10 px-4 bg-[#f3f4f6] border text-sm text-[#191a1d] leading-5 focus:outline-none focus:border-[#191a1d] transition-colors"
-              :class="errors.phone ? 'border-[#d0112f]' : 'border-transparent'"
-            />
-            <p v-if="errors.phone" class="text-xs text-[#d0112f] leading-4">
-              {{ errors.phone }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 省市区 -->
-      <div class="flex gap-4">
-        <!-- 省 -->
-        <div class="flex-1 flex flex-col gap-2">
-          <label class="text-xs text-[#4a5565] leading-4">省</label>
-          <ECSelect
-            v-model="formData.province"
-            :options="provinces"
-            :error="!!errors.province"
-            size="md"
-            placeholder="省份/直辖市"
-            @change="handleProvinceChange"
-          />
-          <p v-if="errors.province" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.province }}
-          </p>
-        </div>
-
-        <!-- 市 -->
-        <div class="flex-1 flex flex-col gap-2">
-          <label class="text-xs text-[#4a5565] leading-4">市</label>
-          <ECSelect
-            v-model="formData.city"
-            :options="cities"
-            :disabled="!formData.province"
-            :error="!!errors.city"
-            size="md"
-            placeholder="市"
-            @change="handleCityChange"
-          />
-          <p v-if="errors.city" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.city }}
-          </p>
-        </div>
-
-        <!-- 区 -->
-        <div class="flex-1 flex flex-col gap-2">
-          <label class="text-xs text-[#4a5565] leading-4">区</label>
-          <ECSelect
-            v-model="formData.district"
-            :options="districts"
-            :disabled="!formData.city"
-            :error="!!errors.district"
-            size="md"
-            placeholder="县/区"
-          />
-          <p v-if="errors.district" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.district }}
-          </p>
-        </div>
-      </div>
-
-      <!-- 详细地址 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">详细地址</label>
-        <div class="flex flex-col gap-1">
-          <textarea
-            v-model="formData.detail"
-            placeholder="请输入街道、门牌号等详细地址"
-            rows="3"
-            class="px-4 py-2 bg-[#f3f4f6] border transition-colors text-xs text-[#191a1d] leading-4 focus:outline-none focus:border-[#191a1d] resize-none"
-            :class="errors.detail ? 'border-[#d0112f]' : 'border-transparent'"
-          ></textarea>
-          <p v-if="errors.detail" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.detail }}
-          </p>
-        </div>
-      </div>
-
-      <!-- 设置为默认地址 -->
-      <ECCheckbox v-model="formData.isDefault" variant="primary" label="设置为默认收货地址" />
-
-      <!-- 保存按钮 -->
-      <button
-        type="submit"
-        :disabled="loading"
-        class="bg-[#191a1d] text-white py-4 text-sm font-medium leading-5 hover:bg-[#191a1d]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {{ loading ? '保存中...' : '保存' }}
-      </button>
-    </form>
+      <AddressForm
+        :form-data="formData"
+        :errors="errors"
+        :loading="loading"
+        :provinces="provinces"
+        :cities="cities"
+        :districts="districts"
+        @update:form-data="formData = $event"
+        @province-change="handleProvinceChange"
+        @city-change="handleCityChange"
+        @submit="handleSubmit"
+      />
     </div>
   </ECModal>
+
+  <!-- H5 端：全屏页面 -->
+  <Teleport v-if="!isDesktop" to="body">
+    <Transition name="slide-right">
+      <div
+        v-if="visible"
+        class="fixed inset-0 z-50 flex flex-col bg-white"
+        data-testid="address-modal-h5"
+      >
+        <!-- H5 头部：返回 -->
+        <div class="flex items-center px-[16px] py-[24px] shrink-0">
+          <button
+            type="button"
+            class="flex items-center gap-[8px] shrink-0"
+            @click="handleClose"
+          >
+            <UIcon name="i-heroicons-chevron-left" class="size-[16px] text-[#191a1d]" />
+            <span class="text-[14px] font-normal leading-[20px] text-[#191a1d]">{{ t('eab46cc2.5f4112') }}</span>
+          </button>
+        </div>
+
+        <!-- H5 表单内容 -->
+        <div class="flex-1 overflow-auto px-[16px]">
+          <AddressForm
+            :form-data="formData"
+            :errors="errors"
+            :loading="loading"
+            :provinces="provinces"
+            :cities="cities"
+            :districts="districts"
+            variant="h5"
+            @update:form-data="formData = $event"
+            @province-change="handleProvinceChange"
+            @city-change="handleCityChange"
+            @submit="handleSubmit"
+          />
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { ECModal } from '~/components/ECModal'
-import { ECCheckbox } from '~/components/ECCheckbox'
-import { ECSelect } from '~/components/ECSelect'
 import type { ISelectOption } from '~/components/ECSelect'
 import type { IRegionItem } from './regionData'
 import { useRegion } from '~/composables/useRegion'
 import { useAddress } from '~/composables/useAddress'
 import type { IAddressFormData } from '~/composables/useAddress'
+import AddressForm from './AddressForm.vue'
 
 defineOptions({
   name: 'AddressModal',
@@ -173,14 +99,27 @@ const emit = defineEmits<{
   success: [data: IAddressFormData]
   close: []
 }>()
+const { t } = useI18n()
+
+// 响应式断点：lg = 1024px
+const LG_BREAKPOINT = 1024
+const windowWidth = ref(import.meta.client ? window.innerWidth : LG_BREAKPOINT)
+const isDesktop = computed(() => windowWidth.value >= LG_BREAKPOINT)
+
+if (import.meta.client) {
+  const onResize = () => { windowWidth.value = window.innerWidth }
+  onMounted(() => window.addEventListener('resize', onResize))
+  onUnmounted(() => window.removeEventListener('resize', onResize))
+}
 
 // 内部状态
 const visible = ref(props.modelValue)
 const loading = ref(false)
 const errors = ref<Partial<Record<keyof IAddressFormData, string>>>({})
 
-// 使用 useRegion composable
+// 使用 composables
 const { regionData, loadRegionData, loading: loadingRegions } = useRegion()
+const { saveAddress } = useAddress()
 
 // 表单数据
 const formData = ref<IAddressFormData>({
@@ -239,17 +178,44 @@ const districts = computed<ISelectOption[]>(() => {
   )
 })
 
+/**
+ * 根据名称反查区域 ID，使编辑时下拉框能正确选中。
+ * API 存储的是名称（如"北京市"），ECSelect 选项值是区域 id。
+ */
+function resolveRegionIds(data: IAddressFormData, regions: IRegionItem[]): IAddressFormData {
+  const resolved = { ...data }
+
+  const provinceItem = regions.find((p) => p.label === data.province || p.id === data.province)
+  if (provinceItem) {
+    resolved.province = provinceItem.id
+
+    const cityItem = provinceItem.children?.find((c) => c.label === data.city || c.id === data.city)
+    if (cityItem) {
+      resolved.city = cityItem.id
+
+      const districtItem = cityItem.children?.find((d) => d.label === data.district || d.id === data.district)
+      if (districtItem) {
+        resolved.district = districtItem.id
+      }
+    }
+
+    resolved.tmp_code = [resolved.province, resolved.city, resolved.district].filter(Boolean)
+  }
+
+  return resolved
+}
+
 // 监听外部变化
 watch(
   () => props.modelValue,
-  (val) => {
+  async (val) => {
     visible.value = val
     if (val) {
-      // 打开时加载省市区数据
-      loadRegionData()
+      const regions = await loadRegionData()
 
       if (props.initialData) {
-        formData.value = { ...props.initialData }
+        const resolved = resolveRegionIds(props.initialData, regions || regionData.value)
+        formData.value = resolved
       }
     }
   }
@@ -286,39 +252,69 @@ function validateForm(): boolean {
   let isValid = true
 
   if (!formData.value.name.trim()) {
-    errors.value.name = '请输入收货人姓名'
+    errors.value.name = t('78c41987.1521d9')
     isValid = false
   }
 
   if (!formData.value.phone.trim()) {
-    errors.value.phone = '请输入手机号码'
+    errors.value.phone = t('78c41987.ff95a4')
     isValid = false
   } else if (!/^1[3-9]\d{9}$/.test(formData.value.phone)) {
-    errors.value.phone = '请输入正确的手机号码'
+    errors.value.phone = t('bbf44084.18d771')
     isValid = false
   }
 
   if (!formData.value.province) {
-    errors.value.province = '请选择省份'
+    errors.value.province = t('78c41987.5f5412')
     isValid = false
   }
 
   if (!formData.value.city) {
-    errors.value.city = '请选择城市'
+    errors.value.city = t('78c41987.7e75a9')
     isValid = false
   }
 
   if (!formData.value.district) {
-    errors.value.district = '请选择区县'
+    errors.value.district = t('78c41987.95470d')
     isValid = false
   }
 
   if (!formData.value.detail.trim()) {
-    errors.value.detail = '请输入详细地址'
+    errors.value.detail = t('78c41987.80d685')
     isValid = false
   }
 
   return isValid
+}
+
+/**
+ * 将表单中的区域 ID 转为 API 所需的名称，同时构造 tmp_code。
+ */
+function buildSaveData(data: IAddressFormData): IAddressFormData {
+  const regions = regionData.value
+  const result = { ...data }
+  const codes: string[] = []
+
+  const provinceItem = regions.find((p) => p.id === data.province)
+  if (provinceItem) {
+    codes.push(provinceItem.id)
+    result.province = provinceItem.label
+
+    const cityItem = provinceItem.children?.find((c) => c.id === data.city)
+    if (cityItem) {
+      codes.push(cityItem.id)
+      result.city = cityItem.label
+
+      const districtItem = cityItem.children?.find((d) => d.id === data.district)
+      if (districtItem) {
+        codes.push(districtItem.id)
+        result.district = districtItem.label
+      }
+    }
+  }
+
+  result.tmp_code = codes
+  return result
 }
 
 /**
@@ -329,18 +325,23 @@ async function handleSubmit() {
     return
   }
 
-  // 使用 useAddress composable
-  const { saveAddress } = useAddress()
+  loading.value = true
+  try {
+    const saveData = buildSaveData(formData.value)
+    const result = await saveAddress(saveData, props.addressId)
 
-  const result = await saveAddress(formData.value, props.addressId)
-
-  if (result.success) {
-    // 成功后触发事件
-    emit('success', { ...formData.value })
-    visible.value = false
-  } else {
-    // 显示错误提示
-    alert(result.error || '保存地址失败，请重试')
+    if (result.success) {
+      emit('success', { ...formData.value })
+      visible.value = false
+    } else {
+      console.error('[AddressModal] 保存失败:', result.error)
+      alert(result.error || t('78c41987.d7f82f'))
+    }
+  } catch (e: any) {
+    console.error('[AddressModal] 保存异常:', e)
+    alert(e?.message || t('78c41987.d7f82f'))
+  } finally {
+    loading.value = false
   }
 }
 
@@ -375,3 +376,16 @@ onMounted(() => {
   loadRegionData()
 })
 </script>
+
+<style scoped>
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-right-enter-from {
+  transform: translateX(100%);
+}
+.slide-right-leave-to {
+  transform: translateX(100%);
+}
+</style>

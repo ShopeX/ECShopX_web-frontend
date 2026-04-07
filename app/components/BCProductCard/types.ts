@@ -24,4 +24,6 @@ export interface IProduct {
   specName?: string
   /** 库存 */
   stock?: number
+  /** 店铺名称（BBC 模式下展示） */
+  storeName?: string
 }

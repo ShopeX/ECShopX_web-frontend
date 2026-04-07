@@ -43,7 +43,10 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
       modelValue: true,
       title: options.title || '提示',
       content: options.content || '',
-      width: options.width || '480px',
+      // 不传 width 时由 ECModal 使用 Figma H5 响应式宽度（min(480px, 100vw-2rem)）
+      ...(options.width != null && options.width !== ''
+        ? { width: options.width }
+        : {}),
       showClose: options.showClose !== false,
       maskClosable: options.maskClosable !== false,
       confirmText:

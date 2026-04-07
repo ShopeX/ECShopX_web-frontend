@@ -5,13 +5,19 @@
       <!-- 顶部信息栏 -->
       <div class="h-9 flex items-center justify-between text-sm text-gray-600">
         <div class="flex items-center space-x-6">
-          <span>欢迎来到ECshopX商城！</span>
-          <NuxtLink v-if="!isLoggedIn" to="/account/login" class="hover:text-primary-500">
-            请登录
+          <span>{{ t('1db81bba.6d8f4c') }}</span>
+          <NuxtLink
+            v-if="!isLoggedIn"
+            :to="localePath('/account/login')"
+            class="hover:text-primary-500"
+          >
+            {{ t('1db81bba.7d1eb0') }}
           </NuxtLink>
           <template v-else>
             <span>{{ userInfo.username }}</span>
-            <button class="hover:text-primary-500" @click="handleLogout">退出</button>
+            <button class="hover:text-primary-500" @click="handleLogout">
+              {{ t('1db81bba.c39922') }}
+            </button>
           </template>
         </div>
         <div class="flex items-center space-x-6">
@@ -29,7 +35,7 @@
       <!-- 主导航栏 -->
       <div class="h-20 flex items-center justify-between">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center">
+        <NuxtLink :to="localePath('/')" class="flex items-center">
           <img src="/images/logo/logo.png" alt="ECshopX Logo" class="h-10" />
         </NuxtLink>
 
@@ -39,7 +45,7 @@
             <input
               v-model="searchKeyword"
               type="text"
-              placeholder="搜索商品"
+              :placeholder="t('1db81bba.2470ef')"
               class="w-full h-10 pl-4 pr-12 rounded-sm border border-primary-500 focus:outline-none"
               @keyup.enter="handleSearch"
             />
@@ -47,12 +53,12 @@
               class="absolute right-0 top-0 h-10 w-16 bg-primary-500 text-white rounded-r-sm hover:bg-primary-600"
               @click="handleSearch"
             >
-              搜索
+              {{ t('1db81bba.e5f71f') }}
             </button>
           </div>
           <!-- 热门搜索 -->
           <div class="mt-2 text-sm text-gray-500">
-            <span>热门搜索：</span>
+            <span>{{ t('1db81bba.67a9a3') }}</span>
             <a
               v-for="(keyword, index) in hotKeywords"
               :key="keyword"
@@ -88,7 +94,7 @@
       <div class="h-10 flex items-center space-x-8">
         <div class="relative group">
           <button class="flex items-center space-x-2 h-10 px-6 bg-primary-500 text-white">
-            <span>全部商品分类</span>
+            <span>{{ t('1db81bba.9772d7') }}</span>
             <UIcon name="i-heroicons-chevron-down" />
           </button>
           <!-- 分类下拉菜单 -->
@@ -97,7 +103,7 @@
           >
             <div v-for="category in categories" :key="category.id" class="relative group/item">
               <NuxtLink
-                :to="`/category/${category.id}`"
+                :to="localePath(`/category/${category.id}`)"
                 class="flex items-center justify-between px-4 h-10 hover:bg-gray-50"
               >
                 <span>{{ category.name }}</span>
@@ -115,7 +121,7 @@
                 <NuxtLink
                   v-for="subCategory in category.children"
                   :key="subCategory.id"
-                  :to="`/category/${subCategory.id}`"
+                  :to="localePath(`/category/${subCategory.id}`)"
                   class="block px-4 h-10 leading-10 hover:bg-gray-50"
                 >
                   {{ subCategory.name }}
@@ -127,7 +133,7 @@
         <div class="flex items-center space-x-8">
           <div v-for="nav in mainNavs" :key="nav.key" class="relative group">
             <NuxtLink
-              :to="nav.path"
+              :to="localePath(nav.path)"
               class="relative py-2 text-gray-700 hover:text-primary-500 transition-colors duration-300"
             >
               <span class="flex items-center gap-1">
@@ -155,7 +161,7 @@
                 <NuxtLink
                   v-for="child in nav.children"
                   :key="child.key"
-                  :to="child.path"
+                  :to="localePath(child.path)"
                   class="block px-4 py-2 text-sm text-gray-600 hover:bg-primary-50 hover:text-primary-500 transition-colors"
                 >
                   {{ child.label }}
@@ -170,7 +176,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 // 用户登录状态
 const isLoggedIn = ref(false)
@@ -180,80 +189,95 @@ const userInfo = ref({
 
 // 搜索相关
 const searchKeyword = ref('')
-const hotKeywords = ['iPhone 15', '华为Mate 60', '小米14', '耳机', '手表']
+const hotKeywords = ['iPhone 15', 'Huawei Mate 60', 'Xiaomi 14', 'Headphones', 'Watch']
 
 // 顶部菜单
-const topMenus = [
-  { key: 'member', label: '会员中心', path: '/member' },
-  { key: 'order', label: '我的订单', path: '/member/orders' },
-  { key: 'favorite', label: '我的收藏', path: '/member/favorites' },
-  { key: 'help', label: '帮助中心', path: '/help' },
-]
+const topMenus = computed(() => [
+  { key: 'member', label: t('1db81bba.12688a'), path: localePath('/member') },
+  { key: 'order', label: t('1db81bba.a73872'), path: localePath('/member/orders') },
+  { key: 'favorite', label: t('1db81bba.975ff6'), path: localePath('/member/favorites') },
+  { key: 'help', label: t('1db81bba.fe4416'), path: localePath('/help') },
+])
 
 // 用户操作区
-const userActions = [
-  { key: 'message', label: '消息', path: '/member/messages', icon: 'i-heroicons-bell' },
-  { key: 'cart', label: '购物车', path: '/cart', icon: 'i-heroicons-shopping-cart' },
-  { key: 'user', label: '我的', path: '/member', icon: 'i-heroicons-user' },
-]
+const userActions = computed(() => [
+  {
+    key: 'message',
+    label: t('1db81bba.ff692f'),
+    path: localePath('/member/messages'),
+    icon: 'i-heroicons-bell',
+  },
+  {
+    key: 'cart',
+    label: t('1db81bba.c017be'),
+    path: localePath('/cart'),
+    icon: 'i-heroicons-shopping-cart',
+  },
+  {
+    key: 'user',
+    label: t('1db81bba.07b181'),
+    path: localePath('/member'),
+    icon: 'i-heroicons-user',
+  },
+])
 
 // 主导航
-const mainNavs = [
-  { key: 'skin-care', label: '肌肤护理', path: '/category/skin-care' },
-  { key: 'beauty-fragrance', label: '美妆香氛', path: '/category/beauty-fragrance' },
+const mainNavs = computed(() => [
+  { key: 'skin-care', label: t('1db81bba.3a74c8'), path: '/category/skin-care' },
+  { key: 'beauty-fragrance', label: t('1db81bba.265464'), path: '/category/beauty-fragrance' },
   {
     key: 'fashion-beauty',
-    label: '时尚美妆',
+    label: t('1db81bba.df1584'),
     path: '/category/fashion-beauty',
     children: [
-      { key: 'skincare', label: '面部护理', path: '/category/fashion-beauty/skincare' },
-      { key: 'makeup', label: '彩妆香氛', path: '/category/fashion-beauty/makeup' },
-      { key: 'perfume', label: '大牌香水', path: '/category/fashion-beauty/perfume' },
+      { key: 'skincare', label: t('1db81bba.408136'), path: '/category/fashion-beauty/skincare' },
+      { key: 'makeup', label: t('1db81bba.7749b8'), path: '/category/fashion-beauty/makeup' },
+      { key: 'perfume', label: t('1db81bba.0aa079'), path: '/category/fashion-beauty/perfume' },
     ],
   },
-  { key: 'face-care', label: '面部护理', path: '/category/face-care' },
-  { key: 'sun-protection', label: '防晒隔离', path: '/category/sun-protection' },
-  { key: 'perfume', label: '香水', path: '/category/perfume' },
-  { key: 'eye-care', label: '眼部护理', path: '/category/eye-care' },
-  { key: 'lip-makeup', label: '唇妆', path: '/category/lip-makeup' },
-  { key: 'points-mall', label: '积分商城', path: '/points-mall' },
-]
+  { key: 'face-care', label: t('1db81bba.408136'), path: '/category/face-care' },
+  { key: 'sun-protection', label: t('1db81bba.70f060'), path: '/category/sun-protection' },
+  { key: 'perfume', label: t('1db81bba.be19dd'), path: '/category/perfume' },
+  { key: 'eye-care', label: t('1db81bba.4a2112'), path: '/category/eye-care' },
+  { key: 'lip-makeup', label: t('1db81bba.6bf846'), path: '/category/lip-makeup' },
+  { key: 'points-mall', label: t('1db81bba.a13364'), path: '/points-mall' },
+])
 
 // 分类数据
-const categories = [
+const categories = computed(() => [
   {
     id: '1',
-    name: '手机数码',
+    name: t('1db81bba.0e4ae5'),
     children: [
-      { id: '1-1', name: '手机' },
-      { id: '1-2', name: '平板' },
-      { id: '1-3', name: '笔记本' },
+      { id: '1-1', name: t('1db81bba.9f9d36') },
+      { id: '1-2', name: t('1db81bba.03ee8b') },
+      { id: '1-3', name: t('1db81bba.1873ea') },
     ],
   },
   {
     id: '2',
-    name: '服装配饰',
+    name: t('1db81bba.1ba4e0'),
     children: [
-      { id: '2-1', name: '男装' },
-      { id: '2-2', name: '女装' },
-      { id: '2-3', name: '童装' },
+      { id: '2-1', name: t('1db81bba.704d5c') },
+      { id: '2-2', name: t('1db81bba.e87512') },
+      { id: '2-3', name: t('1db81bba.7a502d') },
     ],
   },
   {
     id: '3',
-    name: '家用电器',
+    name: t('1db81bba.1bb58d'),
     children: [
-      { id: '3-1', name: '电视' },
-      { id: '3-2', name: '空调' },
-      { id: '3-3', name: '洗衣机' },
+      { id: '3-1', name: t('1db81bba.3a2f90') },
+      { id: '3-2', name: t('1db81bba.5656ad') },
+      { id: '3-3', name: t('1db81bba.640c8a') },
     ],
   },
-]
+])
 
 // 处理搜索
 const handleSearch = () => {
   if (!searchKeyword.value) return
-  navigateTo(`/search?keyword=${encodeURIComponent(searchKeyword.value)}`)
+  navigateTo(localePath(`/search?keyword=${encodeURIComponent(searchKeyword.value)}`))
 }
 
 // 处理退出登录

@@ -22,7 +22,7 @@
           ref="inputRef"
           v-model="keyword"
           type="text"
-          :placeholder="$t('search.placeholder')"
+          :placeholder="t('18b55d98.0a24c0')"
           class="flex-1 text-sm text-[#99a1af] outline-none border-none bg-transparent"
           data-testid="search-input"
           @keydown.enter="handleSearch"
@@ -42,11 +42,11 @@
         <!-- 热门搜索 -->
         <div data-testid="hot-keywords-section">
           <h2 class="text-base font-medium text-[#191a1d] leading-5 mb-8">
-            {{ $t('search.hotKeywords') }}
+            {{ t('18b55d98.c5d14b') }}
           </h2>
           <div class="flex" :class="isMobile ? 'flex-wrap gap-3' : 'flex-col gap-4'">
             <button
-              v-for="item in hotKeywords"
+              v-for="item in resolvedHotKeywords"
               :key="item"
               type="button"
               class="inline-flex items-center justify-center px-2 py-1 text-sm font-medium text-[#191a1d] bg-[#f3f4f6] hover:bg-gray-200 transition-colors self-start"
@@ -62,7 +62,7 @@
         <div data-testid="history-keywords-section">
           <div class="flex items-center justify-between mb-8">
             <h2 class="text-base font-medium text-[#191a1d] leading-5">
-              {{ $t('search.historyKeywords') }}
+              {{ t('18b55d98.1acc8e') }}
             </h2>
             <button
               v-if="historyKeywords.length > 0"
@@ -71,7 +71,7 @@
               data-testid="clear-history"
               @click="handleClearHistory"
             >
-              {{ $t('search.clearHistory') }}
+              {{ t('18b55d98.92ddd8') }}
             </button>
           </div>
           <div class="flex" :class="isMobile ? 'flex-wrap gap-3' : 'flex-col gap-4'">
@@ -86,7 +86,7 @@
               {{ item }}
             </button>
             <p v-if="historyKeywords.length === 0" class="text-sm text-gray-400">
-              {{ $t('search.noHistory') }}
+              {{ t('18b55d98.005414') }}
             </p>
           </div>
         </div>
@@ -111,7 +111,6 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
-  hotKeywords: () => ['手袋', '双十二', '新品', '手表', '香水彩妆', '珠宝腕表', '手提袋'],
 })
 
 const emit = defineEmits<{
@@ -119,6 +118,8 @@ const emit = defineEmits<{
   search: [keyword: string]
   close: []
 }>()
+
+const { t } = useI18n()
 
 // Responsive detection
 const isMobile = ref(false)
@@ -136,6 +137,20 @@ onMounted(() => {
 
 // Search history
 const { historyKeywords, addHistory, clearHistory } = useSearchHistory()
+
+const defaultHotKeywords = computed(() => [
+  t('18b55d98.6e4493'),
+  t('18b55d98.9f351b'),
+  t('18b55d98.5f3ca6'),
+  t('18b55d98.abc55f'),
+  t('18b55d98.3fdf19'),
+  t('18b55d98.247d42'),
+  t('18b55d98.89d075'),
+])
+
+const resolvedHotKeywords = computed(() =>
+  props.hotKeywords && props.hotKeywords.length > 0 ? props.hotKeywords : defaultHotKeywords.value
+)
 
 // Local state
 const keyword = ref('')

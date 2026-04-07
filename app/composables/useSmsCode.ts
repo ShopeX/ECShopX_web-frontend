@@ -22,6 +22,7 @@ import type { ISmsCodeRequest } from '~/types/api/auth'
  * ```
  */
 export function useSmsCode() {
+  const { t } = useI18n()
   // 状态管理
   const isSending = ref(false)
   const error = ref<string>('')
@@ -76,13 +77,13 @@ export function useSmsCode() {
   async function sendCode(phone: string, captcha: string, captchaToken: string): Promise<boolean> {
     // 验证是否可以发送
     if (!canSend.value) {
-      error.value = '请稍后再试'
+      error.value = t('2d006c42.e60fa7')
       return false
     }
 
     // 验证手机号格式
     if (!AuthTransformer.validatePhone(phone)) {
-      error.value = '手机号格式不正确'
+      error.value = t('2d006c42.19c896')
       return false
     }
 
@@ -101,7 +102,7 @@ export function useSmsCode() {
       const result = AuthTransformer.toSmsCodeModel(response)
 
       if (!result.success) {
-        error.value = result.message || '发送失败'
+        error.value = result.message || t('2d006c42.9ca6a3')
         return false
       }
 
@@ -110,7 +111,7 @@ export function useSmsCode() {
 
       return true
     } catch (err: any) {
-      error.value = err.message || '发送失败，请稍后重试'
+      error.value = err.message || t('2d006c42.69d1f0')
       console.error('Send SMS code error:', err)
       return false
     } finally {

@@ -7,6 +7,91 @@ import { test, expect } from '@playwright/test'
 
 const CHECKOUT_PATH = '/checkout'
 
+const typedCheckoutCoupons = [
+  {
+    id: '301',
+    code: 'DISCOUNT-301',
+    coupon_code: 'DISCOUNT-301',
+    title: '秋季折扣券',
+    card_type: 'discount',
+    discount: '80',
+    begin_date: '2026-03-01',
+    end_date: '2026-03-31',
+    apply_scope: '全场可用',
+    use_condition: '满300元可用',
+  },
+  {
+    id: '302',
+    code: 'CASH-302',
+    coupon_code: 'CASH-302',
+    title: '满500减100',
+    card_type: 'cash',
+    least_cost: '50000',
+    reduce_cost: '10000',
+    begin_date: '2026-03-05',
+    end_date: '2026-03-31',
+    apply_scope: '指定商品可用',
+  },
+  {
+    id: '303',
+    code: 'GIFT-303',
+    coupon_code: 'GIFT-303',
+    title: '新品兑换券',
+    card_type: 'gift',
+    begin_date: '2026-03-10',
+    end_date: '2026-03-31',
+    apply_scope: '门店自提可用',
+    description: '可兑换指定赠品',
+  },
+]
+
+async function mockCheckoutCouponApis(page: any, list = typedCheckoutCoupons) {
+  await page.addInitScript(
+    ({ coupons }) => {
+      const originalFetch = window.fetch.bind(window)
+
+      window.fetch = async (input, init) => {
+        const url = typeof input === 'string' ? input : input instanceof Request ? input.url : ''
+
+        if (url.includes('/wxapp/member/addresslist')) {
+          return new Response(
+            JSON.stringify({
+              data: {
+                list: [],
+              },
+            }),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+        }
+
+        if (url.includes('/wxapp/user/newGetCardList')) {
+          return new Response(
+            JSON.stringify({
+              data: {
+                list: coupons,
+              },
+            }),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+        }
+
+        return originalFetch(input, init)
+      }
+    },
+    { coupons: list }
+  )
+}
+
 test.describe('结算页 - 入口与页面展示', () => {
   test('从购物车入口进入结算页时，应展示结算页且包含订单摘要与结算表单区域', async ({ page }) => {
     // 前置：需已登录且购物车有商品；实际可先访问购物车或通过 fixture 准备
@@ -82,6 +167,37 @@ test.describe('结算页 - 优惠券', () => {
       await firstCoupon.click()
       await expect(page.getByTestId('checkout-summary')).toContainText(/优惠|抵扣/)
     }
+  })
+
+  test.fixme('优惠券抽屉按 card_type 展示三种样式，并显示使用时间与适用规则', async ({ page }) => {
+    await mockCheckoutCouponApis(page)
+    await page.goto(CHECKOUT_PATH)
+
+    const couponEntry = page.getByTestId('checkout-coupon-entry')
+    await expect(couponEntry).toBeVisible()
+    await couponEntry.click()
+
+    await expect(page.getByTestId('coupon-list')).toBeVisible()
+    const couponItems = page.getByTestId('coupon-item')
+    await expect(couponItems).toHaveCount(3)
+
+    const discountCard = couponItems.nth(0)
+    await expect(discountCard).toContainText('8折')
+    await expect(discountCard).toContainText('使用时间')
+    await expect(discountCard).toContainText('2026-03-01')
+    await expect(discountCard).toContainText('适用规则')
+    await expect(discountCard).toContainText('全场可用')
+
+    const cashCard = couponItems.nth(1)
+    await expect(cashCard).toContainText('¥')
+    await expect(cashCard).toContainText('100')
+    await expect(cashCard).toContainText('满500减100')
+    await expect(cashCard).toContainText('指定商品可用')
+
+    const giftCard = couponItems.nth(2)
+    await expect(giftCard).toContainText('兑换券')
+    await expect(giftCard).toContainText('新品兑换券')
+    await expect(giftCard).toContainText('门店自提可用')
   })
 })
 

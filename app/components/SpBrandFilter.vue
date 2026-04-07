@@ -1,16 +1,16 @@
 <template>
   <div class="sp-brand-filter">
     <div class="filter-header">
-      <h3 class="title">品牌</h3>
+      <h3 class="title">{{ t('e12603c4.09307c') }}</h3>
       <button v-if="showMore" class="more-btn" @click="toggleExpand">
-        {{ isExpanded ? '收起' : '更多' }}
+        {{ isExpanded ? t('e12603c4.def9e9') : t('e12603c4.0ec9ea') }}
         <UIcon :name="isExpanded ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'" />
       </button>
     </div>
 
     <div class="brand-list" :class="{ expanded: isExpanded }">
       <div class="brand-item" :class="{ active: modelValue === '' }" @click="handleSelect('')">
-        全部
+        {{ t('e12603c4.a8b0c2') }}
       </div>
       <div
         v-for="brand in brands"
@@ -28,6 +28,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { IBrand } from '@/types/api/item'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   modelValue: string | number

@@ -29,14 +29,18 @@
       </div>
 
       <div class="flex justify-between text-xs text-gray-500">
-        <span>销量 {{ info.sales }}</span>
-        <span v-if="info.stock <= 10" class="text-red-500"> 库存 {{ info.stock }} </span>
+        <span>{{ t('a1d64788.44e7eb') }} {{ info.sales }}</span>
+        <span v-if="info.stock <= 10" class="text-red-500">
+          {{ t('a1d64788.0eac88') }} {{ info.stock }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+const { t, localePath } = useI18n()
+
 const props = defineProps({
   info: {
     type: Object,
@@ -51,6 +55,6 @@ const formatPrice = (price) => {
 
 // 跳转到详情页 - 使用 navigateTo 替代 useRouter（SSR 安全）
 const navigateToDetail = () => {
-  navigateTo(`/item/${props.info.id}`)
+  navigateTo(localePath(`/item/${props.info.id}`))
 }
 </script>

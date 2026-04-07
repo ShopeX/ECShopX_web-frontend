@@ -2,7 +2,7 @@
   <div class="flex items-center gap-4 px-8 py-1">
     <!-- 标签 -->
     <div class="flex-shrink-0">
-      <span class="text-sm font-medium text-gray-700">分类</span>
+      <span class="text-sm font-medium text-gray-700">{{ t('df709ba2.d0771a') }}</span>
     </div>
 
     <!-- 分类列表 -->
@@ -41,6 +41,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:selectedCategoryId': [value: string | number | undefined]

@@ -8,158 +8,315 @@
         <!-- 配送信息 -->
         <div class="bg-white flex flex-col gap-4 p-4 lg:p-6">
           <h3 class="text-base font-medium text-[#101828] leading-5">
-            {{ $t('checkout.deliveryInfo') }}
+            {{ $t('ee3264ed.d4327c') }}
           </h3>
 
           <!-- 配送方式选择 -->
           <div class="flex flex-col gap-4">
-            <p class="text-sm text-[#191a1d] leading-5">{{ $t('checkout.selectDelivery') }}</p>
+            <p class="text-sm text-[#191a1d] leading-5">{{ $t('ee3264ed.7126bb') }}</p>
             <div class="flex gap-8 items-center">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   :checked="form.receiptType === 'logistics'"
-                  @change="form.receiptType = 'logistics'"
                   class="w-4 h-4 border border-[#191a1d] rounded-full appearance-none checked:bg-[#191a1d] checked:border-[#191a1d] relative checked:after:content-[''] checked:after:absolute checked:after:w-2 checked:after:h-2 checked:after:bg-white checked:after:rounded-full checked:after:top-1/2 checked:after:start-1/2 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2"
+                  @change="form.receiptType = 'logistics'"
                 />
                 <span class="text-sm font-medium text-[#191a1d] leading-5">{{
-                  $t('checkout.express')
+                  $t('ee3264ed.790974')
                 }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   :checked="form.receiptType === 'ziti'"
-                  @change="form.receiptType = 'ziti'"
                   class="w-4 h-4 border border-[#191a1d] rounded-full appearance-none checked:bg-[#191a1d] checked:border-[#191a1d] relative checked:after:content-[''] checked:after:absolute checked:after:w-2 checked:after:h-2 checked:after:bg-white checked:after:rounded-full checked:after:top-1/2 checked:after:start-1/2 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2"
+                  @change="form.receiptType = 'ziti'"
                 />
                 <span class="text-sm font-medium text-[#191a1d] leading-5">{{
-                  $t('checkout.pickup')
+                  $t('ee3264ed.7f549e')
                 }}</span>
               </label>
             </div>
           </div>
 
-          <!-- 地址选择 -->
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center justify-between">
-              <h4 class="text-base font-medium text-[#191a1d] leading-5">
-                {{ $t('checkout.address') }}
-              </h4>
-              <button
-                class="bg-white border border-[#e5e7eb] px-[17px] py-[9px] hover:bg-gray-50 transition-colors"
-                @click="handleAddAddress"
-              >
-                <span class="text-xs font-medium text-[#191a1d] leading-4">{{
-                  $t('checkout.addAddress')
-                }}</span>
-              </button>
-            </div>
+          <!-- ========== 快递配送：地址选择 ========== -->
+          <template v-if="form.receiptType === 'logistics'">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <h4 class="text-base font-medium text-[#191a1d] leading-5">
+                  {{ $t('ee3264ed.748ea9') }}
+                </h4>
+                <button
+                  class="bg-white border border-[#e5e7eb] px-[17px] py-[9px] hover:bg-gray-50 transition-colors"
+                  @click="handleAddAddress"
+                >
+                  <span class="text-xs font-medium text-[#191a1d] leading-4">{{
+                    $t('ee3264ed.dd4bb4')
+                  }}</span>
+                </button>
+              </div>
 
-            <!-- 加载中骨架屏 -->
-            <div v-if="initialAddressesLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div
-                v-for="i in 2"
-                :key="i"
-                class="border p-[17px] flex flex-col gap-4 border-[#e5e7eb]"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <USkeleton class="h-5 w-16" />
-                    <USkeleton class="h-5 w-24" />
+              <!-- 加载中骨架屏 -->
+              <div v-if="initialAddressesLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div
+                  v-for="i in 2"
+                  :key="i"
+                  class="border p-[17px] flex flex-col gap-4 border-[#e5e7eb]"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <USkeleton class="h-5 w-16" />
+                      <USkeleton class="h-5 w-24" />
+                    </div>
+                    <USkeleton class="h-4 w-12" />
                   </div>
-                  <USkeleton class="h-4 w-12" />
-                </div>
-                <div class="flex flex-col gap-1">
-                  <USkeleton class="h-5 w-32" />
-                  <USkeleton class="h-5 w-full" />
+                  <div class="flex flex-col gap-1">
+                    <USkeleton class="h-5 w-32" />
+                    <USkeleton class="h-5 w-full" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 地址列表 -->
-            <div v-else-if="addresses.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div
-                v-for="address in addresses"
-                :key="address.id"
-                class="border p-[17px] flex flex-col gap-4 cursor-pointer transition-colors"
-                :class="
-                  selectedAddress?.id === address.id ? 'border-[#191a1d]' : 'border-[#e5e7eb]'
-                "
-                @click="selectAddress(address.id)"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span
-                      v-if="address.isDefault"
-                      class="bg-[#f3f4f6] px-2 py-1 text-xs font-medium text-[#191a1d] leading-4"
+              <!-- 地址列表 -->
+              <div v-else-if="addresses.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div
+                  v-for="address in addresses"
+                  :key="address.id"
+                  class="border p-[17px] flex flex-col gap-4 cursor-pointer transition-colors"
+                  :class="
+                    selectedAddress?.id === address.id ? 'border-[#191a1d]' : 'border-[#e5e7eb]'
+                  "
+                  @click="selectAddress(address.id)"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span
+                        v-if="address.isDefault"
+                        class="bg-[#f3f4f6] px-2 py-1 text-xs font-medium text-[#191a1d] leading-4"
+                      >
+                        {{ $t('ee3264ed.18c634') }}
+                      </span>
+                      <span class="text-sm font-medium text-[#191a1d] leading-5">
+                        {{ address.name }}
+                      </span>
+                    </div>
+                    <button
+                      class="text-xs text-[#4a5565] underline leading-4"
+                      @click.stop="handleEditAddress(address.id)"
                     >
-                      {{ $t('checkout.default') }}
-                    </span>
-                    <span class="text-sm font-medium text-[#191a1d] leading-5">
-                      {{ address.name }}
-                    </span>
+                      {{ $t('ee3264ed.95b351') }}
+                    </button>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <p class="text-sm text-[#4a5565] leading-5">{{ address.phone }}</p>
+                    <p class="text-sm text-[#4a5565] leading-5">{{ address.fullAddress }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 空状态 -->
+              <div v-else class="py-8 text-center text-[#4a5565]">
+                {{ $t('ee3264ed.7daf4d') }}
+              </div>
+            </div>
+          </template>
+
+          <!-- ========== 门店自提 ========== -->
+          <template v-else-if="form.receiptType === 'ziti'">
+            <div class="flex flex-col gap-4">
+              <!-- 收货人/手机号 -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-2">
+                  <label class="text-sm font-medium text-[#191a1d] leading-5">{{ $t('checkout.pickupName') }}</label>
+                  <input
+                    v-model="form.pickupName"
+                    type="text"
+                    :placeholder="$t('checkout.pickupNamePlaceholder')"
+                    class="h-11 w-full bg-[#f3f4f6] border border-transparent px-3 text-[14px] leading-5 text-[#191a1d] outline-none focus:border-[#191a1d]"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-sm font-medium text-[#191a1d] leading-5">{{ $t('checkout.pickupPhone') }}</label>
+                  <input
+                    v-model="form.pickupPhone"
+                    type="tel"
+                    :placeholder="$t('checkout.pickupPhonePlaceholder')"
+                    class="h-11 w-full bg-[#f3f4f6] border border-transparent px-3 text-[14px] leading-5 text-[#191a1d] outline-none focus:border-[#191a1d]"
+                  />
+                </div>
+              </div>
+
+              <!-- 查询门店 -->
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium text-[#191a1d] leading-5">{{ $t('checkout.queryStore') }}</label>
+                <div class="flex gap-4 items-end">
+                  <div class="grid grid-cols-2 gap-4 flex-1">
+                    <ECSelect
+                      :model-value="form.pickupProvince"
+                      :options="pickupProvinces"
+                      :placeholder="$t('checkout.selectProvince')"
+                      @update:model-value="handlePickupProvinceChange(String($event))"
+                    />
+                    <ECSelect
+                      :model-value="form.pickupCity"
+                      :options="pickupCities"
+                      :placeholder="$t('checkout.selectCity')"
+                      @update:model-value="form.pickupCity = String($event)"
+                    />
                   </div>
                   <button
-                    class="text-xs text-[#4a5565] underline leading-4"
-                    @click.stop="handleEditAddress(address.id)"
+                    type="button"
+                    :disabled="storesLoading"
+                    class="h-10 shrink-0 bg-[#0f0f10] px-4 text-sm font-medium text-white leading-5 hover:bg-[#191a1d] transition-colors disabled:opacity-50 whitespace-nowrap"
+                    @click="handleSearchStores"
                   >
-                    {{ $t('checkout.edit') }}
+                    {{ storesLoading ? $t('checkout.searching') : $t('checkout.findNearbyStores') }}
                   </button>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <p class="text-sm text-[#4a5565] leading-5">{{ address.phone }}</p>
-                  <p class="text-sm text-[#4a5565] leading-5">{{ address.fullAddress }}</p>
+              </div>
+
+              <!-- 门店列表 -->
+              <div v-if="storesLoading" class="flex flex-col gap-3 pt-2">
+                <div v-for="i in 3" :key="i" class="flex items-start gap-3 animate-pulse">
+                  <div class="w-4 h-4 rounded-full bg-[#e5e7eb] mt-0.5 shrink-0" />
+                  <div class="flex-1 flex flex-col gap-1">
+                    <div class="h-5 w-32 rounded bg-[#e5e7eb]" />
+                    <div class="h-4 w-48 rounded bg-[#e5e7eb]" />
+                    <div class="h-4 w-28 rounded bg-[#e5e7eb]" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 空状态 -->
-            <div v-else class="py-8 text-center text-[#4a5565]">
-              {{ $t('checkout.noAddress') }}
+              <div v-else-if="stores.length > 0" class="flex flex-col gap-3 pt-2">
+                <label
+                  v-for="store in stores"
+                  :key="store.id"
+                  class="flex items-start gap-3 cursor-pointer group"
+                >
+                  <input
+                    type="radio"
+                    :checked="selectedStore?.id === store.id"
+                    class="mt-0.5 w-4 h-4 border border-[#191a1d] rounded-full appearance-none checked:bg-[#191a1d] checked:border-[#191a1d] relative checked:after:content-[''] checked:after:absolute checked:after:w-2 checked:after:h-2 checked:after:bg-white checked:after:rounded-full checked:after:top-1/2 checked:after:start-1/2 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 shrink-0"
+                    @change="selectStore(store.id)"
+                  />
+                  <div class="flex-1 flex flex-col gap-0.5">
+                    <span class="text-sm font-medium text-[#191a1d] leading-5">{{ store.name }}</span>
+                    <span class="text-xs text-[#4a5565] leading-4">{{ store.address }}</span>
+                    <span class="text-xs text-[#4a5565] leading-4">{{ store.phone }}</span>
+                  </div>
+                </label>
+              </div>
+
+              <div v-else-if="stores.length === 0 && !storesLoading && hasSearched" class="py-6 text-center text-sm text-[#4a5565]">
+                {{ $t('checkout.noStoresFound') }}
+              </div>
             </div>
-          </div>
+          </template>
         </div>
 
         <!-- 优惠券 -->
         <div class="bg-white flex flex-col gap-4 p-4 lg:p-6">
           <div class="flex items-center justify-between">
             <h3 class="text-base font-medium text-[#101828] leading-5">
-              {{ $t('checkout.coupon') }}
+              {{ $t('ee3264ed.2f3635') }}
             </h3>
-            <div class="flex items-center gap-2 cursor-pointer" @click="handleOpenCouponSelector">
+            <button
+              type="button"
+              class="flex items-center gap-2 cursor-pointer"
+              data-testid="checkout-coupon-entry"
+              @click="handleOpenCouponSelector"
+            >
               <span v-if="selectedCoupon" class="text-sm text-[#191a1d] leading-5">
                 {{ selectedCoupon.title }}
               </span>
               <span v-else class="text-sm text-[#191a1d] leading-5">{{
-                $t('checkout.selectCoupon')
+                $t('ee3264ed.45bcee')
               }}</span>
               <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-[#4a5565]" />
-            </div>
+            </button>
           </div>
         </div>
 
         <!-- 积分抵扣 -->
-        <div class="bg-white flex flex-col gap-4 p-4 lg:p-6">
-          <div class="flex items-center gap-2">
-            <h3 class="text-base font-medium text-[#101828] leading-5">
-              {{ $t('checkout.points') }}
+        <div class="bg-white flex flex-col gap-4 p-4 lg:p-6 mb-4 lg:mb-6 rounded-md">
+          <div class="flex items-center gap-2 relative" ref="popoverWrapperRef">
+            <h3 class="text-[16px] font-medium text-[#101828] leading-[20px] whitespace-nowrap">
+              {{ $t('ee3264ed.d443a9') }}
             </h3>
-            <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-[#4a5565]" />
+            <button
+              type="button"
+              class="flex items-center justify-center outline-none cursor-pointer relative z-[51]"
+              @click.stop="showPointsRules = true"
+            >
+              <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-[#4a5565] pointer-events-none" />
+            </button>
+
+            <!-- PC 端弹窗 (大屏幕显示) -->
+            <div
+              v-show="showPointsRules"
+              class="hidden lg:block absolute top-[32px] left-[70px] z-[61] bg-white px-[16px] shadow-[0px_2px_6px_0px_#dbdbdb] transition-opacity pointer-events-none"
+            >
+              <div class="bg-white flex flex-col gap-[8px] items-start justify-center p-[16px] text-[14px] whitespace-nowrap">
+                <div class="font-medium text-[#0f0f10] leading-[20px]">积分使用规则：</div>
+                <div class="text-[#4a5565] font-normal leading-[20px]">使用条款</div>
+                <div class="text-[#4a5565] font-normal leading-[20px]">
+                  <p class="mb-0">1、积分支付金额不得超过订单应付总额的100%用量；</p>
+                  <p class="mb-0">2、1积分扣1元;</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- H5 底部弹窗 (小屏幕显示) -->
+            <Teleport to="body">
+              <div
+                v-if="showPointsRules"
+                class="lg:hidden fixed inset-0 z-[100] flex flex-col justify-end pointer-events-auto"
+                @touchmove.prevent
+                @wheel.prevent
+              >
+                <!-- 遮罩背景 -->
+                <div
+                  class="absolute inset-0 bg-[#282828]/50 transition-opacity"
+                  @click.stop="showPointsRules = false"
+                ></div>
+
+                <!-- H5 底部弹窗内容 -->
+                <div
+                  class="lg:hidden relative w-full bg-white flex flex-col gap-[16px] items-start px-[16px] py-[32px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] overflow-clip transform transition-transform"
+                >
+                  <div class="flex items-center justify-between w-full mb-2">
+                    <p class="font-medium leading-[20px] text-[20px] text-[#191a1d] whitespace-nowrap">
+                      积分使用规则
+                    </p>
+                    <button type="button" class="block cursor-pointer outline-none w-[24px] h-[24px]" @click.stop="showPointsRules = false">
+                      <UIcon name="i-heroicons-x-mark" class="w-full h-full text-[#191a1d]" />
+                    </button>
+                  </div>
+                  <div class="text-[14px] font-normal text-[#4a5565] leading-[20px] w-full text-left">
+                    使用条款
+                  </div>
+                  <div class="text-[14px] font-normal text-[#4a5565] leading-[20px] w-full text-left">
+                    <p class="mb-1">1、积分支付金额不得超过订单应付总额的100%用量；</p>
+                    <p class="mb-0">2、1积分扣1元;</p>
+                  </div>
+                </div>
+              </div>
+            </Teleport>
           </div>
 
           <div
             v-if="calculateResult"
-            class="flex flex-col lg:flex-row lg:items-center justify-between gap-2 text-sm text-[#101828] font-medium leading-5"
+            class="flex flex-col lg:flex-row lg:items-center justify-between gap-y-2 text-[14px] text-[#101828] font-medium leading-[20px]"
           >
-            <span>{{ $t('checkout.userPoints', { count: calculateResult.userPoint }) }}</span>
-            <span>{{ $t('checkout.maxPoints', { count: calculateResult.maxPoint }) }}</span>
+            <span>{{ $t('ee3264ed.648843', { count: calculateResult?.userPoint || 0 }) }}</span>
+            <span>{{ $t('ee3264ed.6c9425', { count: calculateResult?.maxPoint || 0 }) }}</span>
           </div>
 
           <ECCheckbox
             :checked="form.usePoint"
             size="sm"
-            :label="$t('checkout.usePoints')"
+            :label="$t('ee3264ed.f929c7')"
             @change="toggleUsePoint"
           />
 
@@ -167,7 +324,7 @@
             <ECCheckbox
               :checked="form.useFullPoint"
               size="sm"
-              :label="$t('checkout.fullDeduction')"
+              :label="$t('ee3264ed.a23745')"
               @change="toggleUseFullPoint"
             />
             <input
@@ -175,65 +332,28 @@
               v-model.number="form.pointUse"
               type="number"
               :max="calculateResult?.maxPoint || 0"
-              class="border border-[#99a1af] h-5 w-[100px] px-2 text-sm"
+              class="border border-[#99a1af] h-5 w-[100px] px-2 text-sm outline-none focus:border-[#101828]"
               @input="calculateOrderAmount"
             />
           </div>
         </div>
 
-        <!-- 发票信息 -->
-        <div class="bg-white flex flex-col gap-4 p-4 lg:p-6">
-          <h3 class="text-base font-medium text-[#191a1d] leading-5">
-            {{ $t('checkout.invoice') }}
-          </h3>
-          <ECCheckbox
-            :checked="form.needInvoice"
-            size="sm"
-            :label="$t('checkout.needInvoice')"
-            @change="handleInvoiceCheckboxChange"
-          />
-
-          <!-- 已填写的发票信息 -->
-          <div v-if="form.needInvoice && invoiceData" class="bg-[#f3f4f6] p-4 flex flex-col gap-2">
-            <div class="flex items-center justify-between">
-              <span class="text-sm font-medium text-[#191a1d] leading-5">
-                {{
-                  invoiceData.type === 'personal'
-                    ? $t('checkout.invoicePersonal')
-                    : $t('checkout.invoiceBusiness')
-                }}
-                | {{ invoiceData.title }}
-              </span>
-              <button class="text-xs text-[#4a5565] underline leading-4" @click="handleEditInvoice">
-                {{ $t('checkout.edit') }}
-              </button>
-            </div>
-            <div class="text-xs text-[#4a5565] leading-4 space-y-1">
-              <p v-if="invoiceData.taxNumber">
-                {{ $t('checkout.invoiceTaxNo') }}: {{ invoiceData.taxNumber }}
-              </p>
-              <p>
-                {{ $t('checkout.invoiceContent') }}:
-                {{ getInvoiceContentLabel(invoiceData.content) }}
-              </p>
-              <p>{{ $t('checkout.invoiceEmail') }}: {{ invoiceData.email }}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- 右侧：订单摘要 (PC 显示，H5 隐藏) -->
-      <div class="hidden lg:flex w-[320px] shrink-0 bg-white flex-col gap-8 p-6">
+      <div
+        class="hidden lg:flex lg:self-start lg:sticky lg:top-[calc(var(--layout-header-height,68px)+20px)] w-[320px] shrink-0 h-fit bg-white flex-col gap-8 p-6"
+      >
         <!-- 商品数量 -->
         <div class="flex items-center gap-2">
           <UIcon name="i-heroicons-shopping-bag" class="w-4 h-4 text-[#4a5565]" />
           <span class="text-sm text-[#4a5565] leading-5">{{
-            $t('checkout.itemCount', { count: itemCount })
+            $t('ee3264ed.26b6eb', { count: itemCount })
           }}</span>
         </div>
 
         <!-- 商品列表 -->
-        <div class="flex flex-col gap-4">
+        <div v-if="isCheckoutSummaryReady" class="flex flex-col gap-4">
           <div v-for="item in selectedItems" :key="item.id" class="flex gap-4">
             <div class="w-24 h-24 shrink-0 bg-[#f9fafb] relative overflow-hidden">
               <img
@@ -246,14 +366,12 @@
               <h4 class="text-sm font-medium text-[#101828] leading-5 truncate">
                 {{ item.productName }}
               </h4>
-              <div class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4">
-                <p>{{ $t('checkout.productNo') }}: {{ item.specName }}</p>
-                <p>{{ $t('checkout.style') }}: {{ item.specName }}</p>
-                <p>{{ $t('checkout.size') }}: {{ item.specName }}</p>
+              <div v-if="item.specName" class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4">
+                <p v-for="(spec, index) in formatSpec(item.specName)" :key="index">{{ spec }}</p>
               </div>
               <div class="flex items-center justify-between mt-auto">
                 <span class="text-xs text-[#364153] leading-4"
-                  >{{ $t('checkout.quantity') }}: {{ item.quantity }}</span
+                  >{{ $t('ee3264ed.0bf60b') }}: {{ item.quantity }}</span
                 >
                 <span class="text-sm font-medium text-[#191a1d] leading-5">
                   {{ item.subtotalDisplay }}
@@ -262,25 +380,42 @@
             </div>
           </div>
         </div>
+        <div v-else class="flex flex-col gap-4">
+          <div
+            v-for="i in 2"
+            :key="`checkout-summary-desktop-skeleton-${i}`"
+            class="flex gap-4 animate-pulse"
+          >
+            <div class="h-24 w-24 shrink-0 bg-[#f3f4f6]" />
+            <div class="flex-1 flex flex-col gap-3 py-1">
+              <div class="h-4 w-4/5 bg-[#f3f4f6]" />
+              <div class="h-3 w-3/5 bg-[#f3f4f6]" />
+              <div class="mt-auto flex items-center justify-between">
+                <div class="h-3 w-16 bg-[#f3f4f6]" />
+                <div class="h-4 w-20 bg-[#f3f4f6]" />
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- 价格明细 -->
         <div class="flex flex-col gap-4">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-[#4a5565] leading-5">{{ $t('checkout.subtotal') }}</span>
+            <span class="text-sm text-[#4a5565] leading-5">{{ $t('ee3264ed.de8e9a') }}</span>
             <span class="text-sm text-[#191a1d] leading-5">{{ itemTotalDisplay }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-[#4a5565] leading-5">{{ $t('checkout.freight') }}</span>
+            <span class="text-sm text-[#4a5565] leading-5">{{ $t('ee3264ed.9a935b') }}</span>
             <span class="text-sm text-[#191a1d] leading-5">{{ freightDisplayText }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-[#4a5565] leading-5">{{ $t('checkout.discount') }}</span>
+            <span class="text-sm text-[#4a5565] leading-5">{{ $t('ee3264ed.f06ebf') }}</span>
             <span class="text-sm text-[#191a1d] leading-5">{{ discountDisplay }}</span>
           </div>
           <div class="h-px bg-[rgba(0,0,0,0.1)]"></div>
           <div class="flex items-center justify-between">
             <span class="text-base font-bold text-[#191a1d] leading-6">{{
-              $t('checkout.total')
+              $t('ee3264ed.599b5a')
             }}</span>
             <span class="text-2xl font-medium text-[#191a1d] leading-9">{{ totalDisplay }}</span>
           </div>
@@ -290,10 +425,10 @@
         <div class="flex flex-col gap-4">
           <ECCheckbox v-model="agreeTerms" size="sm">
             <span class="text-xs text-[#4a5565] leading-4">
-              {{ $t('checkout.agreeTerms') }}
-              <a href="#" class="underline">{{ $t('checkout.privacyPolicy') }}</a>
-              {{ $t('checkout.and') }}
-              <a href="#" class="underline">{{ $t('checkout.salesTerms') }}</a>
+              {{ $t('ee3264ed.6a9b1b') }}
+              <a href="#" class="underline">{{ $t('ee3264ed.cc953a') }}</a>
+              {{ $t('ee3264ed.271965') }}
+              <a href="#" class="underline">{{ $t('ee3264ed.970337') }}</a>
             </span>
           </ECCheckbox>
 
@@ -302,7 +437,7 @@
             @click="handleSubmit"
             class="bg-[#0f0f10] text-white py-4 px-0 text-sm font-medium leading-5 hover:bg-[#191a1d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ loading ? $t('checkout.submitting') : $t('checkout.payNow') }}
+            {{ loading ? $t('ee3264ed.abe2c5') : $t('ee3264ed.747349') }}
           </button>
         </div>
       </div>
@@ -313,12 +448,12 @@
         <div class="flex items-center gap-2">
           <UIcon name="i-heroicons-shopping-bag" class="w-4 h-4 text-[#4a5565]" />
           <span class="text-sm text-[#4a5565] leading-5">{{
-            $t('checkout.itemCount', { count: itemCount })
+            $t('ee3264ed.26b6eb', { count: itemCount })
           }}</span>
         </div>
 
         <!-- 商品列表 -->
-        <div class="flex flex-col gap-4">
+        <div v-if="isCheckoutSummaryReady" class="flex flex-col gap-4">
           <div v-for="item in selectedItems" :key="item.id" class="flex gap-4">
             <div class="w-20 h-20 shrink-0 bg-[#f9fafb] relative overflow-hidden">
               <img
@@ -331,14 +466,12 @@
               <h4 class="text-sm font-medium text-[#101828] leading-5 truncate">
                 {{ item.productName }}
               </h4>
-              <div class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4">
-                <p>{{ $t('checkout.productNo') }}: {{ item.specName }}</p>
-                <p>{{ $t('checkout.style') }}: {{ item.specName }}</p>
-                <p>{{ $t('checkout.size') }}: {{ item.specName }}</p>
+              <div v-if="item.specName" class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4">
+                <p v-for="(spec, index) in formatSpec(item.specName)" :key="index">{{ spec }}</p>
               </div>
               <div class="flex items-center justify-between mt-auto">
                 <span class="text-xs text-[#364153] leading-4"
-                  >{{ $t('checkout.quantity') }}: {{ item.quantity }}</span
+                  >{{ $t('ee3264ed.0bf60b') }}: {{ item.quantity }}</span
                 >
                 <span class="text-sm font-medium text-[#191a1d] leading-5">
                   {{ item.subtotalDisplay }}
@@ -347,19 +480,36 @@
             </div>
           </div>
         </div>
+        <div v-else class="flex flex-col gap-4">
+          <div
+            v-for="i in 2"
+            :key="`checkout-summary-mobile-skeleton-${i}`"
+            class="flex gap-4 animate-pulse"
+          >
+            <div class="h-20 w-20 shrink-0 bg-[#f3f4f6]" />
+            <div class="flex-1 flex flex-col gap-3 py-1">
+              <div class="h-4 w-4/5 bg-[#f3f4f6]" />
+              <div class="h-3 w-3/5 bg-[#f3f4f6]" />
+              <div class="mt-auto flex items-center justify-between">
+                <div class="h-3 w-16 bg-[#f3f4f6]" />
+                <div class="h-4 w-20 bg-[#f3f4f6]" />
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- 价格明细 -->
         <div class="flex flex-col gap-4">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-[#4a5565] leading-5">{{ $t('checkout.subtotal') }}</span>
+            <span class="text-sm text-[#4a5565] leading-5">{{ $t('ee3264ed.de8e9a') }}</span>
             <span class="text-sm text-[#191a1d] leading-5">{{ itemTotalDisplay }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-[#4a5565] leading-5">{{ $t('checkout.freight') }}</span>
+            <span class="text-sm text-[#4a5565] leading-5">{{ $t('ee3264ed.9a935b') }}</span>
             <span class="text-sm text-[#191a1d] leading-5">{{ freightDisplayText }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-[#4a5565] leading-5">{{ $t('checkout.discount') }}</span>
+            <span class="text-sm text-[#4a5565] leading-5">{{ $t('ee3264ed.f06ebf') }}</span>
             <span class="text-sm text-[#191a1d] leading-5">{{ discountDisplay }}</span>
           </div>
         </div>
@@ -372,17 +522,17 @@
         <!-- 协议 -->
         <ECCheckbox v-model="agreeTerms" size="sm">
           <span class="text-xs text-[#4a5565] leading-4">
-            {{ $t('checkout.agreeTerms') }}
-            <a href="#" class="underline">{{ $t('checkout.privacyPolicy') }}</a>
-            {{ $t('checkout.and') }}
-            <a href="#" class="underline">{{ $t('checkout.salesTerms') }}</a>
+            {{ $t('ee3264ed.6a9b1b') }}
+            <a href="#" class="underline">{{ $t('ee3264ed.cc953a') }}</a>
+            {{ $t('ee3264ed.271965') }}
+            <a href="#" class="underline">{{ $t('ee3264ed.970337') }}</a>
           </span>
         </ECCheckbox>
 
         <!-- 总计和支付按钮 -->
         <div class="flex items-center justify-between">
           <div class="flex flex-col">
-            <span class="text-sm text-[#4a5565]">{{ $t('checkout.total') }}</span>
+            <span class="text-sm text-[#4a5565]">{{ $t('ee3264ed.599b5a') }}</span>
             <span class="text-2xl font-medium text-[#191a1d]">{{ totalDisplay }}</span>
           </div>
           <button
@@ -390,7 +540,7 @@
             @click="handleSubmit"
             class="bg-[#0f0f10] text-white py-3 px-8 text-sm font-medium leading-5 hover:bg-[#191a1d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ loading ? $t('checkout.submitting') : $t('checkout.payNow') }}
+            {{ loading ? $t('ee3264ed.abe2c5') : $t('ee3264ed.747349') }}
           </button>
         </div>
       </div>
@@ -420,13 +570,6 @@
         />
       </template>
     </USlideover>
-
-    <!-- 发票弹窗 -->
-    <BCInvoiceModal
-      v-model="showInvoiceModal"
-      :initial-data="invoiceData"
-      @success="handleInvoiceSuccess"
-    />
   </div>
 </template>
 
@@ -434,21 +577,32 @@
 import { computed, onMounted, watch } from 'vue'
 import { useCheckout } from '~/composables/useCheckout'
 import { useCart } from '~/composables/useCart'
+import { useRegion } from '~/composables/useRegion'
 import BCAddressModal from '~/components/BCAddressModal/BCAddressModal.vue'
-import BCInvoiceModal from '~/components/BCInvoiceModal/BCInvoiceModal.vue'
 import BCCouponSelector from '~/components/BCCouponSelector/BCCouponSelector.vue'
+import BCCheckoutErrorModal from '~/components/BCCheckoutErrorModal/BCCheckoutErrorModal.vue'
 import type { IAddressFormData } from '~/composables/useAddress'
-import type { IInvoiceFormData } from '~/components/BCInvoiceModal/types'
 import { ECCheckbox } from '~/components/ECCheckbox'
+import { ECSelect } from '~/components/ECSelect'
 
-// 设置页面元信息
 definePageMeta({
   layout: 'default',
+  keepalive: false,
 })
 
 const { t } = useI18n()
-
 const router = useRouter()
+const showPointsRules = ref(false)
+
+const popoverWrapperRef = ref<HTMLElement | null>(null)
+onMounted(() => {
+  document.addEventListener('click', (e) => {
+    if (showPointsRules.value && popoverWrapperRef.value && !popoverWrapperRef.value.contains(e.target as Node)) {
+      showPointsRules.value = false
+    }
+  })
+})
+
 const { cartUI, items } = useCart()
 const {
   loading,
@@ -459,6 +613,9 @@ const {
   selectedAddress,
   coupons,
   selectedCoupon,
+  stores,
+  selectedStore,
+  storesLoading,
   calculateResult,
   checkoutItems,
   checkoutError,
@@ -473,14 +630,38 @@ const {
   loadCoupons,
   selectCoupon,
   unselectCoupon,
+  searchStores,
+  selectStore,
   toggleUsePoint,
   toggleUseFullPoint,
   calculateOrderAmount,
   createOrder,
 } = useCheckout()
 
-// 引入错误弹窗
-import BCCheckoutErrorModal from '~/components/BCCheckoutErrorModal/BCCheckoutErrorModal.vue'
+// 区域数据（用于门店查询的省/市选择）
+const { regionData, loadRegionData } = useRegion()
+
+const pickupProvinces = computed(() =>
+  regionData.value.map((item) => ({ value: item.id, label: item.label }))
+)
+
+const pickupCities = computed(() => {
+  if (!form.value.pickupProvince) return []
+  const province = regionData.value.find((item) => item.id === form.value.pickupProvince)
+  return province?.children?.map((item) => ({ value: item.id, label: item.label })) || []
+})
+
+function handlePickupProvinceChange(value: string) {
+  form.value.pickupProvince = value
+  form.value.pickupCity = ''
+}
+
+const hasSearched = ref(false)
+
+async function handleSearchStores() {
+  await searchStores()
+  hasSearched.value = true
+}
 
 // 协议同意状态
 const agreeTerms = ref(false)
@@ -493,39 +674,36 @@ const editingAddressData = ref<IAddressFormData>()
 // 优惠券选择抽屉状态
 const showCouponSelector = ref(false)
 
-// 发票弹窗状态
-const showInvoiceModal = ref(false)
-const invoiceData = ref<IInvoiceFormData | undefined>()
-
 // 结算错误弹窗
 const showErrorModal = computed({
   get: () => !!checkoutError.value,
-  set: (val) => {
-    // 这种情况下通常不应该手动关闭，或者是通过弹窗内部按钮关闭
-    if (!val) {
-      // 如果需要清理错误状态，可以在这里处理，
-      // 但 currently useCheckout expose 的 checkoutError 是 readonly
-      // 所以我们依赖弹窗自身的路由跳转来通过离开页面解决问题
-      // 或者如果只是关闭弹窗留在当前页，可能需要 useCheckout 提供 clearError 方法
-      // 目前需求是跳转，所以暂不处理 set false 的逻辑回写
-    }
-  },
+  set: () => {},
 })
 const errorMessage = computed(() => checkoutError.value?.message)
 
-// 选中的商品列表 (使用后端计算返回的商品列表)
+// 选中的商品列表：优先使用后端结算返回，兜底使用购物车勾选项
 const selectedItems = computed(() => {
-  return checkoutItems.value || []
+  return checkoutItems.value
 })
 
-// 运费显示文本（支持 i18n）
+const isCheckoutSummaryReady = computed(() => checkoutItems.value.length > 0)
+
+function formatSpec(specString: string): string[] {
+  if (!specString) return []
+  return specString
+    .split(/[,，]/)
+    .map((s) => s.trim().replace(/([:：])\s*/g, '$1 '))
+    .filter(Boolean)
+}
+
+// 运费显示文本
 const freightDisplayText = computed(() => {
   if (
     freightDisplay.value === '免费' ||
     freightDisplay.value === 'Free' ||
     freightDisplay.value === '¥ 0'
   ) {
-    return t('checkout.freightFree')
+    return t('ee3264ed.aa2c91')
   }
   return freightDisplay.value
 })
@@ -534,11 +712,14 @@ const freightDisplayText = computed(() => {
 const canSubmit = computed(() => {
   if (!agreeTerms.value) return false
   if (form.value.receiptType === 'logistics' && !selectedAddress.value) return false
+  if (form.value.receiptType === 'ziti' && !selectedStore.value) return false
+  if (form.value.receiptType === 'ziti' && !form.value.pickupName.trim()) return false
+  if (form.value.receiptType === 'ziti' && !form.value.pickupPhone.trim()) return false
   if (selectedItems.value.length === 0) return false
   return true
 })
 
-// 监听配送方式变化，重新计算订单金额
+// 监听配送方式变化
 watch(
   () => form.value.receiptType,
   () => {
@@ -546,7 +727,7 @@ watch(
   }
 )
 
-// 监听地址变化，重新计算订单金额
+// 监听地址变化
 watch(
   () => form.value.selectedAddressId,
   () => {
@@ -557,26 +738,23 @@ watch(
 )
 
 // 初始化
-onMounted(async () => {
-  // 加载地址列表
+async function refreshCheckoutPageData() {
   await loadAddresses()
-
-  // 加载优惠券列表
+  await calculateOrderAmount()
   await loadCoupons()
+}
+
+onMounted(async () => {
+  await refreshCheckoutPageData()
+  loadRegionData()
 })
 
-/**
- * 处理添加地址
- */
 function handleAddAddress() {
   editingAddressId.value = undefined
   editingAddressData.value = undefined
   showAddressModal.value = true
 }
 
-/**
- * 处理编辑地址
- */
 function handleEditAddress(addressId: string) {
   const address = addresses.value.find((addr) => addr.id === addressId)
   if (address) {
@@ -584,7 +762,7 @@ function handleEditAddress(addressId: string) {
     editingAddressData.value = {
       name: address.name,
       phone: address.phone,
-      countryCode: '+86', // TODO: 从地址数据中获取
+      countryCode: '+86',
       province: address.province,
       city: address.city,
       district: address.district,
@@ -596,101 +774,37 @@ function handleEditAddress(addressId: string) {
   }
 }
 
-/**
- * 处理地址保存成功
- */
 async function handleAddressSuccess(data: IAddressFormData) {
-  console.log('地址保存成功:', data)
   showAddressModal.value = false
-  // 刷新地址列表
   await loadAddresses()
 }
 
-/**
- * 处理打开优惠券选择器
- */
 async function handleOpenCouponSelector() {
-  // 打开前先加载优惠券列表
   await loadCoupons()
   showCouponSelector.value = true
 }
 
-/**
- * 处理选择优惠券
- */
 function handleSelectCoupon(coupon: any) {
   selectCoupon(coupon)
 }
 
-/**
- * 处理取消选择优惠券
- */
 function handleUnselectCoupon() {
   unselectCoupon()
 }
 
 /**
- * 处理发票复选框变化
- */
-function handleInvoiceCheckboxChange() {
-  if (!form.value.needInvoice) {
-    // 勾选时打开发票弹窗
-    showInvoiceModal.value = true
-  } else {
-    // 取消勾选时清空发票数据
-    form.value.needInvoice = false
-    invoiceData.value = undefined
-    form.value.invoiceType = undefined
-    form.value.invoiceContent = undefined
-  }
-}
-
-/**
- * 处理编辑发票
- */
-function handleEditInvoice() {
-  showInvoiceModal.value = true
-}
-
-/**
- * 处理发票保存成功
- */
-function handleInvoiceSuccess(data: IInvoiceFormData) {
-  invoiceData.value = data
-  form.value.needInvoice = true
-  form.value.invoiceType = data.type
-  form.value.invoiceContent = {
-    title: data.title,
-    taxNumber: data.taxNumber,
-    content: data.content,
-    email: data.email,
-  }
-  console.log('发票信息已保存:', data)
-}
-
-/**
- * 获取发票内容标签
- */
-function getInvoiceContentLabel(value: string): string {
-  const map: Record<string, string> = {
-    goods: t('checkout.invoiceContentGoods'),
-    service: t('checkout.invoiceContentService'),
-    goods_service: t('checkout.invoiceContentGoodsService'),
-    other: t('checkout.invoiceContentOther'),
-  }
-  return map[value] || value
-}
-
-/**
- * 处理提交订单
+ * 提交订单
  */
 async function handleSubmit() {
   if (!canSubmit.value) return
 
-  const result = await createOrder('wxpay') // TODO: 支持选择支付方式
+  form.value.needInvoice = false
+  form.value.invoiceType = undefined
+  form.value.invoiceContent = undefined
+
+  const result = await createOrder('wxpaypc')
 
   if (result.success && result.orderId) {
-    // 跳转到支付页面
     router.push(`/payment?orderId=${result.orderId}`)
   }
 }

@@ -115,12 +115,15 @@
  */
 
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { LOCALE_DEFINITIONS } from '../../../shared/localeConfig'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 const { locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
+const localePath = useLocalePath()
 
 // 定义 emits
 const emit = defineEmits<{
@@ -140,11 +143,7 @@ const currentLocale = computed(() => locale.value)
 const cartItemCount = computed(() => cartStore.totalItems || 0)
 
 // 可用语言列表（从配置中获取）
-const availableLocales: Array<{ code: 'en' | 'zh' | 'ar'; name: string }> = [
-  { code: 'zh', name: '简体中文' },
-  { code: 'en', name: 'English' },
-  { code: 'ar', name: 'العربية' },
-]
+const availableLocales = LOCALE_DEFINITIONS.map(({ code, name }) => ({ code, name }))
 
 /**
  * 切换语言菜单显示状态
@@ -225,18 +224,29 @@ const handleGrid = () => {
 /**
  * 处理用户点击
  */
-const handleUser = () => {
+const redirectToLogin = async () => {
+  const currentPath = route.fullPath
+  await router.push({
+    path: localePath('/account/login'),
+    query: {
+      redirect: currentPath,
+    },
+  })
+}
+
+const handleUser = async () => {
+  if (userStore.token && !userStore.userInfo) {
+    const result = await userStore.fetchUserInfo()
+    if (!result.success) {
+      await redirectToLogin()
+      return
+    }
+  }
+
   if (userStore.isLoggedIn) {
-    router.push('/account')
+    await router.push(localePath('/account'))
   } else {
-    // 跳转到登录页，携带当前路由作为 redirect 参数
-    const currentPath = router.currentRoute.value.fullPath
-    router.push({
-      path: '/account/login',
-      query: {
-        redirect: currentPath,
-      },
-    })
+    await redirectToLogin()
   }
 }
 </script>

@@ -3,7 +3,7 @@
     <Transition name="toast-fade">
       <div
         v-if="visible"
-        class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+        class="fixed inset-0 z-[120] flex items-center justify-center pointer-events-none"
       >
         <div
           class="bg-gray-800 bg-opacity-90 text-white px-6 py-4 rounded-2xl shadow-2xl max-w-md mx-4 pointer-events-auto"

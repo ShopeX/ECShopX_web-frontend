@@ -1,4 +1,6 @@
 import { MoneyValueObject } from '~/shared/value-objects'
+import type { IApiTrackerPullTrace } from '~/types/api/order'
+import { CouponDisplayTransformer, type ICouponModel } from './couponDisplayTransformer'
 
 /**
  * 订单数据转换器
@@ -15,6 +17,9 @@ export interface ICheckoutItem {
   productName: string
   productImage: string
   specName: string
+  skuNo: string
+  style: string
+  size: string
   quantity: number
   price: number
   subtotal: number
@@ -68,30 +73,98 @@ export interface IAddressModel {
   fullAddress: string
 }
 
-export interface ICouponModel {
-  id: string
-  couponCode: string
-  title: string
-  discount: number
-  minFee: number
-  expireTime?: string
-}
-
 export class OrderTransformer {
+  private static extractSkuFields(apiItem: any) {
+    const direct = {
+      skuNo: String(apiItem.sku_no ?? apiItem.item_no ?? ''),
+      style: String(apiItem.spec_style ?? apiItem.style ?? ''),
+      size: String(apiItem.spec_size ?? apiItem.size ?? ''),
+    }
+    if (direct.skuNo || direct.style || direct.size) return direct
+
+    const raw = apiItem.item_spec_desc ?? apiItem.spec_name ?? apiItem.spec_info ?? ''
+    if (!raw) return direct
+
+    let text = ''
+    let parsed: any = null
+
+    if (typeof raw === 'string') {
+      text = raw
+      try {
+        parsed = JSON.parse(raw)
+      } catch {
+        parsed = null
+      }
+    } else if (typeof raw === 'object') {
+      parsed = raw
+      text = JSON.stringify(raw)
+    }
+
+    const result = { ...direct }
+
+    if (parsed && typeof parsed === 'object') {
+      const assignByKey = (key: string, val: unknown) => {
+        const value = typeof val === 'string' ? val : ''
+        if (!value) return
+        if (key.includes('款号') || key.toLowerCase().includes('sku')) result.skuNo = result.skuNo || value
+        if (key.includes('款式') || key.toLowerCase().includes('style')) result.style = result.style || value
+        if (key.includes('尺寸') || key.toLowerCase().includes('size')) result.size = result.size || value
+      }
+
+      Object.entries(parsed).forEach(([k, v]) => {
+        if (typeof v === 'string') {
+          assignByKey(k, v)
+          return
+        }
+        if (v && typeof v === 'object') {
+          const value = (v as any).spec_value ?? (v as any).value ?? (v as any).name ?? ''
+          const label = (v as any).spec_name ?? k
+          assignByKey(String(label), value)
+        }
+      })
+    }
+
+    const match = (label: '款号' | '款式' | '尺寸') =>
+      text.match(new RegExp(`${label}\\s*[:：]\\s*([^,，;；|/]+)`))
+
+    result.skuNo = result.skuNo || match('款号')?.[1]?.trim() || ''
+    result.style = result.style || match('款式')?.[1]?.trim() || ''
+    result.size = result.size || match('尺寸')?.[1]?.trim() || ''
+
+    return result
+  }
+
+  private static resolveItemQuantity(apiItem: any): number {
+    const rawQuantity =
+      apiItem.quantity ??
+      apiItem.num ??
+      apiItem.buy_num ??
+      apiItem.goods_num ??
+      apiItem.item_num ??
+      apiItem.product_num ??
+      0
+
+    return Number(rawQuantity || 0)
+  }
+
   /**
    * 转换结算商品项
    */
   static toCheckoutItemModel(apiItem: any): ICheckoutItem {
     const price = Number(apiItem.price || 0) / 100 // 分转元
-    const quantity = Number(apiItem.quantity || 0)
+    const quantity = OrderTransformer.resolveItemQuantity(apiItem)
     const subtotal = price * quantity
+    const skuFields = OrderTransformer.extractSkuFields(apiItem)
 
     return {
       id: String(apiItem.item_id || ''),
       productId: String(apiItem.item_id || ''),
       productName: apiItem.item_name || apiItem.title || '',
       productImage: apiItem.item_image || apiItem.pic || '',
-      specName: apiItem.spec_name || apiItem.spec_info || '',
+      specName: apiItem.spec_name || apiItem.item_spec_desc || apiItem.spec_info || '',
+      skuNo: skuFields.skuNo,
+      style: skuFields.style,
+      size: skuFields.size,
       quantity,
       price,
       subtotal,
@@ -170,14 +243,7 @@ export class OrderTransformer {
    */
   static toCouponModelList(response: any): ICouponModel[] {
     const list = response?.list || []
-    return list.map((item: any) => ({
-      id: String(item.id || ''),
-      couponCode: item.coupon_code || '',
-      title: item.title || '',
-      discount: Number(item.discount || 0) / 100, // 分转元
-      minFee: Number(item.min_fee || 0) / 100,
-      expireTime: item.expire_time,
-    }))
+    return list.map((item: any) => CouponDisplayTransformer.toCouponModel(item))
   }
 
   /**
@@ -202,17 +268,22 @@ export class OrderTransformer {
    */
   static toOrderItemModel(apiItem: any) {
     const price = Number(apiItem.price || 0) / 100 // 分转元
+    const quantity = OrderTransformer.resolveItemQuantity(apiItem)
+    const leftAftersalesNum = Number(apiItem.left_aftersales_num ?? quantity)
+
     return {
+      detailId: String(apiItem.id || apiItem.item_id || ''),
       itemId: String(apiItem.item_id || ''),
       itemName: apiItem.item_name || apiItem.title || '',
       itemImage: apiItem.item_image || apiItem.item_pic || apiItem.pic || '',
-      specName: apiItem.spec_name || apiItem.spec_info || '',
+      specName: apiItem.spec_name || apiItem.item_spec_desc || apiItem.spec_info || '',
       skuNo: apiItem.sku_no ?? apiItem.item_no ?? '',
       style: apiItem.spec_style ?? apiItem.style ?? '',
       size: apiItem.spec_size ?? apiItem.size ?? '',
-      quantity: Number(apiItem.quantity || 0),
+      quantity,
+      leftAftersalesNum,
       price,
-      subtotal: price * Number(apiItem.quantity || 0),
+      subtotal: price * quantity,
     }
   }
 
@@ -224,15 +295,38 @@ export class OrderTransformer {
     const orderId = String(apiOrder.order_id || '')
     const orderTime = apiOrder.create_time || apiOrder.order_time || ''
     const totalAmount = Number(apiOrder.total_fee || apiOrder.total_amount || 0) / 100 // 分转元
-    const items = (apiOrder.item_infos || apiOrder.items || []).map(OrderTransformer.toOrderItemModel)
+    const items = (apiOrder.item_infos || apiOrder.items || []).map(
+      OrderTransformer.toOrderItemModel
+    )
+    const orderLeftAftersalesNum = Number(apiOrder.left_aftersales_num ?? NaN)
 
     // 状态映射逻辑
     let status = apiOrder.status || '' // 兼容旧接口
-    
-    // 如果有组合状态字段，进行逻辑映射
-    if (apiOrder.pay_status !== undefined) {
+    const deliveryStatus = String(apiOrder.delivery_status || '0')
+
+    if (apiOrder.order_status) {
+      // 详情接口：order_status 为大写字符串
+      const orderStatusMap: Record<string, string> = {
+        DONE: 'completed',
+        NOTPAY: 'pending_payment',
+        PAYED: 'pending_shipment',
+        CANCEL: 'cancelled',
+        WAIT_BUYER_CONFIRM: 'shipped',
+        WAIT_GROUPS_SUCCESS: 'pending_payment',
+        PART_PAYMENT: 'pending_payment',
+      }
+      status = orderStatusMap[apiOrder.order_status] || status
+
+      if (status === 'pending_shipment') {
+        if (['2', 'FINISHED', 'COMPLETED'].includes(deliveryStatus)) {
+          status = 'completed'
+        } else if (['1', 'DONE'].includes(deliveryStatus)) {
+          status = 'shipped'
+        }
+      }
+    } else if (apiOrder.pay_status !== undefined) {
+      // 列表接口：组合状态字段（数值）
       const payStatus = String(apiOrder.pay_status)
-      const deliveryStatus = String(apiOrder.delivery_status || '0')
       const cancelStatus = String(apiOrder.cancel_status || '0')
 
       if (cancelStatus !== '0') {
@@ -248,6 +342,10 @@ export class OrderTransformer {
       }
     }
 
+    const canApplyAftersales = Number.isFinite(orderLeftAftersalesNum)
+      ? orderLeftAftersalesNum > 0
+      : items.some((item: any) => item.leftAftersalesNum > 0)
+
     return {
       orderId,
       orderTime,
@@ -257,11 +355,87 @@ export class OrderTransformer {
       totalAmount,
       shippingAddress: apiOrder.shipping_address,
       // 根据订单状态判断可执行的操作
-      canCancel: status === 'pending_payment',
+      canCancel: ['pending_payment', 'pending_shipment', 'shipped'].includes(status),
       canPay: status === 'pending_payment',
       canConfirmReceipt: status === 'shipped',
-      canDelete: status === 'cancelled',
-      canApplyAftersales: ['pending_shipment', 'shipped', 'completed'].includes(status),
+      canInvoice: ['pending_shipment', 'shipped'].includes(status),
+      canViewLogistics: ['shipped', 'completed'].includes(status),
+      canApplyAftersales: ['shipped', 'completed'].includes(status) && canApplyAftersales,
+      canReview: status === 'pending_review',
+    }
+  }
+
+  /**
+   * 格式化金额（分 → 元字符串）
+   */
+  private static formatFen(fen: number): string {
+    return (Number(fen || 0) / 100).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  }
+
+  /**
+   * 转换物流轨迹
+   */
+  static toLogisticsTraces(raw: any): Array<{ time: string; content: string }> {
+    return (raw.logistics_traces ?? []).map((t: any) => ({
+      time: String(t.time || ''),
+      content: String(t.content || ''),
+    }))
+  }
+
+  /**
+   * 转换物流查询接口返回的轨迹列表
+   */
+  static toTrackerPullTraces(raw: any): Array<{ time: string; content: string }> {
+    const traces = raw?.data ?? raw ?? []
+    return (Array.isArray(traces) ? traces : []).map((trace: IApiTrackerPullTrace) => ({
+      time: String(trace?.AcceptTime || ''),
+      content: String(trace?.AcceptStation || ''),
+    }))
+  }
+
+  /**
+   * 转换订单详情
+   */
+  static toOrderDetailModel(raw: any) {
+    const base = OrderTransformer.toOrderModel(raw)
+
+    const shippingMethodMap: Record<string, string> = {
+      express: '快递配送',
+      logistics: '快递配送',
+      ziti: '门店自提',
+      merchant: '商家配送',
+    }
+
+    const invoiceTypeMap: Record<string, string> = {
+      normal: '需要发票',
+      electronic: '电子发票',
+      no: '不需要发票',
+    }
+
+    return {
+      ...base,
+      receiverName: raw.receiver_name ?? '',
+      receiverMobile: raw.receiver_mobile ?? '',
+      shippingAddress:
+        raw.shipping_address ??
+        [raw.receiver_state, raw.receiver_city, raw.receiver_district, raw.receiver_address]
+          .filter(Boolean)
+          .join(' '),
+      itemFee: OrderTransformer.formatFen(raw.item_fee ?? 0),
+      freightFee: OrderTransformer.formatFen(raw.freight_fee ?? 0),
+      discountFee: OrderTransformer.formatFen(raw.discount_fee ?? 0),
+      pointFee: OrderTransformer.formatFen(raw.point_fee ?? 0),
+      totalFee: OrderTransformer.formatFen(Number(raw.total_fee || raw.total_amount || 0)),
+      logisticsNo: raw.logistics_no ?? raw.delivery_code ?? '',
+      logisticsCompany: raw.logistics_company ?? raw.delivery_corp ?? '',
+      logisticsTraces: OrderTransformer.toLogisticsTraces(raw),
+      payTime: raw.pay_time ? String(raw.pay_time) : '',
+      shippingMethod: shippingMethodMap[raw.receipt_type ?? ''] || raw.receipt_type || '',
+      invoiceInfo: invoiceTypeMap[raw.invoice_type ?? ''] || raw.invoice_info || '',
+      storeName: raw.distributor_name || raw.store_name || raw.shop_name || '',
     }
   }
 
@@ -270,12 +444,13 @@ export class OrderTransformer {
    */
   static toOrderListModel(response: any) {
     const data = response?.data || response
+    const pager = data?.pager || response?.pager || {}
     const orders = data?.list || data?.orders || []
     return {
       orders: orders.map(OrderTransformer.toOrderModel),
-      total: Number(data?.total_count || data?.total || 0),
-      page: Number(data?.page || 1),
-      pageSize: Number(data?.pageSize || data?.page_size || 10),
+      total: Number((pager?.count ?? data?.total_count ?? data?.total) || 0),
+      page: Number((pager?.page_no ?? data?.page ?? data?.current_page) || 1),
+      pageSize: Number((pager?.page_size ?? data?.pageSize ?? data?.page_size) || 10),
     }
   }
 }

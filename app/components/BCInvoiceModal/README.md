@@ -53,7 +53,7 @@ import { InvoiceModal, type IInvoiceFormData } from '~/components/business/invoi
 
 const showInvoiceModal = ref(false)
 const invoiceData = ref<IInvoiceFormData>({
-  type: 'company',
+  type: 'enterprise',
   title: '示例公司',
   taxNumber: '91110000MA01234567',
   content: 'goods',
@@ -85,8 +85,8 @@ function handleInvoiceSuccess(data: IInvoiceFormData) {
 
 ```typescript
 interface IInvoiceFormData {
-  /** 发票类型：personal-个人，company-企业 */
-  type: 'personal' | 'company'
+  /** 发票类型：individual-个人，enterprise-企业 */
+  type: 'individual' | 'enterprise'
   /** 发票抬头（个人姓名或企业名称） */
   title: string
   /** 纳税人识别号（企业必填） */

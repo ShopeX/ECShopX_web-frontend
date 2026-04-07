@@ -12,7 +12,7 @@
     @change="handleSelect"
     @blur="$emit('blur')"
   >
-    <option value="" disabled>{{ placeholder || '请选择' }}</option>
+    <option value="" disabled>{{ placeholder || t('ab0b5e27.708c9d') }}</option>
     <option
       v-for="option in options"
       :key="String(option.value)"
@@ -40,6 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   error: false,
 })
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | number]

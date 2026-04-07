@@ -1,297 +1,241 @@
 <template>
-  <ECModal
-    v-model="visible"
-    title="发票信息"
-    :width="598"
-    :show-footer="false"
-    @close="handleClose"
-  >
-    <form class="flex flex-col gap-8" @submit.prevent="handleSubmit">
-      <!-- 发票类型 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">发票类型</label>
-        <div class="flex gap-4">
-          <button
-            type="button"
-            :class="[
-              'flex-1 py-3 px-4 border text-sm font-medium leading-5 transition-colors',
-              formData.type === 'personal'
-                ? 'bg-[#191a1d] text-white border-[#191a1d]'
-                : 'bg-white text-[#191a1d] border-[#191a1d] hover:bg-gray-50',
-            ]"
-            @click="formData.type = 'personal'"
-          >
-            个人
-          </button>
-          <button
-            type="button"
-            :class="[
-              'flex-1 py-3 px-4 border text-sm font-medium leading-5 transition-colors',
-              formData.type === 'company'
-                ? 'bg-[#191a1d] text-white border-[#191a1d]'
-                : 'bg-white text-[#191a1d] border-[#191a1d] hover:bg-gray-50',
-            ]"
-            @click="formData.type = 'company'"
-          >
-            企业
-          </button>
-        </div>
-      </div>
-
-      <!-- 发票抬头 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">
-          {{ formData.type === 'personal' ? '个人姓名' : '企业名称' }}
-          <span class="text-[#d0112f]">*</span>
-        </label>
-        <div class="flex flex-col gap-1">
-          <input
-            v-model="formData.title"
-            type="text"
-            :placeholder="formData.type === 'personal' ? '请输入个人姓名' : '请输入企业名称'"
-            class="h-10 px-4 bg-[#f3f4f6] border text-sm text-[#191a1d] leading-5 focus:outline-none focus:border-[#191a1d] transition-colors"
-            :class="errors.title ? 'border-[#d0112f]' : 'border-transparent'"
-          />
-          <p v-if="errors.title" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.title }}
-          </p>
-        </div>
-      </div>
-
-      <!-- 纳税人识别号（仅企业） -->
-      <div v-if="formData.type === 'company'" class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">
-          纳税人识别号
-          <span class="text-[#d0112f]">*</span>
-        </label>
-        <div class="flex flex-col gap-1">
-          <input
-            v-model="formData.taxNumber"
-            type="text"
-            placeholder="请输入纳税人识别号（统一社会信用代码）"
-            class="h-10 px-4 bg-[#f3f4f6] border text-sm text-[#191a1d] leading-5 focus:outline-none focus:border-[#191a1d] transition-colors"
-            :class="errors.taxNumber ? 'border-[#d0112f]' : 'border-transparent'"
-          />
-          <p v-if="errors.taxNumber" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.taxNumber }}
-          </p>
-        </div>
-      </div>
-
-      <!-- 发票内容 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">
-          发票内容
-          <span class="text-[#d0112f]">*</span>
-        </label>
-        <ECSelect
-          v-model="formData.content"
-          :options="invoiceContentOptions"
-          :error="!!errors.content"
-          size="md"
-          placeholder="请选择发票内容"
-        />
-        <p v-if="errors.content" class="text-xs text-[#d0112f] leading-4">
-          {{ errors.content }}
-        </p>
-      </div>
-
-      <!-- 接收邮箱 -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs text-[#4a5565] leading-4">
-          接收邮箱
-          <span class="text-[#d0112f]">*</span>
-        </label>
-        <div class="flex flex-col gap-1">
-          <input
-            v-model="formData.email"
-            type="email"
-            placeholder="请输入接收电子发票的邮箱地址"
-            class="h-10 px-4 bg-[#f3f4f6] border text-sm text-[#191a1d] leading-5 focus:outline-none focus:border-[#191a1d] transition-colors"
-            :class="errors.email ? 'border-[#d0112f]' : 'border-transparent'"
-          />
-          <p v-if="errors.email" class="text-xs text-[#d0112f] leading-4">
-            {{ errors.email }}
-          </p>
-        </div>
-      </div>
-
-      <!-- 保存按钮 -->
-      <button
-        type="submit"
-        :disabled="loading"
-        class="bg-[#191a1d] text-white py-4 text-sm font-medium leading-5 hover:bg-[#191a1d]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+  <Teleport to="body">
+    <Transition name="modal-fade">
+      <div
+        v-if="modelValue"
+        data-testid="invoice-dialog"
+        class="fixed inset-0 z-50 bg-black/60"
+        @click.self="emitClose"
       >
-        {{ loading ? '保存中...' : '保存' }}
-      </button>
-    </form>
-  </ECModal>
+        <!-- PC 端弹窗 -->
+        <div class="hidden h-full items-center justify-center px-4 py-32 md:flex">
+          <div
+            data-testid="invoice-desktop-modal"
+            class="w-full max-w-[600px] bg-white px-8 py-8 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+          >
+            <div class="flex flex-col gap-8">
+              <!-- 标题栏 -->
+              <div class="flex items-center justify-between">
+                <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">{{ t('invoiceForm.title') }}</h2>
+                <button
+                  type="button"
+                  :aria-label="t('common.close')"
+                  class="flex size-6 items-center justify-center text-[#191a1d] transition-opacity hover:opacity-70"
+                  @click="emitClose"
+                >
+                  <UIcon name="i-heroicons-x-mark" class="size-6" />
+                </button>
+              </div>
+
+              <!-- 共享表单字段 -->
+              <BCInvoiceFormFields
+                :form-data="formData"
+                :errors="errors"
+                :submit-error="submitError"
+                @update:form-data="formData = $event"
+                @update:errors="errors = $event"
+              />
+
+              <!-- 底部按钮 -->
+              <div class="flex w-full gap-4">
+                <button
+                  data-testid="invoice-cancel"
+                  type="button"
+                  class="flex-1 border border-[#0f0f10] bg-white py-4 text-[14px] font-medium leading-5 text-[#191a1d]"
+                  @click="emitCancel"
+                >
+                  {{ t('3e6ed17a.625fb2') }}
+                </button>
+                <button
+                  data-testid="invoice-submit"
+                  type="button"
+                  :disabled="loading"
+                  class="flex-1 bg-[#0f0f10] py-4 text-[14px] font-medium leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                  @click="handleSubmit"
+                >
+                  {{ loading ? t('ee3264ed.abe2c5') : t('invoiceForm.submit') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- H5 端底部弹出 -->
+        <div class="flex h-full items-end md:hidden">
+          <div class="w-full">
+            <div
+              data-testid="invoice-mobile-sheet"
+              class="w-full bg-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+            >
+              <div
+                class="overflow-y-auto px-4 py-8"
+                :class="formData.type === 'enterprise' ? 'max-h-[500px]' : 'max-h-[calc(100vh-120px)]'"
+              >
+                <div class="flex flex-col gap-8">
+                  <div class="flex items-center justify-between">
+                    <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">{{ t('invoiceForm.title') }}</h2>
+                    <button
+                      type="button"
+                      :aria-label="t('common.close')"
+                      class="flex size-6 items-center justify-center text-[#191a1d] transition-opacity hover:opacity-70"
+                      @click="emitClose"
+                    >
+                      <UIcon name="i-heroicons-x-mark" class="size-6" />
+                    </button>
+                  </div>
+
+                  <BCInvoiceFormFields
+                    :form-data="formData"
+                    :errors="errors"
+                    :submit-error="submitError"
+                    @update:form-data="formData = $event"
+                    @update:errors="errors = $event"
+                  />
+                </div>
+              </div>
+
+              <div class="border-t border-[#e5e7eb] px-4 py-8">
+                <div class="flex w-full gap-4">
+                  <button
+                    data-testid="invoice-cancel"
+                    type="button"
+                    class="flex-1 border border-[#0f0f10] bg-white py-4 text-[14px] font-medium leading-5 text-[#191a1d]"
+                    @click="emitCancel"
+                  >
+                    {{ t('3e6ed17a.625fb2') }}
+                  </button>
+                  <button
+                    data-testid="invoice-submit"
+                    type="button"
+                    :disabled="loading"
+                    class="flex-1 bg-[#0f0f10] py-4 text-[14px] font-medium leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                    @click="handleSubmit"
+                  >
+                    {{ loading ? t('ee3264ed.abe2c5') : t('invoiceForm.submit') }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { ECModal } from '~/components/ECModal'
-import { ECSelect } from '~/components/ECSelect'
-import type { ISelectOption } from '~/components/ECSelect'
-import type { IInvoiceFormData as IInvoiceFormDataLocal } from './types'
-export type IInvoiceFormData = IInvoiceFormDataLocal
+import { ref, watch } from 'vue'
+import type { IInvoiceFormData } from './types'
+import BCInvoiceFormFields from './BCInvoiceFormFields.vue'
 
-defineOptions({
-  name: 'InvoiceModal',
-})
+export type { IInvoiceFormData }
+
+defineOptions({ name: 'BCInvoiceModal' })
 
 interface Props {
-  /** 是否显示 */
   modelValue?: boolean
-  /** 初始数据 */
   initialData?: IInvoiceFormData
+  loading?: boolean
+  submitError?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   initialData: undefined,
+  loading: false,
+  submitError: '',
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
-  success: [data: IInvoiceFormData]
+  submit: [data: IInvoiceFormData]
   close: []
+  cancel: []
 }>()
 
-// 内部状态
-const visible = ref(props.modelValue)
-const loading = ref(false)
-const errors = ref<Partial<Record<keyof IInvoiceFormData, string>>>({})
+const { t } = useI18n()
 
-// 表单数据
-const formData = ref<IInvoiceFormData>({
-  type: 'personal',
+const createDefaultFormData = (): IInvoiceFormData => ({
+  type: 'individual',
   title: '',
   taxNumber: '',
-  content: '',
-  email: '',
+  businessAddress: '',
+  bank: '',
+  bankAccount: '',
+  telephone: '',
 })
 
-// 发票内容选项
-const invoiceContentOptions: ISelectOption[] = [
-  { value: 'goods', label: '商品明细' },
-  { value: 'service', label: '服务费' },
-  { value: 'goods_service', label: '商品及服务' },
-  { value: 'other', label: '其他' },
-]
+const formData = ref<IInvoiceFormData>(createDefaultFormData())
+const errors = ref<Record<string, string>>({})
 
-// 监听外部变化
 watch(
   () => props.modelValue,
-  (val) => {
-    visible.value = val
-    if (val && props.initialData) {
-      formData.value = { ...props.initialData }
+  (visible) => {
+    if (visible) {
+      formData.value = props.initialData ? { ...props.initialData } : createDefaultFormData()
+      errors.value = {}
     }
   }
 )
 
-// 监听内部变化
-watch(visible, (val) => {
-  emit('update:modelValue', val)
-  if (!val) {
-    resetForm()
-  }
-})
-
-/**
- * 验证表单
- */
-function validateForm(): boolean {
-  errors.value = {}
-  let isValid = true
-
-  // 验证发票抬头
-  if (!formData.value.title.trim()) {
-    errors.value.title = formData.value.type === 'personal' ? '请输入个人姓名' : '请输入企业名称'
-    isValid = false
-  }
-
-  // 企业类型需要验证纳税人识别号
-  if (formData.value.type === 'company') {
-    if (!formData.value.taxNumber.trim()) {
-      errors.value.taxNumber = '请输入纳税人识别号'
-      isValid = false
-    } else if (
-      !/^[0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10}$/.test(formData.value.taxNumber)
-    ) {
-      errors.value.taxNumber = '请输入正确的纳税人识别号（18位统一社会信用代码）'
-      isValid = false
+watch(
+  () => props.initialData,
+  (value) => {
+    if (props.modelValue && value) {
+      formData.value = { ...value }
     }
   }
+)
 
-  // 验证发票内容
-  if (!formData.value.content) {
-    errors.value.content = '请选择发票内容'
-    isValid = false
-  }
-
-  // 验证邮箱
-  if (!formData.value.email.trim()) {
-    errors.value.email = '请输入接收邮箱'
-    isValid = false
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-    errors.value.email = '请输入正确的邮箱地址'
-    isValid = false
-  }
-
-  return isValid
-}
-
-/**
- * 处理提交
- */
-async function handleSubmit() {
-  if (!validateForm()) {
-    return
-  }
-
-  loading.value = true
-  try {
-    // 构建发票数据
-    const invoiceData: IInvoiceFormData = {
-      type: formData.value.type,
-      title: formData.value.title.trim(),
-      taxNumber: formData.value.type === 'company' ? formData.value.taxNumber.trim() : '',
-      content: formData.value.content,
-      email: formData.value.email.trim(),
-    }
-
-    // 触发成功事件
-    emit('success', invoiceData)
-    visible.value = false
-  } catch (error: any) {
-    // 显示错误提示
-    alert(error.message || '保存发票信息失败，请重试')
-  } finally {
-    loading.value = false
-  }
-}
-
-/**
- * 处理关闭
- */
-function handleClose() {
-  visible.value = false
+function emitClose() {
+  emit('update:modelValue', false)
   emit('close')
 }
 
-/**
- * 重置表单
- */
-function resetForm() {
-  formData.value = {
-    type: 'personal',
-    title: '',
-    taxNumber: '',
-    content: '',
-    email: '',
+function emitCancel() {
+  emit('update:modelValue', false)
+  emit('cancel')
+}
+
+function validateForm() {
+  const nextErrors: Record<string, string> = {}
+
+  if (!formData.value.title.trim()) {
+    nextErrors.title =
+      formData.value.type === 'individual'
+        ? t('invoiceForm.titleRequired')
+        : t('invoiceForm.companyNameRequired')
   }
-  errors.value = {}
+
+  if (formData.value.type === 'enterprise' && !formData.value.taxNumber.trim()) {
+    nextErrors.taxNumber = t('invoiceForm.taxNumberRequired')
+  }
+
+  errors.value = nextErrors
+  return Object.keys(nextErrors).length === 0
+}
+
+function handleSubmit() {
+  if (!validateForm()) return
+
+  emit('submit', {
+    ...formData.value,
+    title: formData.value.title.trim(),
+    taxNumber: formData.value.taxNumber.trim(),
+    businessAddress: formData.value.businessAddress.trim(),
+    bank: formData.value.bank.trim(),
+    bankAccount: formData.value.bankAccount.trim(),
+  })
 }
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+</style>

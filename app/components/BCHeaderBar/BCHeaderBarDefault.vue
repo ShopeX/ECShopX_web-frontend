@@ -5,15 +5,20 @@
       <div class="container mx-auto h-10 flex items-center justify-between px-4">
         <!-- 左侧导航 -->
         <div class="flex items-center space-x-6 text-sm">
-          <NuxtLink to="/" class="hover:text-gray-300 transition-colors"> 网站首页 </NuxtLink>
+          <NuxtLink :to="localePath('/')" class="hover:text-gray-300 transition-colors">
+            {{ t('794cd7be.72e45d') }}
+          </NuxtLink>
           <div class="hidden xl:flex items-center space-x-2">
-            <span class="text-gray-300">中国大陆版</span>
+            <span class="text-gray-300">{{ t('794cd7be.a42bf4') }}</span>
             <span class="text-gray-400">-</span>
-            <span class="text-gray-300">上海</span>
+            <span class="text-gray-300">{{ t('794cd7be.e94e8b') }}</span>
           </div>
           <div v-if="!isLoggedIn" class="flex items-center space-x-2">
-            <NuxtLink to="/account/login" class="hover:text-gray-300 transition-colors">
-              请登录
+            <NuxtLink
+              :to="localePath('/account/login')"
+              class="hover:text-gray-300 transition-colors"
+            >
+              {{ t('794cd7be.7d1eb0') }}
             </NuxtLink>
           </div>
           <div v-else class="flex items-center space-x-2">
@@ -25,10 +30,10 @@
         <!-- 右侧导航菜单 -->
         <nav class="flex items-center space-x-4 xl:space-x-6 text-sm">
           <NuxtLink
-            to="/cart"
+            :to="localePath('/cart')"
             class="hover:text-gray-300 transition-colors flex items-center space-x-1 relative"
           >
-            <span>购物车</span>
+            <span>{{ t('794cd7be.c017be') }}</span>
             <span
               v-if="cartCount > 0"
               class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-medium text-white bg-red-600 rounded-full"
@@ -36,40 +41,45 @@
               {{ cartCount > 99 ? '99+' : cartCount }}
             </span>
           </NuxtLink>
-          <NuxtLink to="/member/orders" class="hover:text-gray-300 transition-colors">
-            我的订单
-          </NuxtLink>
-          <NuxtLink to="/member" class="hover:text-gray-300 transition-colors"> 个人中心 </NuxtLink>
           <NuxtLink
-            to="/enterprise"
+            :to="localePath('/member/orders')"
+            class="hover:text-gray-300 transition-colors"
+          >
+            {{ t('794cd7be.a73872') }}
+          </NuxtLink>
+          <NuxtLink :to="localePath('/member')" class="hover:text-gray-300 transition-colors">
+            {{ t('794cd7be.409120') }}
+          </NuxtLink>
+          <NuxtLink
+            :to="localePath('/enterprise')"
             class="hover:text-gray-300 transition-colors hidden xl:inline-block"
           >
-            企业采购
+            {{ t('794cd7be.04259a') }}
           </NuxtLink>
           <NuxtLink
-            to="/merchant"
+            :to="localePath('/merchant')"
             class="hover:text-gray-300 transition-colors hidden xl:inline-block"
           >
-            商家服务
+            {{ t('794cd7be.2b8cb8') }}
           </NuxtLink>
           <NuxtLink
-            to="/sitemap"
+            :to="localePath('/sitemap')"
             class="hover:text-gray-300 transition-colors hidden xl:inline-block"
           >
-            网站导航
+            {{ t('794cd7be.bcf029') }}
           </NuxtLink>
           <NuxtLink
-            to="/mobile"
+            :to="localePath('/mobile')"
             class="hover:text-gray-300 transition-colors hidden xl:flex items-center space-x-1"
           >
-            <img src="/icons/qrcode-gray.svg" alt="手机版" class="w-4 h-4" />
-            <span>手机版</span>
+            <img src="/icons/qrcode-gray.svg" :alt="t('794cd7be.51d1f9')" class="w-4 h-4" />
+            <span>{{ t('794cd7be.51d1f9') }}</span>
           </NuxtLink>
           <NuxtLink
-            to="/accessibility"
+            :to="localePath('/accessibility')"
             class="hover:text-gray-300 transition-colors hidden xl:inline-block"
           >
-            网站无障碍
+            {{ t('794cd7be.ed275a') }}
           </NuxtLink>
         </nav>
       </div>
@@ -82,7 +92,7 @@
         <button
           class="lg:hidden p-2 hover:bg-gray-100 rounded-md"
           @click="toggleMobileMenu"
-          aria-label="菜单"
+          :aria-label="t('794cd7be.4ccbdc')"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -95,7 +105,7 @@
         </button>
 
         <!-- Logo -->
-        <NuxtLink to="/" class="flex-shrink-0">
+        <NuxtLink :to="localePath('/')" class="flex-shrink-0">
           <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-12" />
         </NuxtLink>
 
@@ -106,7 +116,7 @@
               <input
                 v-model="searchKeyword"
                 type="text"
-                placeholder="搜索商品"
+                :placeholder="t('794cd7be.2470ef')"
                 class="w-full h-10 pl-4 pr-24 rounded-sm border border-red-500 focus:outline-none focus:border-red-600"
                 @keyup.enter="handleSearch"
               />
@@ -114,12 +124,12 @@
                 class="absolute right-0 top-0 h-10 w-20 bg-red-500 text-white rounded-r-sm hover:bg-red-600 transition-colors"
                 @click="handleSearch"
               >
-                搜索
+                {{ t('794cd7be.e5f71f') }}
               </button>
             </div>
             <!-- 热门搜索 -->
             <div v-if="hotKeywords.length > 0" class="mt-2 text-sm text-gray-500 hidden xl:block">
-              <span>热门搜索：</span>
+              <span>{{ t('794cd7be.67a9a3') }}</span>
               <button
                 v-for="keyword in hotKeywords"
                 :key="keyword"
@@ -136,21 +146,23 @@
         <button
           class="lg:hidden p-2 hover:bg-gray-100 rounded-md"
           @click="toggleSearch"
-          aria-label="搜索"
+          :aria-label="t('794cd7be.e5f71f')"
         >
-          <img src="/icons/search.svg" alt="搜索" class="w-5 h-5" />
+          <img src="/icons/search.svg" :alt="t('794cd7be.e5f71f')" class="w-5 h-5" />
         </button>
 
         <!-- 右侧功能区 -->
         <div class="flex items-center space-x-4 lg:space-x-6">
           <NuxtLink
-            to="/cart"
+            :to="localePath('/cart')"
             class="flex items-center space-x-2 hover:text-red-500 transition-colors relative"
           >
-            <img src="/icons/cart.svg" alt="购物车" class="w-6 h-6" />
+            <img src="/icons/cart.svg" :alt="t('794cd7be.c017be')" class="w-6 h-6" />
             <div class="hidden lg:flex flex-col">
-              <span class="text-sm">购物车</span>
-              <span v-if="cartCount > 0" class="text-xs text-red-500">{{ cartCount }}件</span>
+              <span class="text-sm">{{ t('794cd7be.c017be') }}</span>
+              <span v-if="cartCount > 0" class="text-xs text-red-500">
+                {{ cartCount }}{{ t('794cd7be.f7edf5') }}
+              </span>
             </div>
             <!-- 移动端购物车数量角标 -->
             <span
@@ -163,9 +175,9 @@
 
           <!-- 用户菜单 - 移动端 -->
           <NuxtLink
-            to="/member"
+            :to="localePath('/member')"
             class="lg:hidden p-2 hover:bg-gray-100 rounded-md"
-            aria-label="个人中心"
+            :aria-label="t('794cd7be.409120')"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -185,7 +197,7 @@
           <input
             v-model="searchKeyword"
             type="text"
-            placeholder="搜索商品"
+            :placeholder="t('794cd7be.2470ef')"
             class="w-full h-10 pl-4 pr-20 rounded-sm border border-red-500 focus:outline-none focus:border-red-600"
             @keyup.enter="handleSearch"
           />
@@ -193,7 +205,7 @@
             class="absolute right-0 top-0 h-10 w-16 bg-red-500 text-white rounded-r-sm hover:bg-red-600 transition-colors"
             @click="handleSearch"
           >
-            搜索
+            {{ t('794cd7be.e5f71f') }}
           </button>
         </div>
       </div>
@@ -214,11 +226,11 @@
           <div class="p-4 border-b border-gray-200 flex items-center justify-between">
             <div v-if="!isLoggedIn">
               <NuxtLink
-                to="/account/login"
+                :to="localePath('/account/login')"
                 class="text-red-500 font-medium"
                 @click="closeMobileMenu"
               >
-                请登录
+                {{ t('794cd7be.7d1eb0') }}
               </NuxtLink>
             </div>
             <div v-else class="flex items-center space-x-2">
@@ -230,7 +242,7 @@
             <button
               class="p-2 hover:bg-gray-100 rounded-md"
               @click="closeMobileMenu"
-              aria-label="关闭"
+              :aria-label="t('794cd7be.b15d91')"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -245,50 +257,54 @@
 
           <!-- 菜单列表 -->
           <nav class="py-2">
-            <NuxtLink to="/" class="block px-4 py-3 hover:bg-gray-100" @click="closeMobileMenu">
-              网站首页
-            </NuxtLink>
             <NuxtLink
-              to="/member/orders"
+              :to="localePath('/')"
               class="block px-4 py-3 hover:bg-gray-100"
               @click="closeMobileMenu"
             >
-              我的订单
+              {{ t('794cd7be.72e45d') }}
             </NuxtLink>
             <NuxtLink
-              to="/member"
+              :to="localePath('/member/orders')"
               class="block px-4 py-3 hover:bg-gray-100"
               @click="closeMobileMenu"
             >
-              个人中心
+              {{ t('794cd7be.a73872') }}
             </NuxtLink>
             <NuxtLink
-              to="/enterprise"
+              :to="localePath('/member')"
               class="block px-4 py-3 hover:bg-gray-100"
               @click="closeMobileMenu"
             >
-              企业采购
+              {{ t('794cd7be.409120') }}
             </NuxtLink>
             <NuxtLink
-              to="/merchant"
+              :to="localePath('/enterprise')"
               class="block px-4 py-3 hover:bg-gray-100"
               @click="closeMobileMenu"
             >
-              商家服务
+              {{ t('794cd7be.04259a') }}
             </NuxtLink>
             <NuxtLink
-              to="/sitemap"
+              :to="localePath('/merchant')"
               class="block px-4 py-3 hover:bg-gray-100"
               @click="closeMobileMenu"
             >
-              网站导航
+              {{ t('794cd7be.2b8cb8') }}
             </NuxtLink>
             <NuxtLink
-              to="/accessibility"
+              :to="localePath('/sitemap')"
               class="block px-4 py-3 hover:bg-gray-100"
               @click="closeMobileMenu"
             >
-              网站无障碍
+              {{ t('794cd7be.bcf029') }}
+            </NuxtLink>
+            <NuxtLink
+              :to="localePath('/accessibility')"
+              class="block px-4 py-3 hover:bg-gray-100"
+              @click="closeMobileMenu"
+            >
+              {{ t('794cd7be.ed275a') }}
             </NuxtLink>
           </nav>
         </div>
@@ -316,6 +332,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userStore = useUserStore()
 const cartStore = useCartStore()
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 /**
  * 用户登录状态
@@ -352,7 +370,7 @@ const showMobileSearch = ref(false)
  */
 const hotKeywords = computed(() => {
   if (!props.showHotKeywords) return []
-  return ['iPhone 15', '华为Mate 60', '小米14', '耳机', '手表']
+  return ['iPhone 15', 'Huawei Mate 60', 'Xiaomi 14', 'Headphones', 'Watch']
 })
 
 /**
@@ -360,7 +378,7 @@ const hotKeywords = computed(() => {
  */
 const handleSearch = () => {
   if (!searchKeyword.value.trim()) return
-  navigateTo(`/search?keyword=${encodeURIComponent(searchKeyword.value)}`)
+  navigateTo(localePath(`/search?keyword=${encodeURIComponent(searchKeyword.value)}`))
   showMobileSearch.value = false
 }
 
@@ -381,7 +399,7 @@ const handleLogout = async () => {
     const userStore = useUserStore()
     const result = await userStore.logout()
     if (result.success) {
-      navigateTo('/auth/login')
+      navigateTo(localePath('/auth/login'))
     }
   }
 }

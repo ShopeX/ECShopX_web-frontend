@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM reg.ishopex.cn/paiops-lang-base/nodejs-alpine:20.19 AS base
 
 RUN corepack enable
 

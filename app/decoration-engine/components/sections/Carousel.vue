@@ -90,8 +90,8 @@
 </template>
 
 <script setup lang="ts">
-import type { DecorationSection } from '~/types/decoration'
-import { useDecorationPreview } from '~/composables/useDecorationPreview'
+import type { DecorationSection } from '~/decoration-engine/types/decoration'
+import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 
 interface CarouselSettings {
   autoplay: boolean

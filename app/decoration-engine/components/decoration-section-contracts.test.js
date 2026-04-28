@@ -8,7 +8,7 @@ const cwd = process.cwd()
 const read = (relativePath) => readFileSync(path.resolve(cwd, relativePath), 'utf8')
 
 test('Carousel section follows decoration plan contract', () => {
-  const source = read('app/components/decoration/sections/Carousel.vue')
+  const source = read('app/decoration-engine/components/sections/Carousel.vue')
 
   assert.match(source, /block_order/)
   assert.match(source, /interval/)
@@ -22,7 +22,7 @@ test('Carousel section follows decoration plan contract', () => {
 })
 
 test('ImageHotspot section follows decoration plan contract', () => {
-  const source = read('app/components/decoration/sections/ImageHotspot.vue')
+  const source = read('app/decoration-engine/components/sections/ImageHotspot.vue')
 
   assert.match(source, /block_order/)
   assert.match(source, /shape/)
@@ -37,7 +37,7 @@ test('ImageHotspot section follows decoration plan contract', () => {
 })
 
 test('ProductShelf section follows decoration plan contract', () => {
-  const source = read('app/components/decoration/sections/ProductShelf.vue')
+  const source = read('app/decoration-engine/components/sections/ProductShelf.vue')
 
   assert.match(source, /displayMode/)
   assert.match(source, /categoryId/)

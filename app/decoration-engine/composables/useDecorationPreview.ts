@@ -4,8 +4,8 @@ import type {
   DecorationHighlightedBlock,
   DecorationMessage,
   PageType,
-} from '~/types/decoration'
-import { normalizeDecorationDSL } from '~/types/decoration'
+} from '~/decoration-engine/types/decoration'
+import { normalizeDecorationDSL } from '~/decoration-engine/types/decoration'
 
 function normalizeAllowedOrigins(origins: string | undefined): string[] {
   if (!origins) {

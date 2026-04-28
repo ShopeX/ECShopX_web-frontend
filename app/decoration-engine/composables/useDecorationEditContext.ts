@@ -1,5 +1,5 @@
 import { computed, inject, ref, type ComputedRef, type InjectionKey, type Ref } from 'vue'
-import type { DecorationHighlightedBlock } from '~/types/decoration'
+import type { DecorationHighlightedBlock } from '~/decoration-engine/types/decoration'
 
 interface OverlayRect {
   top: number

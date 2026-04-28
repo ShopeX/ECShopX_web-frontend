@@ -28,7 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import type { DecorationHighlightedBlock, DecorationSection } from '~/types/decoration'
+import type {
+  DecorationHighlightedBlock,
+  DecorationSection,
+} from '~/decoration-engine/types/decoration'
 
 const props = defineProps<{
   section: DecorationSection

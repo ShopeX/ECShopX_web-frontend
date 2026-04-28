@@ -40,7 +40,10 @@
 <script setup lang="ts">
 import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
 import type { IProduct } from '~/components/BCProductCard/types'
-import type { DecorationHighlightedBlock, DecorationSection } from '~/types/decoration'
+import type {
+  DecorationHighlightedBlock,
+  DecorationSection,
+} from '~/decoration-engine/types/decoration'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
 

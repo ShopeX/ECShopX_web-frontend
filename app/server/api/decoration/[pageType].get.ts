@@ -1,5 +1,5 @@
-import type { DecorationDSL } from '~/types/decoration'
-import { normalizeDecorationDSL } from '~/types/decoration'
+import type { DecorationDSL } from '~/decoration-engine/types/decoration'
+import { normalizeDecorationDSL } from '~/decoration-engine/types/decoration'
 
 function resolveApiBase(apiBase: unknown): string | null {
   if (typeof apiBase !== 'string' || !/^https?:\/\//.test(apiBase)) {

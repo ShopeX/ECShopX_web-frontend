@@ -51,8 +51,11 @@
 
 <script setup lang="ts">
 import type { Component, Ref } from 'vue'
-import type { DecorationDSL, DecorationHighlightedBlock } from '~/types/decoration'
-import { decorationEditKey, type DecorationEditContext } from '~/composables/useDecorationEditContext'
+import type { DecorationDSL, DecorationHighlightedBlock } from '~/decoration-engine/types/decoration'
+import {
+  decorationEditKey,
+  type DecorationEditContext,
+} from '~/decoration-engine/composables/useDecorationEditContext'
 
 const props = defineProps<{
   dsl: DecorationDSL

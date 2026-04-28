@@ -1,10 +1,10 @@
 import type { Component } from 'vue'
-import Carousel from '~/components/decoration/sections/Carousel.vue'
-import AnnouncementBar from '~/components/decoration/sections/AnnouncementBar.vue'
-import DecorationFooterSection from '~/components/decoration/sections/DecorationFooterSection.vue'
-import DecorationHeaderSection from '~/components/decoration/sections/DecorationHeaderSection.vue'
-import ImageHotspot from '~/components/decoration/sections/ImageHotspot.vue'
-import ProductShelf from '~/components/decoration/sections/ProductShelf.vue'
+import Carousel from '~/decoration-engine/components/sections/Carousel.vue'
+import AnnouncementBar from '~/decoration-engine/components/sections/AnnouncementBar.vue'
+import DecorationFooterSection from '~/decoration-engine/components/sections/DecorationFooterSection.vue'
+import DecorationHeaderSection from '~/decoration-engine/components/sections/DecorationHeaderSection.vue'
+import ImageHotspot from '~/decoration-engine/components/sections/ImageHotspot.vue'
+import ProductShelf from '~/decoration-engine/components/sections/ProductShelf.vue'
 
 export type DecorationRegistry = Record<string, Component>
 

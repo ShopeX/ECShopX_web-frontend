@@ -121,19 +121,19 @@
 </template>
 
 <script setup lang="ts">
-import DecorationRenderer from '~/components/decoration/DecorationRenderer.vue'
+import DecorationRenderer from '~/decoration-engine/components/DecorationRenderer.vue'
 import WCHeroBanner from '~/components/WCHeroBanner/WCHeroBanner.vue'
 import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
 import ECButton from '~/components/ECButton/ECButton.vue'
 import BCNewsCard from '~/components/BCNewsCard/BCNewsCard.vue'
 import { useHomeData } from '~/composables/useHomeData'
-import { useDecorationPreview } from '~/composables/useDecorationPreview'
+import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import {
   EMPTY_DECORATION_DSL,
   hasDecorationSections,
   normalizeDecorationDSL,
   type DecorationDSL,
-} from '~/types/decoration'
+} from '~/decoration-engine/types/decoration'
 
 const route = useRoute()
 const { pageConfig, products, pending, fetchHomeData } = useHomeData()

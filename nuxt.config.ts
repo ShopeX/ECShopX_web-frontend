@@ -1,4 +1,3 @@
-import { resolve } from 'path'
 import { defineNuxtConfig } from 'nuxt/config'
 import {
   DEFAULT_LOCALE_CODE,
@@ -40,6 +39,10 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
     },
+  },
+
+  routeRules: {
+    '/?preview=true': { ssr: false },
   },
 
   // 源码目录
@@ -125,6 +128,14 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_DEFAULT_COUNTRY_CODE ||
         getApiCountryCodeByLocale(DEFAULT_LOCALE_CODE),
       businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // bbc 或 b2c
+      decorationAdminOrigin:
+        process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGIN ||
+        process.env.VITE_DECORATION_ADMIN_ORIGIN ||
+        '',
+      decorationAdminOrigins:
+        process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS ||
+        process.env.VITE_DECORATION_ADMIN_ORIGINS ||
+        '',
     },
   },
 

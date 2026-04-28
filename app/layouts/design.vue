@@ -6,7 +6,7 @@
   >
     design
     <!-- 简化版头部（仅 Logo 和基本导航） -->
-    <TemplateEngine template="header">
+    <TemplateEngine v-if="!useDecorationDrivenChrome" template="header">
       <template #header>
         <HeaderBarSimple />
       </template>
@@ -85,6 +85,20 @@ function toCamelCase(str: string): string {
 
 const selectedWidget = ref<SelectedWidget | null>(null)
 const { notifySelection } = useDesignMode()
+const route = useRoute()
+const isEmbedded = ref(false)
+if (import.meta.client) {
+  try {
+    isEmbedded.value = window.parent !== window
+  } catch {
+    isEmbedded.value = false
+  }
+}
+const isDecorationPreview = computed(
+  () => String(route.query.preview || '') === 'true' || isEmbedded.value
+)
+const isHomePage = computed(() => route.path === '/')
+const useDecorationDrivenChrome = computed(() => isDecorationPreview.value || isHomePage.value)
 
 // 计算绝对位置
 const getAbsolutePosition = (el: HTMLElement) => {

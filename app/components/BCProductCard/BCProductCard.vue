@@ -4,7 +4,7 @@
     class="sp-product-card h-full block group relative opacity-0 translate-y-4"
     :class="{ 'sp-product-card--visible': isVisible }"
   >
-    <NuxtLink :to="localePath(`/products/${product.itemId}`)" class="flex flex-col h-full">
+    <NuxtLink :to="productLink" class="flex flex-col h-full">
       <!-- 商品图片容器 - 正方形 1:1 -->
       <div class="sp-product-card__image relative overflow-hidden aspect-square w-full">
         <!-- 商品图片 -->
@@ -34,7 +34,7 @@
         </h2>
 
         <!-- 价格区域 -->
-        <div class="sp-product-card__price w-full flex flex-col items-center">
+        <div v-if="showPrice" class="sp-product-card__price w-full flex flex-col items-center">
           <ECPrice
             :amount="getCurrentPrice()"
             class-name="text-[#191a1d] font-sans"
@@ -67,13 +67,18 @@ interface Props {
   product: IProduct
   /** 商品名称最大行数 */
   titleLines?: number
+  showPrice?: boolean
+  showAddCart?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   titleLines: 2,
+  showPrice: true,
+  showAddCart: true,
 })
 const localePath = useLocalePath()
 const { t } = useI18n()
+const productLink = computed(() => localePath(`/products/${props.product.itemId}` as any))
 
 // BBC 模式判断（NUXT_PUBLIC_BUSINESS_MODE=bbc 时为 BBC 模式）
 const isBBC = computed(() => getBusinessMode() === 'bbc')

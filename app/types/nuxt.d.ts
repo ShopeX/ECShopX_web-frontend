@@ -1,8 +1,11 @@
+import type { Component } from 'vue'
+
 /// <reference types="nuxt" />
 
 declare module '#app' {
   interface NuxtApp {
     $fetch: typeof import('ofetch').$fetch
+    $decorationRegistry: Record<string, Component>
   }
 }
 

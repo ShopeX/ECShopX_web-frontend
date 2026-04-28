@@ -242,7 +242,6 @@ export default defineNuxtPlugin({
       },
 
       async onResponseError({ response, error, options }) {
-        debugger
         // 错误日志
         console.error(`[API Error] ${response?.status || 'Network'} ${response?.url || ''}`)
 

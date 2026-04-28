@@ -5,6 +5,7 @@
       ref="headerContainerRef"
       class="header-container sticky top-0 z-50 bg-white"
       :class="hideMobileHeader ? 'hidden lg:block' : ''"
+      v-if="!useDecorationDrivenChrome"
     >
       <TemplateEngine template="header">
         <template #header>
@@ -15,6 +16,8 @@
           />
         </template>
       </TemplateEngine>
+      <!-- Web 端商城导航菜单（管理后台配置的 key，如 header_nav） -->
+      <DecorationNavMenu menu-key="header_nav" />
     </div>
 
     <!-- 页面内容区域 -->
@@ -23,7 +26,7 @@
     </main>
 
     <!-- Footer 区域 -->
-    <div :class="hideMobileFooter ? 'hidden lg:block' : ''">
+    <div v-if="!useDecorationDrivenChrome" :class="hideMobileFooter ? 'hidden lg:block' : ''">
       <BCFooter />
     </div>
 
@@ -72,6 +75,20 @@ import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
 
 const router = useRouter()
 const route = useRoute()
+const isEmbedded = ref(false)
+if (import.meta.client) {
+  try {
+    isEmbedded.value = window.parent !== window
+  } catch {
+    isEmbedded.value = false
+  }
+}
+const isDecorationPreview = computed(
+  () => String(route.query.preview || '') === 'true' || isEmbedded.value
+)
+const isHomePage = computed(() => route.path === '/')
+// 首页头尾统一由 app/pages/index.vue 的 DecorationRenderer 负责，避免与 layout 的模板引擎混用。
+const useDecorationDrivenChrome = computed(() => isDecorationPreview.value || isHomePage.value)
 
 const hideMobileHeader = computed(() => Boolean(route.meta.hideMobileHeader))
 const hideMobileFooter = computed(() => Boolean(route.meta.hideMobileFooter))

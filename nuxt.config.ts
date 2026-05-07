@@ -42,7 +42,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/?preview=true': { ssr: false },
+    '/?designMode=1': { ssr: false },
   },
 
   // 源码目录
@@ -154,6 +154,13 @@ export default defineNuxtConfig({
         pathPrefix: false,
       },
       '~/templateEngines',
+      // DecorationRenderer 等使用的宿主组件在 decoration-engine 下，需参与自动注册
+      {
+        path: '~/decoration-engine/components',
+        extensions: ['vue'],
+        pattern: '**/*.vue',
+        pathPrefix: false,
+      },
     ],
   },
 })

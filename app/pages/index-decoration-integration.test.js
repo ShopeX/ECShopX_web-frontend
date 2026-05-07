@@ -9,25 +9,41 @@ const read = (relativePath) => readFileSync(path.resolve(cwd, relativePath), 'ut
 
 test('homepage integrates preview mode, SSR decoration fetch, and renderer fallback', () => {
   const source = read('app/pages/index.vue')
+  const renderer = read('app/decoration-engine/components/DecorationRenderer.vue')
 
-  assert.match(source, /preview === 'true'/)
+  assert.match(source, /useDecorationRouteContext/)
+  assert.match(source, /useDecorationPageDslFetch/)
   assert.match(source, /useDecorationPreview/)
-  assert.match(source, /useFetch\(['"]\/api\/decoration\/home['"]/)
+  assert.match(source, /DECORATION_PAGE_TYPE/)
   assert.match(source, /DecorationRenderer/)
-  assert.match(source, /section-click|focusSection/)
   assert.match(
     source,
     /hasDecorationSections|shouldRenderDecoration|renderDsl/
   )
+  assert.match(renderer, /onSectionActivate/)
+  assert.match(renderer, /focusSection/)
+  assert.match(renderer, /useDecorationRouteContext/)
 })
 
-test('nuxt config exposes decoration env and preview route rule', () => {
+test('decoration route + DSL fetch composables exist for multi-page reuse', () => {
+  const routeCtx = read('app/decoration-engine/composables/useDecorationRouteContext.ts')
+  const dslFetch = read('app/decoration-engine/composables/useDecorationPageDslFetch.ts')
+
+  assert.match(routeCtx, /useDecorationRouteContext/)
+  assert.match(routeCtx, /isDecorationPreviewRouteQuery/)
+  assert.match(routeCtx, /isDecorationPreviewActiveOnRoute/)
+  assert.match(routeCtx, /isEmbeddedDecorPreview/)
+  assert.match(dslFetch, /useDecorationPageDslFetch/)
+  assert.match(dslFetch, /options\.pageType/)
+})
+
+test('nuxt config exposes decoration env and decoration preview route rules', () => {
   const source = read('nuxt.config.ts')
 
   assert.match(source, /decorationAdminOrigin/)
   assert.match(source, /decorationAdminOrigins/)
   assert.match(source, /routeRules/)
-  assert.match(source, /preview/)
+  assert.match(source, /designMode=1/)
 })
 
 test('server decoration API routes exist for page and global dsl reads', () => {

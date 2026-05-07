@@ -12,10 +12,55 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/log'
+
 const router = useRouter()
+const route = useRoute()
+
+/** 装修后台 iframe（designMode=1）时隐藏 html/body 滚动条（滚动仍可用） */
+function decorationPreviewScrollbarHideActive(): boolean {
+  if (route.query.designMode === '1') {
+    return true
+  }
+  if (import.meta.client) {
+    try {
+      return window.parent !== window
+    } catch {
+      return false
+    }
+  }
+  return false
+}
+
+function applyDecorationPreviewScrollbarClass() {
+  if (!import.meta.client) {
+    return
+  }
+  const el = document.documentElement
+  if (!el) {
+    return
+  }
+  if (decorationPreviewScrollbarHideActive()) {
+    el.classList.add('decoration-preview-hide-scrollbar')
+  } else {
+    el.classList.remove('decoration-preview-hide-scrollbar')
+  }
+}
+
+watch(
+  () => [route.query.designMode, route.fullPath],
+  () => applyDecorationPreviewScrollbarClass(),
+  { flush: 'post' }
+)
 
 onMounted(() => {
   logger.info(router)
+  applyDecorationPreviewScrollbarClass()
+})
+
+onBeforeUnmount(() => {
+  if (import.meta.client) {
+    document.documentElement.classList.remove('decoration-preview-hide-scrollbar')
+  }
 })
 </script>
 
@@ -33,6 +78,26 @@ body {
   padding: 0;
   background-color: #f9fafb; /* bg-gray-50 的颜色 */
   color: #111827; /* text-gray-900 的颜色 */
+}
+
+/* 管理后台嵌入的装修预览：隐藏主文档滚动条，避免 iframe 内出现粗滚动条 */
+html.decoration-preview-hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html.decoration-preview-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+html.decoration-preview-hide-scrollbar body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html.decoration-preview-hide-scrollbar body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 #__nuxt {

@@ -2,16 +2,16 @@
   <div class="flex flex-col">
     <template v-if="hasRenderableSections">
       <template v-for="sectionId in dsl.order" :key="sectionId">
-        <DecorationSectionHost
-          v-if="shouldRenderSection(sectionId)"
-          :section-id="sectionId"
-        >
+        <DecorationSectionHost v-if="shouldRenderSection(sectionId)" :section-id="sectionId">
+          <!-- 与 TemplateEngine 一致：父级传入与 sectionId 同名的具名插槽时，替代 registry 区块组件 -->
+          <slot v-if="hasNamedSlot(sectionId)" :name="sectionId" />
           <component
+            v-else
             :is="resolveSectionComponent(sectionId)"
             :section="dsl.sections[sectionId]"
             :section-id="sectionId"
             :is-preview="isPreview"
-            @click="emit('section-click', sectionId)"
+            @click="onSectionActivate(sectionId)"
           />
         </DecorationSectionHost>
       </template>
@@ -24,42 +24,51 @@
     </div>
     <slot v-else />
   </div>
-  <Teleport v-if="isPreview && overlayTarget" :to="overlayTarget">
-    <div
-      class="pointer-events-none absolute inset-x-0 top-0 z-9999"
-      :style="{ height: `${overlayDocHeight}px` }"
-    >
-      <div
-        v-if="selectedSectionOverlay"
-        class="absolute border-2 border-[#3b82f6] bg-transparent"
-        :style="selectedSectionOverlay"
-      />
-      <div
-        v-for="item in dashedBlockOverlays"
-        :key="item.key"
-        class="absolute border border-dashed border-[#6366f1] bg-transparent"
-        :style="item.style"
-      />
-      <div
-        v-if="activeBlockOverlay"
-        class="absolute border-2 border-[#6366f1] bg-transparent"
-        :style="activeBlockOverlay"
-      />
-    </div>
-  </Teleport>
 </template>
 
 <script setup lang="ts">
-import type { Component, Ref } from 'vue'
-import type { DecorationDSL, DecorationHighlightedBlock } from '~/decoration-engine/types/decoration'
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  shallowRef,
+  toRef,
+  useSlots,
+  watch,
+  type Component,
+  type Ref,
+  type WatchStopHandle,
+} from 'vue'
+import type {
+  DecorationDSL,
+  DecorationHighlightedBlock,
+  PageType,
+} from '~/decoration-engine/types/decoration'
 import {
   decorationEditKey,
   type DecorationEditContext,
 } from '~/decoration-engine/composables/useDecorationEditContext'
+import {
+  bindHighlightedBlockToPreviewStore,
+  getDecorationPreviewEditContext,
+} from '~/decoration-engine/composables/useDecorationPreviewEditStore'
+import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
+import { useDecorationRouteContext } from '~/decoration-engine/composables/useDecorationRouteContext'
 
 const props = defineProps<{
   dsl: DecorationDSL
+  /**
+   * 仅用于「路由上不是预览，但仍要打开预览行为」时显式传 `true`。
+   * 路由/embed 已判定为预览（`useDecorationRouteContext().isPreview`）时 **始终为预览**，勿用 `false` 试图关闭（`false` 在部分环境下会被误当成已传 prop，覆盖路由）。
+   */
   isPreview?: boolean
+  /**
+   * 预览会话 key：必须与 useDecorationPreview(pageType) 的 pageType 对齐。
+   * 典型问题：global/header/footer 子集 DSL 的 pageType 可能是 `global`，而页面主体是 `home`，
+   * 若按 dsl.pageType 拆分编辑态，会导致 rects/pinned 与 overlay 读取的不是同一份状态。
+   */
+  previewSessionKey?: PageType | string | null
   highlightedBlock?: DecorationHighlightedBlock | null
 }>()
 
@@ -72,119 +81,197 @@ const sectionRegistry = computed<Record<string, Component>>(
   () => ($decorationRegistry || {}) as Record<string, Component>
 )
 
-const pinnedSectionId = ref<string | null>(null)
-const hoverSectionId = ref<string | null>(null)
-const hoveredBlock = ref<{ sectionId: string; blockId: string } | null>(null)
-const overlayTarget = ref<HTMLElement | null>(null)
-const overlayDocHeight = ref(0)
-const sectionRects = ref<Record<string, { top: number; left: number; width: number; height: number }>>({})
-const blockRects = ref<
-  Record<string, { sectionId: string; blockId: string; top: number; left: number; width: number; height: number }>
->({})
-const isPreview = computed(() => Boolean(props.isPreview))
-const highlightedBlock = toRef(props, 'highlightedBlock') as Readonly<Ref<DecorationHighlightedBlock | null | undefined>>
+/** 父级具名插槽名集合（不含 default），slot 名需与 dsl.order 中的 sectionId 一致 */
+const slots = useSlots()
+const namedSlotKeys = computed(() => Object.keys(slots).filter((name) => name !== 'default'))
 
-function tryClearHoveredFromBlock(e: PointerEvent, sectionId: string, blockId: string) {
-  if (hoveredBlock.value?.sectionId !== sectionId || hoveredBlock.value?.blockId !== blockId) {
-    return
-  }
-  const next = e.relatedTarget
-  if (next && next instanceof Element) {
-    const el = next.closest?.('[data-decoration-block]')
-    if (el) {
-      const d = el.getAttribute('data-decoration-block') || ''
-      if (d.startsWith(`${sectionId}::`)) {
-        return
-      }
-    }
-  }
-  hoveredBlock.value = null
+function hasNamedSlot(sectionId: string): boolean {
+  return namedSlotKeys.value.includes(sectionId)
 }
 
-const editContext: DecorationEditContext = {
-  isPreview,
-  pinnedSectionId,
-  hoverSectionId,
-  hoveredBlock,
-  highlightedBlock,
-  setPinnedSection: (id) => {
-    pinnedSectionId.value = id
-  },
-  setHoverSection: (id) => {
-    hoverSectionId.value = id
-  },
-  setHoveredBlock: (sectionId, blockId) => {
-    hoveredBlock.value = { sectionId, blockId }
-  },
-  tryClearHoveredFromBlock,
-  sectionRects,
-  blockRects,
-  setSectionRect: (sectionId, rect) => {
-    sectionRects.value = {
-      ...sectionRects.value,
-      [sectionId]: rect,
-    }
-  },
-  setBlockRect: (sectionId, blockId, rect) => {
-    blockRects.value = {
-      ...blockRects.value,
-      [`${sectionId}::${blockId}`]: {
-        sectionId,
-        blockId,
-        ...rect,
-      },
-    }
-  },
-}
+const { isPreview: routeIsPreview, route } = useDecorationRouteContext()
+/** 路由/embed 优先；仅 `props.isPreview === true` 可在非预览路由下强制预览 */
+const isPreview = computed(
+  () => routeIsPreview.value || props.isPreview === true
+)
+const highlightedBlock = toRef(props, 'highlightedBlock') as Readonly<
+  Ref<DecorationHighlightedBlock | null | undefined>
+>
 
-provide(decorationEditKey, editContext)
+const previewEditPageType = computed<PageType>(() => {
+  const key = props.previewSessionKey
+  if (
+    key === 'home' ||
+    key === 'list' ||
+    key === 'detail' ||
+    key === 'custom' ||
+    key === 'global'
+  ) {
+    return key
+  }
+  return props.dsl.pageType
+})
 
-let overlayResizeObserver: ResizeObserver | null = null
+const { initPreview, focusSection } = useDecorationPreview(() => previewEditPageType.value)
 
-function updateOverlayDocHeight() {
-  if (!import.meta.client) return
-  const doc = document.documentElement
-  const body = document.body
-  overlayDocHeight.value = Math.max(
-    doc?.scrollHeight || 0,
-    doc?.clientHeight || 0,
-    body?.scrollHeight || 0,
-    body?.clientHeight || 0
-  )
+function onSectionActivate(sectionId: string) {
+  if (isPreview.value) {
+    focusSection(sectionId)
+  }
+  emit('section-click', sectionId)
 }
 
 onMounted(() => {
-  const id = 'decoration-overlay-root'
-  let target = document.getElementById(id)
-  if (!target) {
-    target = document.createElement('div')
-    target.id = id
+  if (import.meta.dev) {
+    console.info('[ecshopx-decoration-handshake] DecorationRenderer mounted', {
+      isPreview: isPreview.value,
+      routeIsPreview: routeIsPreview.value,
+      propsIsPreview: props.isPreview,
+      designMode: route.query.designMode,
+      fullPath: route.fullPath,
+      previewSessionKey: props.previewSessionKey,
+      inIframe: (() => {
+        try {
+          return window.parent !== window
+        } catch {
+          return 'unavailable'
+        }
+      })(),
+    })
   }
-  target.setAttribute('data-decoration-overlay-root', '1')
-  document.body.appendChild(target)
-  overlayTarget.value = target
-  updateOverlayDocHeight()
-  overlayResizeObserver = new ResizeObserver(() => updateOverlayDocHeight())
-  overlayResizeObserver.observe(document.documentElement)
-  overlayResizeObserver.observe(document.body)
-  window.addEventListener('resize', updateOverlayDocHeight)
+  if (isPreview.value) {
+    initPreview()
+  } else if (import.meta.dev) {
+    console.warn('[ecshopx-decoration-handshake] 未调用 initPreview：isPreview=false')
+  }
 })
 
-onBeforeUnmount(() => {
-  overlayResizeObserver?.disconnect()
-  overlayResizeObserver = null
-  window.removeEventListener('resize', updateOverlayDocHeight)
-  if (overlayTarget.value && overlayTarget.value.parentNode) {
-    overlayTarget.value.parentNode.removeChild(overlayTarget.value)
+watch(isPreview, (v) => {
+  if (import.meta.client && v) {
+    initPreview()
   }
-  overlayTarget.value = null
+})
+
+function createLocalEditContext(): DecorationEditContext {
+  const localIsPreview = computed(() => false)
+  const pinnedSectionId = ref<string | null>(null)
+  const hoverSectionId = ref<string | null>(null)
+  const hoveredBlock = ref<{ sectionId: string; blockId: string } | null>(null)
+  const sectionRects = ref<
+    Record<string, { top: number; left: number; width: number; height: number }>
+  >({})
+  const blockRects = ref<
+    Record<
+      string,
+      {
+        sectionId: string
+        blockId: string
+        top: number
+        left: number
+        width: number
+        height: number
+      }
+    >
+  >({})
+
+  function tryClearHoveredFromBlock(e: PointerEvent, sectionId: string, blockId: string) {
+    if (hoveredBlock.value?.sectionId !== sectionId || hoveredBlock.value?.blockId !== blockId) {
+      return
+    }
+    const next = e.relatedTarget
+    if (next && next instanceof Element) {
+      const el = next.closest?.('[data-decoration-block]')
+      if (el) {
+        const d = el.getAttribute('data-decoration-block') || ''
+        if (d.startsWith(`${sectionId}::`)) {
+          return
+        }
+      }
+    }
+    hoveredBlock.value = null
+  }
+
+  return {
+    isPreview: localIsPreview,
+    pinnedSectionId,
+    hoverSectionId,
+    hoveredBlock,
+    highlightedBlock,
+    setPinnedSection: (id) => {
+      pinnedSectionId.value = id
+    },
+    setHoverSection: (id) => {
+      hoverSectionId.value = id
+    },
+    setHoveredBlock: (sectionId, blockId) => {
+      hoveredBlock.value = { sectionId, blockId }
+    },
+    tryClearHoveredFromBlock,
+    sectionRects,
+    blockRects,
+    setSectionRect: (sectionId, rect) => {
+      sectionRects.value = {
+        ...sectionRects.value,
+        [sectionId]: rect,
+      }
+    },
+    setBlockRect: (sectionId, blockId, rect) => {
+      blockRects.value = {
+        ...blockRects.value,
+        [`${sectionId}::${blockId}`]: {
+          sectionId,
+          blockId,
+          ...rect,
+        },
+      }
+    },
+  }
+}
+
+const editContextRef = shallowRef<DecorationEditContext>(
+  isPreview.value
+    ? getDecorationPreviewEditContext(previewEditPageType.value)
+    : createLocalEditContext()
+)
+
+watch(
+  () => [isPreview.value, previewEditPageType.value] as const,
+  ([nextPreview, pageType]) => {
+    editContextRef.value = nextPreview
+      ? getDecorationPreviewEditContext(pageType)
+      : createLocalEditContext()
+  }
+)
+
+let stopHighlightBind: WatchStopHandle | null = null
+
+watch(
+  () => [isPreview.value, previewEditPageType.value] as const,
+  ([nextPreview, pageType]) => {
+    stopHighlightBind?.()
+    stopHighlightBind = null
+    if (!nextPreview) {
+      return
+    }
+    stopHighlightBind = bindHighlightedBlockToPreviewStore(pageType, highlightedBlock)
+  },
+  { immediate: true }
+)
+
+provide(decorationEditKey, editContextRef)
+
+const editContext = computed(() => editContextRef.value)
+
+onBeforeUnmount(() => {
+  stopHighlightBind?.()
+  stopHighlightBind = null
 })
 
 /** 后台选中时同步「点击态」选区边框（pinned），与指针 hover 独立 */
 watch(
   () => props.highlightedBlock,
   (hb) => {
-    pinnedSectionId.value = hb?.sectionId ?? null
+    editContext.value.setPinnedSection(hb?.sectionId ?? null)
   },
   { immediate: true, deep: true }
 )
@@ -193,6 +280,10 @@ const shouldRenderSection = (sectionId: string) => {
   const section = props.dsl.sections[sectionId]
   if (!section || section.disabled) {
     return false
+  }
+
+  if (hasNamedSlot(sectionId)) {
+    return true
   }
 
   return Boolean(sectionRegistry.value[section.type])
@@ -212,67 +303,5 @@ const hasRenderableSections = computed(() => {
     return false
   }
   return props.dsl.order.some((sectionId) => shouldRenderSection(sectionId))
-})
-
-const selectedSectionOverlay = computed(() => {
-  const sid = pinnedSectionId.value
-  if (!sid) {
-    return null
-  }
-  const rect = sectionRects.value[sid]
-  if (!rect) {
-    return null
-  }
-  return {
-    top: `${rect.top}px`,
-    left: `${rect.left}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-  }
-})
-
-const activeBlockKey = computed(() => {
-  if (hoveredBlock.value?.sectionId && hoveredBlock.value?.blockId) {
-    return `${hoveredBlock.value.sectionId}::${hoveredBlock.value.blockId}`
-  }
-  if (highlightedBlock.value?.sectionId && highlightedBlock.value?.blockId) {
-    return `${highlightedBlock.value.sectionId}::${highlightedBlock.value.blockId}`
-  }
-  return ''
-})
-
-const activeBlockOverlay = computed(() => {
-  if (!activeBlockKey.value) {
-    return null
-  }
-  const rect = blockRects.value[activeBlockKey.value]
-  if (!rect) {
-    return null
-  }
-  return {
-    top: `${rect.top}px`,
-    left: `${rect.left}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-  }
-})
-
-const dashedBlockOverlays = computed(() => {
-  const sid = hoverSectionId.value
-  if (!sid) {
-    return []
-  }
-  return Object.keys(blockRects.value)
-    .map((key) => ({ key, ...blockRects.value[key] }))
-    .filter((item) => item.sectionId === sid && item.key !== activeBlockKey.value)
-    .map((item) => ({
-      key: item.key,
-      style: {
-        top: `${item.top}px`,
-        left: `${item.left}px`,
-        width: `${item.width}px`,
-        height: `${item.height}px`,
-      },
-    }))
 })
 </script>

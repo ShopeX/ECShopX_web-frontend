@@ -69,6 +69,7 @@
 
 <script setup lang="ts">
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
+import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 
 interface HotspotBlock {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core'
 import type { HTMLAttributes, StyleValue } from 'vue'
+import { useDecorationEditOrDisabled } from '~/decoration-engine/composables/useDecorationEditContext'
 
 const props = defineProps<{
   sectionId: string

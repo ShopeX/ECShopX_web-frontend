@@ -1,65 +1,127 @@
 <template>
-  <div class="min-h-screen bg-gray-50" :style="layoutCssVars">
-    <!-- 头部导航栏 - 支持 CMS 装修，API 失败时自动使用默认模板 -->
-    <div
-      ref="headerContainerRef"
-      class="header-container sticky top-0 z-50 bg-white"
-      :class="hideMobileHeader ? 'hidden lg:block' : ''"
-      v-if="!useDecorationDrivenChrome"
-    >
-      <TemplateEngine template="header">
-        <template #header>
-          <BCHeaderBar
-            @open-category-nav="handleOpenCategoryNav"
-            @open-mini-cart="handleOpenMiniCart"
-            @open-search="handleOpenSearch"
-          />
-        </template>
-      </TemplateEngine>
-      <!-- Web 端商城导航菜单（管理后台配置的 key，如 header_nav） -->
-      <DecorationNavMenu menu-key="header_nav" />
-    </div>
+  <div
+    class="min-h-screen bg-gray-50"
+    @click.capture="onLayoutPointerCapture"
+    @mousedown.capture="onLayoutPointerCapture"
+  >
+    <DecorationPreviewSelectionOverlay
+      v-if="isDecorationPreview"
+      :page-type="decorationPreviewOverlayPageType"
+    />
 
-    <!-- 页面内容区域 -->
-    <main class="mx-auto">
+    <!-- 头区：仅由头区装修 DSL 渲染（设计器下可通过 #header 插槽叠 BCHeaderBar） -->
+    <DecorationRenderer
+      v-if="shouldRenderHeaderDecoration"
+      :dsl="resolvedHeaderDecorationDsl"
+      :preview-session-key="decorationPreviewSessionKey"
+      :highlighted-block="props.highlightedBlock"
+      :data-testid="
+        isDecorationRouteDesignMode
+          ? 'design-layout-decoration-renderer-header'
+          : 'layout-decoration-renderer-header'
+      "
+      @section-click="emit('section-click', $event)"
+    >
+      <template v-if="isDecorationRouteDesignMode" #header>
+        <BCHeaderBar v-on="headerBarNavHandlers" />
+      </template>
+    </DecorationRenderer>
+
+    <main
+      :class="
+        isDecorationRouteDesignMode
+          ? [
+              'py-0',
+              isDecorationPreview
+                ? 'w-full max-w-none px-0'
+                : 'container mx-auto px-0 md:px-4 md:py-8',
+            ]
+          : 'mx-auto'
+      "
+    >
       <slot />
     </main>
 
-    <!-- Footer 区域 -->
-    <div v-if="!useDecorationDrivenChrome" :class="hideMobileFooter ? 'hidden lg:block' : ''">
-      <BCFooter />
+    <template v-if="!isDecorationRouteDesignMode">
+      <DecorationRenderer
+        v-if="shouldRenderFooterDecoration"
+        :dsl="resolvedFooterDecorationDsl"
+        :preview-session-key="decorationPreviewSessionKey"
+        :highlighted-block="props.highlightedBlock"
+        data-testid="layout-decoration-renderer-footer"
+        @section-click="emit('section-click', $event)"
+      />
+
+      <div
+        v-if="!shouldRenderFooterDecoration && !isDecorationPreview"
+        :class="hideMobileFooter ? 'hidden lg:block' : ''"
+      >
+        <BCFooter />
+      </div>
+
+      <USlideover v-model:open="showSearchDrawer" side="left">
+        <template #content>
+          <BCSearchDrawer
+            v-model="showSearchDrawer"
+            :hot-keywords="hotKeywords"
+            @close="showSearchDrawer = false"
+            @search="handleSearch"
+          />
+        </template>
+      </USlideover>
+
+      <USlideover v-model:open="showCategoryNav" side="left">
+        <template #content>
+          <BCCategoryNav
+            v-model="showCategoryNav"
+            @close="showCategoryNav = false"
+            @search="handleCategorySearch"
+            @change-region="handleChangeRegion"
+          />
+        </template>
+      </USlideover>
+
+      <USlideover v-model:open="showMiniCart" side="right">
+        <template #content>
+          <BCMiniCart v-model="showMiniCart" @close="showMiniCart = false" />
+        </template>
+      </USlideover>
+    </template>
+
+    <!-- designMode=1：区块选中 overlay -->
+    <div
+      v-if="isDecorationRouteDesignMode && selectedWidget"
+      class="selection-overlay absolute pointer-events-none z-50 rounded-none border-2 border-primary-500 transition-all duration-75"
+      :style="{
+        top: `${selectedWidget.top}px`,
+        left: `${selectedWidget.left}px`,
+        width: `${selectedWidget.width}px`,
+        height: `${selectedWidget.height}px`,
+      }"
+    >
+      <div
+        class="absolute top-0 left-0 -translate-y-full rounded-none bg-primary-500 px-2 py-1 text-xs text-white pointer-events-auto"
+      >
+        {{ selectedWidget.label || 'Widget' }}
+      </div>
+
+      <div
+        class="absolute right-0 top-0 translate-x-full ml-2 flex flex-col gap-1 pointer-events-auto bg-white shadow-lg border border-gray-100 rounded p-1"
+      >
+        <button class="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Move Up">
+          <UIcon name="i-heroicons-arrow-up" class="w-4 h-4" />
+        </button>
+        <button class="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Move Down">
+          <UIcon name="i-heroicons-arrow-down" class="w-4 h-4" />
+        </button>
+        <button class="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Duplicate">
+          <UIcon name="i-heroicons-document-duplicate" class="w-4 h-4" />
+        </button>
+        <button class="p-1.5 hover:bg-red-50 rounded text-red-500" title="Delete">
+          <UIcon name="i-heroicons-trash" class="w-4 h-4" />
+        </button>
+      </div>
     </div>
-
-    <!-- 全局搜索抽屉 - 使用 USlideover 包裹，和分类导航一致 -->
-    <USlideover v-model:open="showSearchDrawer" side="left">
-      <template #content>
-        <BCSearchDrawer
-          v-model="showSearchDrawer"
-          :hot-keywords="hotKeywords"
-          @close="showSearchDrawer = false"
-          @search="handleSearch"
-        />
-      </template>
-    </USlideover>
-
-    <!-- 分类导航侧边栏 -->
-    <USlideover v-model:open="showCategoryNav" side="left">
-      <template #content>
-        <BCCategoryNav
-          v-model="showCategoryNav"
-          @close="showCategoryNav = false"
-          @search="handleCategorySearch"
-          @change-region="handleChangeRegion"
-        />
-      </template>
-    </USlideover>
-
-    <!-- Mini 购物车侧边栏 -->
-    <USlideover v-model:open="showMiniCart" side="right">
-      <template #content>
-        <BCMiniCart v-model="showMiniCart" @close="showMiniCart = false" />
-      </template>
-    </USlideover>
   </div>
 </template>
 
@@ -70,67 +132,84 @@ import BCFooter from '~/components/BCFooter/BCFooter.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
 import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
 import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
+import { useDesignMode } from '~/composables/useDesignMode'
+import {
+  useShopLayoutDecoration,
+  type ShopLayoutDecorationBindProps,
+} from '~/composables/useShopLayoutDecoration'
+import DecorationPreviewSelectionOverlay from '~/decoration-engine/components/DecorationPreviewSelectionOverlay.vue'
+import DecorationRenderer from '~/decoration-engine/components/DecorationRenderer.vue'
+import schemaMap from '~/templateEngines/schema'
 
-// 默认布局组件 - 使用完整的电商头部
+interface SelectedWidget {
+  el: HTMLElement
+  top: number
+  left: number
+  width: number
+  height: number
+  label?: string
+  widgetName?: string
+  schemaConfig?: unknown
+}
+
+function toCamelCase(str: string): string {
+  return str
+    .replace(/[-_\s]+(.)?/g, (_, chr: string | undefined) => (chr ? chr.toUpperCase() : ''))
+    .replace(/^([A-Z])/, (m) => m.toLowerCase())
+}
+
+const props = withDefaults(defineProps<ShopLayoutDecorationBindProps>(), {
+  headerDecorationDsl: null,
+  footerDecorationDsl: null,
+  decorationPreview: false,
+  decorationPreviewSessionKey: null,
+  highlightedBlock: null,
+})
+
+const emit = defineEmits<{
+  (e: 'section-click', sectionId: string): void
+}>()
+
+const {
+  route,
+  isDecorationPreview,
+  isDecorationRouteDesignMode,
+  decorationPreviewSessionKey,
+  decorationPreviewOverlayPageType,
+  shouldRenderHeaderDecoration,
+  shouldRenderFooterDecoration,
+  resolvedHeaderDecorationDsl,
+  resolvedFooterDecorationDsl,
+} = useShopLayoutDecoration(props)
+
+const hideMobileFooter = computed(() => Boolean(route.meta.hideMobileFooter))
+
+const showCategoryNav = ref(false)
+const showMiniCart = ref(false)
+const showSearchDrawer = ref(false)
+const hotKeywords = ref(['手袋', '双十二', '新品', '手表', '香水彩妆', '珠宝腕表', '手提袋'])
 
 const router = useRouter()
-const route = useRoute()
-const isEmbedded = ref(false)
-if (import.meta.client) {
-  try {
-    isEmbedded.value = window.parent !== window
-  } catch {
-    isEmbedded.value = false
-  }
-}
-const isDecorationPreview = computed(
-  () => String(route.query.preview || '') === 'true' || isEmbedded.value
-)
-const isHomePage = computed(() => route.path === '/')
-// 首页头尾统一由 app/pages/index.vue 的 DecorationRenderer 负责，避免与 layout 的模板引擎混用。
-const useDecorationDrivenChrome = computed(() => isDecorationPreview.value || isHomePage.value)
 
-const hideMobileHeader = computed(() => Boolean(route.meta.hideMobileHeader))
-const hideMobileFooter = computed(() => Boolean(route.meta.hideMobileFooter))
-const headerContainerRef = ref<HTMLElement | null>(null)
-const headerHeight = ref(0)
-const layoutCssVars = computed(() => ({
-  '--layout-header-height': `${headerHeight.value}px`,
-}))
-
-// 分类导航侧边栏状态
-const showCategoryNav = ref(false)
-// Mini 购物车侧边栏状态
-const showMiniCart = ref(false)
-// 搜索抽屉状态
-const showSearchDrawer = ref(false)
-
-// 热门搜索关键词
-const hotKeywords = ref(['手袋', '双十二', '新品', '手表', '香水彩妆', '珠宝腕表', '手提袋'])
-let headerResizeObserver: ResizeObserver | null = null
-
-const updateHeaderHeight = () => {
-  headerHeight.value = headerContainerRef.value?.offsetHeight ?? 0
-}
-
-// 手动处理打开分类导航
 const handleOpenCategoryNav = () => {
   showCategoryNav.value = true
 }
 
-// 手动处理打开 Mini 购物车
 const handleOpenMiniCart = () => {
   showMiniCart.value = true
 }
 
-// 手动处理打开搜索抽屉
 const handleOpenSearch = () => {
   showSearchDrawer.value = true
 }
 
-/**
- * 处理搜索 - 跳转到商品列表页
- */
+/** 设计器头区插槽内 BCHeaderBar 的抽屉/导航事件 */
+const headerBarNavHandlers = {
+  openCategoryNav: handleOpenCategoryNav,
+  openMiniCart: handleOpenMiniCart,
+  openSearch: handleOpenSearch,
+}
+
 const handleSearch = (keyword: string) => {
   if (keyword.trim()) {
     showSearchDrawer.value = false
@@ -141,12 +220,8 @@ const handleSearch = (keyword: string) => {
   }
 }
 
-/**
- * 处理分类导航搜索
- */
 const handleCategorySearch = (keyword: string) => {
   console.log('分类搜索:', keyword)
-  // TODO: 实现搜索逻辑，例如跳转到搜索结果页
   if (keyword.trim()) {
     showCategoryNav.value = false
     router.push({
@@ -156,26 +231,97 @@ const handleCategorySearch = (keyword: string) => {
   }
 }
 
-/**
- * 处理更改配送地区
- */
 const handleChangeRegion = () => {
   console.log('更改配送地区')
-  // TODO: 实现地区选择逻辑，例如打开地区选择弹窗
+}
+
+const selectedWidget = ref<SelectedWidget | null>(null)
+const { notifySelection } = useDesignMode()
+
+const getAbsolutePosition = (el: HTMLElement) => {
+  const rect = el.getBoundingClientRect()
+  const scrollLeft = window.scrollX ?? document.documentElement.scrollLeft
+  const scrollTop = window.scrollY ?? document.documentElement.scrollTop
+  return {
+    top: rect.top + scrollTop,
+    left: rect.left + scrollLeft,
+    width: rect.width,
+    height: rect.height,
+  }
+}
+
+const updateOverlay = () => {
+  if (selectedWidget.value?.el) {
+    if (!selectedWidget.value.el.isConnected) {
+      selectedWidget.value = null
+      return
+    }
+    const pos = getAbsolutePosition(selectedWidget.value.el)
+    selectedWidget.value.top = pos.top
+    selectedWidget.value.left = pos.left
+    selectedWidget.value.width = pos.width
+    selectedWidget.value.height = pos.height
+  }
+}
+
+const handleMouseEvent = (e: MouseEvent) => {
+  const target = e.target as HTMLElement
+
+  if (target.closest('.selection-overlay')) {
+    return
+  }
+
+  const widget = target.closest('.section-widget') as HTMLElement | null
+
+  if (widget) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (e.type === 'mousedown') {
+      const pos = getAbsolutePosition(widget)
+      const label = widget.getAttribute('data-label') || '产品系列列表'
+
+      const widgetNameAttr = widget.getAttribute('widget-name') || ''
+      const widgetNameCamel = widgetNameAttr ? toCamelCase(widgetNameAttr) : ''
+
+      const schemaConfig =
+        widgetNameCamel && Object.prototype.hasOwnProperty.call(schemaMap, widgetNameCamel)
+          ? (schemaMap as Record<string, (typeof schemaMap)[keyof typeof schemaMap]>)[
+              widgetNameCamel
+            ]
+          : undefined
+
+      selectedWidget.value = {
+        el: widget,
+        top: pos.top,
+        left: pos.left,
+        width: pos.width,
+        height: pos.height,
+        label,
+        widgetName: widgetNameCamel,
+        schemaConfig,
+      }
+
+      notifySelection(widgetNameCamel, selectedWidget.value, schemaConfig)
+    }
+  } else if (e.type === 'mousedown') {
+    selectedWidget.value = null
+    notifySelection(null)
+  }
+}
+
+const onLayoutPointerCapture = (e: MouseEvent) => {
+  if (!isDecorationRouteDesignMode.value) return
+  handleMouseEvent(e)
 }
 
 onMounted(() => {
-  updateHeaderHeight()
-  window.addEventListener('resize', updateHeaderHeight)
-
-  if (headerContainerRef.value && typeof ResizeObserver !== 'undefined') {
-    headerResizeObserver = new ResizeObserver(updateHeaderHeight)
-    headerResizeObserver.observe(headerContainerRef.value)
+  if (isDecorationRouteDesignMode.value) {
+    window.addEventListener('resize', updateOverlay)
   }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', updateHeaderHeight)
-  headerResizeObserver?.disconnect()
+  window.removeEventListener('resize', updateOverlay)
 })
 </script>

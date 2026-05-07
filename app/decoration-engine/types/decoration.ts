@@ -39,6 +39,7 @@ export interface DecorationMessage {
   payload: Record<string, unknown>
 }
 
+/** blockId 为空字符串表示仅选中分区（无具体 block），预览端用分区描边而非 block 描边 */
 export interface DecorationHighlightedBlock {
   sectionId: string
   blockId: string
@@ -65,9 +66,10 @@ export function isDecorationDSL(value: unknown): value is DecorationDSL {
 
   const candidate = value as Partial<DecorationDSL>
 
+  // pageId 允许空字符串：后台 decoration store 默认 `pageId: ''`，用 truthy 判断会误判为非法 DSL
   return Boolean(
     candidate.pageType &&
-      candidate.pageId &&
+      typeof candidate.pageId === 'string' &&
       candidate.sections &&
       typeof candidate.sections === 'object' &&
       Array.isArray(candidate.order)
@@ -82,10 +84,27 @@ export function normalizeDecorationDSL(
     return fallback
   }
 
+  const sections: Record<string, DecorationSection> = {}
+  Object.keys(value.sections || {}).forEach((sectionId) => {
+    const raw = value.sections[sectionId] as unknown as Record<string, unknown>
+    const blockOrderFromSnake = Array.isArray(raw.block_order) ? (raw.block_order as string[]) : []
+    const blockOrderFromCamel = Array.isArray(raw.blockOrder) ? (raw.blockOrder as string[]) : []
+    const block_order = blockOrderFromSnake.length ? blockOrderFromSnake : blockOrderFromCamel
+
+    const next = { ...(raw as any) } as Record<string, unknown>
+    delete next.block_order
+    delete next.blockOrder
+
+    sections[sectionId] = {
+      ...(next as unknown as DecorationSection),
+      block_order,
+    }
+  })
+
   return {
     pageType: value.pageType,
     pageId: value.pageId,
-    sections: value.sections,
+    sections,
     order: value.order,
   }
 }

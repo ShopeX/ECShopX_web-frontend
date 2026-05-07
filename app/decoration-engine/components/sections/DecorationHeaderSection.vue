@@ -14,20 +14,27 @@
       </a>
 
       <nav class="hidden items-center gap-6 md:flex">
-        <a
-          v-for="item in navItems"
-          :key="item.id"
-          :href="item.link"
-          class="text-sm text-neutral-700 transition hover:text-black"
+        <DecorationBlockHost
+          v-for="item in navBlocks"
+          :key="item.blockId"
+          :section-id="sectionId"
+          :block-id="item.blockId"
+          root-class="inline-flex min-w-0"
         >
-          {{ item.label }}
-        </a>
+          <a
+            :href="item.link"
+            class="text-sm text-neutral-700 transition hover:text-black"
+          >
+            {{ item.label }}
+          </a>
+        </DecorationBlockHost>
       </nav>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
+import DecorationBlockHost from '~/decoration-engine/components/DecorationBlockHost.vue'
 import type {
   DecorationHighlightedBlock,
   DecorationSection,
@@ -43,7 +50,8 @@ const props = defineProps<{
 const logoUrl = computed(() => String(props.section.settings.logoUrl || ''))
 const logoLink = computed(() => String(props.section.settings.logoLink || '/'))
 
-const navItems = computed(
+/** 每个导航块用 DecorationBlockHost 包一层，预览时才能上报 blockRects、画出后台选中描边 */
+const navBlocks = computed(
   () =>
     props.section.block_order
       .map((blockId) => {
@@ -55,11 +63,11 @@ const navItems = computed(
         const settings = block.settings as Record<string, unknown>
 
         return {
-          id: blockId,
+          blockId,
           label: String(settings.label || settings.title || '导航'),
           link: String(settings.link || '#'),
         }
       })
-      .filter(Boolean) as Array<{ id: string; label: string; link: string }>
+      .filter(Boolean) as Array<{ blockId: string; label: string; link: string }>
 )
 </script>

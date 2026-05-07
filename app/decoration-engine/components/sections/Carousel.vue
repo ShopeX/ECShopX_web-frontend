@@ -20,8 +20,19 @@
           :block-id="activeSlide.id"
           root-class="h-full w-full"
         >
+          <video
+            v-if="activeSlide.kind === 'video' && activeSlide.videoUrl"
+            :key="activeSlide.id"
+            :src="activeSlide.videoUrl"
+            :poster="activeSlide.posterUrl || undefined"
+            class="h-full w-full object-cover"
+            autoplay
+            muted
+            playsinline
+            loop
+          />
           <img
-            v-if="activeSlide.imageUrl"
+            v-else-if="activeSlide.kind === 'image' && activeSlide.imageUrl"
             :src="activeSlide.imageUrl"
             :alt="activeSlide.alt"
             class="h-full w-full object-cover"
@@ -91,6 +102,7 @@
 
 <script setup lang="ts">
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
+import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 
 interface CarouselSettings {
@@ -103,7 +115,10 @@ interface CarouselSettings {
 
 interface CarouselSlide {
   id: string
+  kind: 'image' | 'video'
   imageUrl: string
+  videoUrl: string
+  posterUrl: string
   link: string
   alt: string
 }
@@ -144,9 +159,13 @@ const slides = computed<CarouselSlide[]>(() =>
       }
 
       const slideSettings = block.settings as Record<string, unknown>
+      const kind = block.type === 'video' ? 'video' : 'image'
       return {
         id: blockId,
+        kind,
         imageUrl: String(slideSettings.imageUrl || ''),
+        videoUrl: String(slideSettings.videoUrl || ''),
+        posterUrl: String(slideSettings.posterUrl || ''),
         link: String(slideSettings.link || ''),
         alt: String(slideSettings.alt || props.section.title || ''),
       }

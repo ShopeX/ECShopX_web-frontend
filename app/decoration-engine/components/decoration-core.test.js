@@ -29,6 +29,13 @@ test('decoration DSL types define page and message contracts', () => {
   assert.match(source, /'BLOCK_RECT'/)
 })
 
+test('normalizeDecorationDSL maps admin blockOrder into renderer block_order', () => {
+  const source = read('app/decoration-engine/types/decoration.ts')
+  assert.match(source, /blockOrder/)
+  assert.match(source, /block_order/)
+  assert.match(source, /typeof candidate\.pageId === 'string'/)
+})
+
 test('useDecorationPreview validates origins and handles init update ready focus and block highlight messages', () => {
   const filePath = path.resolve(cwd, 'app/decoration-engine/composables/useDecorationPreview.ts')
   assert.ok(existsSync(filePath), 'app/decoration-engine/composables/useDecorationPreview.ts should exist')
@@ -68,6 +75,7 @@ test('DecorationRenderer iterates ordered sections, skips disabled ones, and res
   assert.match(source, /decorationRegistry|sectionRegistry/)
   assert.match(source, /@click|section-click/)
   assert.match(source, /<component/)
+  assert.match(source, /useSlots/)
 })
 
 for (const sectionName of [

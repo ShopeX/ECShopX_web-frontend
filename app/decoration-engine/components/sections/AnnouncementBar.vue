@@ -4,17 +4,22 @@
     :class="settings.color_mode === 'dark' ? 'bg-[#111827] text-white' : 'bg-white text-[#111827]'"
     data-section-type="announcement-bar"
   >
-    <div class="mx-auto flex max-w-[1440px] items-center px-6 py-2 text-sm md:px-12">
-      <DecorationBlockHost
-        v-if="activeBlock"
-        :section-id="sectionId"
-        :block-id="activeBlock.id"
-        root-class="min-w-0 flex-1"
-      >
-        <div class="truncate">
-          {{ activeText }}
-        </div>
-      </DecorationBlockHost>
+    <div
+      class="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-3 gap-y-1 px-6 py-2 text-sm md:px-12"
+    >
+      <template v-if="orderedBlocks.length">
+        <DecorationBlockHost
+          v-for="row in orderedBlocks"
+          :key="row.blockId"
+          :section-id="sectionId"
+          :block-id="row.blockId"
+          root-class="min-w-0 flex-1"
+        >
+          <div class="truncate">
+            {{ row.text }}
+          </div>
+        </DecorationBlockHost>
+      </template>
       <div v-else class="min-w-0 flex-1 truncate opacity-70">--</div>
     </div>
   </section>
@@ -36,20 +41,20 @@ const settings = computed(() => {
   }
 })
 
-const activeBlock = computed(() => {
-  const firstId = props.section.block_order?.[0]
-  if (!firstId) {
-    return null
-  }
-  const block = props.section.blocks?.[firstId]
-  if (!block) {
-    return null
-  }
-  return {
-    id: firstId,
-    settings: (block.settings || {}) as Record<string, unknown>,
-  }
-})
-
-const activeText = computed(() => String(activeBlock.value?.settings?.text || '--'))
+/** 每条公告独立 BlockHost，多 block 时后台选中任一条都能上报 rect */
+const orderedBlocks = computed(() =>
+  (props.section.block_order || [])
+    .map((blockId) => {
+      const block = props.section.blocks?.[blockId]
+      if (!block) {
+        return null
+      }
+      const settings = (block.settings || {}) as Record<string, unknown>
+      return {
+        blockId,
+        text: String(settings.text || '--'),
+      }
+    })
+    .filter(Boolean) as Array<{ blockId: string; text: string }>
+)
 </script>

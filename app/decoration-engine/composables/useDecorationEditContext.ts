@@ -1,4 +1,4 @@
-import { computed, inject, ref, type ComputedRef, type InjectionKey, type Ref } from 'vue'
+import { computed, inject, ref, type ComputedRef, type InjectionKey, type Ref, type ShallowRef } from 'vue'
 import type { DecorationHighlightedBlock } from '~/decoration-engine/types/decoration'
 
 interface OverlayRect {
@@ -30,33 +30,63 @@ export interface DecorationEditContext {
   setBlockRect: (sectionId: string, blockId: string, rect: OverlayRect) => void
 }
 
-export const decorationEditKey: InjectionKey<DecorationEditContext> = Symbol('decorationEdit')
+export const decorationEditKey: InjectionKey<ShallowRef<DecorationEditContext>> = Symbol('decorationEdit')
+
+const disabledDecorationEditStub: DecorationEditContext = {
+  isPreview: computed(() => false),
+  pinnedSectionId: ref(null),
+  hoverSectionId: ref(null),
+  hoveredBlock: ref(null),
+  highlightedBlock: ref(undefined),
+  setPinnedSection: () => {},
+  setHoverSection: () => {},
+  setHoveredBlock: () => {},
+  tryClearHoveredFromBlock: () => {},
+  sectionRects: ref({}),
+  blockRects: ref({}),
+  setSectionRect: () => {},
+  setBlockRect: () => {},
+}
+
+/**
+ * DecorationRenderer 在 isPreview / pageType 变化时会整体替换 provide 的 ShallowRef.value。
+ * 子组件若在 setup 里只读一次 injected.value，会永远持有「已废弃」的 ctx，setSectionRect/setBlockRect 写不进共享 store，
+ * 表现为 iframe 无选中描边。此处用 Proxy 把属性访问始终转发到最新的 injected.value。
+ */
+function createLiveDecorationEditHandle(
+  injected: ShallowRef<DecorationEditContext> | null
+): DecorationEditContext | null {
+  if (!injected) {
+    return null
+  }
+  return new Proxy({} as DecorationEditContext, {
+    get(_, prop: string | symbol) {
+      const cur = injected.value
+      if (!cur) {
+        return undefined
+      }
+      const val = (cur as Record<string | symbol, unknown>)[prop]
+      if (typeof val === 'function') {
+        return (val as (...args: unknown[]) => unknown).bind(cur)
+      }
+      return val
+    },
+  }) as DecorationEditContext
+}
 
 /**
  * 子 block 使用；非预览或未 provide 时返回 null
  */
 export function useDecorationEditOptional(): DecorationEditContext | null {
-  return inject(decorationEditKey, null)
+  const injected = inject(decorationEditKey, null)
+  return createLiveDecorationEditHandle(injected)
 }
 
 export function useDecorationEditOrDisabled(): DecorationEditContext {
-  const v = useDecorationEditOptional()
-  if (v) {
-    return v
+  const injected = inject(decorationEditKey, null)
+  const live = createLiveDecorationEditHandle(injected)
+  if (live) {
+    return live
   }
-  return {
-    isPreview: computed(() => false),
-    pinnedSectionId: ref(null),
-    hoverSectionId: ref(null),
-    hoveredBlock: ref(null),
-    highlightedBlock: ref(undefined),
-    setPinnedSection: () => {},
-    setHoverSection: () => {},
-    setHoveredBlock: () => {},
-    tryClearHoveredFromBlock: () => {},
-    sectionRects: ref({}),
-    blockRects: ref({}),
-    setSectionRect: () => {},
-    setBlockRect: () => {},
-  }
+  return disabledDecorationEditStub
 }

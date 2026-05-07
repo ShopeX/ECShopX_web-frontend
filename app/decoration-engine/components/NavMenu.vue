@@ -22,14 +22,14 @@ const topItems = computed(() => {
         :key="item.id"
         class="nav-item group relative"
       >
-        <DecorationNavMenuItem :item="item" />
+        <NavMenuItem :item="item" />
 
         <ul
           v-if="item.children && item.children.length"
           class="nav-submenu invisible absolute left-0 top-full z-50 min-w-[160px] rounded border border-gray-100 bg-white py-1 shadow-md opacity-0 transition group-hover:visible group-hover:opacity-100"
         >
           <li v-for="child in item.children" :key="child.id" class="px-3 py-1.5 hover:bg-gray-50">
-            <DecorationNavMenuItem :item="child" />
+            <NavMenuItem :item="child" />
           </li>
         </ul>
       </li>

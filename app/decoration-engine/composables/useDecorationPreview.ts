@@ -24,7 +24,7 @@ function normalizeAllowedOrigins(origins: string | undefined): string[] {
     .filter(Boolean)
 }
 
-/** 后台 PreviewCanvas 发送的 payload 为 { pageType, pageId, dsl }，DSL 在 dsl 字段内 */
+/** 兼容旧版 PreviewCanvas 发送的 { pageType, pageId, dsl }，新协议使用 pageDsl/headerDsl/footerDsl */
 function extractDslPayload(payload: Record<string, unknown>): unknown {
   if (payload && typeof payload.dsl === 'object' && payload.dsl !== null) {
     return payload.dsl
@@ -34,16 +34,50 @@ function extractDslPayload(payload: Record<string, unknown>): unknown {
 
 function extractSplitDslPayload(payload: Record<string, unknown>): {
   pageDsl: unknown
+  headerDsl: unknown
+  footerDsl: unknown
   globalDsl: unknown
 } | null {
-  const hasPage = typeof payload.pageDsl === 'object' && payload.pageDsl !== null
+  const hasPage =
+    typeof payload.pageDsl === 'object' && payload.pageDsl !== null ||
+    typeof payload.dsl === 'object' && payload.dsl !== null
+  const hasHeader = typeof payload.headerDsl === 'object' && payload.headerDsl !== null
+  const hasFooter = typeof payload.footerDsl === 'object' && payload.footerDsl !== null
   const hasGlobal = typeof payload.globalDsl === 'object' && payload.globalDsl !== null
-  if (!hasPage && !hasGlobal) {
+  if (!hasPage && !hasHeader && !hasFooter && !hasGlobal) {
     return null
   }
   return {
-    pageDsl: payload.pageDsl ?? null,
+    pageDsl: payload.pageDsl ?? payload.dsl ?? null,
+    headerDsl: payload.headerDsl ?? null,
+    footerDsl: payload.footerDsl ?? null,
     globalDsl: payload.globalDsl ?? null,
+  }
+}
+
+function pickPreviewDslSubset(
+  source: DecorationDSL | null | undefined,
+  predicate: (sectionId: string) => boolean
+): DecorationDSL | null {
+  if (!source) {
+    return null
+  }
+  const order = (source.order || []).filter((sectionId) => predicate(sectionId))
+  const sections: DecorationDSL['sections'] = {}
+  order.forEach((sectionId) => {
+    const section = source.sections?.[sectionId]
+    if (section) {
+      sections[sectionId] = section
+    }
+  })
+  if (!order.length) {
+    return null
+  }
+  return {
+    pageType: source.pageType || 'home',
+    pageId: source.pageId || 'home',
+    sections,
+    order,
   }
 }
 
@@ -120,6 +154,8 @@ function extractSelectionFromDslPayload(payload: Record<string, unknown>): Decor
   const selection =
     typeof payload.selection === 'object' && payload.selection !== null
       ? (payload.selection as Record<string, unknown>)
+      : typeof payload.sections === 'object' && payload.sections !== null
+        ? (payload.sections as Record<string, unknown>)
       : null
   if (!selection) {
     return null
@@ -151,6 +187,14 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
   /** 单页共享，避免多处调用 useDecorationPreview 时出现多份 dsl/highlight（监听只更新其中一份） */
   const dsl = useState<DecorationDSL | null>(`decoration-preview-dsl-${pageTypeKey}`, () => null)
   const pageDsl = useState<DecorationDSL | null>(`decoration-preview-page-dsl-${pageTypeKey}`, () => null)
+  const headerDsl = useState<DecorationDSL | null>(
+    `decoration-preview-header-dsl-${pageTypeKey}`,
+    () => null
+  )
+  const footerDsl = useState<DecorationDSL | null>(
+    `decoration-preview-footer-dsl-${pageTypeKey}`,
+    () => null
+  )
   const globalDsl = useState<DecorationDSL | null>(
     `decoration-preview-global-dsl-${pageTypeKey}`,
     () => null
@@ -160,28 +204,18 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     () => null
   )
   const isInitialized = ref(false)
+  const previewReadyAcked = ref(false)
+  let previewReadyRetryTimer: ReturnType<typeof setInterval> | null = null
+  let previewReadyRetryAttempts = 0
   let removeScrollListeners: (() => void) | null = null
+  const PREVIEW_READY_RETRY_DELAY = 250
+  const PREVIEW_READY_RETRY_LIMIT = 20
 
   const allowedOrigins = computed(() =>
     normalizeAllowedOrigins(config.public.decorationAdminOrigins as string | undefined)
   )
 
-  /** 接收 postMessage 时：列表 + 单独的 NUXT_PUBLIC_DECORATION_ADMIN_ORIGIN（很多人只配后者） */
-  const allowedAdminOriginsForMessages = computed(() => {
-    const list = [...allowedOrigins.value]
-    const single = String(config.public.decorationAdminOrigin || '').trim()
-    if (single && !list.includes(single)) {
-      list.push(single)
-    }
-    return list
-  })
-
   const targetOrigin = computed(() => {
-    const configuredOrigin = String(config.public.decorationAdminOrigin || '').trim()
-    if (configuredOrigin) {
-      return configuredOrigin
-    }
-
     const fromList = allowedOrigins.value[0]
     if (fromList) {
       return fromList
@@ -204,25 +238,47 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     const split = extractSplitDslPayload(raw)
     if (split) {
       pageDsl.value = normalizeDecorationDSL(split.pageDsl)
-      globalDsl.value = normalizeDecorationDSL(split.globalDsl)
+      const legacyGlobalDsl = normalizeDecorationDSL(split.globalDsl)
+      headerDsl.value =
+        normalizeDecorationDSL(split.headerDsl) ||
+        pickPreviewDslSubset(legacyGlobalDsl, (sectionId) => sectionId !== 'footer')
+      footerDsl.value =
+        normalizeDecorationDSL(split.footerDsl) ||
+        pickPreviewDslSubset(legacyGlobalDsl, (sectionId) => sectionId === 'footer')
+      globalDsl.value = legacyGlobalDsl
       // Keep legacy single dsl state for existing consumers.
       dsl.value = pageDsl.value || normalizeDecorationDSL(extractDslPayload(raw))
+      if (import.meta.dev) {
+        console.info('[ecshopx-decoration-handshake] synced preview dsl', {
+          pageOrder: pageDsl.value?.order || [],
+          headerOrder: headerDsl.value?.order || [],
+          footerOrder: footerDsl.value?.order || [],
+          pageSections: Object.keys(pageDsl.value?.sections || {}),
+          headerSections: Object.keys(headerDsl.value?.sections || {}),
+          footerSections: Object.keys(footerDsl.value?.sections || {}),
+        })
+      }
     } else {
       const nextDsl = normalizeDecorationDSL(extractDslPayload(raw))
       if (nextDsl) {
         dsl.value = nextDsl
         pageDsl.value = nextDsl
       }
+      headerDsl.value = null
+      footerDsl.value = null
       globalDsl.value = null
     }
-    // 仅当 payload 显式携带 selection 时更新高亮，避免无 selection 的推送把选中态清空
-    if (Object.prototype.hasOwnProperty.call(raw, 'selection')) {
+    // 仅当 payload 显式携带 selection/sections 时更新高亮，避免无选中态的推送把描边清空
+    if (
+      Object.prototype.hasOwnProperty.call(raw, 'selection') ||
+      Object.prototype.hasOwnProperty.call(raw, 'sections')
+    ) {
       highlightedBlock.value = extractSelectionFromDslPayload(raw)
     }
   }
 
   const handleMessage = (event: MessageEvent<DecorationMessage>) => {
-    const allowed = allowedAdminOriginsForMessages.value
+    const allowed = allowedOrigins.value
     const originOk =
       allowed.length > 0
         ? isAllowedAdminMessageOrigin(event.origin, allowed)
@@ -237,8 +293,46 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
       return
     }
 
+    if (import.meta.dev && (message.type === 'DECORATION_INIT' || message.type === 'DECORATION_UPDATE')) {
+      const payload = message.payload as Record<string, unknown>
+      console.info('[ecshopx-decoration-handshake] receive decoration payload', {
+        origin: event.origin,
+        type: message.type,
+        pageOrder: Array.isArray((payload.pageDsl as any)?.order)
+          ? ((payload.pageDsl as any).order as unknown[]).length
+          : 0,
+        headerOrder: Array.isArray((payload.headerDsl as any)?.order)
+          ? ((payload.headerDsl as any).order as unknown[]).length
+          : 0,
+        footerOrder: Array.isArray((payload.footerDsl as any)?.order)
+          ? ((payload.footerDsl as any).order as unknown[]).length
+          : 0,
+        globalOrder: Array.isArray((payload.globalDsl as any)?.order)
+          ? ((payload.globalDsl as any).order as unknown[]).length
+          : 0,
+        legacyOrder: Array.isArray((payload.dsl as any)?.order)
+          ? ((payload.dsl as any).order as unknown[]).length
+          : 0,
+        payload,
+      })
+    }
+
     if (message.type === 'DECORATION_INIT' || message.type === 'DECORATION_UPDATE') {
       syncDslFromMessage(message)
+      return
+    }
+
+    if (message.type === 'PREVIEW_READY_ACK') {
+      const raw = message as unknown as Record<string, unknown>
+      const payload = (raw.payload ?? {}) as Record<string, unknown>
+      const ackPageType = String(payload.pageType ?? '').trim()
+      if (!ackPageType || ackPageType === resolvePageType()) {
+        previewReadyAcked.value = true
+        if (previewReadyRetryTimer) {
+          clearInterval(previewReadyRetryTimer)
+          previewReadyRetryTimer = null
+        }
+      }
       return
     }
 
@@ -298,6 +392,8 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
 
     window.addEventListener('message', handleMessage)
     isInitialized.value = true
+    previewReadyAcked.value = false
+    previewReadyRetryAttempts = 0
     if (import.meta.dev) {
       devLogHandshake('initPreview 开始', {
         pageType: resolvePageType(),
@@ -331,6 +427,37 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
       type: 'PREVIEW_READY',
       payload: { pageType: resolvePageType() },
     })
+    if (!previewReadyRetryTimer) {
+      previewReadyRetryTimer = setInterval(() => {
+        if (previewReadyAcked.value) {
+          if (previewReadyRetryTimer) {
+            clearInterval(previewReadyRetryTimer)
+            previewReadyRetryTimer = null
+          }
+          return
+        }
+
+        if (previewReadyRetryAttempts >= PREVIEW_READY_RETRY_LIMIT) {
+          if (previewReadyRetryTimer) {
+            clearInterval(previewReadyRetryTimer)
+            previewReadyRetryTimer = null
+          }
+          if (import.meta.dev) {
+            devWarnHandshake('PREVIEW_READY 重试已达上限', {
+              pageType: resolvePageType(),
+              attempts: previewReadyRetryAttempts,
+            })
+          }
+          return
+        }
+
+        previewReadyRetryAttempts += 1
+        postToParent({
+          type: 'PREVIEW_READY',
+          payload: { pageType: resolvePageType() },
+        })
+      }, PREVIEW_READY_RETRY_DELAY)
+    }
     handlePreviewScroll()
   }
 
@@ -407,11 +534,17 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
       removeScrollListeners = null
       isInitialized.value = false
     }
+    if (previewReadyRetryTimer) {
+      clearInterval(previewReadyRetryTimer)
+      previewReadyRetryTimer = null
+    }
   })
 
   return {
     dsl,
     pageDsl,
+    headerDsl,
+    footerDsl,
     globalDsl,
     highlightedBlock,
     initPreview,

@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout
+  <DefaultLayout
     :header-decoration-dsl="headerRenderDsl"
     :footer-decoration-dsl="footerRenderDsl"
     :decoration-preview-session-key="DECORATION_PAGE_TYPE"
@@ -19,11 +19,12 @@
         /> -->
       </DecorationRenderer>
     </div>
-  </NuxtLayout>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
 import DecorationRenderer from '~/decoration-engine/components/DecorationRenderer.vue'
+import DefaultLayout from '~/layouts/default.vue'
 import HomePageDecorationFallback from '~/components/home/HomePageDecorationFallback.vue'
 import { useHomeData } from '~/composables/useHomeData'
 import type { IProduct } from '~/components/BCProductCard/types'
@@ -43,6 +44,8 @@ const fallbackProducts = computed(() => products.value as ReadonlyArray<IProduct
 const {
   dsl: previewDsl,
   pageDsl: previewPageDsl,
+  headerDsl: previewHeaderDsl,
+  footerDsl: previewFooterDsl,
   globalDsl: previewGlobalDsl,
   highlightedBlock,
 } = useDecorationPreview(DECORATION_PAGE_TYPE)
@@ -57,6 +60,8 @@ const { activePageDsl, headerRenderDsl, footerRenderDsl, pageRenderDsl } = useHo
   ssrDsl,
   previewDsl,
   previewPageDsl,
+  previewHeaderDsl,
+  previewFooterDsl,
   previewGlobalDsl,
 })
 

@@ -128,14 +128,8 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_DEFAULT_COUNTRY_CODE ||
         getApiCountryCodeByLocale(DEFAULT_LOCALE_CODE),
       businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // bbc 或 b2c
-      decorationAdminOrigin:
-        process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGIN ||
-        process.env.VITE_DECORATION_ADMIN_ORIGIN ||
-        '',
       decorationAdminOrigins:
-        process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS ||
-        process.env.VITE_DECORATION_ADMIN_ORIGINS ||
-        '',
+        process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS || '',
     },
   },
 

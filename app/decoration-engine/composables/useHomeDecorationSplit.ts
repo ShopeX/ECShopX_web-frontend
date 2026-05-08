@@ -1,4 +1,4 @@
-import { computed, unref, type MaybeRef } from 'vue'
+import { computed, unref, watchEffect, type MaybeRef } from 'vue'
 import { useDecorationRouteContext } from '~/decoration-engine/composables/useDecorationRouteContext'
 import {
   EMPTY_DECORATION_DSL,
@@ -38,6 +38,8 @@ export function useHomeDecorationSplit(options: {
   ssrDsl: MaybeRef<DecorationDSL | null | undefined>
   previewDsl: MaybeRef<DecorationDSL | null | undefined>
   previewPageDsl: MaybeRef<DecorationDSL | null | undefined>
+  previewHeaderDsl?: MaybeRef<DecorationDSL | null | undefined>
+  previewFooterDsl?: MaybeRef<DecorationDSL | null | undefined>
   previewGlobalDsl: MaybeRef<DecorationDSL | null | undefined>
 }) {
   const { isPreview: routeIsPreview } = useDecorationRouteContext()
@@ -55,22 +57,40 @@ export function useHomeDecorationSplit(options: {
     effectiveIsPreview.value ? unref(options.previewGlobalDsl) : null
   )
 
+  const activeHeaderDsl = computed(() =>
+    effectiveIsPreview.value ? unref(options.previewHeaderDsl) || null : null
+  )
+
+  const activeFooterDsl = computed(() =>
+    effectiveIsPreview.value ? unref(options.previewFooterDsl) || null : null
+  )
+
   const headerIds = computed(() => {
-    const order = (activeGlobalDsl.value?.order || activePageDsl.value?.order || []).slice()
+    const order = (
+      activeHeaderDsl.value?.order ||
+      activeGlobalDsl.value?.order ||
+      activePageDsl.value?.order ||
+      []
+    ).slice()
     return order.filter((id) => id !== 'footer')
   })
 
   const footerIds = computed(() => {
-    const order = (activeGlobalDsl.value?.order || activePageDsl.value?.order || []).slice()
+    const order = (
+      activeFooterDsl.value?.order ||
+      activeGlobalDsl.value?.order ||
+      activePageDsl.value?.order ||
+      []
+    ).slice()
     return order.filter((id) => id === 'footer')
   })
 
   const headerRenderDsl = computed(() =>
-    pickDecorationDslSubset(activeGlobalDsl.value || activePageDsl.value, headerIds.value)
+    pickDecorationDslSubset(activeHeaderDsl.value || activeGlobalDsl.value || activePageDsl.value, headerIds.value)
   )
 
   const footerRenderDsl = computed(() =>
-    pickDecorationDslSubset(activeGlobalDsl.value || activePageDsl.value, footerIds.value)
+    pickDecorationDslSubset(activeFooterDsl.value || activeGlobalDsl.value || activePageDsl.value, footerIds.value)
   )
 
   const pageRenderDsl = computed(() => {
@@ -86,9 +106,25 @@ export function useHomeDecorationSplit(options: {
     return pickDecorationDslSubset(source, pageOrder)
   })
 
+  if (import.meta.client && import.meta.dev) {
+    watchEffect(() => {
+      console.info('[ecshopx-decoration-handshake] split render dsl', {
+        isPreview: effectiveIsPreview.value,
+        activePageOrder: activePageDsl.value?.order || [],
+        activeHeaderOrder: activeHeaderDsl.value?.order || [],
+        activeFooterOrder: activeFooterDsl.value?.order || [],
+        headerRenderOrder: headerRenderDsl.value.order,
+        footerRenderOrder: footerRenderDsl.value.order,
+        pageRenderOrder: pageRenderDsl.value.order,
+      })
+    })
+  }
+
   return {
     activePageDsl,
     activeGlobalDsl,
+    activeHeaderDsl,
+    activeFooterDsl,
     headerRenderDsl,
     footerRenderDsl,
     pageRenderDsl,

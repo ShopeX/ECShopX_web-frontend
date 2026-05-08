@@ -10,12 +10,14 @@ const read = (relativePath) => readFileSync(path.resolve(cwd, relativePath), 'ut
 test('homepage integrates preview mode, SSR decoration fetch, and renderer fallback', () => {
   const source = read('app/pages/index.vue')
   const renderer = read('app/decoration-engine/components/DecorationRenderer.vue')
+  const layout = read('app/layouts/default.vue')
 
   assert.match(source, /useDecorationRouteContext/)
   assert.match(source, /useDecorationPageDslFetch/)
   assert.match(source, /useDecorationPreview/)
   assert.match(source, /DECORATION_PAGE_TYPE/)
   assert.match(source, /DecorationRenderer/)
+  assert.match(source, /DefaultLayout/)
   assert.match(
     source,
     /hasDecorationSections|shouldRenderDecoration|renderDsl/
@@ -23,6 +25,8 @@ test('homepage integrates preview mode, SSR decoration fetch, and renderer fallb
   assert.match(renderer, /onSectionActivate/)
   assert.match(renderer, /focusSection/)
   assert.match(renderer, /useDecorationRouteContext/)
+  assert.match(layout, /v-if="shouldRenderFooterDecoration"/)
+  assert.doesNotMatch(layout, /<template v-if="!isDecorationRouteDesignMode">\s*<DecorationRenderer/)
 })
 
 test('decoration route + DSL fetch composables exist for multi-page reuse', () => {
@@ -40,8 +44,8 @@ test('decoration route + DSL fetch composables exist for multi-page reuse', () =
 test('nuxt config exposes decoration env and decoration preview route rules', () => {
   const source = read('nuxt.config.ts')
 
-  assert.match(source, /decorationAdminOrigin/)
   assert.match(source, /decorationAdminOrigins/)
+  assert.doesNotMatch(source, /VITE_DECORATION_ADMIN_ORIGINS/)
   assert.match(source, /routeRules/)
   assert.match(source, /designMode=1/)
 })

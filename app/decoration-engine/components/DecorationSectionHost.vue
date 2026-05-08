@@ -6,6 +6,10 @@ const props = defineProps<{
   sectionId: string
 }>()
 
+const emit = defineEmits<{
+  (e: 'activate', sectionId: string): void
+}>()
+
 const ctx = useDecorationEditOptional()
 const isEditPreview = computed(() => (ctx ? unref(ctx.isPreview) : false))
 const root = ref<HTMLElement | null>(null)
@@ -42,6 +46,7 @@ function onSectionPointerDownCapture(e: PointerEvent) {
     return
   }
   ctx.setPinnedSection(props.sectionId)
+  emit('activate', props.sectionId)
   // pinned 边框依赖 sectionRects；仅 hover 才上报时，直接点击可能拿不到 rect，导致“选中无描边”
   reportSelfRect()
 }
@@ -54,6 +59,7 @@ function onSectionClick(e: MouseEvent) {
     return
   }
   ctx.setPinnedSection(props.sectionId)
+  emit('activate', props.sectionId)
   reportSelfRect()
 }
 

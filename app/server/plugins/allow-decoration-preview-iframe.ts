@@ -42,9 +42,7 @@ export default defineNitroPlugin((nitroApp) => {
     }
 
     const rawOrigins =
-      (process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS ||
-        process.env.VITE_DECORATION_ADMIN_ORIGINS ||
-        '') as string
+      (process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS || '') as string
     const origins = rawOrigins
       .split(',')
       .map((o) => o.trim())

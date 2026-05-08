@@ -42,16 +42,16 @@
       <slot />
     </main>
 
-    <template v-if="!isDecorationRouteDesignMode">
-      <DecorationRenderer
-        v-if="shouldRenderFooterDecoration"
-        :dsl="resolvedFooterDecorationDsl"
-        :preview-session-key="decorationPreviewSessionKey"
-        :highlighted-block="props.highlightedBlock"
-        data-testid="layout-decoration-renderer-footer"
-        @section-click="emit('section-click', $event)"
-      />
+    <DecorationRenderer
+      v-if="shouldRenderFooterDecoration"
+      :dsl="resolvedFooterDecorationDsl"
+      :preview-session-key="decorationPreviewSessionKey"
+      :highlighted-block="props.highlightedBlock"
+      data-testid="layout-decoration-renderer-footer"
+      @section-click="emit('section-click', $event)"
+    />
 
+    <template v-if="!isDecorationRouteDesignMode">
       <div
         v-if="!shouldRenderFooterDecoration && !isDecorationPreview"
         :class="hideMobileFooter ? 'hidden lg:block' : ''"

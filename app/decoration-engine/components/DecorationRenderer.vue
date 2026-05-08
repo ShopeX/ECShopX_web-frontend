@@ -2,7 +2,11 @@
   <div class="flex flex-col">
     <template v-if="hasRenderableSections">
       <template v-for="sectionId in dsl.order" :key="sectionId">
-        <DecorationSectionHost v-if="shouldRenderSection(sectionId)" :section-id="sectionId">
+        <DecorationSectionHost
+          v-if="shouldRenderSection(sectionId)"
+          :section-id="sectionId"
+          @activate="onSectionActivate"
+        >
           <!-- 与 TemplateEngine 一致：父级传入与 sectionId 同名的具名插槽时，替代 registry 区块组件 -->
           <slot v-if="hasNamedSlot(sectionId)" :name="sectionId" />
           <component
@@ -11,7 +15,6 @@
             :section="dsl.sections[sectionId]"
             :section-id="sectionId"
             :is-preview="isPreview"
-            @click="onSectionActivate(sectionId)"
           />
         </DecorationSectionHost>
       </template>
@@ -36,6 +39,7 @@ import {
   toRef,
   useSlots,
   watch,
+  watchEffect,
   type Component,
   type Ref,
   type WatchStopHandle,
@@ -304,4 +308,28 @@ const hasRenderableSections = computed(() => {
   }
   return props.dsl.order.some((sectionId) => shouldRenderSection(sectionId))
 })
+
+if (import.meta.client && import.meta.dev) {
+  watchEffect(() => {
+    const skipped = (props.dsl?.order || []).map((sectionId) => {
+      const section = props.dsl.sections?.[sectionId]
+      return {
+        sectionId,
+        type: section?.type,
+        disabled: section?.disabled,
+        hasSection: Boolean(section),
+        hasNamedSlot: hasNamedSlot(sectionId),
+        hasRegistry: Boolean(section?.type && sectionRegistry.value[section.type]),
+        shouldRender: shouldRenderSection(sectionId),
+      }
+    })
+    console.info('[ecshopx-decoration-handshake] renderer gate', {
+      previewSessionKey: props.previewSessionKey,
+      isPreview: isPreview.value,
+      order: props.dsl?.order || [],
+      hasRenderableSections: hasRenderableSections.value,
+      sections: skipped,
+    })
+  })
+}
 </script>

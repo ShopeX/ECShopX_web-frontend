@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import type {
   DecorationDSL,
   DecorationHighlightedBlock,
@@ -68,6 +68,19 @@ export function useShopLayoutDecoration(props: ShopLayoutDecorationBindProps) {
   const resolvedFooterDecorationDsl = computed(
     () => footerDecorationDsl.value || EMPTY_DECORATION_DSL
   )
+
+  if (import.meta.client && import.meta.dev) {
+    watchEffect(() => {
+      console.info('[ecshopx-decoration-handshake] layout decoration gate', {
+        isDecorationPreview: isDecorationPreview.value,
+        isDecorationRouteDesignMode: isDecorationRouteDesignMode.value,
+        headerOrder: headerDecorationDsl.value?.order || [],
+        footerOrder: footerDecorationDsl.value?.order || [],
+        shouldRenderHeaderDecoration: shouldRenderHeaderDecoration.value,
+        shouldRenderFooterDecoration: shouldRenderFooterDecoration.value,
+      })
+    })
+  }
 
   return {
     route,

@@ -25,6 +25,7 @@ export type DecorationMessageType =
   | 'DECORATION_INIT'
   | 'DECORATION_UPDATE'
   | 'PREVIEW_READY'
+  | 'PREVIEW_READY_ACK'
   | 'SECTION_FOCUSED'
   | 'SECTION_HOVERED'
   | 'SECTION_RECT'

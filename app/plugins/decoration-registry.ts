@@ -13,6 +13,7 @@ export const decorationRegistry: DecorationRegistry = {
   header: DecorationHeaderSection,
   footer: DecorationFooterSection,
   carousel: Carousel,
+  'main-carousel': Carousel,
   'image-hotspot': ImageHotspot,
   'product-shelf': ProductShelf,
 }

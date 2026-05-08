@@ -13,12 +13,12 @@
           class="pointer-events-none absolute inset-0 rounded-none border-2 border-primary shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]"
         />
         <div
-          class="pointer-events-auto absolute left-0 top-0 z-[1] -translate-y-full rounded-none bg-primary px-2 py-1 text-[11px] font-medium leading-tight text-white shadow-sm"
+          :class="adminSyncedChromeLabelClass"
         >
           {{ adminSyncedChromeLabel }}
         </div>
         <div
-          class="pointer-events-auto absolute right-0 top-0 z-[1] ml-2 flex translate-x-full flex-col gap-0.5 rounded-md border border-neutral-200 bg-white p-1 shadow-lg"
+          :class="adminSyncedChromeActionsClass"
           @pointerdown.stop
         >
           <button type="button" class="rounded p-1.5 text-neutral-600 hover:bg-neutral-100" title="上移" @click.stop.prevent>
@@ -63,6 +63,7 @@ const props = withDefaults(
 
 const overlayTarget = ref<HTMLElement | null>(null)
 const overlayDocHeight = ref(0)
+const overlayViewportWidth = ref(0)
 let overlayResizeObserver: ResizeObserver | null = null
 
 const previewPageType = computed<PageType>(() => {
@@ -78,6 +79,8 @@ const editContext = computed(() => getDecorationPreviewEditContext(previewPageTy
 const decorationPreviewBundle = useDecorationPreview(previewPageType.value)
 
 const mergedPreviewSections = computed((): Record<string, DecorationSection> => ({
+  ...(decorationPreviewBundle.headerDsl.value?.sections || {}),
+  ...(decorationPreviewBundle.footerDsl.value?.sections || {}),
   ...(decorationPreviewBundle.globalDsl.value?.sections || {}),
   ...(decorationPreviewBundle.pageDsl.value?.sections || {}),
 }))
@@ -89,6 +92,21 @@ const SECTION_TYPE_LABEL: Record<string, string> = {
   carousel: '轮播',
   'image-hotspot': '图片热区',
   'product-shelf': '商品货架',
+}
+
+const BLOCK_TRANSLATION_LABEL: Record<string, string> = {
+  'blocks.header_product_list.name': '商品列表',
+  'blocks.header_collection_product_list.name': '产品系列商品列表',
+  'blocks.mega_menu.name': '大型菜单',
+}
+
+function resolvePreviewLabel(value: unknown): string {
+  const text = String(value || '').trim()
+  if (!text.startsWith('t:')) {
+    return text
+  }
+  const key = text.slice(2)
+  return BLOCK_TRANSLATION_LABEL[key] || key || text
 }
 
 function buildPreviewSelectionLabel(
@@ -107,7 +125,7 @@ function buildPreviewSelectionLabel(
       return blockId
     }
     const s = (block.settings || {}) as Record<string, unknown>
-    const t = String(s.label || s.title || '').trim()
+    const t = resolvePreviewLabel(s.label || s.title)
     if (t) {
       return t
     }
@@ -132,6 +150,7 @@ function updateOverlayDocHeight() {
     body?.scrollHeight || 0,
     body?.clientHeight || 0
   )
+  overlayViewportWidth.value = window.innerWidth || doc?.clientWidth || 0
 }
 
 function ensureOverlayRootAttached() {
@@ -285,6 +304,29 @@ const adminSyncedChromeLabel = computed(() => {
     return buildPreviewSelectionLabel(sections, 'block', c.sectionId, c.blockId)
   }
   return buildPreviewSelectionLabel(sections, 'section', c.sectionId)
+})
+
+const adminSyncedChromeLabelClass = computed(() => {
+  const c = adminSyncedChrome.value
+  const canPlaceAbove = Boolean(c?.rect && c.rect.top >= 24)
+  return [
+    'pointer-events-auto absolute left-0 z-[1] rounded-none bg-primary px-2 py-1 text-[11px] font-medium leading-tight text-white shadow-sm',
+    canPlaceAbove ? 'top-0 -translate-y-full' : 'top-0 translate-y-0',
+  ]
+})
+
+const adminSyncedChromeActionsClass = computed(() => {
+  const c = adminSyncedChrome.value
+  const viewportWidth = overlayViewportWidth.value
+  const actionsWidth = 40
+  const gap = 8
+  const canPlaceOutsideRight = Boolean(
+    c?.rect && c.rect.left + c.rect.width + actionsWidth + gap <= viewportWidth
+  )
+  return [
+    'pointer-events-auto absolute top-0 z-[1] flex flex-col gap-0.5 rounded-md border border-neutral-200 bg-white p-1 shadow-lg',
+    canPlaceOutsideRight ? 'right-0 ml-2 translate-x-full' : 'right-1 translate-x-0',
+  ]
 })
 
 const dashedBlockOverlays = computed(() => {

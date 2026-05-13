@@ -28,6 +28,9 @@ function onPointerLeave(e: PointerEvent) {
   }
   const next = e.relatedTarget
   const host = e.currentTarget as HTMLElement
+  if (next instanceof Element && next.closest?.('[data-decoration-add-control]')) {
+    return
+  }
   if (next instanceof Node && host.contains(next)) {
     return
   }
@@ -130,6 +133,8 @@ if (import.meta.client) {
   <div
     v-if="isEditPreview"
     ref="root"
+    :data-decoration-section="sectionId"
+    :data-section-id="sectionId"
     class="relative w-full min-w-0"
     @pointerenter="onPointerEnter"
     @pointerleave="onPointerLeave"

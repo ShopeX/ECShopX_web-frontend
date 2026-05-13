@@ -1,5 +1,9 @@
 <template>
-  <div class="flex flex-col">
+  <div
+    class="flex flex-col"
+    @click.capture="handlePreviewInteractiveCapture"
+    @submit.capture="handlePreviewInteractiveCapture"
+  >
     <template v-if="hasRenderableSections">
       <template v-for="sectionId in dsl.order" :key="sectionId">
         <DecorationSectionHost
@@ -32,6 +36,7 @@
 <script setup lang="ts">
 import {
   computed,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   provide,
@@ -123,6 +128,26 @@ function onSectionActivate(sectionId: string) {
     focusSection(sectionId)
   }
   emit('section-click', sectionId)
+}
+
+function handlePreviewInteractiveCapture(event: Event) {
+  if (!isPreview.value) {
+    return
+  }
+
+  const target = event.target
+  if (!(target instanceof Element)) {
+    return
+  }
+
+  const interactiveElement = target.closest(
+    'a[href], button[type="submit"], input[type="submit"], form'
+  )
+  if (!interactiveElement) {
+    return
+  }
+
+  event.preventDefault()
 }
 
 onMounted(() => {
@@ -266,9 +291,62 @@ provide(decorationEditKey, editContextRef)
 
 const editContext = computed(() => editContextRef.value)
 
+function reportCurrentDecorationRects() {
+  if (!import.meta.client || !isPreview.value) {
+    return
+  }
+  const ctx = editContext.value
+  const scrollX = window.scrollX || 0
+  const scrollY = window.scrollY || 0
+
+  document.querySelectorAll<HTMLElement>('[data-decoration-section]').forEach((el) => {
+    const sectionId = el.dataset.sectionId || el.dataset.decorationSection || ''
+    if (!sectionId) {
+      return
+    }
+    const rect = el.getBoundingClientRect()
+    ctx.setSectionRect(sectionId, {
+      top: rect.top + scrollY,
+      left: rect.left + scrollX,
+      width: rect.width,
+      height: rect.height,
+    })
+  })
+
+  document.querySelectorAll<HTMLElement>('[data-decoration-block]').forEach((el) => {
+    const sectionId = el.dataset.sectionId || ''
+    const blockId = el.dataset.blockId || ''
+    if (!sectionId || !blockId) {
+      return
+    }
+    const rect = el.getBoundingClientRect()
+    ctx.setBlockRect(sectionId, blockId, {
+      top: rect.top + scrollY,
+      left: rect.left + scrollX,
+      width: rect.width,
+      height: rect.height,
+    })
+  })
+}
+
+let layoutRefreshRafId: number | null = null
+function scheduleDecorationRectRefresh() {
+  if (!import.meta.client || layoutRefreshRafId !== null) {
+    return
+  }
+  layoutRefreshRafId = window.requestAnimationFrame(() => {
+    layoutRefreshRafId = null
+    reportCurrentDecorationRects()
+  })
+}
+
 onBeforeUnmount(() => {
   stopHighlightBind?.()
   stopHighlightBind = null
+  if (layoutRefreshRafId !== null && import.meta.client) {
+    window.cancelAnimationFrame(layoutRefreshRafId)
+    layoutRefreshRafId = null
+  }
 })
 
 /** 后台选中时同步「点击态」选区边框（pinned），与指针 hover 独立 */
@@ -278,6 +356,18 @@ watch(
     editContext.value.setPinnedSection(hb?.sectionId ?? null)
   },
   { immediate: true, deep: true }
+)
+
+watch(
+  () => [props.dsl?.order, props.dsl?.sections],
+  async () => {
+    if (!isPreview.value) {
+      return
+    }
+    await nextTick()
+    scheduleDecorationRectRefresh()
+  },
+  { immediate: true, deep: true, flush: 'post' }
 )
 
 const shouldRenderSection = (sectionId: string) => {

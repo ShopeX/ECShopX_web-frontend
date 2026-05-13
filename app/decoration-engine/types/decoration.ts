@@ -1,5 +1,6 @@
 export interface DecorationBlock {
   type: string
+  disabled?: boolean
   settings: Record<string, unknown>
 }
 
@@ -34,6 +35,11 @@ export type DecorationMessageType =
   | 'BLOCK_HOVERED'
   | 'BLOCK_HIGHLIGHT'
   | 'BLOCK_RECT'
+  | 'ADD_BLOCK_REQUESTED'
+  | 'ADD_SECTION_REQUESTED'
+  | 'MOVE_SECTION_REQUESTED'
+  | 'DUPLICATE_SECTION_REQUESTED'
+  | 'REMOVE_SECTION_REQUESTED'
 
 export interface DecorationMessage {
   type: DecorationMessageType

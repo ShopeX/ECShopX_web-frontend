@@ -475,6 +475,41 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     })
   }
 
+  const requestAddBlock = (sectionId: string, insertIndex?: number) => {
+    postToParent({
+      type: 'ADD_BLOCK_REQUESTED',
+      payload: { pageType: resolvePageType(), sectionId, insertIndex },
+    })
+  }
+
+  const requestAddSection = (sectionId: string, insertIndex?: number) => {
+    postToParent({
+      type: 'ADD_SECTION_REQUESTED',
+      payload: { pageType: resolvePageType(), sectionId, insertIndex },
+    })
+  }
+
+  const requestMoveSection = (sectionId: string, direction: 'up' | 'down') => {
+    postToParent({
+      type: 'MOVE_SECTION_REQUESTED',
+      payload: { pageType: resolvePageType(), sectionId, direction },
+    })
+  }
+
+  const requestDuplicateSection = (sectionId: string) => {
+    postToParent({
+      type: 'DUPLICATE_SECTION_REQUESTED',
+      payload: { pageType: resolvePageType(), sectionId },
+    })
+  }
+
+  const requestRemoveSection = (sectionId: string) => {
+    postToParent({
+      type: 'REMOVE_SECTION_REQUESTED',
+      payload: { pageType: resolvePageType(), sectionId },
+    })
+  }
+
   const reportBlockRect = (sectionId: string, blockId: string, rect: DecorationBlockRect) => {
     postToParent({
       type: 'BLOCK_RECT',
@@ -550,6 +585,11 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     initPreview,
     focusSection,
     focusBlock,
+    requestAddBlock,
+    requestAddSection,
+    requestMoveSection,
+    requestDuplicateSection,
+    requestRemoveSection,
     reportBlockRect,
     reportSectionRect,
     setHoveredSection,

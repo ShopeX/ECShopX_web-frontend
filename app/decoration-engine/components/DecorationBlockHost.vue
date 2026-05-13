@@ -2,6 +2,7 @@
 import { useResizeObserver } from '@vueuse/core'
 import type { HTMLAttributes, StyleValue } from 'vue'
 import { useDecorationEditOrDisabled } from '~/decoration-engine/composables/useDecorationEditContext'
+import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 
 const props = defineProps<{
   sectionId: string
@@ -15,7 +16,19 @@ const props = defineProps<{
 
 const root = ref<HTMLDivElement | null>(null)
 const ctx = useDecorationEditOrDisabled()
+const { focusBlock } = useDecorationPreview()
 const isEditPreview = computed(() => unref(ctx.isPreview))
+
+function onClick(event: MouseEvent) {
+  if (!isEditPreview.value) {
+    return
+  }
+  event.preventDefault()
+  event.stopPropagation()
+  ctx.setHoveredBlock(props.sectionId, props.blockId)
+  reportSelfRect()
+  focusBlock(props.sectionId, props.blockId)
+}
 
 function onPointerEnter() {
   if (!isEditPreview.value) {
@@ -31,6 +44,9 @@ function onPointerLeave(e: PointerEvent) {
   }
   const next = e.relatedTarget
   if (next && next instanceof Element) {
+    if (next.closest?.('[data-decoration-add-control]')) {
+      return
+    }
     const el = next.closest?.('[data-decoration-block]')
     if (el) {
       const d = el.getAttribute('data-decoration-block') || ''
@@ -120,6 +136,7 @@ if (import.meta.client) {
     :style="rootStyle"
     @pointerenter="onPointerEnter"
     @pointerleave="onPointerLeave"
+    @click="onClick"
   >
     <slot />
   </div>

@@ -1,8 +1,11 @@
 <template>
   <div
     ref="cardRef"
-    class="sp-product-card h-full block group relative opacity-0 translate-y-4"
-    :class="{ 'sp-product-card--visible': isVisible }"
+    class="sp-product-card h-full block group relative"
+    :class="{
+      'opacity-0 translate-y-4': !disableAppearAnimation,
+      'sp-product-card--visible': isVisible || disableAppearAnimation
+    }"
   >
     <NuxtLink :to="productLink" class="flex flex-col h-full">
       <!-- 商品图片容器 - 正方形 1:1 -->
@@ -69,12 +72,14 @@ interface Props {
   titleLines?: number
   showPrice?: boolean
   showAddCart?: boolean
+  disableAppearAnimation?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   titleLines: 2,
   showPrice: true,
   showAddCart: true,
+  disableAppearAnimation: false,
 })
 const localePath = useLocalePath()
 const { t } = useI18n()
@@ -89,6 +94,10 @@ const isVisible = ref(false)
 
 // 监听元素进入视口
 onMounted(() => {
+  if (props.disableAppearAnimation) {
+    isVisible.value = true
+    return
+  }
   if (cardRef.value) {
     useIntersectionObserver(
       cardRef,

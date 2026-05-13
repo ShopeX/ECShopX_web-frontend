@@ -46,7 +46,7 @@ const orderedBlocks = computed(() =>
   (props.section.block_order || [])
     .map((blockId) => {
       const block = props.section.blocks?.[blockId]
-      if (!block) {
+      if (!block || block.disabled) {
         return null
       }
       const settings = (block.settings || {}) as Record<string, unknown>

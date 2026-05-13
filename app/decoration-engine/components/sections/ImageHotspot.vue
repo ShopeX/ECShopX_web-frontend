@@ -5,12 +5,14 @@
       统一用同一 relative 容器：有/无底图都叠加热区；无热区时在预览下可用整块占位承接 BLOCK_HIGHLIGHT。
     -->
     <div class="relative w-full" :style="aspectRatioStyle">
-      <img
-        v-if="backgroundImage"
-        :src="backgroundImage"
-        :alt="section.title || 'image hotspot'"
-        class="absolute inset-0 h-full w-full object-cover"
-      />
+      <picture v-if="backgroundImage || mobileBackgroundImage">
+        <source v-if="mobileBackgroundImage" media="(max-width: 767px)" :srcset="mobileBackgroundImage" />
+        <img
+          :src="backgroundImage || mobileBackgroundImage"
+          :alt="section.title || 'image hotspot'"
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+      </picture>
       <div
         v-else
         class="absolute inset-0 flex min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"
@@ -19,32 +21,23 @@
       </div>
 
       <DecorationBlockHost
-        v-for="hotspot in hotspots"
+        v-for="hotspot in activeHotspots"
         :key="hotspot.id"
         :section-id="sectionId"
         :block-id="hotspot.id"
         :root-style="hotspot.style"
-        :root-class="'group absolute z-[1] flex -translate-x-1/2 -translate-y-1/2 items-center justify-center'"
+        :root-class="'group absolute z-[1] flex items-center justify-center'"
       >
         <component
           :is="resolveHotspotTag(hotspot.link)"
+          class="relative block h-full w-full"
           :href="resolveHotspotHref(hotspot.link)"
           :target="resolveHotspotTarget(hotspot.link)"
           :rel="resolveHotspotRel(hotspot.link)"
           :aria-label="hotspot.label || `hotspot-${hotspot.id}`"
           @click="handleHotspotClick($event, hotspot.id)"
         >
-          <span
-            v-if="hotspot.shape === 'rect'"
-            class="min-h-12 min-w-12 rounded-xl border-2 border-white/80 bg-black/20 shadow-lg backdrop-blur-sm"
-          />
-          <span
-            v-else
-            class="relative flex h-6 w-6 items-center justify-center rounded-full bg-white/80 shadow-lg"
-          >
-            <span class="absolute inset-0 rounded-full bg-white/40 animate-ping" />
-            <span class="relative h-3 w-3 rounded-full bg-white" />
-          </span>
+          <span class="block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm" />
 
           <span
             v-if="hotspot.label"
@@ -74,14 +67,20 @@ import { useDecorationPreview } from '~/decoration-engine/composables/useDecorat
 
 interface HotspotBlock {
   id: string
-  x: number
-  y: number
-  link: string
+  rect: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+  link: Record<string, unknown>
   label: string
   shape: 'circle' | 'rect'
   style: {
     left: string
     top: string
+    width: string
+    height: string
   }
 }
 
@@ -94,56 +93,111 @@ const props = defineProps<{
 const { t } = useI18n()
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
+const isMobileViewport = ref(false)
+
+const updateViewport = () => {
+  if (!import.meta.client) return
+  isMobileViewport.value = window.innerWidth <= 767
+}
 
 const sectionSettings = computed(() => {
   const raw = props.section.settings as Record<string, unknown>
   const imageWidth = Number(raw.imageWidth ?? 1200)
   const imageHeight = Number(raw.imageHeight ?? 600)
+  const pcImage = String(raw.pc_image || '')
+  const mobileImage = String(raw.mobile_image || '')
+  const pcHotspots = Array.isArray(raw.pc_hotspots) ? raw.pc_hotspots : []
+  const mobileHotspots = Array.isArray(raw.mobile_hotspots) ? raw.mobile_hotspots : []
+  const legacyHotspots = Array.isArray(raw.hotspot) ? raw.hotspot : []
 
   return {
-    imageUrl: String(raw.imageUrl || ''),
+    pcImage,
+    mobileImage,
+    pcHotspots,
+    mobileHotspots,
+    legacyHotspots,
     imageWidth: Number.isFinite(imageWidth) && imageWidth > 0 ? imageWidth : 1200,
     imageHeight: Number.isFinite(imageHeight) && imageHeight > 0 ? imageHeight : 600,
   }
 })
 
-const backgroundImage = computed(() => sectionSettings.value.imageUrl)
+const backgroundImage = computed(() => sectionSettings.value.pcImage)
+const mobileBackgroundImage = computed(() => sectionSettings.value.mobileImage)
 const aspectRatioStyle = computed(() => ({
   aspectRatio: `${sectionSettings.value.imageWidth} / ${sectionSettings.value.imageHeight}`,
 }))
 
-const hotspots = computed<HotspotBlock[]>(() =>
-  props.section.block_order
-    .map((blockId) => {
-      const block = props.section.blocks[blockId]
-      if (!block) {
-        return null
-      }
+const toPercent = (value: unknown) => {
+  const numberValue = Number(value) || 0
+  const percentValue = numberValue > 1 ? numberValue : numberValue * 100
 
-      const settings = block.settings as Record<string, unknown>
-      const x = Number(settings.x ?? 0)
-      const y = Number(settings.y ?? 0)
-      const shape: HotspotBlock['shape'] = settings.shape === 'rect' ? 'rect' : 'circle'
+  return Math.min(100, Math.max(0, percentValue))
+}
 
-      return {
-        id: blockId,
-        x: Math.min(100, Math.max(0, Number.isFinite(x) ? x : 0)),
-        y: Math.min(100, Math.max(0, Number.isFinite(y) ? y : 0)),
-        link: String(settings.link || ''),
-        label: String(settings.label || ''),
-        shape,
-        style: {
-          left: `${Math.min(100, Math.max(0, Number.isFinite(x) ? x : 0))}%`,
-          top: `${Math.min(100, Math.max(0, Number.isFinite(y) ? y : 0))}%`,
-        },
-      }
-    })
-    .filter((hotspot): hotspot is HotspotBlock => Boolean(hotspot))
-)
+const activeHotspots = computed<HotspotBlock[]>(() => {
+  const deviceHotspots = isMobileViewport.value
+    ? sectionSettings.value.mobileHotspots
+    : sectionSettings.value.pcHotspots
+  const rawHotspots = deviceHotspots.length
+    ? deviceHotspots
+    : sectionSettings.value.legacyHotspots.length
+      ? sectionSettings.value.legacyHotspots
+      : props.section.block_order.map((blockId) => {
+          const block = props.section.blocks[blockId]
+          const settings = block?.settings as Record<string, unknown> | undefined
+
+          return settings
+            ? {
+                id: blockId,
+                x: settings.x,
+                y: settings.y,
+                width: settings.width || 12,
+                height: settings.height || 12,
+                link: settings.link,
+                label: settings.label,
+                shape: settings.shape,
+              }
+            : null
+        })
+
+  const normalized = rawHotspots.map((item: any, index: number) => {
+    const rect = item?.rect || {
+      x: Number(item?.leftPer ?? item?.x ?? 0),
+      y: Number(item?.topPer ?? item?.y ?? 0),
+      width: Number(item?.widthPer ?? item?.width ?? 0),
+      height: Number(item?.heightPer ?? item?.height ?? 0),
+    }
+    const x = toPercent(rect.x)
+    const y = toPercent(rect.y)
+    const width = toPercent(rect.width)
+    const height = toPercent(rect.height)
+    return {
+      id: item?.id || `hotspot_${index}`,
+      rect: { x, y, width, height },
+      link: item?.link || {
+        linkType: item?.linkType ?? 0,
+        linkUrl: item?.linkUrl || '',
+        linkPage: item?.linkPage || '',
+        id: item?.id || '',
+        title: item?.title || '',
+      },
+      label: String(item?.label || ''),
+      shape: item?.shape === 'rect' ? 'rect' : 'circle',
+      style: {
+        left: `${x}%`,
+        top: `${y}%`,
+        width: `${width}%`,
+        height: `${height}%`,
+      },
+    }
+  })
+
+  return normalized.filter(Boolean)
+})
 
 /** 无热区节点时（仅空底图占位），用编辑上下文里的高亮块 id 撑一层整区 BlockHost，便于看到选中描边 */
 const placeholderHighlightBlockId = computed(() => {
-  if (hotspots.value.length > 0 || backgroundImage.value) {
+  if (activeHotspots.value.length > 0 || backgroundImage.value || mobileBackgroundImage.value) {
     return null
   }
   const hb = editCtx ? unref(editCtx.highlightedBlock) : undefined
@@ -153,12 +207,17 @@ const placeholderHighlightBlockId = computed(() => {
   return hb.blockId
 })
 
-const resolveHotspotTag = (link: string) => (link && !props.isPreview ? 'a' : 'button')
-const resolveHotspotHref = (link: string) => (link && !props.isPreview ? link : undefined)
-const resolveHotspotTarget = (link: string) =>
-  !props.isPreview && /^https?:\/\//.test(link) ? '_blank' : undefined
-const resolveHotspotRel = (link: string) =>
-  !props.isPreview && /^https?:\/\//.test(link) ? 'noopener noreferrer' : undefined
+const resolveHotspotTag = (link: Record<string, unknown>) =>
+  resolveHotspotHref(link) && !props.isPreview ? 'a' : 'button'
+const resolveHotspotHref = (link: Record<string, unknown>) => {
+  if (props.isPreview) return undefined
+  if (Number(link?.linkType) === 1) return String(link?.linkUrl || '') || undefined
+  return undefined
+}
+const resolveHotspotTarget = (link: Record<string, unknown>) =>
+  !props.isPreview && Number((link as any)?.linkType) === 1 && /^https?:\/\//.test(String((link as any)?.linkUrl || '')) ? '_blank' : undefined
+const resolveHotspotRel = (link: Record<string, unknown>) =>
+  !props.isPreview && Number((link as any)?.linkType) === 1 && /^https?:\/\//.test(String((link as any)?.linkUrl || '')) ? 'noopener noreferrer' : undefined
 
 const handleHotspotClick = (event: MouseEvent, blockId: string) => {
   if (!props.isPreview) {
@@ -169,4 +228,14 @@ const handleHotspotClick = (event: MouseEvent, blockId: string) => {
   event.stopPropagation()
   focusBlock(props.sectionId, blockId)
 }
+
+onMounted(() => {
+  updateViewport()
+  window.addEventListener('resize', updateViewport)
+})
+
+onBeforeUnmount(() => {
+  if (!import.meta.client) return
+  window.removeEventListener('resize', updateViewport)
+})
 </script>

@@ -5,6 +5,7 @@ import DecorationFooterSection from '~/decoration-engine/components/sections/Dec
 import DecorationHeaderSection from '~/decoration-engine/components/sections/DecorationHeaderSection.vue'
 import ImageHotspot from '~/decoration-engine/components/sections/ImageHotspot.vue'
 import ProductShelf from '~/decoration-engine/components/sections/ProductShelf.vue'
+import ProductTabShelf from '~/decoration-engine/components/sections/ProductTabShelf.vue'
 
 export type DecorationRegistry = Record<string, Component>
 
@@ -16,6 +17,7 @@ export const decorationRegistry: DecorationRegistry = {
   'main-carousel': Carousel,
   'image-hotspot': ImageHotspot,
   'product-shelf': ProductShelf,
+  'product-tab-shelf': ProductTabShelf,
 }
 
 export default defineNuxtPlugin((nuxtApp) => {

@@ -49,3 +49,18 @@ test('ProductShelf section follows decoration plan contract', () => {
   assert.match(source, /grid-cols-/)
   assert.match(source, /c40a02ee\.c5c5f2|c40a02ee\.8bb820/)
 })
+
+test('ProductTabShelf section follows decoration plan contract', () => {
+  const source = read('app/decoration-engine/components/sections/ProductTabShelf.vue')
+  const registry = read('app/plugins/decoration-registry.ts')
+
+  assert.match(source, /product-tab-shelf/)
+  assert.match(source, /product-tab/)
+  assert.match(source, /DecorationBlockHost/)
+  assert.match(source, /focusBlock/)
+  assert.match(source, /itemApiClient/)
+  assert.match(source, /ProductTransformer/)
+  assert.match(source, /BCProductCard/)
+  assert.match(registry, /ProductTabShelf/)
+  assert.match(registry, /'product-tab-shelf'/)
+})

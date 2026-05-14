@@ -5,7 +5,7 @@
     :decoration-preview-session-key="DECORATION_PAGE_TYPE"
     :highlighted-block="highlightedBlock"
   >
-    <div class="min-h-screen bg-white">
+    <div :class="[isPreview ? 'decoration-preview-page-content' : 'min-h-screen', 'bg-white']">
       <DecorationRenderer
         :dsl="pageRenderDsl"
         :preview-session-key="DECORATION_PAGE_TYPE"

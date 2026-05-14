@@ -1,6 +1,9 @@
 <template>
   <div
-    class="min-h-screen bg-gray-50"
+    :class="[
+      'bg-gray-50',
+      isDecorationPreview ? 'decoration-preview-page' : 'min-h-screen',
+    ]"
     @click.capture="onLayoutPointerCapture"
     @mousedown.capture="onLayoutPointerCapture"
   >

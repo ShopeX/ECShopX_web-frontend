@@ -80,8 +80,10 @@ body {
   color: #111827; /* text-gray-900 的颜色 */
 }
 
-/* 管理后台嵌入的装修预览：隐藏主文档滚动条，避免 iframe 内出现粗滚动条 */
+/* 管理后台嵌入的装修预览：iframe 固定为预览视口，子页面由 html/documentElement 滚动 */
 html.decoration-preview-hide-scrollbar {
+  height: 100%;
+  overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -91,6 +93,8 @@ html.decoration-preview-hide-scrollbar::-webkit-scrollbar {
   height: 0;
 }
 html.decoration-preview-hide-scrollbar body {
+  min-height: 100%;
+  overflow: visible;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -102,6 +106,10 @@ html.decoration-preview-hide-scrollbar body::-webkit-scrollbar {
 
 #__nuxt {
   min-height: 100vh;
+}
+
+html.decoration-preview-hide-scrollbar #__nuxt {
+  min-height: 100%;
 }
 
 /* 加载时的最小样式 */

@@ -1,8 +1,7 @@
 <template>
   <Teleport v-if="overlayTarget" :to="overlayTarget">
     <div
-      class="pointer-events-none absolute inset-x-0 top-0 z-[10050]"
-      :style="{ height: `${overlayDocHeight}px` }"
+      class="pointer-events-none absolute inset-x-0 top-0 z-[10050] h-0 overflow-visible"
     >
       <div
         v-if="selectedChromeStyle && selectedChrome"
@@ -110,7 +109,6 @@ const props = withDefaults(
 )
 
 const overlayTarget = ref<HTMLElement | null>(null)
-const overlayDocHeight = ref(0)
 const overlayViewportWidth = ref(0)
 let overlayResizeObserver: ResizeObserver | null = null
 
@@ -206,19 +204,11 @@ function buildPreviewSelectionLabel(
   return SECTION_TYPE_LABEL[section.type] || section.type || sectionId
 }
 
-function updateOverlayDocHeight() {
+function updateOverlayViewportWidth() {
   if (!import.meta.client) {
     return
   }
-  const doc = document.documentElement
-  const body = document.body
-  overlayDocHeight.value = Math.max(
-    doc?.scrollHeight || 0,
-    doc?.clientHeight || 0,
-    body?.scrollHeight || 0,
-    body?.clientHeight || 0
-  )
-  overlayViewportWidth.value = window.innerWidth || doc?.clientWidth || 0
+  overlayViewportWidth.value = window.innerWidth || document.documentElement?.clientWidth || 0
 }
 
 function ensureOverlayRootAttached() {
@@ -251,13 +241,12 @@ function bindOverlayMetrics() {
   if (!import.meta.client) {
     return
   }
-  updateOverlayDocHeight()
+  updateOverlayViewportWidth()
   if (!overlayResizeObserver) {
-    overlayResizeObserver = new ResizeObserver(() => updateOverlayDocHeight())
+    overlayResizeObserver = new ResizeObserver(() => updateOverlayViewportWidth())
     overlayResizeObserver.observe(document.documentElement)
-    overlayResizeObserver.observe(document.body)
   }
-  window.addEventListener('resize', updateOverlayDocHeight)
+  window.addEventListener('resize', updateOverlayViewportWidth)
 }
 
 function unbindOverlayMetrics() {
@@ -266,7 +255,7 @@ function unbindOverlayMetrics() {
   }
   overlayResizeObserver?.disconnect()
   overlayResizeObserver = null
-  window.removeEventListener('resize', updateOverlayDocHeight)
+  window.removeEventListener('resize', updateOverlayViewportWidth)
 }
 
 onMounted(() => {
@@ -293,7 +282,7 @@ watch(
   }),
   () => {
     if (import.meta.client) {
-      updateOverlayDocHeight()
+      updateOverlayViewportWidth()
     }
   },
   { deep: true }

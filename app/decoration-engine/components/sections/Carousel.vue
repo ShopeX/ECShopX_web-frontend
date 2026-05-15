@@ -46,10 +46,13 @@
                 playsinline
                 loop
               />
-              <picture v-else-if="slide.kind === 'image' && slide.pcImage" class="block h-full w-full">
+              <picture
+                v-else-if="slide.kind === 'image' && (slide.pcImage || slide.mobileImage)"
+                class="block h-full w-full"
+              >
                 <source v-if="slide.mobileImage" media="(max-width: 767px)" :srcset="slide.mobileImage" />
                 <img
-                  :src="slide.pcImage"
+                  :src="slide.pcImage || slide.mobileImage"
                   :alt="slide.alt"
                   class="h-full w-full object-cover object-center"
                 />

@@ -14,32 +14,31 @@
       />
     </div>
 
-    <div v-if="tabs.length > 1" class="mb-[32px] flex justify-center gap-[12px]">
-      <button
-        v-for="tab in tabs"
-        :key="tab.id"
-        type="button"
-        :class="[
-          'rounded-full px-5 py-1.5 text-sm font-medium transition-colors',
-          activeTabId === tab.id
-            ? 'bg-[#191A1D] text-white'
-            : 'bg-[#F4F5F7] text-[#596273] hover:bg-[#ECEFF3]',
-        ]"
-        @click="handleTabClick($event, tab.id)"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
     <DecorationBlockHost
       v-if="activeTab"
       :section-id="sectionId"
       :block-id="activeTab.id"
       root-class="decoration-product-tab-block min-h-[120px]"
     >
+      <div class="mb-6 flex flex-wrap justify-center gap-2 md:mb-[32px] md:gap-[12px]">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          type="button"
+          :class="[
+            'rounded-full px-4 py-1.5 text-sm font-medium transition-colors md:px-5',
+            activeTabId === tab.id
+              ? 'bg-[#191A1D] text-white'
+              : 'bg-[#F4F5F7] text-[#596273] hover:bg-[#ECEFF3]',
+          ]"
+          @click="handleTabClick($event, tab.id)"
+          v-html="tab.label"
+        />
+      </div>
+
       <div
         v-if="showPlaceholder"
-        class="grid"
+        class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
         :style="gridStyle"
       >
         <BCProductCard
@@ -53,7 +52,11 @@
         />
       </div>
 
-      <div v-else-if="products.length" class="grid" :style="gridStyle">
+      <div
+        v-else-if="products.length"
+        class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
+        :style="gridStyle"
+      >
         <BCProductCard
           v-for="product in products"
           :key="product.itemId"
@@ -90,7 +93,7 @@ interface ProductTabShelfSettings {
   size: ProductTabShelfSize
   alignment: 'left' | 'center' | 'right'
   columns: 1 | 2 | 3 | 4 | 5 | 6
-  spacing: 'small' | 'medium' | 'large'
+  spacing: 'none' | 'small' | 'medium' | 'large'
   fullWidth: boolean
   showPrice: boolean
   showAddCart: boolean
@@ -134,7 +137,7 @@ const settings = computed<ProductTabShelfSettings>(() => {
   const alignment = ['left', 'center', 'right'].includes(String(raw.alignment))
     ? String(raw.alignment)
     : 'center'
-  const spacing = ['small', 'medium', 'large'].includes(String(raw.spacing))
+  const spacing = ['none', 'small', 'medium', 'large'].includes(String(raw.spacing))
     ? String(raw.spacing)
     : 'medium'
 
@@ -172,7 +175,8 @@ const tabs = computed<ProductTabItem[]>(() =>
       const blockSettings = block.settings as Record<string, unknown>
       const rawProductIds = Array.isArray(blockSettings.product_ids) ? blockSettings.product_ids : []
       const rawLimit = Number(blockSettings.limit ?? 8)
-      const rawSize = String(blockSettings.size || settings.value.size)
+      const rawSize =
+        blockSettings.size_override === true ? String(blockSettings.size || '') : settings.value.size
       const rawColumns = Number(blockSettings.columns ?? settings.value.columns)
 
       return {
@@ -181,7 +185,7 @@ const tabs = computed<ProductTabItem[]>(() =>
         productIds: rawProductIds.map((id) => String(id)).filter(Boolean),
         size: normalizeSize(rawSize, settings.value.size),
         columns: normalizeColumns(rawColumns),
-        limit: Number.isFinite(rawLimit) ? Math.min(20, Math.max(1, rawLimit)) : 8,
+        limit: Number.isFinite(rawLimit) ? Math.min(24, Math.max(2, rawLimit)) : 8,
       }
     })
     .filter((tab: ProductTabItem | null): tab is ProductTabItem => Boolean(tab))
@@ -225,7 +229,7 @@ const showPlaceholder = computed(() => !activeTab.value || activeTab.value.produ
 const placeholderProducts = computed<IProduct[]>(() => {
   if (!isDecorationPreview.value) return []
   const limit = activeTab.value?.limit || 8
-  return Array.from({ length: Math.min(8, Math.max(1, limit)) }, (_, index) => ({
+  return Array.from({ length: Math.min(8, Math.max(2, limit)) }, (_, index) => ({
     itemId: `decoration-placeholder-${index + 1}`,
     itemName: '产品标题示例',
     img: placeholderProductImage,
@@ -276,12 +280,14 @@ const { data: productsData, pending } = await useAsyncData(
 const products = computed(() => productsData.value || [])
 
 const sectionClasses = computed(() => [
-  settings.value.fullWidth ? 'w-full' : 'mx-auto max-w-[1440px]',
-  'px-[64px] py-[96px] lg:px-[128px]',
+  'py-12 md:py-[96px]',
+  settings.value.fullWidth
+    ? 'w-full px-4 md:px-[48px] lg:px-[64px]'
+    : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
 ])
 
 const headingClasses = computed(() => [
-  'mb-[64px]',
+  'mb-8 md:mb-[64px]',
   settings.value.alignment === 'center' && 'text-center',
   settings.value.alignment === 'right' && 'text-right',
   settings.value.alignment === 'left' && 'text-left',
@@ -306,13 +312,14 @@ const sizeTextClass = computed(() => {
 })
 
 const gridGap = computed(() => {
-  if (settings.value.spacing === 'small') return '16px'
-  if (settings.value.spacing === 'large') return '32px'
-  return '24px'
+  if (settings.value.spacing === 'none') return '0px'
+  if (settings.value.spacing === 'small') return '12px'
+  if (settings.value.spacing === 'large') return '20px'
+  return '16px'
 })
 
 const gridStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${activeColumns.value}, minmax(0, 1fr))`,
+  '--product-tab-columns': activeColumns.value,
   gap: gridGap.value,
 }))
 

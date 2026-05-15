@@ -475,17 +475,27 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     })
   }
 
-  const requestAddBlock = (sectionId: string, insertIndex?: number) => {
+  const requestAddBlock = (
+    sectionId: string,
+    insertIndex?: number,
+    anchor?: { clientX: number; clientY: number },
+    area?: 'header' | 'template' | 'footer'
+  ) => {
     postToParent({
       type: 'ADD_BLOCK_REQUESTED',
-      payload: { pageType: resolvePageType(), sectionId, insertIndex },
+      payload: { pageType: resolvePageType(), sectionId, insertIndex, anchor, area },
     })
   }
 
-  const requestAddSection = (sectionId: string, insertIndex?: number) => {
+  const requestAddSection = (
+    sectionId: string,
+    insertIndex?: number,
+    anchor?: { clientX: number; clientY: number },
+    area?: 'header' | 'template' | 'footer'
+  ) => {
     postToParent({
       type: 'ADD_SECTION_REQUESTED',
-      payload: { pageType: resolvePageType(), sectionId, insertIndex },
+      payload: { pageType: resolvePageType(), sectionId, insertIndex, anchor, area },
     })
   }
 

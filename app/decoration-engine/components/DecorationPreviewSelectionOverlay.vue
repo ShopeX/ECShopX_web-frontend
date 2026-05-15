@@ -54,7 +54,7 @@
             aria-label="添加"
             @pointerenter="keepAddControlHover"
             @pointerdown.stop
-            @click.stop.prevent="handleAddClick('before')"
+            @click.stop.prevent="handleAddClick('before', $event)"
           >
             <span class="absolute inset-0 rounded-full bg-primary shadow-sm" />
             <UIcon name="i-heroicons-plus" class="relative h-3.5 w-3.5 shrink-0" />
@@ -70,7 +70,7 @@
             aria-label="添加"
             @pointerenter="keepAddControlHover"
             @pointerdown.stop
-            @click.stop.prevent="handleAddClick('after')"
+            @click.stop.prevent="handleAddClick('after', $event)"
           >
             <span class="absolute inset-0 rounded-full bg-primary shadow-sm" />
             <UIcon name="i-heroicons-plus" class="relative h-3.5 w-3.5 shrink-0" />
@@ -137,6 +137,20 @@ const mergedPreviewSections = computed((): Record<string, DecorationSection> => 
   ...(decorationPreviewBundle.globalDsl.value?.sections || {}),
   ...(decorationPreviewBundle.pageDsl.value?.sections || {}),
 }))
+
+type DecorationArea = 'header' | 'template' | 'footer'
+
+function resolveDecorationArea(sectionId: string): DecorationArea {
+  if (decorationPreviewBundle.headerDsl.value?.sections?.[sectionId]) return 'header'
+  if (decorationPreviewBundle.footerDsl.value?.sections?.[sectionId]) return 'footer'
+  return 'template'
+}
+
+function resolveAreaOrder(area: DecorationArea) {
+  if (area === 'header') return decorationPreviewBundle.headerDsl.value?.order || []
+  if (area === 'footer') return decorationPreviewBundle.footerDsl.value?.order || []
+  return decorationPreviewBundle.pageDsl.value?.order || []
+}
 
 const SECTION_TYPE_LABEL: Record<string, string> = {
   'announcement-bar': '公告栏',
@@ -492,17 +506,17 @@ function keepAddControlHover() {
   ctx.setHoverSection(chrome.sectionId)
 }
 
-function handleAddClick(position: 'before' | 'after') {
+function handleAddClick(position: 'before' | 'after', event: MouseEvent) {
   const chrome = adminSyncedChrome.value
   if (!chrome) return
   if (chrome.kind === 'block') {
-    handleAddBlockClick(chrome.sectionId, chrome.blockId, position)
+    handleAddBlockClick(chrome.sectionId, chrome.blockId, position, event)
     return
   }
-  handleAddSectionClick(chrome.sectionId, position)
+  handleAddSectionClick(chrome.sectionId, position, event)
 }
 
-function handleAddBlockClick(sectionId: string, blockId: string, position: 'before' | 'after') {
+function handleAddBlockClick(sectionId: string, blockId: string, position: 'before' | 'after', event: MouseEvent) {
   const section = mergedPreviewSections.value[sectionId]
   const blockOrder = Array.isArray(section?.block_order) ? section.block_order : []
   const activeIndex = blockId ? blockOrder.indexOf(blockId) : -1
@@ -510,14 +524,15 @@ function handleAddBlockClick(sectionId: string, blockId: string, position: 'befo
     activeIndex >= 0
       ? activeIndex + (position === 'after' ? 1 : 0)
       : blockOrder.length || undefined
-  requestAddBlock(sectionId, insertIndex)
+  requestAddBlock(sectionId, insertIndex, { clientX: event.clientX, clientY: event.clientY }, resolveDecorationArea(sectionId))
 }
 
-function handleAddSectionClick(sectionId: string, position: 'before' | 'after') {
-  const order = decorationPreviewBundle.pageDsl.value?.order || []
+function handleAddSectionClick(sectionId: string, position: 'before' | 'after', event: MouseEvent) {
+  const area = resolveDecorationArea(sectionId)
+  const order = resolveAreaOrder(area)
   const activeIndex = order.indexOf(sectionId)
   const insertIndex = activeIndex >= 0 ? activeIndex + (position === 'after' ? 1 : 0) : undefined
-  requestAddSection(sectionId, insertIndex)
+  requestAddSection(sectionId, insertIndex, { clientX: event.clientX, clientY: event.clientY }, area)
 }
 
 const dashedBlockOverlays = computed(() => {

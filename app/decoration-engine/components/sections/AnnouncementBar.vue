@@ -1,7 +1,8 @@
 <template>
   <section
-    class="w-full border-b border-neutral-200"
-    :class="settings.color_mode === 'dark' ? 'bg-[#111827] text-white' : 'bg-white text-[#111827]'"
+    class="w-full border-b border-neutral-200 bg-[var(--section-background)] text-[var(--section-foreground)]"
+    :class="sectionClasses"
+    :style="sectionStyle"
     data-section-type="announcement-bar"
   >
     <div
@@ -27,6 +28,7 @@
 
 <script setup lang="ts">
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
+import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
 
 const props = defineProps<{
   section: DecorationSection
@@ -38,6 +40,17 @@ const settings = computed(() => {
   const raw = props.section.settings as Record<string, unknown>
   return {
     color_mode: String(raw.color_mode || 'light'),
+  }
+})
+const sectionClasses = computed(() => [
+  resolveSectionPaddingClass(props.section.settings?.padding_top || 'none', 'top'),
+  resolveSectionPaddingClass(props.section.settings?.padding_bottom || 'none', 'bottom'),
+])
+const sectionStyle = computed(() => {
+  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  return {
+    '--section-background': scheme.background,
+    '--section-foreground': scheme.foreground,
   }
 })
 

@@ -1,5 +1,10 @@
 <template>
-  <section class="relative w-full overflow-hidden bg-neutral-100" data-section-type="image-hotspot">
+  <section
+    class="relative w-full overflow-hidden bg-[var(--section-background)] text-[var(--section-foreground)]"
+    :class="sectionClasses"
+    :style="sectionStyle"
+    data-section-type="image-hotspot"
+  >
     <!--
       无背景图时原先不渲染 DecorationBlockHost，Admin 选中「图片」块后预览区没有任何描边节点。
       统一用同一 relative 容器：有/无底图都叠加热区；无热区时在预览下可用整块占位承接 BLOCK_HIGHLIGHT。
@@ -64,6 +69,7 @@
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
+import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
 
 interface HotspotBlock {
   id: string
@@ -123,6 +129,17 @@ const sectionSettings = computed(() => {
 
 const backgroundImage = computed(() => sectionSettings.value.pcImage)
 const mobileBackgroundImage = computed(() => sectionSettings.value.mobileImage)
+const sectionClasses = computed(() => [
+  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
+  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+])
+const sectionStyle = computed(() => {
+  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  return {
+    '--section-background': scheme.background,
+    '--section-foreground': scheme.foreground,
+  }
+})
 const aspectRatioStyle = computed(() => ({
   aspectRatio: `${sectionSettings.value.imageWidth} / ${sectionSettings.value.imageHeight}`,
 }))

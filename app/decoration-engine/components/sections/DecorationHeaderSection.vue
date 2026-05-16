@@ -1,40 +1,70 @@
 <template>
-  <header class="border-b border-neutral-200 bg-white" data-section-type="header">
-    <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-8 px-6 py-5 md:px-12">
-      <a :href="logoLink" class="flex items-center gap-3">
+  <header
+    class="border-b border-neutral-200 bg-[var(--section-background)] text-[var(--section-foreground)]"
+    :class="sectionClasses"
+    :style="sectionStyle"
+    data-section-type="header"
+  >
+    <div :class="innerClasses">
+      <div class="col-start-1 row-start-1 flex items-center gap-3 lg:gap-6">
+        <a v-if="isLogoLeft" :href="logoLink" class="flex items-center">
+          <img
+            :src="logoUrl"
+            :alt="section.title || 'logo'"
+            class="h-10 w-auto object-contain"
+          />
+        </a>
+
+        <button
+          type="button"
+          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
+          aria-label="搜索"
+          @click="emit('open-search')"
+        >
+          <Icon name="i-heroicons-magnifying-glass" class="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
+          aria-label="菜单"
+          @click="emit('open-category-nav')"
+        >
+          <Icon name="i-heroicons-bars-3" class="h-5 w-5" />
+        </button>
+      </div>
+
+      <a v-if="!isLogoLeft" :href="logoLink" class="col-start-2 row-start-1 flex items-center justify-self-center">
         <img
-          v-if="logoUrl"
           :src="logoUrl"
           :alt="section.title || 'logo'"
           class="h-10 w-auto object-contain"
         />
-        <span v-else class="text-lg font-semibold text-[#191A1D]">
-          {{ section.title || 'ECSHOPX' }}
-        </span>
       </a>
 
-      <nav class="hidden items-center gap-6 md:flex">
-        <DecorationBlockHost
-          v-for="item in navBlocks"
-          :key="item.blockId"
-          :section-id="sectionId"
-          :block-id="item.blockId"
-          root-class="inline-flex min-w-0"
+      <div class="col-start-3 row-start-1 flex h-5 items-center justify-end gap-3 lg:gap-6">
+        <button
+          type="button"
+          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
+          aria-label="购物袋"
+          @click="emit('open-mini-cart')"
         >
-          <a
-            :href="item.link"
-            class="text-sm text-neutral-700 transition hover:text-black"
-          >
-            {{ item.label }}
-          </a>
-        </DecorationBlockHost>
-      </nav>
+          <Icon name="i-heroicons-shopping-bag" class="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
+          aria-label="用户"
+          @click="emit('open-user')"
+        >
+          <Icon name="i-heroicons-user" class="h-5 w-5" />
+        </button>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import DecorationBlockHost from '~/decoration-engine/components/DecorationBlockHost.vue'
+import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
 import type {
   DecorationHighlightedBlock,
   DecorationSection,
@@ -46,28 +76,35 @@ const props = defineProps<{
   isPreview?: boolean
   highlightedBlock?: DecorationHighlightedBlock | null
 }>()
+const emit = defineEmits<{
+  'open-category-nav': []
+  'open-mini-cart': []
+  'open-search': []
+  'open-user': []
+}>()
 
-const logoUrl = computed(() => String(props.section.settings.logoUrl || ''))
+const logoUrl = computed(() => String(props.section.settings.logoUrl || '/images/logo/logo.png'))
 const logoLink = computed(() => String(props.section.settings.logoLink || '/'))
-
-/** 每个导航块用 DecorationBlockHost 包一层，预览时才能上报 blockRects、画出后台选中描边 */
-const navBlocks = computed(
-  () =>
-    props.section.block_order
-      .map((blockId) => {
-        const block = props.section.blocks[blockId]
-        if (!block || block.disabled) {
-          return null
-        }
-
-        const settings = block.settings as Record<string, unknown>
-
-        return {
-          blockId,
-          label: String(settings.label || settings.title || '导航'),
-          link: String(settings.link || '#'),
-        }
-      })
-      .filter(Boolean) as Array<{ blockId: string; label: string; link: string }>
+const logoPosition = computed(() =>
+  props.section.settings?.logo_position === 'left' ? 'left' : 'center'
 )
+const isLogoLeft = computed(() => logoPosition.value === 'left')
+const isFullWidth = computed(() => props.section.settings?.full_width === true)
+const sectionClasses = computed(() => [
+  isFullWidth.value ? 'w-full' : 'mx-auto max-w-[1440px]',
+  resolveSectionPaddingClass(props.section.settings?.padding_top || 'xs', 'top'),
+  resolveSectionPaddingClass(props.section.settings?.padding_bottom || 'xs', 'bottom'),
+])
+const innerClasses = computed(() => [
+  'mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-8 px-6',
+  isFullWidth.value ? 'w-full max-w-none' : 'max-w-[1440px]',
+])
+const sectionStyle = computed(() => {
+  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  return {
+    '--section-background': scheme.background,
+    '--section-foreground': scheme.foreground,
+  }
+})
+
 </script>

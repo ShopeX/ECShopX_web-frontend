@@ -19,6 +19,10 @@
             :section="dsl.sections[sectionId]"
             :section-id="sectionId"
             :is-preview="isPreview"
+            @open-category-nav="emit('open-category-nav')"
+            @open-mini-cart="emit('open-mini-cart')"
+            @open-search="emit('open-search')"
+            @open-user="emit('open-user')"
           />
         </DecorationSectionHost>
       </template>
@@ -83,6 +87,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'section-click', sectionId: string): void
+  (e: 'open-category-nav'): void
+  (e: 'open-mini-cart'): void
+  (e: 'open-search'): void
+  (e: 'open-user'): void
 }>()
 
 const { $decorationRegistry } = useNuxtApp()

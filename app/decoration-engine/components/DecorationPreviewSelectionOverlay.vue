@@ -174,6 +174,9 @@ const BLOCK_TYPE_LABEL: Record<string, string> = {
   hotspot: '热区',
   'nav-item': '导航菜单',
   'footer-link': '页脚链接',
+  'footer-menu': '菜单',
+  'footer-image': '图片',
+  'footer-text': '文本',
   'product-tab': '产品系列',
   'header-product-list': '商品列表',
   'header-collection-product-list': '产品系列商品列表',
@@ -203,11 +206,6 @@ function buildPreviewSelectionLabel(
     const block = section.blocks?.[blockId]
     if (!block) {
       return blockId
-    }
-    const s = (block.settings || {}) as Record<string, unknown>
-    const t = resolvePreviewLabel(s.label || s.title)
-    if (t) {
-      return t
     }
     return BLOCK_TYPE_LABEL[block.type] || block.type || blockId
   }

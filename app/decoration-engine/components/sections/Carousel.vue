@@ -1,11 +1,12 @@
 <template>
   <section
-    class="group relative w-full overflow-hidden bg-neutral-100"
-    :style="{ height: normalizedHeight }"
+    class="group relative w-full"
+    :class="sectionThemeClasses"
+    :style="sectionStyle"
     data-section-type="carousel"
   >
     <template v-if="slides.length">
-      <div class="h-full w-full overflow-hidden">
+      <div class="relative w-full overflow-hidden" :style="carouselViewportStyle">
         <div
           class="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
           :style="trackStyle"
@@ -66,72 +67,72 @@
             </DecorationBlockHost>
           </component>
         </div>
-      </div>
 
-      <div
-        v-if="shouldShowDots"
-        :class="paginationClass"
-      >
-        <template v-if="settings.paginationType === 'counter'">
-          {{ currentIndex + 1 }}/{{ slides.length }}
-        </template>
-        <template v-else-if="settings.paginationType === 'number'">
+        <div
+          v-if="shouldShowDots"
+          :class="paginationClass"
+        >
+          <template v-if="settings.paginationType === 'counter'">
+            {{ currentIndex + 1 }}/{{ slides.length }}
+          </template>
+          <template v-else-if="settings.paginationType === 'number'">
+            <button
+              v-for="(_, index) in slides"
+              :key="index"
+              type="button"
+              :class="[
+                'flex items-center justify-center rounded-full transition',
+                paginationNumberSizeClass,
+                index === currentIndex ? 'bg-white text-neutral-900' : 'text-white/70 hover:text-white'
+              ]"
+              :aria-label="`slide-${index + 1}`"
+              @click.stop="currentIndex = index"
+            >
+              {{ index + 1 }}
+            </button>
+          </template>
+          <template v-else>
+            <button
+              v-for="(_, index) in slides"
+              :key="index"
+              type="button"
+              :class="[
+                'relative overflow-hidden rounded-full bg-neutral-900/25 transition-colors duration-200 hover:bg-neutral-900/45',
+                paginationDotSizeClass,
+                index === currentIndex ? 'bg-neutral-900/25' : ''
+              ]"
+              :aria-label="`slide-${index + 1}`"
+              @click.stop="currentIndex = index"
+            >
+              <span
+                v-if="index === currentIndex"
+                :key="`${currentIndex}-${settings.interval}`"
+                class="carousel-pagination-progress absolute inset-y-0 left-0 rounded-full bg-neutral-900"
+                :style="paginationProgressStyle"
+              />
+            </button>
+          </template>
+        </div>
+
+        <template v-if="shouldShowArrows">
           <button
-            v-for="(_, index) in slides"
-            :key="index"
             type="button"
-            :class="[
-              'flex items-center justify-center rounded-full transition',
-              paginationNumberSizeClass,
-              index === currentIndex ? 'bg-white text-neutral-900' : 'text-white/70 hover:text-white'
-            ]"
-            :aria-label="`slide-${index + 1}`"
-            @click.stop="currentIndex = index"
+            class="absolute left-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white transition hover:bg-black/50 group-hover:flex"
+            aria-label="previous-slide"
+            @click.stop="goToPrevious"
           >
-            {{ index + 1 }}
+            <span aria-hidden="true">&lsaquo;</span>
+          </button>
+          <button
+            type="button"
+            class="absolute right-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white transition hover:bg-black/50 group-hover:flex"
+            aria-label="next-slide"
+            @click.stop="goToNext"
+          >
+            <span aria-hidden="true">&rsaquo;</span>
           </button>
         </template>
-        <template v-else>
-          <button
-            v-for="(_, index) in slides"
-            :key="index"
-            type="button"
-            :class="[
-              'relative overflow-hidden rounded-full bg-neutral-900/25 transition-colors duration-200 hover:bg-neutral-900/45',
-              paginationDotSizeClass,
-              index === currentIndex ? 'bg-neutral-900/25' : ''
-            ]"
-            :aria-label="`slide-${index + 1}`"
-            @click.stop="currentIndex = index"
-          >
-            <span
-              v-if="index === currentIndex"
-              :key="`${currentIndex}-${settings.interval}`"
-              class="carousel-pagination-progress absolute inset-y-0 left-0 rounded-full bg-neutral-900"
-              :style="paginationProgressStyle"
-            />
-          </button>
-        </template>
       </div>
-
-      <template v-if="shouldShowArrows">
-        <button
-          type="button"
-          class="absolute left-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white transition hover:bg-black/50 group-hover:flex"
-          aria-label="previous-slide"
-          @click.stop="goToPrevious"
-        >
-          <span aria-hidden="true">&lsaquo;</span>
-        </button>
-        <button
-          type="button"
-          class="absolute right-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white transition hover:bg-black/50 group-hover:flex"
-          aria-label="next-slide"
-          @click.stop="goToNext"
-        >
-          <span aria-hidden="true">&rsaquo;</span>
-        </button>
-      </template>
     </template>
 
     <template v-else-if="isPreview && placeholderHighlightBlockId">
@@ -158,6 +159,7 @@ import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { useDecorationRouteContext } from '~/decoration-engine/composables/useDecorationRouteContext'
+import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
 
 interface CarouselSettings {
   autoplay: boolean
@@ -167,6 +169,7 @@ interface CarouselSettings {
   paginationSize: 'small' | 'medium' | 'large'
   showDots: boolean
   showArrows: boolean
+  fullWidth: boolean
 }
 
 interface CarouselSlide {
@@ -217,6 +220,7 @@ const settings = computed<CarouselSettings>(() => {
     paginationSize: isCarouselPaginationSize(paginationSize) ? paginationSize : 'medium',
     showDots: raw.showDots !== false,
     showArrows: raw.enable_arrow !== false,
+    fullWidth: raw.full_width === true,
   }
 })
 
@@ -287,6 +291,25 @@ const slides = computed<CarouselSlide[]>(() =>
 const activeSlide = computed(() => slides.value[currentIndex.value] || slides.value[0] || null)
 const isActiveSlide = (slideId: string) => activeSlide.value?.id === slideId
 const normalizedHeight = computed(() => settings.value.height)
+const sectionThemeClasses = computed(() => {
+  return [
+    'text-[var(--section-foreground)]',
+    settings.value.fullWidth ? 'w-full' : 'mx-auto max-w-[1440px]',
+    resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
+    resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+    'bg-[var(--section-background)]',
+  ]
+})
+const sectionStyle = computed(() => {
+  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  return {
+    '--section-background': scheme.background,
+    '--section-foreground': scheme.foreground,
+  }
+})
+const carouselViewportStyle = computed(() => ({
+  height: normalizedHeight.value,
+}))
 const trackStyle = computed(() => ({
   transform: `translate3d(-${currentIndex.value * 100}%, 0, 0)`,
 }))

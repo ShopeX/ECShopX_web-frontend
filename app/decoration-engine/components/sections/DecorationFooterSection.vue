@@ -1,27 +1,82 @@
 <template>
-  <footer class="border-t border-neutral-200 bg-[#111214] text-white" data-section-type="footer">
-    <div class="mx-auto flex max-w-[1440px] flex-col gap-6 px-6 py-10 md:px-12">
-      <div class="flex flex-wrap items-center gap-5 text-sm text-white/80">
+  <footer
+    class="border-t border-neutral-200 bg-[var(--section-background)] text-[var(--section-foreground)]"
+    :class="sectionClasses"
+    :style="sectionStyle"
+    data-section-type="footer"
+  >
+    <div class="mx-auto max-w-[1440px] px-6 md:px-12">
+      <div class="grid grid-cols-12 gap-4 md:gap-6">
         <DecorationBlockHost
           v-for="item in footerBlocks"
           :key="item.blockId"
           :section-id="sectionId"
           :block-id="item.blockId"
-          root-class="inline-flex min-w-0"
+          :root-class="item.rootClass"
         >
-          <a :href="item.link" class="transition hover:text-white">
-            {{ item.label }}
-          </a>
+          <component :is="item.component" v-bind="item.props">
+            <template v-if="item.kind === 'text'">
+              <div :class="item.alignmentClass">
+                <div
+                  v-if="item.title"
+                  :class="['font-semibold leading-7 text-current', item.titleSizeClass]"
+                  v-html="item.title"
+                />
+                <div
+                  v-if="item.content"
+                  :class="['mt-3 leading-6 text-current opacity-70', item.contentSizeClass]"
+                  v-html="item.content"
+                />
+              </div>
+            </template>
+            <template v-else-if="item.kind === 'menu'">
+              <div :class="item.alignmentClass">
+                <div
+                  v-if="item.title"
+                  :class="['font-semibold leading-7 text-current', item.sizeClass]"
+                  v-html="item.title"
+                />
+                <ul :class="['mt-3 space-y-3 leading-6 text-current opacity-70', item.itemSizeClass]">
+                  <li v-for="menuItem in item.menuItems" :key="menuItem.label">
+                    <a
+                      :href="menuItem.url"
+                      class="inline-block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0_1px] bg-left-bottom bg-no-repeat transition-[background-size,opacity] duration-200 hover:bg-[length:100%_1px] hover:opacity-100"
+                    >
+                      {{ menuItem.label }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </template>
+            <template v-else-if="item.kind === 'image'">
+              <div :class="['flex', item.alignmentClass]">
+                <img
+                  v-if="item.image"
+                  :src="item.image"
+                  alt=""
+                  :class="['object-cover', item.widthClass, item.radiusClass]"
+                />
+                <div
+                  v-else
+                  :class="['flex min-h-[96px] items-center justify-center border border-current/10 bg-current/5 text-sm text-current opacity-40', item.widthClass, item.radiusClass]"
+                >
+                  footer image
+                </div>
+              </div>
+            </template>
+          </component>
         </DecorationBlockHost>
       </div>
 
-      <p class="text-sm text-white/60">{{ copyrightText }}</p>
+      <p class="mt-8 text-sm text-current opacity-60">{{ copyrightText }}</p>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
 import DecorationBlockHost from '~/decoration-engine/components/DecorationBlockHost.vue'
+import { useWebMenu } from '~/composables/useWebMenu'
+import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
 import type {
   DecorationHighlightedBlock,
   DecorationSection,
@@ -37,24 +92,192 @@ const props = defineProps<{
 const copyrightText = computed(() =>
   String(props.section.settings.copyright || 'Copyright © ECSHOPX')
 )
+const sectionClasses = computed(() => [
+  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
+  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+])
+const sectionStyle = computed(() => {
+  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  return {
+    '--section-background': scheme.background,
+    '--section-foreground': scheme.foreground,
+  }
+})
 
-const footerBlocks = computed(
-  () =>
-    props.section.block_order
-      .map((blockId) => {
-        const block = props.section.blocks[blockId]
-        if (!block || block.disabled) {
-          return null
-        }
+const footerMenuKeys = computed(() =>
+  props.section.block_order
+    .map((blockId) => props.section.blocks[blockId])
+    .filter((block) => block?.type === 'footer-menu' && !block.disabled)
+    .map((block) => String((block?.settings as Record<string, unknown>)?.menu || '').trim())
+    .filter(Boolean)
+)
 
-        const settings = block.settings as Record<string, unknown>
+const menuQueries = await Promise.all(
+  footerMenuKeys.value.map(async (menuKey) => {
+    const { data } = await useWebMenu(menuKey)
+    return [menuKey, data.value] as const
+  })
+)
 
+const footerMenuMap = new Map(menuQueries)
+
+const footerBlocks = computed(() =>
+  props.section.block_order
+    .map((blockId) => {
+      const block = props.section.blocks[blockId]
+      if (!block || block.disabled) {
+        return null
+      }
+
+      const settings = block.settings as Record<string, unknown>
+      const columnSpan = normalizeColumnSpan(settings.column_span)
+
+      if (block.type === 'footer-menu') {
+        const menu = normalizeSelectedMenu(settings.menu)
+        const menuData = footerMenuMap.get(String(menu?.key || menu?.id || '').trim())
         return {
           blockId,
-          label: String(settings.label || settings.title || '页脚链接'),
-          link: String(settings.link || '#'),
+          kind: 'menu',
+          rootClass: spanClass(columnSpan),
+          title: String(settings.title || menu?.name || menuData?.name || ''),
+          menuItems: normalizeMenuItems(menuData?.items || settings.menu_items),
+          sizeClass: resolveTextSizeClass(settings.size, 'small'),
+          itemSizeClass: resolveMenuItemSizeClass(settings.size),
+          alignmentClass: resolveTextAlignmentClass(settings.alignment),
+          component: 'div',
+          props: {}
         }
-      })
-      .filter(Boolean) as Array<{ blockId: string; label: string; link: string }>
+      }
+
+      if (block.type === 'footer-image') {
+        return {
+          blockId,
+          kind: 'image',
+          rootClass: spanClass(columnSpan),
+          image: String(settings.image || ''),
+          alignmentClass: resolveImageAlignmentClass(settings.alignment),
+          widthClass: resolveImageWidthClass(settings.width),
+          radiusClass: resolveImageRadiusClass(settings.radius),
+          component: 'div',
+          props: {}
+        }
+      }
+
+      return {
+        blockId,
+        kind: 'text',
+        rootClass: spanClass(columnSpan),
+        title: String(settings.title || ''),
+        content: String(settings.content || ''),
+        titleSizeClass: resolveTextSizeClass(settings.title_size, 'medium'),
+        contentSizeClass: resolveTextSizeClass(settings.content_size, 'small'),
+        alignmentClass: resolveTextAlignmentClass(settings.alignment),
+        component: 'div',
+        props: {}
+      }
+    })
+    .filter(Boolean) as Array<{ blockId: string; label: string; link: string }>
 )
+
+function normalizeColumnSpan(value: unknown): number {
+  const next = Number(value)
+  if (!Number.isFinite(next)) return 12
+  return Math.min(12, Math.max(1, Math.round(next)))
+}
+
+function spanClass(span: number): string {
+  const map: Record<number, string> = {
+    12: 'col-span-12',
+    11: 'col-span-11',
+    10: 'col-span-10',
+    9: 'col-span-9',
+    8: 'col-span-8',
+    7: 'col-span-7',
+    6: 'col-span-6',
+    5: 'col-span-5',
+    4: 'col-span-4',
+    3: 'col-span-3',
+    2: 'col-span-2',
+    1: 'col-span-1'
+  }
+  return map[span] || 'col-span-12'
+}
+
+function resolveTextSizeClass(value: unknown, fallback: string): string {
+  const size = String(value || fallback)
+  const map: Record<string, string> = {
+    xsmall: 'text-sm',
+    small: 'text-base',
+    medium: 'text-xl',
+    large: 'text-2xl',
+    xlarge: 'text-3xl'
+  }
+  return map[size] || map[fallback] || map.medium
+}
+
+function resolveMenuItemSizeClass(value: unknown): string {
+  const size = String(value || 'small')
+  const itemSizeMap: Record<string, string> = {
+    xsmall: 'text-xs',
+    small: 'text-sm',
+    medium: 'text-base',
+    large: 'text-xl',
+    xlarge: 'text-2xl'
+  }
+  return itemSizeMap[size] || itemSizeMap.small
+}
+
+function resolveTextAlignmentClass(value: unknown): string {
+  const alignment = String(value || 'left')
+  if (alignment === 'center') return 'text-center'
+  if (alignment === 'right') return 'text-right'
+  return 'text-left'
+}
+
+function resolveImageAlignmentClass(value: unknown): string {
+  const alignment = String(value || 'left')
+  if (alignment === 'center') return 'justify-center'
+  if (alignment === 'right') return 'justify-end'
+  return 'justify-start'
+}
+
+function resolveImageWidthClass(value: unknown): string {
+  const width = String(value || '100')
+  const map: Record<string, string> = {
+    '25': 'w-1/4',
+    '50': 'w-1/2',
+    '75': 'w-3/4',
+    '100': 'w-full'
+  }
+  return map[width] || map['100']
+}
+
+function resolveImageRadiusClass(value: unknown): string {
+  const radius = String(value || 'medium')
+  const map: Record<string, string> = {
+    none: 'rounded-none',
+    small: 'rounded',
+    medium: 'rounded-lg',
+    large: 'rounded-2xl',
+    full: 'rounded-full'
+  }
+  return map[radius] || map.medium
+}
+
+function normalizeSelectedMenu(menu: unknown) {
+  if (!menu) return null
+  if (typeof menu === 'object') return menu as Record<string, unknown>
+  const key = String(menu).trim()
+  if (!key) return null
+  return { id: key, key, name: key }
+}
+
+function normalizeMenuItems(value: unknown) {
+  return Array.isArray(value)
+    ? value.map((item) => ({
+        label: String(item?.label || item?.title || ''),
+        url: String(item?.url || '#')
+      }))
+    : []
+}
 </script>

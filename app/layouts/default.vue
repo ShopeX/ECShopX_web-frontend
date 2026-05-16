@@ -24,11 +24,11 @@
           : 'layout-decoration-renderer-header'
       "
       @section-click="emit('section-click', $event)"
-    >
-      <template v-if="isDecorationRouteDesignMode" #header>
-        <BCHeaderBar v-on="headerBarNavHandlers" />
-      </template>
-    </DecorationRenderer>
+      @open-category-nav="handleOpenCategoryNav"
+      @open-mini-cart="handleOpenMiniCart"
+      @open-search="handleOpenSearch"
+      @open-user="handleOpenUser"
+    />
 
     <main
       :class="
@@ -130,7 +130,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import BCHeaderBar from '~/components/BCHeaderBar/BCHeaderBar.vue'
 import BCFooter from '~/components/BCFooter/BCFooter.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
 import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
@@ -206,11 +205,8 @@ const handleOpenSearch = () => {
   showSearchDrawer.value = true
 }
 
-/** 设计器头区插槽内 BCHeaderBar 的抽屉/导航事件 */
-const headerBarNavHandlers = {
-  openCategoryNav: handleOpenCategoryNav,
-  openMiniCart: handleOpenMiniCart,
-  openSearch: handleOpenSearch,
+const handleOpenUser = async () => {
+  await router.push('/account')
 }
 
 const handleSearch = (keyword: string) => {

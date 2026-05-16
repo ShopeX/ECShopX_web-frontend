@@ -1,6 +1,7 @@
 <template>
   <section
     :class="sectionClasses"
+    :style="sectionThemeStyle"
     data-section-type="product-tab-shelf"
   >
     <div v-if="settings.title || settings.intro" :class="headingClasses">
@@ -28,8 +29,8 @@
           :class="[
             'rounded-full px-4 py-1.5 text-sm font-medium transition-colors md:px-5',
             activeTabId === tab.id
-              ? 'bg-[#191A1D] text-white'
-              : 'bg-[#F4F5F7] text-[#596273] hover:bg-[#ECEFF3]',
+              ? 'bg-[var(--section-active-background)] text-[var(--section-active-foreground)]'
+              : 'bg-[var(--section-soft-background)] text-[var(--section-muted-foreground)] hover:opacity-85',
           ]"
           @click="handleTabClick($event, tab.id)"
           v-html="tab.label"
@@ -86,6 +87,7 @@ import { useDecorationEditOptional } from '~/decoration-engine/composables/useDe
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
 
 interface ProductTabShelfSettings {
   title: string
@@ -97,8 +99,8 @@ interface ProductTabShelfSettings {
   fullWidth: boolean
   showPrice: boolean
   showAddCart: boolean
-  paddingTop: 's' | 'm' | 'l'
-  paddingBottom: 's' | 'm' | 'l'
+  paddingTop: 'none' | 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl'
+  paddingBottom: 'none' | 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl'
 }
 
 interface ProductTabItem {
@@ -127,10 +129,10 @@ const isDecorationPreview = computed(() => Boolean(props.isPreview))
 const settings = computed<ProductTabShelfSettings>(() => {
   const raw = props.section.settings as Record<string, unknown>
   const rawColumns = Number(raw.columns ?? 4)
-  const paddingTop = ['s', 'm', 'l'].includes(String(raw.padding_top))
+  const paddingTop = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(String(raw.padding_top))
     ? String(raw.padding_top)
     : 'm'
-  const paddingBottom = ['s', 'm', 'l'].includes(String(raw.padding_bottom))
+  const paddingBottom = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(String(raw.padding_bottom))
     ? String(raw.padding_bottom)
     : 'm'
   const size = normalizeSize(raw.size)
@@ -280,11 +282,23 @@ const { data: productsData, pending } = await useAsyncData(
 const products = computed(() => productsData.value || [])
 
 const sectionClasses = computed(() => [
-  'py-12 md:py-[96px]',
-  settings.value.fullWidth
-    ? 'w-full px-4 md:px-[48px] lg:px-[64px]'
-    : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
+  'w-full',
+  settings.value.fullWidth ? 'px-4 md:px-[48px] lg:px-[64px]' : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
+  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
+  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+  'bg-[var(--section-background)] text-[var(--section-foreground)]',
 ])
+const sectionThemeStyle = computed(() => {
+  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  return {
+    '--section-background': scheme.background,
+    '--section-foreground': scheme.foreground,
+    '--section-muted-foreground': scheme.mutedForeground,
+    '--section-soft-background': scheme.softBackground,
+    '--section-active-background': scheme.activeBackground,
+    '--section-active-foreground': scheme.activeForeground,
+  }
+})
 
 const headingClasses = computed(() => [
   'mb-8 md:mb-[64px]',
@@ -294,12 +308,12 @@ const headingClasses = computed(() => [
 ])
 
 const titleClasses = computed(() => [
-  'font-normal tracking-[-0.48px] text-[#191A1D]',
+  'font-normal tracking-[-0.48px] text-[var(--section-foreground)]',
   sizeTextClass.value,
 ])
 
 const introClasses = computed(() => [
-  'mt-4 text-[#5F646D]',
+  'mt-4 text-[var(--section-muted-foreground)]',
   sizeTextClass.value,
 ])
 

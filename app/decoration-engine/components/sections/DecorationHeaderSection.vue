@@ -91,7 +91,7 @@ const logoPosition = computed(() =>
 const isLogoLeft = computed(() => logoPosition.value === 'left')
 const isFullWidth = computed(() => props.section.settings?.full_width === true)
 const sectionClasses = computed(() => [
-  isFullWidth.value ? 'w-full' : 'mx-auto max-w-[1440px]',
+  'w-full',
   resolveSectionPaddingClass(props.section.settings?.padding_top || 'xs', 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom || 'xs', 'bottom'),
 ])

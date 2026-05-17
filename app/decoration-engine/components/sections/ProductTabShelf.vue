@@ -1,81 +1,83 @@
 <template>
   <section
-    :class="sectionClasses"
+    :class="sectionOuterClasses"
     :style="sectionThemeStyle"
     data-section-type="product-tab-shelf"
   >
-    <div v-if="settings.title || settings.intro" :class="headingClasses">
-      <h2 v-if="settings.title" :class="titleClasses">
-        {{ settings.title }}
-      </h2>
-      <div
-        v-if="settings.intro"
-        :class="introClasses"
-        v-html="settings.intro"
-      />
+    <div :class="sectionInnerClasses">
+      <div v-if="settings.title || settings.intro" :class="headingClasses">
+        <h2 v-if="settings.title" :class="titleClasses">
+          {{ settings.title }}
+        </h2>
+        <div
+          v-if="settings.intro"
+          :class="introClasses"
+          v-html="settings.intro"
+        />
+      </div>
+
+      <DecorationBlockHost
+        v-if="activeTab"
+        :section-id="sectionId"
+        :block-id="activeTab.id"
+        root-class="decoration-product-tab-block min-h-[120px]"
+      >
+        <div class="mb-6 flex flex-wrap justify-center gap-2 md:mb-[32px] md:gap-[12px]">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            type="button"
+            :class="[
+              'rounded-full px-4 py-1.5 text-sm font-medium transition-colors md:px-5',
+              activeTabId === tab.id
+                ? 'bg-[var(--section-active-background)] text-[var(--section-active-foreground)]'
+                : 'bg-[var(--section-soft-background)] text-[var(--section-muted-foreground)] hover:opacity-85',
+            ]"
+            @click="handleTabClick($event, tab.id)"
+            v-html="tab.label"
+          />
+        </div>
+
+        <div
+          v-if="showPlaceholder"
+          class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
+          :style="gridStyle"
+        >
+          <BCProductCard
+            v-for="product in placeholderProducts"
+            :key="product.itemId"
+            :product="product"
+            mode="popular"
+            :show-price="settings.showPrice"
+            :show-add-cart="settings.showAddCart"
+            disable-appear-animation
+          />
+        </div>
+
+        <div
+          v-else-if="products.length"
+          class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
+          :style="gridStyle"
+        >
+          <BCProductCard
+            v-for="product in products"
+            :key="product.itemId"
+            :product="product"
+            mode="popular"
+            :show-price="settings.showPrice"
+            :show-add-cart="settings.showAddCart"
+            disable-appear-animation
+          />
+        </div>
+
+        <div
+          v-else-if="pending"
+          class="flex min-h-[200px] items-center justify-center text-sm text-neutral-500"
+        >
+          Loading...
+        </div>
+      </DecorationBlockHost>
     </div>
-
-    <DecorationBlockHost
-      v-if="activeTab"
-      :section-id="sectionId"
-      :block-id="activeTab.id"
-      root-class="decoration-product-tab-block min-h-[120px]"
-    >
-      <div class="mb-6 flex flex-wrap justify-center gap-2 md:mb-[32px] md:gap-[12px]">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          type="button"
-          :class="[
-            'rounded-full px-4 py-1.5 text-sm font-medium transition-colors md:px-5',
-            activeTabId === tab.id
-              ? 'bg-[var(--section-active-background)] text-[var(--section-active-foreground)]'
-              : 'bg-[var(--section-soft-background)] text-[var(--section-muted-foreground)] hover:opacity-85',
-          ]"
-          @click="handleTabClick($event, tab.id)"
-          v-html="tab.label"
-        />
-      </div>
-
-      <div
-        v-if="showPlaceholder"
-        class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
-        :style="gridStyle"
-      >
-        <BCProductCard
-          v-for="product in placeholderProducts"
-          :key="product.itemId"
-          :product="product"
-          mode="popular"
-          :show-price="settings.showPrice"
-          :show-add-cart="settings.showAddCart"
-          disable-appear-animation
-        />
-      </div>
-
-      <div
-        v-else-if="products.length"
-        class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
-        :style="gridStyle"
-      >
-        <BCProductCard
-          v-for="product in products"
-          :key="product.itemId"
-          :product="product"
-          mode="popular"
-          :show-price="settings.showPrice"
-          :show-add-cart="settings.showAddCart"
-          disable-appear-animation
-        />
-      </div>
-
-      <div
-        v-else-if="pending"
-        class="flex min-h-[200px] items-center justify-center text-sm text-neutral-500"
-      >
-        Loading...
-      </div>
-    </DecorationBlockHost>
   </section>
 </template>
 
@@ -281,12 +283,16 @@ const { data: productsData, pending } = await useAsyncData(
 
 const products = computed(() => productsData.value || [])
 
-const sectionClasses = computed(() => [
+const sectionOuterClasses = computed(() => [
   'w-full',
-  settings.value.fullWidth ? 'px-4 md:px-[48px] lg:px-[64px]' : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
   'bg-[var(--section-background)] text-[var(--section-foreground)]',
+])
+const sectionInnerClasses = computed(() => [
+  settings.value.fullWidth
+    ? 'w-full max-w-none px-4 md:px-[48px] lg:px-[64px]'
+    : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
 ])
 const sectionThemeStyle = computed(() => {
   const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)

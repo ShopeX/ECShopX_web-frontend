@@ -6,7 +6,8 @@
     data-section-type="carousel"
   >
     <template v-if="slides.length">
-      <div class="relative w-full overflow-hidden" :style="carouselViewportStyle">
+      <div :class="carouselInnerClasses">
+        <div class="relative w-full overflow-hidden" :style="carouselViewportStyle">
         <div
           class="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
           :style="trackStyle"
@@ -132,22 +133,25 @@
             <span aria-hidden="true">&rsaquo;</span>
           </button>
         </template>
+        </div>
       </div>
     </template>
 
     <template v-else-if="isPreview && placeholderHighlightBlockId">
-      <DecorationBlockHost
-        :section-id="sectionId"
-        :block-id="placeholderHighlightBlockId"
-        root-class="flex h-full min-h-[200px] w-full items-center justify-center bg-neutral-100 text-sm text-neutral-400"
-      >
-        {{ t('8cac7342.cc2e46') }}
-      </DecorationBlockHost>
+      <div :class="carouselInnerClasses">
+        <DecorationBlockHost
+          :section-id="sectionId"
+          :block-id="placeholderHighlightBlockId"
+          root-class="flex h-full min-h-[200px] w-full items-center justify-center bg-neutral-100 text-sm text-neutral-400"
+        >
+          {{ t('8cac7342.cc2e46') }}
+        </DecorationBlockHost>
+      </div>
     </template>
 
     <div
       v-else
-      class="flex h-full min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"
+      :class="['flex h-full min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400', carouselInnerClasses]"
     >
       {{ t('8cac7342.cc2e46') }}
     </div>
@@ -294,12 +298,14 @@ const normalizedHeight = computed(() => settings.value.height)
 const sectionThemeClasses = computed(() => {
   return [
     'text-[var(--section-foreground)]',
-    settings.value.fullWidth ? 'w-full' : 'mx-auto max-w-[1440px]',
     resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
     resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
     'bg-[var(--section-background)]',
   ]
 })
+const carouselInnerClasses = computed(() => [
+  settings.value.fullWidth ? 'w-full' : 'mx-auto max-w-[1440px]',
+])
 const sectionStyle = computed(() => {
   const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
   return {

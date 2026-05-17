@@ -9,58 +9,60 @@
       无背景图时原先不渲染 DecorationBlockHost，Admin 选中「图片」块后预览区没有任何描边节点。
       统一用同一 relative 容器：有/无底图都叠加热区；无热区时在预览下可用整块占位承接 BLOCK_HIGHLIGHT。
     -->
-    <div class="relative w-full" :style="aspectRatioStyle">
-      <picture v-if="backgroundImage || mobileBackgroundImage">
-        <source v-if="mobileBackgroundImage" media="(max-width: 767px)" :srcset="mobileBackgroundImage" />
-        <img
-          :src="backgroundImage || mobileBackgroundImage"
-          :alt="section.title || 'image hotspot'"
-          class="absolute inset-0 h-full w-full object-cover"
-        />
-      </picture>
-      <div
-        v-else
-        class="absolute inset-0 flex min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"
-      >
-        {{ t('44646d39.9bb1a6') }}
-      </div>
-
-      <DecorationBlockHost
-        v-for="hotspot in activeHotspots"
-        :key="hotspot.id"
-        :section-id="sectionId"
-        :block-id="hotspot.id"
-        :root-style="hotspot.style"
-        :root-class="'group absolute z-[1] flex items-center justify-center'"
-      >
-        <component
-          :is="resolveHotspotTag(hotspot.link)"
-          class="relative block h-full w-full"
-          :href="resolveHotspotHref(hotspot.link)"
-          :target="resolveHotspotTarget(hotspot.link)"
-          :rel="resolveHotspotRel(hotspot.link)"
-          :aria-label="hotspot.label || `hotspot-${hotspot.id}`"
-          @click="handleHotspotClick($event, hotspot.id)"
+    <div :class="innerClasses">
+      <div class="relative w-full" :style="aspectRatioStyle">
+        <picture v-if="backgroundImage || mobileBackgroundImage">
+          <source v-if="mobileBackgroundImage" media="(max-width: 767px)" :srcset="mobileBackgroundImage" />
+          <img
+            :src="backgroundImage || mobileBackgroundImage"
+            :alt="section.title || 'image hotspot'"
+            class="absolute inset-0 h-full w-full object-cover"
+          />
+        </picture>
+        <div
+          v-else
+          class="absolute inset-0 flex min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"
         >
-          <span class="block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm" />
+          {{ t('44646d39.9bb1a6') }}
+        </div>
 
-          <span
-            v-if="hotspot.label"
-            class="pointer-events-none absolute -top-3 left-1/2 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full bg-black/75 px-3 py-1 text-xs text-white group-hover:block"
+        <DecorationBlockHost
+          v-for="hotspot in activeHotspots"
+          :key="hotspot.id"
+          :section-id="sectionId"
+          :block-id="hotspot.id"
+          :root-style="hotspot.style"
+          :root-class="'group absolute z-[1] flex items-center justify-center'"
+        >
+          <component
+            :is="resolveHotspotTag(hotspot.link)"
+            class="relative block h-full w-full"
+            :href="resolveHotspotHref(hotspot.link)"
+            :target="resolveHotspotTarget(hotspot.link)"
+            :rel="resolveHotspotRel(hotspot.link)"
+            :aria-label="hotspot.label || `hotspot-${hotspot.id}`"
+            @click="handleHotspotClick($event, hotspot.id)"
           >
-            {{ hotspot.label }}
-          </span>
-        </component>
-      </DecorationBlockHost>
+            <span class="block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm" />
 
-      <DecorationBlockHost
-        v-if="isPreview && placeholderHighlightBlockId"
-        :section-id="sectionId"
-        :block-id="placeholderHighlightBlockId"
-        root-class="absolute inset-0 z-[2] min-h-[120px]"
-      >
-        <span class="sr-only">{{ t('44646d39.9bb1a6') }}</span>
-      </DecorationBlockHost>
+            <span
+              v-if="hotspot.label"
+              class="pointer-events-none absolute -top-3 left-1/2 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full bg-black/75 px-3 py-1 text-xs text-white group-hover:block"
+            >
+              {{ hotspot.label }}
+            </span>
+          </component>
+        </DecorationBlockHost>
+
+        <DecorationBlockHost
+          v-if="isPreview && placeholderHighlightBlockId"
+          :section-id="sectionId"
+          :block-id="placeholderHighlightBlockId"
+          root-class="absolute inset-0 z-[2] min-h-[120px]"
+        >
+          <span class="sr-only">{{ t('44646d39.9bb1a6') }}</span>
+        </DecorationBlockHost>
+      </div>
     </div>
   </section>
 </template>
@@ -132,6 +134,9 @@ const mobileBackgroundImage = computed(() => sectionSettings.value.mobileImage)
 const sectionClasses = computed(() => [
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+])
+const innerClasses = computed(() => [
+  props.section.settings?.full_width === true ? 'w-full' : 'mx-auto max-w-[1440px]',
 ])
 const sectionStyle = computed(() => {
   const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)

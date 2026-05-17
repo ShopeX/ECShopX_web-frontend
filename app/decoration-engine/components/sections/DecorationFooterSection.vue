@@ -5,7 +5,7 @@
     :style="sectionStyle"
     data-section-type="footer"
   >
-    <div class="mx-auto max-w-[1440px] px-6 md:px-12">
+    <div :class="sectionInnerClasses">
       <div class="grid grid-cols-12 gap-4 md:gap-6">
         <DecorationBlockHost
           v-for="item in footerBlocks"
@@ -95,6 +95,11 @@ const copyrightText = computed(() =>
 const sectionClasses = computed(() => [
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+])
+const sectionInnerClasses = computed(() => [
+  props.section.settings?.full_width === false
+    ? 'mx-auto max-w-[1440px] px-6 md:px-12'
+    : 'w-full max-w-none px-6 md:px-12',
 ])
 const sectionStyle = computed(() => {
   const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)

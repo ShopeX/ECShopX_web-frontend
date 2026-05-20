@@ -152,7 +152,7 @@ const settings = computed<ProductTabShelfSettings>(() => {
     alignment: alignment as ProductTabShelfSettings['alignment'],
     columns: normalizeColumns(rawColumns),
     spacing: spacing as ProductTabShelfSettings['spacing'],
-    fullWidth: raw.full_width !== false,
+    fullWidth: raw.full_width === true,
     showPrice: raw.show_price !== false,
     showAddCart: raw.show_add_cart !== false,
     paddingTop: paddingTop as ProductTabShelfSettings['paddingTop'],

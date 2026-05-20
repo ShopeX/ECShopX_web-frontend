@@ -6,7 +6,7 @@
     data-section-type="footer"
   >
     <div :class="sectionInnerClasses">
-      <div class="grid grid-cols-12 gap-4 md:gap-6">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-6">
         <DecorationBlockHost
           v-for="item in footerBlocks"
           :key="item.blockId"
@@ -36,7 +36,9 @@
                   :class="['font-semibold leading-7 text-current', item.sizeClass]"
                   v-html="item.title"
                 />
-                <ul :class="['mt-3 space-y-3 leading-6 text-current opacity-70', item.itemSizeClass]">
+                <ul
+                  :class="['mt-3 space-y-3 leading-6 text-current opacity-70', item.itemSizeClass]"
+                >
                   <li v-for="menuItem in item.menuItems" :key="menuItem.label">
                     <a
                       :href="menuItem.url"
@@ -58,7 +60,11 @@
                 />
                 <div
                   v-else
-                  :class="['flex min-h-[96px] items-center justify-center border border-current/10 bg-current/5 text-sm text-current opacity-40', item.widthClass, item.radiusClass]"
+                  :class="[
+                    'flex min-h-[96px] items-center justify-center border border-current/10 bg-current/5 text-sm text-current opacity-40',
+                    item.widthClass,
+                    item.radiusClass,
+                  ]"
                 >
                   footer image
                 </div>
@@ -68,15 +74,30 @@
         </DecorationBlockHost>
       </div>
 
-      <p class="mt-8 text-sm text-current opacity-60">{{ copyrightText }}</p>
+      <div class="mt-8 flex justify-center">
+        <img
+          src="/images/brand/copyright.png"
+          alt="Powered by ShopeX"
+          class="h-4 w-auto object-contain"
+        />
+      </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
 import DecorationBlockHost from '~/decoration-engine/components/DecorationBlockHost.vue'
-import { useWebMenu } from '~/composables/useWebMenu'
-import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  resolveWebMenuRequestValue,
+  resolveWebMenuItemLink,
+  useWebMenu,
+  type NormalizedWebMenuSelection,
+} from '~/composables/useWebMenu'
+import type { WebMenuItem, WebMenuPayload } from '~/decoration-engine/components/webMenuTypes'
+import {
+  resolveSectionColorScheme,
+  resolveSectionPaddingClass,
+} from '~/decoration-engine/utils/sectionAppearance'
 import type {
   DecorationHighlightedBlock,
   DecorationSection,
@@ -89,9 +110,6 @@ const props = defineProps<{
   highlightedBlock?: DecorationHighlightedBlock | null
 }>()
 
-const copyrightText = computed(() =>
-  String(props.section.settings.copyright || 'Copyright © ECSHOPX')
-)
 const sectionClasses = computed(() => [
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
@@ -109,79 +127,81 @@ const sectionStyle = computed(() => {
   }
 })
 
-const footerMenuKeys = computed(() =>
+const footerMenuIds = computed(() =>
   props.section.block_order
     .map((blockId) => props.section.blocks[blockId])
     .filter((block) => block?.type === 'footer-menu' && !block.disabled)
-    .map((block) => String((block?.settings as Record<string, unknown>)?.menu || '').trim())
+    .map((block) => resolveWebMenuRequestValue((block?.settings as Record<string, unknown>)?.menu))
     .filter(Boolean)
 )
 
 const menuQueries = await Promise.all(
-  footerMenuKeys.value.map(async (menuKey) => {
-    const { data } = await useWebMenu(menuKey)
-    return [menuKey, data.value] as const
+  footerMenuIds.value.map(async (menuId) => {
+    const { data } = await useWebMenu(menuId)
+    return [menuId, data.value] as const
   })
 )
 
 const footerMenuMap = new Map(menuQueries)
 
-const footerBlocks = computed(() =>
-  props.section.block_order
-    .map((blockId) => {
-      const block = props.section.blocks[blockId]
-      if (!block || block.disabled) {
-        return null
-      }
+const footerBlocks = computed(
+  () =>
+    props.section.block_order
+      .map((blockId) => {
+        const block = props.section.blocks[blockId]
+        if (!block || block.disabled) {
+          return null
+        }
 
-      const settings = block.settings as Record<string, unknown>
-      const columnSpan = normalizeColumnSpan(settings.column_span)
+        const settings = block.settings as Record<string, unknown>
+        const columnSpan = normalizeColumnSpan(settings.column_span)
 
-      if (block.type === 'footer-menu') {
-        const menu = normalizeSelectedMenu(settings.menu)
-        const menuData = footerMenuMap.get(String(menu?.key || menu?.id || '').trim())
+        if (block.type === 'footer-menu') {
+          const menu = normalizeSelectedMenu(settings.menu)
+          const menuId = resolveWebMenuRequestValue(menu)
+          const menuData = footerMenuMap.get(menuId) as WebMenuPayload | null | undefined
+          return {
+            blockId,
+            kind: 'menu',
+            rootClass: spanClass(columnSpan),
+            title: String(settings.title || menu?.name || menuData?.name || ''),
+            menuItems: normalizeMenuItems(menuData?.items || settings.menu_items),
+            sizeClass: resolveTextSizeClass(settings.size, 'small'),
+            itemSizeClass: resolveMenuItemSizeClass(settings.size),
+            alignmentClass: resolveTextAlignmentClass(settings.alignment),
+            component: 'div',
+            props: {},
+          }
+        }
+
+        if (block.type === 'footer-image') {
+          return {
+            blockId,
+            kind: 'image',
+            rootClass: spanClass(columnSpan),
+            image: String(settings.image || ''),
+            alignmentClass: resolveImageAlignmentClass(settings.alignment),
+            widthClass: resolveImageWidthClass(settings.width),
+            radiusClass: resolveImageRadiusClass(settings.radius),
+            component: 'div',
+            props: {},
+          }
+        }
+
         return {
           blockId,
-          kind: 'menu',
+          kind: 'text',
           rootClass: spanClass(columnSpan),
-          title: String(settings.title || menu?.name || menuData?.name || ''),
-          menuItems: normalizeMenuItems(menuData?.items || settings.menu_items),
-          sizeClass: resolveTextSizeClass(settings.size, 'small'),
-          itemSizeClass: resolveMenuItemSizeClass(settings.size),
+          title: String(settings.title || ''),
+          content: String(settings.content || ''),
+          titleSizeClass: resolveTextSizeClass(settings.title_size, 'medium'),
+          contentSizeClass: resolveTextSizeClass(settings.content_size, 'small'),
           alignmentClass: resolveTextAlignmentClass(settings.alignment),
           component: 'div',
-          props: {}
+          props: {},
         }
-      }
-
-      if (block.type === 'footer-image') {
-        return {
-          blockId,
-          kind: 'image',
-          rootClass: spanClass(columnSpan),
-          image: String(settings.image || ''),
-          alignmentClass: resolveImageAlignmentClass(settings.alignment),
-          widthClass: resolveImageWidthClass(settings.width),
-          radiusClass: resolveImageRadiusClass(settings.radius),
-          component: 'div',
-          props: {}
-        }
-      }
-
-      return {
-        blockId,
-        kind: 'text',
-        rootClass: spanClass(columnSpan),
-        title: String(settings.title || ''),
-        content: String(settings.content || ''),
-        titleSizeClass: resolveTextSizeClass(settings.title_size, 'medium'),
-        contentSizeClass: resolveTextSizeClass(settings.content_size, 'small'),
-        alignmentClass: resolveTextAlignmentClass(settings.alignment),
-        component: 'div',
-        props: {}
-      }
-    })
-    .filter(Boolean) as Array<{ blockId: string; label: string; link: string }>
+      })
+      .filter(Boolean) as Array<{ blockId: string; label: string; link: string }>
 )
 
 function normalizeColumnSpan(value: unknown): number {
@@ -192,20 +212,20 @@ function normalizeColumnSpan(value: unknown): number {
 
 function spanClass(span: number): string {
   const map: Record<number, string> = {
-    12: 'col-span-12',
-    11: 'col-span-11',
-    10: 'col-span-10',
-    9: 'col-span-9',
-    8: 'col-span-8',
-    7: 'col-span-7',
-    6: 'col-span-6',
-    5: 'col-span-5',
-    4: 'col-span-4',
-    3: 'col-span-3',
-    2: 'col-span-2',
-    1: 'col-span-1'
+    12: 'md:col-span-12',
+    11: 'md:col-span-11',
+    10: 'md:col-span-10',
+    9: 'md:col-span-9',
+    8: 'md:col-span-8',
+    7: 'md:col-span-7',
+    6: 'md:col-span-6',
+    5: 'md:col-span-5',
+    4: 'md:col-span-4',
+    3: 'md:col-span-3',
+    2: 'md:col-span-2',
+    1: 'md:col-span-1',
   }
-  return map[span] || 'col-span-12'
+  return map[span] || 'md:col-span-12'
 }
 
 function resolveTextSizeClass(value: unknown, fallback: string): string {
@@ -215,7 +235,7 @@ function resolveTextSizeClass(value: unknown, fallback: string): string {
     small: 'text-base',
     medium: 'text-xl',
     large: 'text-2xl',
-    xlarge: 'text-3xl'
+    xlarge: 'text-3xl',
   }
   return map[size] || map[fallback] || map.medium
 }
@@ -227,7 +247,7 @@ function resolveMenuItemSizeClass(value: unknown): string {
     small: 'text-sm',
     medium: 'text-base',
     large: 'text-xl',
-    xlarge: 'text-2xl'
+    xlarge: 'text-2xl',
   }
   return itemSizeMap[size] || itemSizeMap.small
 }
@@ -252,7 +272,7 @@ function resolveImageWidthClass(value: unknown): string {
     '25': 'w-1/4',
     '50': 'w-1/2',
     '75': 'w-3/4',
-    '100': 'w-full'
+    '100': 'w-full',
   }
   return map[width] || map['100']
 }
@@ -264,25 +284,45 @@ function resolveImageRadiusClass(value: unknown): string {
     small: 'rounded',
     medium: 'rounded-lg',
     large: 'rounded-2xl',
-    full: 'rounded-full'
+    full: 'rounded-full',
   }
   return map[radius] || map.medium
 }
 
-function normalizeSelectedMenu(menu: unknown) {
+function normalizeSelectedMenu(menu: unknown): NormalizedWebMenuSelection | null {
   if (!menu) return null
-  if (typeof menu === 'object') return menu as Record<string, unknown>
-  const key = String(menu).trim()
-  if (!key) return null
-  return { id: key, key, name: key }
+  if (typeof menu === 'object') return menu as NormalizedWebMenuSelection
+
+  const value = String(menu).trim()
+  if (!value) return null
+
+  if (/^\d+$/.test(value)) {
+    return { id: value, key: value, name: value }
+  }
+
+  return { key: value, name: value }
 }
 
 function normalizeMenuItems(value: unknown) {
-  return Array.isArray(value)
-    ? value.map((item) => ({
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value
+    .map((item) => {
+      if (item && typeof item === 'object' && 'link_type' in item) {
+        const menuItem = item as WebMenuItem
+        return {
+          label: String(menuItem.name || ''),
+          url: resolveWebMenuItemLink(menuItem),
+        }
+      }
+
+      return {
         label: String(item?.label || item?.title || ''),
-        url: String(item?.url || '#')
-      }))
-    : []
+        url: String(item?.url || '#'),
+      }
+    })
+    .filter((item) => item.label)
 }
 </script>

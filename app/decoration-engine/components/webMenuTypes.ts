@@ -2,8 +2,18 @@
 export interface WebMenuItem {
   id: number
   name: string
-  link_type: 'category' | 'custom_page' | 'list_page' | 'article' | 'url' | 'none'
+  image_url?: string | null
+  link_type:
+    | 'category'
+    | 'sale_category'
+    | 'goods'
+    | 'custom_page'
+    | 'list_page'
+    | 'article'
+    | 'url'
+    | 'none'
   link_value: string | null
+  link_extra?: Record<string, unknown>
   children: WebMenuItem[]
 }
 

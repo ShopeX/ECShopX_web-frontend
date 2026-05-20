@@ -64,3 +64,12 @@ test('ProductTabShelf section follows decoration plan contract', () => {
   assert.match(registry, /ProductTabShelf/)
   assert.match(registry, /'product-tab-shelf'/)
 })
+
+test('DecorationFooterSection uses single-column mobile layout and desktop spans', () => {
+  const source = read('app/decoration-engine/components/sections/DecorationFooterSection.vue')
+
+  assert.match(source, /grid-cols-1/)
+  assert.match(source, /md:grid-cols-12/)
+  assert.match(source, /md:col-span-12/)
+  assert.match(source, /md:col-span-6/)
+})

@@ -22,7 +22,7 @@
           ref="inputRef"
           v-model="keyword"
           type="text"
-          :placeholder="t('18b55d98.0a24c0')"
+          :placeholder="t('e11aa0ec.2470ef')"
           class="flex-1 text-sm text-[#99a1af] outline-none border-none bg-transparent"
           data-testid="search-input"
           @keydown.enter="handleSearch"
@@ -38,9 +38,12 @@
       </div>
 
       <!-- 热门搜索和历史搜索 - PC 两列并排 -->
-      <div class="grid gap-8" :class="isMobile ? 'grid-cols-1' : 'grid-cols-2'">
+      <div
+        class="grid gap-8"
+        :class="showHotKeywords ? (isMobile ? 'grid-cols-1' : 'grid-cols-2') : 'grid-cols-1'"
+      >
         <!-- 热门搜索 -->
-        <div data-testid="hot-keywords-section">
+        <div v-if="showHotKeywords" data-testid="hot-keywords-section">
           <h2 class="text-base font-medium text-[#191a1d] leading-5 mb-8">
             {{ t('18b55d98.c5d14b') }}
           </h2>
@@ -120,6 +123,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const showHotKeywords = false
 
 // Responsive detection
 const isMobile = ref(false)

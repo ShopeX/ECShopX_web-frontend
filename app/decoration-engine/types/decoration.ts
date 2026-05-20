@@ -13,7 +13,15 @@ export interface DecorationSection {
   block_order: string[]
 }
 
-export type PageType = 'home' | 'list' | 'detail' | 'custom' | 'global'
+export type PageType =
+  | 'home'
+  | 'list'
+  | 'product_list'
+  | 'detail'
+  | 'custom'
+  | 'header'
+  | 'footer'
+  | 'global'
 
 export interface DecorationDSL {
   pageType: PageType
@@ -40,6 +48,9 @@ export type DecorationMessageType =
   | 'MOVE_SECTION_REQUESTED'
   | 'DUPLICATE_SECTION_REQUESTED'
   | 'REMOVE_SECTION_REQUESTED'
+  | 'MOVE_BLOCK_REQUESTED'
+  | 'DUPLICATE_BLOCK_REQUESTED'
+  | 'REMOVE_BLOCK_REQUESTED'
 
 export interface DecorationMessage {
   type: DecorationMessageType

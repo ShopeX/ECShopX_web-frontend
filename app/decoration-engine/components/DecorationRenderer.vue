@@ -348,6 +348,43 @@ function scheduleDecorationRectRefresh() {
   })
 }
 
+function escapeDomSelectorValue(value: string): string {
+  if (import.meta.client && typeof window.CSS?.escape === 'function') {
+    return window.CSS.escape(value)
+  }
+  return value.replace(/["\\]/g, '\\$&')
+}
+
+function findDecorationElement(sectionId: string, blockId?: string) {
+  if (!import.meta.client || !sectionId) {
+    return null
+  }
+  if (blockId) {
+    return document.querySelector<HTMLElement>(
+      `[data-decoration-block="${escapeDomSelectorValue(`${sectionId}::${blockId}`)}"]`
+    )
+  }
+  return document.querySelector<HTMLElement>(
+    `[data-decoration-section="${escapeDomSelectorValue(sectionId)}"]`
+  )
+}
+
+function scrollDecorationElementIntoView(sectionId: string, blockId?: string) {
+  if (!import.meta.client || !isPreview.value) {
+    return
+  }
+  const target = findDecorationElement(sectionId, blockId)
+  if (!target) {
+    return
+  }
+  target.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center',
+    inline: 'nearest',
+  })
+  scheduleDecorationRectRefresh()
+}
+
 onBeforeUnmount(() => {
   stopHighlightBind?.()
   stopHighlightBind = null
@@ -362,6 +399,9 @@ watch(
   () => props.highlightedBlock,
   (hb) => {
     editContext.value.setPinnedSection(hb?.sectionId ?? null)
+    if (hb?.sectionId) {
+      nextTick(() => scrollDecorationElementIntoView(hb.sectionId, hb.blockId || undefined))
+    }
   },
   { immediate: true, deep: true }
 )

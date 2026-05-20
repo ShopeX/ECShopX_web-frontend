@@ -3,10 +3,10 @@ import { computed } from 'vue'
 import type { WebMenuPayload } from './webMenuTypes'
 
 const props = defineProps<{
-  menuKey: string
+  menuId: string | number
 }>()
 
-const { data: menu, status, error } = await useWebMenu(props.menuKey)
+const { data: menu, status, error } = await useWebMenu(props.menuId)
 
 const topItems = computed(() => {
   const m = menu.value as WebMenuPayload | null | undefined
@@ -15,13 +15,12 @@ const topItems = computed(() => {
 </script>
 
 <template>
-  <nav v-if="status === 'success' && menu && !error" class="nav-menu-root border-b border-gray-100 bg-white">
+  <nav
+    v-if="status === 'success' && menu && !error"
+    class="nav-menu-root border-b border-gray-100 bg-white"
+  >
     <ul class="nav-menu flex flex-wrap items-center gap-1 px-4 py-2 text-sm text-gray-800">
-      <li
-        v-for="item in topItems"
-        :key="item.id"
-        class="nav-item group relative"
-      >
+      <li v-for="item in topItems" :key="item.id" class="nav-item group relative">
         <NavMenuItem :item="item" />
 
         <ul

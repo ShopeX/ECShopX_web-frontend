@@ -61,7 +61,7 @@
           </Transition>
         </div>
 
-        <!-- 右侧：筛选按钮 -->
+        <!-- 右侧：筛选按钮（MVP 暂时隐藏）
         <button
           class="flex items-center gap-2 text-sm font-medium leading-5 text-[#191a1d] hover:opacity-80 transition-opacity"
           data-testid="filter-toggle-button"
@@ -70,6 +70,7 @@
           <span>{{ t('9e569ba6.c2fe62') }}</span>
           <UIcon name="i-heroicons-funnel" class="size-4" />
         </button>
+        -->
       </div>
 
       <!-- H5 端排序下拉菜单 - 全宽显示在筛选栏下方 -->

@@ -1,4 +1,4 @@
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, unref, watchEffect, type MaybeRef } from 'vue'
 import type {
   DecorationDSL,
   DecorationHighlightedBlock,
@@ -16,13 +16,21 @@ export interface ShopLayoutDecorationBindProps {
   highlightedBlock?: DecorationHighlightedBlock | null
 }
 
+export interface ShopLayoutDecorationFallbacks {
+  headerDecorationDsl?: MaybeRef<DecorationDSL | null | undefined>
+  footerDecorationDsl?: MaybeRef<DecorationDSL | null | undefined>
+}
+
 /**
  * 商城布局共用的装修预览态、头尾 DSL 解析。
  *
  * - **isDecorationRouteDesignMode**：仅地址栏 `designMode=1`（含 fullPath / location 回退）→ 后台设计器壳层（简头插槽、通栏 main、widget 选中）。
  * - **isDecorationPreview**：广义预览 = 上者 **或** `decorationPreview` prop **或** iframe 嵌入（父页未传 query 时仍要遮罩/藏默认头）。
  */
-export function useShopLayoutDecoration(props: ShopLayoutDecorationBindProps) {
+export function useShopLayoutDecoration(
+  props: ShopLayoutDecorationBindProps,
+  fallbacks: ShopLayoutDecorationFallbacks = {}
+) {
   const route = useRoute()
 
   const isEmbedded = ref(false)
@@ -38,22 +46,43 @@ export function useShopLayoutDecoration(props: ShopLayoutDecorationBindProps) {
   const isDecorationRouteDesignMode = computed(() => isDecorationPreviewActiveOnRoute(route))
 
   const isDecorationPreview = computed(
-    () =>
-      Boolean(props.decorationPreview) || isDecorationRouteDesignMode.value || isEmbedded.value
+    () => Boolean(props.decorationPreview) || isDecorationRouteDesignMode.value || isEmbedded.value
   )
 
   const decorationPreviewSessionKey = computed(() => props.decorationPreviewSessionKey ?? null)
 
   const decorationPreviewOverlayPageType = computed<PageType>(() => {
     const k = decorationPreviewSessionKey.value
-    if (k === 'home' || k === 'list' || k === 'detail' || k === 'custom' || k === 'global') {
+    if (
+      k === 'home' ||
+      k === 'list' ||
+      k === 'detail' ||
+      k === 'custom' ||
+      k === 'header' ||
+      k === 'footer' ||
+      k === 'global'
+    ) {
       return k
     }
     return 'home'
   })
 
-  const headerDecorationDsl = computed(() => props.headerDecorationDsl ?? null)
-  const footerDecorationDsl = computed(() => props.footerDecorationDsl ?? null)
+  const headerDecorationDsl = computed(() => {
+    const propValue = props.headerDecorationDsl ?? null
+    if (hasDecorationSections(propValue)) {
+      return propValue
+    }
+
+    return unref(fallbacks.headerDecorationDsl) ?? propValue
+  })
+  const footerDecorationDsl = computed(() => {
+    const propValue = props.footerDecorationDsl ?? null
+    if (hasDecorationSections(propValue)) {
+      return propValue
+    }
+
+    return unref(fallbacks.footerDecorationDsl) ?? propValue
+  })
 
   const shouldRenderHeaderDecoration = computed(() =>
     hasDecorationSections(headerDecorationDsl.value)

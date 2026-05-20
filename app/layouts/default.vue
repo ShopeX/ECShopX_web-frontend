@@ -1,9 +1,6 @@
 <template>
   <div
-    :class="[
-      'bg-gray-50',
-      isDecorationPreview ? 'decoration-preview-page' : 'min-h-screen',
-    ]"
+    :class="['bg-gray-50', isDecorationPreview ? 'decoration-preview-page' : 'min-h-screen']"
     @click.capture="onLayoutPointerCapture"
     @mousedown.capture="onLayoutPointerCapture"
   >
@@ -73,10 +70,16 @@
         </template>
       </USlideover>
 
-      <USlideover v-model:open="showCategoryNav" side="left">
+      <USlideover
+        v-model:open="showCategoryNav"
+        side="left"
+        :content="{ style: { width: '720px', maxWidth: '720px' } }"
+        :ui="{ content: 'left-0 inset-y-0 !w-[720px] !max-w-[720px] bg-default divide-y divide-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none' }"
+      >
         <template #content>
           <BCCategoryNav
             v-model="showCategoryNav"
+            :menu-id="headerMenuId"
             @close="showCategoryNav = false"
             @search="handleCategorySearch"
             @change-region="handleChangeRegion"
@@ -134,6 +137,7 @@ import BCFooter from '~/components/BCFooter/BCFooter.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
 import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
 import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
+import { resolveWebMenuRequestValue } from '~/composables/useWebMenu'
 import { useDesignMode } from '~/composables/useDesignMode'
 import {
   useShopLayoutDecoration,
@@ -141,6 +145,7 @@ import {
 } from '~/composables/useShopLayoutDecoration'
 import DecorationPreviewSelectionOverlay from '~/decoration-engine/components/DecorationPreviewSelectionOverlay.vue'
 import DecorationRenderer from '~/decoration-engine/components/DecorationRenderer.vue'
+import { useDecorationDslFetch } from '~/decoration-engine/composables/useDecorationDslFetch'
 import schemaMap from '~/templateEngines/schema'
 
 interface SelectedWidget {
@@ -172,6 +177,17 @@ const emit = defineEmits<{
   (e: 'section-click', sectionId: string): void
 }>()
 
+const [{ dsl: ssrHeaderDecorationDsl }, { dsl: ssrFooterDecorationDsl }] = await Promise.all([
+  useDecorationDslFetch({
+    pageType: 'header',
+    pageId: 'header',
+  }),
+  useDecorationDslFetch({
+    pageType: 'footer',
+    pageId: 'footer',
+  }),
+])
+
 const {
   route,
   isDecorationPreview,
@@ -182,9 +198,21 @@ const {
   shouldRenderFooterDecoration,
   resolvedHeaderDecorationDsl,
   resolvedFooterDecorationDsl,
-} = useShopLayoutDecoration(props)
+} = useShopLayoutDecoration(props, {
+  headerDecorationDsl: ssrHeaderDecorationDsl,
+  footerDecorationDsl: ssrFooterDecorationDsl,
+})
 
 const hideMobileFooter = computed(() => Boolean(route.meta.hideMobileFooter))
+const headerMenuId = computed(() => {
+  const dsl = resolvedHeaderDecorationDsl.value
+  if (!dsl) return ''
+
+  const sectionId = (dsl.order || []).find((id) => dsl.sections?.[id]?.type === 'header')
+  if (!sectionId) return ''
+
+  return resolveWebMenuRequestValue(dsl.sections?.[sectionId]?.settings?.menu)
+})
 
 const showCategoryNav = ref(false)
 const showMiniCart = ref(false)

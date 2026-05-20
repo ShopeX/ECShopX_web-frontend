@@ -118,19 +118,19 @@
         <template v-if="shouldShowArrows">
           <button
             type="button"
-            class="absolute left-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white transition hover:bg-black/50 group-hover:flex"
+            class="absolute left-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white transition hover:bg-black/50 group-hover:flex"
             aria-label="previous-slide"
             @click.stop="goToPrevious"
           >
-            <span aria-hidden="true">&lsaquo;</span>
+            <ChevronLeft :size="20" :stroke-width="1.8" aria-hidden="true" />
           </button>
           <button
             type="button"
-            class="absolute right-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-xl text-white transition hover:bg-black/50 group-hover:flex"
+            class="absolute right-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white transition hover:bg-black/50 group-hover:flex"
             aria-label="next-slide"
             @click.stop="goToNext"
           >
-            <span aria-hidden="true">&rsaquo;</span>
+            <ChevronRight :size="20" :stroke-width="1.8" aria-hidden="true" />
           </button>
         </template>
         </div>
@@ -159,6 +159,7 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'

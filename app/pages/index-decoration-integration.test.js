@@ -7,7 +7,7 @@ const cwd = process.cwd()
 
 const read = (relativePath) => readFileSync(path.resolve(cwd, relativePath), 'utf8')
 
-test('homepage integrates preview mode, SSR decoration fetch, and renderer fallback', () => {
+test('homepage integrates preview mode and SSR decoration fetch without legacy page-config fallback', () => {
   const source = read('app/pages/index.vue')
   const renderer = read('app/decoration-engine/components/DecorationRenderer.vue')
   const layout = read('app/layouts/default.vue')
@@ -18,27 +18,64 @@ test('homepage integrates preview mode, SSR decoration fetch, and renderer fallb
   assert.match(source, /DECORATION_PAGE_TYPE/)
   assert.match(source, /DecorationRenderer/)
   assert.match(source, /DefaultLayout/)
-  assert.match(
-    source,
-    /hasDecorationSections|shouldRenderDecoration|renderDsl/
-  )
+  assert.doesNotMatch(source, /useHomeData/)
+  assert.doesNotMatch(source, /HomePageDecorationFallback/)
+  assert.match(source, /pageRenderDsl|headerRenderDsl|footerRenderDsl/)
   assert.match(renderer, /onSectionActivate/)
   assert.match(renderer, /focusSection/)
   assert.match(renderer, /useDecorationRouteContext/)
   assert.match(layout, /v-if="shouldRenderFooterDecoration"/)
-  assert.doesNotMatch(layout, /<template v-if="!isDecorationRouteDesignMode">\s*<DecorationRenderer/)
+  assert.match(layout, /useDecorationDslFetch/)
+  assert.match(layout, /pageType:\s*'header'/)
+  assert.match(layout, /pageType:\s*'footer'/)
+  assert.doesNotMatch(
+    layout,
+    /<template v-if="!isDecorationRouteDesignMode">\s*<DecorationRenderer/
+  )
 })
 
-test('decoration route + DSL fetch composables exist for multi-page reuse', () => {
+test('homepage only passes split header/footer DSL into layout during preview mode', () => {
+  const source = read('app/pages/index.vue')
+
+  assert.match(source, /const layoutHeaderDecorationDsl = computed\(/)
+  assert.match(source, /const layoutFooterDecorationDsl = computed\(/)
+  assert.match(source, /:header-decoration-dsl="layoutHeaderDecorationDsl"/)
+  assert.match(source, /:footer-decoration-dsl="layoutFooterDecorationDsl"/)
+  assert.doesNotMatch(source, /:header-decoration-dsl="headerRenderDsl"/)
+  assert.doesNotMatch(source, /:footer-decoration-dsl="footerRenderDsl"/)
+})
+
+test('custom page renders custom decoration by route id', () => {
+  const source = read('app/pages/custom/[id].vue')
+  const menu = read('app/composables/useWebMenu.ts')
+
+  assert.match(source, /DECORATION_PAGE_TYPE = 'custom'/)
+  assert.match(source, /route\.params\.id/)
+  assert.match(source, /useDecorationPageDslFetch/)
+  assert.match(source, /pageType:\s*DECORATION_PAGE_TYPE/)
+  assert.match(source, /pageId:\s*customPageId/)
+  assert.match(source, /data-testid="custom-decoration-renderer-page"/)
+  assert.match(menu, /case 'custom_page':/)
+  assert.match(menu, /\/custom\/\$\{item\.link_value/)
+  assert.doesNotMatch(menu, /\/page\/\$\{item\.link_value/)
+})
+
+test('decoration route + DSL fetch composables exist for page and layout reuse', () => {
   const routeCtx = read('app/decoration-engine/composables/useDecorationRouteContext.ts')
+  const genericDslFetch = read('app/decoration-engine/composables/useDecorationDslFetch.ts')
   const dslFetch = read('app/decoration-engine/composables/useDecorationPageDslFetch.ts')
 
   assert.match(routeCtx, /useDecorationRouteContext/)
   assert.match(routeCtx, /isDecorationPreviewRouteQuery/)
   assert.match(routeCtx, /isDecorationPreviewActiveOnRoute/)
   assert.match(routeCtx, /isEmbeddedDecorPreview/)
+  assert.match(genericDslFetch, /useDecorationDslFetch/)
+  assert.match(genericDslFetch, /pageType/)
+  assert.match(genericDslFetch, /\/wxapp\/pctemplate\/getTemplateContent/)
+  assert.doesNotMatch(genericDslFetch, /\/h5app\/wxapp\/pctemplate\/getTemplateContent/)
+  assert.doesNotMatch(genericDslFetch, /\/api\/decoration\//)
   assert.match(dslFetch, /useDecorationPageDslFetch/)
-  assert.match(dslFetch, /options\.pageType/)
+  assert.match(dslFetch, /useDecorationDslFetch/)
 })
 
 test('nuxt config exposes decoration env and decoration preview route rules', () => {
@@ -50,19 +87,13 @@ test('nuxt config exposes decoration env and decoration preview route rules', ()
   assert.match(source, /designMode=1/)
 })
 
-test('server decoration API routes exist for page and global dsl reads', () => {
-  const pageRoutePath = path.resolve(cwd, 'app/server/api/decoration/[pageType].get.ts')
-  const globalRoutePath = path.resolve(cwd, 'app/server/api/decoration/global.get.ts')
-
-  assert.ok(existsSync(pageRoutePath), 'app/server/api/decoration/[pageType].get.ts should exist')
-  assert.ok(existsSync(globalRoutePath), 'app/server/api/decoration/global.get.ts should exist')
-
-  const pageRouteSource = read('app/server/api/decoration/[pageType].get.ts')
-  const globalRouteSource = read('app/server/api/decoration/global.get.ts')
-
-  assert.match(pageRouteSource, /pageType/)
-  assert.match(pageRouteSource, /pageId/)
-  assert.match(pageRouteSource, /decoration/)
-  assert.match(globalRouteSource, /global/)
-  assert.match(globalRouteSource, /decoration/)
+test('web no longer ships local decoration proxy routes after direct H5 integration', () => {
+  assert.ok(
+    !existsSync(path.resolve(cwd, 'app/server/api/decoration/[pageType].get.ts')),
+    'app/server/api/decoration/[pageType].get.ts should be removed after direct H5 integration'
+  )
+  assert.ok(
+    !existsSync(path.resolve(cwd, 'app/server/api/decoration/global.get.ts')),
+    'app/server/api/decoration/global.get.ts should be removed after direct H5 integration'
+  )
 })

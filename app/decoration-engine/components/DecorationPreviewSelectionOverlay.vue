@@ -1,7 +1,7 @@
 <template>
   <Teleport v-if="overlayTarget" :to="overlayTarget">
     <div
-      class="pointer-events-none absolute inset-x-0 top-0 z-[10050] h-0 overflow-visible"
+      class="pointer-events-none fixed inset-0 z-[10050] overflow-visible"
     >
       <div
         v-if="selectedChromeStyle && selectedChrome"
@@ -19,16 +19,92 @@
           :class="selectedChromeActionsClass"
           @pointerdown.stop
         >
-          <button type="button" :class="selectedChromeActionButtonClass" aria-label="上移" @click.stop.prevent="handleSelectedSectionAction('up')">
-            <ArrowUp :size="16" :stroke-width="1.8" />
+          <button
+            type="button"
+            :class="selectedSectionActionButtonClass(selectedSectionActionState.canMoveUp)"
+            :disabled="!selectedSectionActionState.canMoveUp"
+            aria-label="上移"
+            @click.stop.prevent="handleSelectedSectionAction('up')"
+          >
+            <ArrowUp
+              :size="16"
+              :stroke-width="1.8"
+              :color="selectedActionIconColor(selectedSectionActionState.canMoveUp)"
+            />
           </button>
-          <button type="button" :class="selectedChromeActionButtonClass" aria-label="下移" @click.stop.prevent="handleSelectedSectionAction('down')">
-            <ArrowDown :size="16" :stroke-width="1.8" />
+          <button
+            type="button"
+            :class="selectedSectionActionButtonClass(selectedSectionActionState.canMoveDown)"
+            :disabled="!selectedSectionActionState.canMoveDown"
+            aria-label="下移"
+            @click.stop.prevent="handleSelectedSectionAction('down')"
+          >
+            <ArrowDown
+              :size="16"
+              :stroke-width="1.8"
+              :color="selectedActionIconColor(selectedSectionActionState.canMoveDown)"
+            />
           </button>
-          <button type="button" :class="selectedChromeActionButtonClass" aria-label="复制" @click.stop.prevent="handleSelectedSectionAction('duplicate')">
+          <button
+            v-if="selectedSectionActionState.canDuplicate"
+            type="button"
+            :class="selectedChromeActionButtonClass"
+            aria-label="复制"
+            @click.stop.prevent="handleSelectedSectionAction('duplicate')"
+          >
             <Copy :size="16" :stroke-width="1.8" />
           </button>
-          <button type="button" :class="selectedChromeActionButtonClass" aria-label="删除" @click.stop.prevent="handleSelectedSectionAction('remove')">
+          <button
+            v-if="selectedSectionActionState.canRemove"
+            type="button"
+            :class="selectedChromeActionButtonClass"
+            aria-label="删除"
+            @click.stop.prevent="handleSelectedSectionAction('remove')"
+          >
+            <Trash2 :size="16" :stroke-width="1.8" />
+          </button>
+        </div>
+        <div
+          v-else-if="selectedChrome.kind === 'block'"
+          :class="selectedBlockActionsClass"
+          @pointerdown.stop
+        >
+          <button
+            type="button"
+            :class="selectedBlockActionButtonClass(selectedBlockActionState.canMoveUp)"
+            :disabled="!selectedBlockActionState.canMoveUp"
+            aria-label="上移"
+            @click.stop.prevent="handleSelectedBlockAction('up')"
+          >
+            <ArrowUp
+              :size="16"
+              :stroke-width="1.8"
+              :color="selectedActionIconColor(selectedBlockActionState.canMoveUp)"
+            />
+          </button>
+          <button
+            type="button"
+            :class="selectedBlockActionButtonClass(selectedBlockActionState.canMoveDown)"
+            :disabled="!selectedBlockActionState.canMoveDown"
+            aria-label="下移"
+            @click.stop.prevent="handleSelectedBlockAction('down')"
+          >
+            <ArrowDown
+              :size="16"
+              :stroke-width="1.8"
+              :color="selectedActionIconColor(selectedBlockActionState.canMoveDown)"
+            />
+          </button>
+          <button type="button" :class="selectedChromeActionButtonClass" aria-label="复制" @click.stop.prevent="handleSelectedBlockAction('duplicate')">
+            <Copy :size="16" :stroke-width="1.8" />
+          </button>
+          <button
+            v-if="selectedBlockActionState.canRemove"
+            type="button"
+            :class="selectedChromeActionButtonClass"
+            aria-label="删除"
+            @click.stop.prevent="handleSelectedBlockAction('remove')"
+          >
             <Trash2 :size="16" :stroke-width="1.8" />
           </button>
         </div>
@@ -110,6 +186,8 @@ const props = withDefaults(
 
 const overlayTarget = ref<HTMLElement | null>(null)
 const overlayViewportWidth = ref(0)
+const overlayScrollX = ref(0)
+const overlayScrollY = ref(0)
 let overlayResizeObserver: ResizeObserver | null = null
 
 const previewPageType = computed<PageType>(() => {
@@ -129,6 +207,9 @@ const {
   requestMoveSection,
   requestDuplicateSection,
   requestRemoveSection,
+  requestMoveBlock,
+  requestDuplicateBlock,
+  requestRemoveBlock,
 } = decorationPreviewBundle
 
 const mergedPreviewSections = computed((): Record<string, DecorationSection> => ({
@@ -150,6 +231,10 @@ function resolveAreaOrder(area: DecorationArea) {
   if (area === 'header') return decorationPreviewBundle.headerDsl.value?.order || []
   if (area === 'footer') return decorationPreviewBundle.footerDsl.value?.order || []
   return decorationPreviewBundle.pageDsl.value?.order || []
+}
+
+function getSectionAreaOrder(sectionId: string) {
+  return resolveAreaOrder(resolveDecorationArea(sectionId))
 }
 
 const SECTION_TYPE_LABEL: Record<string, string> = {
@@ -216,11 +301,13 @@ function buildPreviewSelectionLabel(
   return SECTION_TYPE_LABEL[section.type] || section.type || sectionId
 }
 
-function updateOverlayViewportWidth() {
+function updateOverlayMetrics() {
   if (!import.meta.client) {
     return
   }
   overlayViewportWidth.value = window.innerWidth || document.documentElement?.clientWidth || 0
+  overlayScrollX.value = window.scrollX || window.pageXOffset || 0
+  overlayScrollY.value = window.scrollY || window.pageYOffset || 0
 }
 
 function ensureOverlayRootAttached() {
@@ -253,12 +340,13 @@ function bindOverlayMetrics() {
   if (!import.meta.client) {
     return
   }
-  updateOverlayViewportWidth()
+  updateOverlayMetrics()
   if (!overlayResizeObserver) {
-    overlayResizeObserver = new ResizeObserver(() => updateOverlayViewportWidth())
+    overlayResizeObserver = new ResizeObserver(() => updateOverlayMetrics())
     overlayResizeObserver.observe(document.documentElement)
   }
-  window.addEventListener('resize', updateOverlayViewportWidth)
+  window.addEventListener('resize', updateOverlayMetrics)
+  window.addEventListener('scroll', updateOverlayMetrics, { passive: true })
 }
 
 function unbindOverlayMetrics() {
@@ -267,7 +355,8 @@ function unbindOverlayMetrics() {
   }
   overlayResizeObserver?.disconnect()
   overlayResizeObserver = null
-  window.removeEventListener('resize', updateOverlayViewportWidth)
+  window.removeEventListener('resize', updateOverlayMetrics)
+  window.removeEventListener('scroll', updateOverlayMetrics)
 }
 
 onMounted(() => {
@@ -294,7 +383,7 @@ watch(
   }),
   () => {
     if (import.meta.client) {
-      updateOverlayViewportWidth()
+      updateOverlayMetrics()
     }
   },
   { deep: true }
@@ -316,6 +405,15 @@ const activeBlockKey = computed(() => {
 })
 
 type PreviewChromeRect = { top: number; left: number; width: number; height: number }
+
+function toViewportRect(rect: PreviewChromeRect): PreviewChromeRect {
+  return {
+    top: rect.top - overlayScrollY.value,
+    left: rect.left - overlayScrollX.value,
+    width: rect.width,
+    height: rect.height,
+  }
+}
 
 const adminSyncedChrome = computed(() => {
   const ctx = editContext.value
@@ -394,7 +492,7 @@ function toChromeStyle(chrome: { rect?: PreviewChromeRect } | null) {
   if (!chrome?.rect) {
     return null
   }
-  const r = chrome.rect
+  const r = toViewportRect(chrome.rect)
   return {
     top: `${r.top}px`,
     left: `${r.left}px`,
@@ -435,7 +533,7 @@ const selectedChromeLabel = computed(() => {
 
 const adminSyncedChromeLabelClass = computed(() => {
   const c = adminSyncedChrome.value
-  const canPlaceAbove = Boolean(c?.rect && c.rect.top >= 24)
+  const canPlaceAbove = Boolean(c?.rect && toViewportRect(c.rect).top >= 24)
   return [
     'pointer-events-auto absolute left-0 z-[1] rounded-none bg-primary px-2 py-1 text-[11px] font-medium leading-tight text-white shadow-sm',
     canPlaceAbove ? 'top-0 -translate-y-full' : 'top-0 translate-y-0',
@@ -444,7 +542,7 @@ const adminSyncedChromeLabelClass = computed(() => {
 
 const selectedChromeLabelClass = computed(() => {
   const c = selectedChrome.value
-  const canPlaceAbove = Boolean(c?.rect && c.rect.top >= 24)
+  const canPlaceAbove = Boolean(c?.rect && toViewportRect(c.rect).top >= 24)
   return [
     'pointer-events-auto absolute left-0 z-[1] rounded-none bg-primary px-2 py-1 text-[11px] font-medium leading-tight text-white shadow-sm',
     canPlaceAbove ? 'top-0 -translate-y-full' : 'top-0 translate-y-0',
@@ -456,12 +554,30 @@ const selectedChromeActionsClass = computed(() => {
   const viewportWidth = overlayViewportWidth.value
   const actionsWidth = 40
   const gap = 8
+  const rect = c?.rect ? toViewportRect(c.rect) : null
   const canPlaceOutsideRight = Boolean(
-    c?.rect && c.rect.left + c.rect.width + actionsWidth + gap <= viewportWidth
+    rect && rect.left + rect.width + actionsWidth + gap <= viewportWidth
   )
   return [
     'pointer-events-auto absolute top-0 z-[1] flex flex-col items-center gap-1 rounded-xl border border-slate-100 bg-white px-2 py-2 shadow-[0_8px_24px_rgba(15,23,42,0.12)]',
     canPlaceOutsideRight ? 'right-0 ml-2 translate-x-full' : 'right-1 translate-x-0',
+  ]
+})
+
+const selectedBlockActionsClass = computed(() => {
+  const chrome = selectedChrome.value
+  const rect = chrome?.rect ? toViewportRect(chrome.rect) : null
+  const viewportWidth = overlayViewportWidth.value
+  const viewportHeight = import.meta.client ? window.innerHeight || document.documentElement?.clientHeight || 0 : 0
+  const actionsWidth = 152
+  const actionsHeight = 48
+  const gap = 8
+  const canPlaceBelow = Boolean(rect && rect.top + rect.height + actionsHeight + gap <= viewportHeight)
+  const canAlignRight = Boolean(rect && rect.left + rect.width - actionsWidth >= 0)
+  return [
+    'pointer-events-auto absolute z-[1] flex items-center gap-1 rounded-xl border border-slate-100 bg-white px-2 py-2 shadow-[0_8px_24px_rgba(15,23,42,0.12)]',
+    canPlaceBelow ? 'bottom-0 translate-y-[calc(100%+8px)]' : 'bottom-2 translate-y-0',
+    canAlignRight ? 'right-0' : 'left-0',
   ]
 })
 
@@ -470,6 +586,69 @@ const selectedChromeActionButtonClass = [
   'hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30',
 ]
+
+const selectedSectionActionState = computed(() => {
+  const chrome = selectedChrome.value
+  if (!chrome || chrome.kind !== 'section') {
+    return {
+      canMoveUp: false,
+      canMoveDown: false,
+      canDuplicate: false,
+      canRemove: false,
+    }
+  }
+  const area = resolveDecorationArea(chrome.sectionId)
+  const sectionOrder = resolveAreaOrder(area)
+  const currentIndex = sectionOrder.indexOf(chrome.sectionId)
+  const canMove = currentIndex >= 0
+  return {
+    canMoveUp: canMove && currentIndex > 0,
+    canMoveDown: canMove && currentIndex < sectionOrder.length - 1,
+    canDuplicate: area === 'template',
+    canRemove: sectionOrder.length > 1,
+  }
+})
+
+function getBlockOrder(sectionId: string) {
+  const section = mergedPreviewSections.value[sectionId]
+  return Array.isArray(section?.block_order) ? section.block_order : []
+}
+
+const selectedBlockActionState = computed(() => {
+  const chrome = selectedChrome.value
+  if (!chrome || chrome.kind !== 'block' || !chrome.blockId) {
+    return {
+      canMoveUp: false,
+      canMoveDown: false,
+      canRemove: false,
+    }
+  }
+  const blockOrder = getBlockOrder(chrome.sectionId)
+  const currentIndex = blockOrder.indexOf(chrome.blockId)
+  const canMove = currentIndex >= 0
+  return {
+    canMoveUp: canMove && currentIndex > 0,
+    canMoveDown: canMove && currentIndex < blockOrder.length - 1,
+    canRemove: blockOrder.length > 1,
+  }
+})
+
+function selectedBlockActionButtonClass(enabled: boolean) {
+  return [
+    ...selectedChromeActionButtonClass,
+    enabled
+      ? ''
+      : 'cursor-not-allowed text-[#B8BEC8] hover:bg-transparent hover:text-[#B8BEC8] active:bg-transparent',
+  ]
+}
+
+function selectedSectionActionButtonClass(enabled: boolean) {
+  return selectedBlockActionButtonClass(enabled)
+}
+
+function selectedActionIconColor(enabled: boolean) {
+  return enabled ? '#475569' : '#AEB4BE'
+}
 
 const addButtonLabel = computed(() =>
   adminSyncedChrome.value?.kind === 'block' ? '添加块' : '添加分区'
@@ -481,14 +660,37 @@ function handleSelectedSectionAction(action: 'up' | 'down' | 'duplicate' | 'remo
     return
   }
   if (action === 'up' || action === 'down') {
+    if (action === 'up' && !selectedSectionActionState.value.canMoveUp) return
+    if (action === 'down' && !selectedSectionActionState.value.canMoveDown) return
     requestMoveSection(chrome.sectionId, action)
     return
   }
   if (action === 'duplicate') {
+    if (!selectedSectionActionState.value.canDuplicate) return
     requestDuplicateSection(chrome.sectionId)
     return
   }
+  if (!selectedSectionActionState.value.canRemove) return
   requestRemoveSection(chrome.sectionId)
+}
+
+function handleSelectedBlockAction(action: 'up' | 'down' | 'duplicate' | 'remove') {
+  const chrome = selectedChrome.value
+  if (!chrome || chrome.kind !== 'block' || !chrome.blockId) {
+    return
+  }
+  if (action === 'up' || action === 'down') {
+    if (action === 'up' && !selectedBlockActionState.value.canMoveUp) return
+    if (action === 'down' && !selectedBlockActionState.value.canMoveDown) return
+    requestMoveBlock(chrome.sectionId, chrome.blockId, action)
+    return
+  }
+  if (action === 'duplicate') {
+    requestDuplicateBlock(chrome.sectionId, chrome.blockId)
+    return
+  }
+  if (!selectedBlockActionState.value.canRemove) return
+  requestRemoveBlock(chrome.sectionId, chrome.blockId)
 }
 
 function keepAddControlHover() {
@@ -515,8 +717,7 @@ function handleAddClick(position: 'before' | 'after', event: MouseEvent) {
 }
 
 function handleAddBlockClick(sectionId: string, blockId: string, position: 'before' | 'after', event: MouseEvent) {
-  const section = mergedPreviewSections.value[sectionId]
-  const blockOrder = Array.isArray(section?.block_order) ? section.block_order : []
+  const blockOrder = getBlockOrder(sectionId)
   const activeIndex = blockId ? blockOrder.indexOf(blockId) : -1
   const insertIndex =
     activeIndex >= 0
@@ -542,14 +743,17 @@ const dashedBlockOverlays = computed(() => {
   return Object.keys(ctx.blockRects.value)
     .map((key) => ({ key, ...ctx.blockRects.value[key] }))
     .filter((item) => item.sectionId === sid && item.key !== activeBlockKey.value)
-    .map((item) => ({
-      key: item.key,
-      style: {
-        top: `${item.top}px`,
-        left: `${item.left}px`,
-        width: `${item.width}px`,
-        height: `${item.height}px`,
-      },
-    }))
+    .map((item) => {
+      const rect = toViewportRect(item)
+      return {
+        key: item.key,
+        style: {
+          top: `${rect.top}px`,
+          left: `${rect.left}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`,
+        },
+      }
+    })
 })
 </script>

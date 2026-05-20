@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50" data-testid="collections-page">
+  <div class="min-h-screen bg-white" data-testid="collections-page">
     <!-- BBC 店铺 Header（仅在携带 shopid 参数时展示） -->
     <BCShopHeader
       v-if="shopId"
@@ -40,11 +40,22 @@
       <div class="w-full">
         <!-- 加载状态 -->
         <div
-          v-if="pending && !products.length"
-          class="flex justify-center py-12"
+          v-if="(!hasInitialLoadCompleted || pending) && !products.length"
+          class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5"
           data-testid="collections-loading"
         >
-          <ECLoading />
+          <div
+            v-for="index in productSkeletonCount"
+            :key="`collections-skeleton-${index}`"
+            class="group"
+          >
+            <USkeleton class="aspect-square w-full" />
+            <div class="flex flex-col items-center gap-3 bg-[#f6f6f6] px-6 py-8">
+              <USkeleton class="h-4 w-4/5" />
+              <USkeleton class="h-4 w-3/5" />
+              <USkeleton class="h-4 w-16" />
+            </div>
+          </div>
         </div>
 
         <!-- 错误状态 -->
@@ -66,7 +77,7 @@
 
         <!-- 空状态 -->
         <div
-          v-else-if="!products.length && !pending"
+          v-else-if="hasInitialLoadCompleted && !products.length && !pending"
           class="text-center py-12"
           data-testid="collections-empty"
         >
@@ -145,6 +156,13 @@ import { ProductTransformer } from '~/infrastructure/transformers/productTransfo
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 
 const { t, locale } = useI18n()
+const route = useRoute()
+const router = useRouter()
+
+const mainCategory = computed(() => {
+  const routeId = route.params.id
+  return Array.isArray(routeId) ? String(routeId[0] || '') : String(routeId || '')
+})
 
 // 启用页面缓存
 definePageMeta({
@@ -209,6 +227,11 @@ const productFilterValue = ref<IProductFilterValue>({
 
 // 控制筛选面板显示
 const showFilterPanel = ref(false)
+
+// 首屏客户端加载完成标记
+const hasInitialLoadCompleted = ref(false)
+
+const productSkeletonCount = 10
 
 // ProductFilter 筛选组配置
 const filterGroups = computed<IFilterGroup[]>(() => [
@@ -309,7 +332,7 @@ const buildApiParams = (
     page: page.toString(),
     pageSize: pageSize.toString(),
     item_type: 'normal',
-    main_category: '',
+    main_category: mainCategory.value,
     is_tdk: '1',
     type: '0',
     company_id: '1',
@@ -409,10 +432,6 @@ watch(
   { deep: true }
 )
 
-// 路由和查询参数
-const route = useRoute()
-const router = useRouter()
-
 // BBC 店铺上下文：有 shopid query 参数时展示店铺 Header
 const shopId = computed(() => route.query.shopid as string | undefined)
 
@@ -492,91 +511,6 @@ const restoreFromUrl = () => {
   }
 }
 
-// 从 URL 恢复筛选状态的函数（独立版本，用于SSR）
-const getFilterParamsFromUrl = () => {
-  const query = route.query
-  return {
-    categoryId: query.category ? (query.category as string) : undefined,
-    brandId: query.brand ? (query.brand as string) : '',
-    sort: query.sort ? (query.sort as string) : 'default',
-    startPrice: query.min_price ? Number(query.min_price) : undefined,
-    endPrice: query.max_price ? Number(query.max_price) : undefined,
-    keyword: query.keyword ? (query.keyword as string) : '',
-  }
-}
-
-// SSR 数据预取
-const initialDataKey = computed(
-  () => `item-list-initial:${route.path}:${route.fullPath}:${locale.value}`
-)
-
-const {
-  data: initialData,
-  pending: initialPending,
-  error: initialError,
-} = await useLazyAsyncData(
-  initialDataKey,
-  async () => {
-    // 从 URL 恢复筛选状态（使用独立函数）
-    const urlParams = getFilterParamsFromUrl()
-
-    // 构建 API 参数
-    const params = buildApiParams(1, 20, urlParams)
-
-    // 使用 HTTP Client 获取数据
-    const data = await itemApiClient.getItemList(params)
-
-    if (data?.list) {
-      // 使用 Transformer 转换为 UI 数据
-      const productList = ProductTransformer.toModelList(data.list)
-
-      // 更新品牌列表
-      if (data.brand_list?.list) {
-        brands.value = data.brand_list.list
-      }
-
-      return {
-        products: productList,
-        pagination: {
-          total: data.total_count || 0,
-          current: 1,
-          hasMore: 20 < (data.total_count || 0),
-        },
-        urlParams, // 返回URL参数用于初始化状态
-      }
-    }
-
-    return {
-      products: [],
-      pagination: { total: 0, current: 1, hasMore: false },
-      urlParams,
-    }
-  },
-  {
-    server: true, // 启用服务端渲染
-    default: () => ({
-      products: [],
-      pagination: { total: 0, current: 1, hasMore: false },
-      urlParams: getFilterParamsFromUrl(),
-    }),
-  }
-)
-
-// 使用 SSR 预取的数据初始化状态
-if (initialData.value) {
-  products.value = initialData.value.products
-  pagination.value = initialData.value.pagination
-
-  // 从SSR数据初始化筛选参数
-  if (initialData.value.urlParams) {
-    filterParams.value = { ...initialData.value.urlParams }
-  }
-}
-
-// 设置初始加载状态
-pending.value = initialPending.value
-error.value = initialError.value as Error | null
-
 // 滚动加载触发器
 const loadMoreTrigger = ref<HTMLElement | null>(null)
 
@@ -599,20 +533,16 @@ onMounted(async () => {
     )
   }
 
-  // 如果SSR没有数据，则在客户端加载
+  // 客户端首屏加载
   if (!products.value.length && !error.value) {
-    // 如果还没有从SSR初始化筛选参数，则从URL恢复
-    if (
-      !filterParams.value.categoryId &&
-      !filterParams.value.brandId &&
-      !filterParams.value.startPrice &&
-      !filterParams.value.endPrice &&
-      !filterParams.value.keyword &&
-      filterParams.value.sort === 'default'
-    ) {
+    try {
       restoreFromUrl()
+      await loadPage(1)
+    } finally {
+      hasInitialLoadCompleted.value = true
     }
-    await loadPage(1)
+  } else {
+    hasInitialLoadCompleted.value = true
   }
 
   // 模拟品牌数据（实际应该从 API 获取）

@@ -13,6 +13,8 @@ import type {
 } from '~/decoration-engine/types/decoration'
 import { normalizeDecorationDSL } from '~/decoration-engine/types/decoration'
 
+type DecorationPreviewArea = 'header' | 'template' | 'footer'
+
 function normalizeAllowedOrigins(origins: string | undefined): string[] {
   if (!origins) {
     return []
@@ -479,7 +481,7 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     sectionId: string,
     insertIndex?: number,
     anchor?: { clientX: number; clientY: number },
-    area?: 'header' | 'template' | 'footer'
+    area?: DecorationPreviewArea
   ) => {
     postToParent({
       type: 'ADD_BLOCK_REQUESTED',
@@ -491,7 +493,7 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
     sectionId: string,
     insertIndex?: number,
     anchor?: { clientX: number; clientY: number },
-    area?: 'header' | 'template' | 'footer'
+    area?: DecorationPreviewArea
   ) => {
     postToParent({
       type: 'ADD_SECTION_REQUESTED',

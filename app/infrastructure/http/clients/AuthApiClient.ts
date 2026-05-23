@@ -1,13 +1,13 @@
 import type {
   ILoginRequest,
   IPhoneLoginRequest,
+  IMemberRegisterRequest,
+  IEmailMemberRegisterRequest,
   ISmsCodeRequest,
-  ILogoutRequest,
   ILoginResponse,
   ISmsCodeResponseData,
   ICaptchaRequest,
   ICaptchaResponse,
-  ILogoutResponse,
   IGetUserInfoResponse,
 } from '~/types/api/auth'
 
@@ -50,6 +50,13 @@ export class AuthApiClient {
     return this.$api
   }
 
+  private assertNewLoginSuccess(response: ILoginResponse & { status?: number; error_message?: string }) {
+    if (response?.status === 0 || !response?.token) {
+      const message = response?.error_message || '用户名或密码错误'
+      throw new Error(message)
+    }
+  }
+
   /**
    * 账号密码登录
    *
@@ -67,15 +74,26 @@ export class AuthApiClient {
    * ```
    */
   async login(params: ILoginRequest): Promise<ILoginResponse> {
-    return this.http('/wxapp/login', {
+    const response = await this.http('/wxapp/new_login', {
       method: 'POST',
-      body: params,
-      // ✅ company_id 和 Content-Type 由 HTTP 插件统一处理
+      body: {
+        username: params.username,
+        password: params.password,
+        check_type: 'password',
+        silent: 1,
+        auto_register: 0,
+        auth_type: 'local',
+        showError: false,
+        trustlogin_tag: 'weixin',
+        version_tag: 'touch',
+      },
     })
+    this.assertNewLoginSuccess(response)
+    return response
   }
 
   /**
-   * 手机验证码登录
+   * 手机密码登录
    *
    * @param params - 手机登录请求参数
    * @returns 登录响应数据（HTTP 插件已自动解包 data 字段）
@@ -84,15 +102,64 @@ export class AuthApiClient {
    * ```typescript
    * const response = await client.loginWithPhone({
    *   phone: '13800138000',
-   *   smsCode: '123456'
+   *   password: 'password'
    * })
    * // response = { token: 'xxx' }，已自动解包
    * ```
    */
   async loginWithPhone(params: IPhoneLoginRequest): Promise<ILoginResponse> {
-    return this.http('/wxapp/auth/login/phone', {
+    const response = await this.http('/wxapp/new_login', {
       method: 'POST',
-      body: params,
+      body: {
+        username: params.phone,
+        password: params.password,
+        check_type: 'password',
+        silent: 1,
+        auto_register: 0,
+        auth_type: 'local',
+        trustlogin_tag: 'weixin',
+        version_tag: 'touch',
+      },
+    })
+    this.assertNewLoginSuccess(response)
+    return response
+  }
+
+  /**
+   * 会员注册
+   */
+  async registerMember(params: IMemberRegisterRequest): Promise<any> {
+    return this.http('/wxapp/member', {
+      method: 'POST',
+      body: {
+        auth_type: 'local',
+        check_type: 'sign',
+        mobile: params.mobile,
+        email: params.email,
+        password: params.password,
+        vcode: params.vcode,
+        sex: 0,
+        user_type: 'local',
+      },
+    })
+  }
+
+  /**
+   * 邮箱会员注册
+   */
+  async registerEmailMember(params: IEmailMemberRegisterRequest): Promise<any> {
+    return this.http('/wxapp/member/email/register', {
+      method: 'POST',
+      body: {
+        email: params.email,
+        password: params.password,
+        password_confirmation: params.passwordConfirmation,
+        token: params.token,
+        yzm: params.yzm,
+        sex: 0,
+        user_type: 'local',
+        grade_id: 17,
+      },
     })
   }
 
@@ -109,9 +176,15 @@ export class AuthApiClient {
    * const { imageData, imageToken } = response.data
    * ```
    */
-  async getCaptcha(_params: ICaptchaRequest): Promise<{ data: ICaptchaResponse }> {
-    return this.http('/wxapp/distributor/image/code', {
+  async getCaptcha(params: ICaptchaRequest): Promise<{ data: ICaptchaResponse }> {
+    const endpoint =
+      params.scope === 'member' ? '/wxapp/member/image/code' : '/wxapp/distributor/image/code'
+
+    return this.http(endpoint, {
       method: 'GET',
+      params: {
+        type: params.type,
+      },
       cache: 'no-cache', // 验证码不缓存
     })
   }
@@ -137,24 +210,6 @@ export class AuthApiClient {
     return this.http('/wxapp/member/sms/code', {
       method: 'GET',
       params: params,
-    })
-  }
-
-  /**
-   * 登出
-   *
-   * @param params - 登出请求参数（可选）
-   * @returns 登出结果
-   *
-   * @example
-   * ```typescript
-   * await client.logout()
-   * ```
-   */
-  async logout(params?: ILogoutRequest): Promise<ILogoutResponse> {
-    return this.http('/wxapp/auth/logout', {
-      method: 'POST',
-      body: params,
     })
   }
 

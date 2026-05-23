@@ -1,12 +1,74 @@
 <template>
-  <div class="flex h-full w-full flex-col bg-white px-8 py-8">
-    <div class="flex items-center justify-between pb-6">
+  <div class="flex h-full w-full flex-col bg-white px-4 py-6 md:px-8 md:py-8">
+    <div class="hidden items-center justify-between pb-6 md:flex">
       <button class="flex h-6 w-6 items-center justify-center" @click="handleClose">
         <UIcon name="i-heroicons-x-mark" class="h-6 w-6 text-[#191a1d]" />
       </button>
     </div>
 
-    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div data-testid="category-nav-mobile-header" class="flex items-center pb-10 md:hidden">
+      <button type="button" class="flex h-6 w-6 items-center justify-center" aria-label="关闭菜单" @click="handleClose">
+        <UIcon name="i-heroicons-x-mark" class="h-6 w-6 text-[#191a1d]" />
+      </button>
+    </div>
+
+    <div class="min-h-0 flex-1 overflow-y-auto md:hidden">
+      <div v-if="mobileMenuLevel === 'primary'" data-testid="category-nav-mobile-primary" class="flex flex-col gap-8">
+        <button
+          v-for="item in mobilePrimaryItems"
+          :key="item.id"
+          type="button"
+          class="flex w-full items-center justify-between text-left text-[16px] font-medium leading-5 text-[#4a5565]"
+          :class="item.children?.length ? 'text-[#191a1d]' : ''"
+          @click="openMobilePrimary(item)"
+        >
+          <span>{{ item.name }}</span>
+          <UIcon v-if="item.children?.length" name="i-heroicons-chevron-right" class="h-5 w-5 text-[#191a1d]" />
+        </button>
+      </div>
+
+      <div v-else-if="mobileMenuLevel === 'secondary'" data-testid="category-nav-mobile-secondary" class="flex flex-col gap-8">
+        <button type="button" class="flex items-center gap-2 text-[16px] font-normal leading-6 text-[#4a5565]" @click="goMobileBack">
+          <UIcon name="i-heroicons-arrow-left" class="h-5 w-5 text-[#191a1d]" />
+          <span>{{ mobileSecondaryTitle }}</span>
+        </button>
+        <button
+          v-for="item in mobileSecondaryItems"
+          :key="item.id"
+          type="button"
+          class="flex w-full items-center justify-between text-left text-[16px] font-medium leading-5 text-[#4a5565]"
+          :class="item.children?.length ? 'text-[#191a1d]' : ''"
+          @click="openMobileSecondary(item)"
+        >
+          <span>{{ item.name }}</span>
+          <UIcon v-if="item.children?.length" name="i-heroicons-chevron-right" class="h-5 w-5 text-[#191a1d]" />
+        </button>
+      </div>
+
+      <div v-else data-testid="category-nav-mobile-tertiary" class="flex flex-col gap-8">
+        <button type="button" class="flex items-center gap-2 text-[16px] font-normal leading-6 text-[#4a5565]" @click="goMobileBack">
+          <UIcon name="i-heroicons-arrow-left" class="h-5 w-5 text-[#191a1d]" />
+          <span>{{ mobileTertiaryTitle }}</span>
+        </button>
+        <component
+          :is="item.external ? 'a' : NuxtLink"
+          v-for="item in mobileTertiaryItems"
+          :key="item.id"
+          v-bind="getMenuLinkProps(item)"
+          class="flex w-full flex-col gap-4 text-left"
+          @click="handleClose"
+        >
+          <div class="h-[150px] w-full overflow-hidden bg-[#f3f4f6]">
+            <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="h-full w-full object-cover" />
+            <div v-else class="flex h-full w-full items-center justify-center bg-[#f3f4f6] text-[14px] text-[#4a5565]">{{ item.name }}</div>
+          </div>
+          <span class="text-[16px] font-medium leading-5 text-[#191a1d]">{{ item.name }}</span>
+        </component>
+      </div>
+
+    </div>
+
+    <div class="hidden min-h-0 flex-1 flex-col overflow-hidden md:flex">
       <div class="flex items-center gap-2 border-b border-[#e5e7eb] pb-4">
         <button class="flex h-5 w-5 items-center justify-center">
           <UIcon name="i-heroicons-magnifying-glass" class="h-5 w-5 text-[#191a1d]" />
@@ -165,6 +227,9 @@ const { data: menu } = await useWebMenu(props.menuId)
 const searchKeyword = ref('')
 const activePrimaryId = ref<number | null>(null)
 const activeSecondaryId = ref<number | null>(null)
+const mobileMenuLevel = ref<'primary' | 'secondary' | 'tertiary'>('primary')
+const mobileActivePrimaryId = ref<number | null>(null)
+const mobileActiveSecondaryId = ref<number | null>(null)
 
 const fallbackCategories = computed<CategoryItem[]>(() => [
   { id: 1, name: t('df37674e.7c85ce'), link: '/collections/new', external: false, image_url: '', link_type: 'url', link_value: '/collections/new', children: [], sort: 0 },
@@ -190,6 +255,10 @@ function normalizeMenuItem(item: WebMenuItem): CategoryItem {
 
 const menuColumns = computed<CategoryItem[]>(() =>
   Array.isArray(menu.value?.items) ? menu.value.items.map(normalizeMenuItem) : []
+)
+
+const mobilePrimaryItems = computed<CategoryItem[]>(() =>
+  menuColumns.value.length ? menuColumns.value : fallbackCategories.value
 )
 
 watch(
@@ -250,8 +319,63 @@ const tertiaryItems = computed<CategoryItem[]>(() => {
   return []
 })
 
+const mobileActivePrimary = computed<CategoryItem | null>(
+  () => mobilePrimaryItems.value.find((item) => item.id === mobileActivePrimaryId.value) || null
+)
+
+const mobileSecondaryTitle = computed(() => mobileActivePrimary.value?.name || '')
+const mobileSecondaryItems = computed<CategoryItem[]>(() => mobileActivePrimary.value?.children || [])
+
+const mobileActiveSecondary = computed<CategoryItem | null>(
+  () => mobileSecondaryItems.value.find((item) => item.id === mobileActiveSecondaryId.value) || null
+)
+
+const mobileTertiaryTitle = computed(() => mobileActiveSecondary.value?.name || '')
+const mobileTertiaryItems = computed<CategoryItem[]>(() => {
+  if (mobileActiveSecondary.value?.children?.length) {
+    return mobileActiveSecondary.value.children
+      .filter((item) => Boolean(item.image_url))
+      .concat(mobileActiveSecondary.value.children.filter((item) => !item.image_url))
+  }
+
+  return []
+})
+
 function setActiveSecondary(id: number) {
   activeSecondaryId.value = id
+}
+
+function openMobilePrimary(item: CategoryItem) {
+  if (!item.children?.length) {
+    navigateMenuItem(item)
+    return
+  }
+
+  mobileActivePrimaryId.value = item.id
+  mobileActiveSecondaryId.value = null
+  mobileMenuLevel.value = 'secondary'
+}
+
+function openMobileSecondary(item: CategoryItem) {
+  if (!item.children?.length) {
+    navigateMenuItem(item)
+    return
+  }
+
+  mobileActiveSecondaryId.value = item.id
+  mobileMenuLevel.value = 'tertiary'
+}
+
+function goMobileBack() {
+  if (mobileMenuLevel.value === 'tertiary') {
+    mobileMenuLevel.value = 'secondary'
+    mobileActiveSecondaryId.value = null
+    return
+  }
+
+  mobileMenuLevel.value = 'primary'
+  mobileActivePrimaryId.value = null
+  mobileActiveSecondaryId.value = null
 }
 
 function navigateMenuItem(item: CategoryItem) {

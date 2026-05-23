@@ -28,7 +28,7 @@
         to="/"
         class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hover:opacity-80 transition-opacity"
       >
-        <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
+        <img :src="mallLogoDarkUrl" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
       </NuxtLink>
 
       <!-- 右侧容器 -->
@@ -124,6 +124,7 @@ const cartStore = useCartStore()
 const { locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 const localePath = useLocalePath()
+const { mallLogoDarkUrl } = await useMallGlobalSetting()
 
 // 定义 emits
 const emit = defineEmits<{

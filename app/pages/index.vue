@@ -7,7 +7,7 @@
   >
     <div :class="[isPreview ? 'decoration-preview-page-content' : 'min-h-screen', 'bg-white']">
       <DecorationRenderer
-        :dsl="pageRenderDsl"
+        :dsl="pageRenderDslWithDefault"
         :preview-session-key="DECORATION_PAGE_TYPE"
         :highlighted-block="highlightedBlock"
         data-testid="home-decoration-renderer-page"
@@ -24,7 +24,9 @@ import { useDecorationPreview } from '~/decoration-engine/composables/useDecorat
 import { useDecorationPageDslFetch } from '~/decoration-engine/composables/useDecorationPageDslFetch'
 import { useDecorationRouteContext } from '~/decoration-engine/composables/useDecorationRouteContext'
 import { useHomeDecorationSplit } from '~/decoration-engine/composables/useHomeDecorationSplit'
+import { createDefaultHomeDecorationDsl } from '~/decoration-engine/defaults/defaultDecorationDsl'
 import type { DecorationDSL } from '~/decoration-engine/types/decoration'
+import { hasDecorationSections } from '~/decoration-engine/types/decoration'
 
 /** 与后台、postMessage、`preview-session-key` 保持一致；其他页面改为各自 pageType 并复用下方 composables */
 const DECORATION_PAGE_TYPE = 'home' as const satisfies DecorationDSL['pageType']
@@ -53,6 +55,11 @@ const { headerRenderDsl, footerRenderDsl, pageRenderDsl } = useHomeDecorationSpl
   previewFooterDsl,
   previewGlobalDsl,
 })
+
+const defaultHomeDecorationDsl = createDefaultHomeDecorationDsl({ pageId: DECORATION_PAGE_ID })
+const pageRenderDslWithDefault = computed(() =>
+  hasDecorationSections(pageRenderDsl.value) ? pageRenderDsl.value : defaultHomeDecorationDsl
+)
 
 const layoutHeaderDecorationDsl = computed(() => (isPreview.value ? headerRenderDsl.value : null))
 const layoutFooterDecorationDsl = computed(() => (isPreview.value ? footerRenderDsl.value : null))

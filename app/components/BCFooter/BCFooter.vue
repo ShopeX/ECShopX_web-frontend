@@ -13,7 +13,7 @@
 
         <!-- 品牌 Logo -->
         <div class="w-[120px] h-[30px]">
-          <img src="/images/logo/logo.png" alt="Brand Logo" class="w-full h-full object-contain" />
+          <img :src="mallLogoLightUrl" alt="Brand Logo" class="w-full h-full object-contain" />
         </div>
       </div>
 
@@ -29,7 +29,7 @@
 
         <!-- 品牌 Logo -->
         <div class="w-[120px] h-[30px]">
-          <img src="/images/logo/logo.png" alt="Brand Logo" class="w-full h-full object-contain" />
+          <img :src="mallLogoLightUrl" alt="Brand Logo" class="w-full h-full object-contain" />
         </div>
       </div>
     </div>
@@ -40,6 +40,8 @@
 defineOptions({
   name: 'Footer',
 })
+
+const { mallLogoLightUrl } = await useMallGlobalSetting()
 </script>
 
 <style scoped>

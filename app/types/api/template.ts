@@ -19,3 +19,10 @@ export interface ITemplateConfig {
   sections: Record<string, ITemplateSection>
   order: string[]
 }
+
+export interface IMallGlobalSetting {
+  logo?: string
+  logo_light?: string
+  logo_dark?: string
+  background?: string
+}

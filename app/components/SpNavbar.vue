@@ -36,7 +36,7 @@
       <div class="h-20 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink :to="localePath('/')" class="flex items-center">
-          <img src="/images/logo/logo.png" alt="ECshopX Logo" class="h-10" />
+          <img :src="mallLogoDarkUrl" alt="ECshopX Logo" class="h-10" />
         </NuxtLink>
 
         <!-- 搜索框 -->
@@ -180,6 +180,7 @@ import { computed, ref } from 'vue'
 
 const localePath = useLocalePath()
 const { t } = useI18n()
+const { mallLogoDarkUrl } = await useMallGlobalSetting()
 
 // 用户登录状态
 const isLoggedIn = ref(false)

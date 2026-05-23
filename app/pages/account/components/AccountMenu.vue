@@ -148,8 +148,7 @@ function handleLogout() {
       try {
         await logout()
         emit('logout')
-        // 跳转到登录页
-        router.push(localePath('/account/login'))
+        router.push(localePath('/'))
       } catch (error) {
         console.error('退出登录失败:', error)
       }

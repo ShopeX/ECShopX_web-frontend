@@ -120,6 +120,7 @@ const previewEditPageType = computed<PageType>(() => {
   if (
     key === 'home' ||
     key === 'list' ||
+    key === 'product_list' ||
     key === 'detail' ||
     key === 'custom' ||
     key === 'global'

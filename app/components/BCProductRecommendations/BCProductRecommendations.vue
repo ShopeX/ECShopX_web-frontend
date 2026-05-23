@@ -82,12 +82,12 @@
         </div>
       </div>
 
-      <!-- PC端：Flex 布局 -->
-      <div class="hidden lg:flex items-start w-full">
+      <!-- PC端：五列 Grid，商品不足 5 个时也保持设计稿卡片宽度 -->
+      <div class="hidden lg:grid lg:grid-cols-5 items-start w-full">
         <div
           v-for="(product, index) in displayProducts"
           :key="product.id || index"
-          class="flex-1 flex flex-col items-start overflow-hidden"
+          class="flex flex-col items-start overflow-hidden"
         >
           <NuxtLink :to="`/products/${product.id}`" class="w-full">
             <!-- 商品图片 -->

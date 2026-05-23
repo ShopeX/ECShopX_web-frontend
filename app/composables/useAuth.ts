@@ -41,12 +41,15 @@ export function useAuth() {
   /**
    * 获取图形验证码
    */
-  async function getCaptcha(type: string = 'login'): Promise<boolean> {
+  async function getCaptcha(
+    type: string = 'login',
+    scope: 'distributor' | 'member' = 'distributor'
+  ): Promise<boolean> {
     try {
       captchaLoading.value = true
       error.value = ''
 
-      const response = await authApiClient.getCaptcha({ type })
+      const response = await authApiClient.getCaptcha({ type, scope })
       // company_id 由 HTTP 插件自动添加
       captcha.value = AuthTransformer.toCaptchaModel(response)
 
@@ -63,8 +66,11 @@ export function useAuth() {
   /**
    * 刷新图形验证码
    */
-  async function refreshCaptcha() {
-    return await getCaptcha()
+  async function refreshCaptcha(
+    type: string = 'login',
+    scope: 'distributor' | 'member' = 'distributor'
+  ) {
+    return await getCaptcha(type, scope)
   }
 
   /**

@@ -1,4 +1,4 @@
-import type { ITemplateConfig } from '~/types/api/template'
+import type { IMallGlobalSetting } from '~/types/api/template'
 
 /**
  * 模板配置 HTTP 客户端
@@ -35,6 +35,16 @@ export class TemplateApiClient {
     return this.http('/wxapp/getPageConfig', {
       method: 'GET',
       query: { name },
+      cache: 'default',
+    })
+  }
+
+  /**
+   * 获取商城登录页和全局 Logo 设置
+   */
+  async getLoginPageSetting(): Promise<IMallGlobalSetting> {
+    return this.http('/wxapp/pctemplate/loginPage/setting', {
+      method: 'GET',
       cache: 'default',
     })
   }

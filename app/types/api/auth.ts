@@ -14,13 +14,43 @@ export interface ILoginRequest {
 }
 
 /**
- * 手机验证码登录请求
+ * 手机密码登录请求
  */
 export interface IPhoneLoginRequest {
   /** 手机号 */
   phone: string
-  /** 短信验证码 */
-  smsCode: string
+  /** 密码 */
+  password: string
+}
+
+/**
+ * 会员注册请求
+ */
+export interface IMemberRegisterRequest {
+  /** 手机号 */
+  mobile?: string
+  /** 邮箱 */
+  email?: string
+  /** 密码 */
+  password: string
+  /** 验证码 */
+  vcode: string
+}
+
+/**
+ * 邮箱会员注册请求
+ */
+export interface IEmailMemberRegisterRequest {
+  /** 邮箱 */
+  email: string
+  /** 密码 */
+  password: string
+  /** 确认密码 */
+  passwordConfirmation: string
+  /** 图形验证码 token */
+  token: string
+  /** 图形验证码 */
+  yzm: string
 }
 
 /**
@@ -67,6 +97,8 @@ export interface ISmsCodeResponse {
 export interface ICaptchaRequest {
   /** 类型 */
   type: string
+  /** 验证码业务域 */
+  scope?: 'distributor' | 'member'
   /** 公司ID（可选，HTTP 插件会自动添加） */
   company_id?: string
 }
@@ -102,7 +134,11 @@ export interface IUserInfo {
  */
 export interface ILoginResponse {
   /** JWT Token */
-  token: string
+  token: string | null
+  /** 新登录接口业务状态，0 表示失败 */
+  status?: number
+  /** 新登录接口失败提示 */
+  error_message?: string
 }
 
 /**

@@ -74,7 +74,12 @@ export function useSmsCode() {
    * @param captcha - 图形验证码
    * @param captchaToken - 图形验证码 token
    */
-  async function sendCode(phone: string, captcha: string, captchaToken: string): Promise<boolean> {
+  async function sendCode(
+    phone: string,
+    captcha: string,
+    captchaToken: string,
+    type: string = 'login'
+  ): Promise<boolean> {
     // 验证是否可以发送
     if (!canSend.value) {
       error.value = t('2d006c42.e60fa7')
@@ -94,7 +99,7 @@ export function useSmsCode() {
       // 调用发送短信验证码 API
       // company_id 由 HTTP 插件自动添加
       const response = await authApiClient.sendSmsCode({
-        type: 'login',
+        type,
         mobile: phone,
         yzm: captcha,
         token: captchaToken,

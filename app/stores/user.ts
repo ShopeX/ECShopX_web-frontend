@@ -139,29 +139,11 @@ export const useUserStore = defineStore('user', {
      * 登出
      */
     async logout() {
-      try {
-        // 调用登出 API
-        await authApiClient.logout()
+      this.isLoggedIn = false
+      this.userInfo = null
+      this.setToken(null, null)
 
-        // 清除状态
-        this.isLoggedIn = false
-        this.userInfo = null
-        this.setToken(null, null)
-
-        return { success: true }
-      } catch (error: any) {
-        console.error('Logout error:', error)
-
-        // 即使登出接口失败，也清除本地状态
-        this.isLoggedIn = false
-        this.userInfo = null
-        this.setToken(null, null)
-
-        return {
-          success: false,
-          error: error.message || '登出失败',
-        }
-      }
+      return { success: true }
     },
 
     /**

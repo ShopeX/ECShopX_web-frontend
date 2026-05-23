@@ -73,8 +73,8 @@
       <USlideover
         v-model:open="showCategoryNav"
         side="left"
-        :content="{ style: { width: '720px', maxWidth: '720px' } }"
-        :ui="{ content: 'left-0 inset-y-0 !w-[720px] !max-w-[720px] bg-default divide-y divide-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none' }"
+        :content="{ style: { width: 'min(100vw, 720px)', maxWidth: '720px' } }"
+        :ui="{ content: 'left-0 inset-y-0 !w-screen md:!w-[720px] !max-w-[720px] bg-default divide-y divide-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none' }"
       >
         <template #content>
           <BCCategoryNav
@@ -146,6 +146,10 @@ import {
 import DecorationPreviewSelectionOverlay from '~/decoration-engine/components/DecorationPreviewSelectionOverlay.vue'
 import DecorationRenderer from '~/decoration-engine/components/DecorationRenderer.vue'
 import { useDecorationDslFetch } from '~/decoration-engine/composables/useDecorationDslFetch'
+import {
+  createDefaultFooterDecorationDsl,
+  createDefaultHeaderDecorationDsl,
+} from '~/decoration-engine/defaults/defaultDecorationDsl'
 import schemaMap from '~/templateEngines/schema'
 
 interface SelectedWidget {
@@ -188,6 +192,9 @@ const [{ dsl: ssrHeaderDecorationDsl }, { dsl: ssrFooterDecorationDsl }] = await
   }),
 ])
 
+const defaultHeaderDecorationDsl = createDefaultHeaderDecorationDsl()
+const defaultFooterDecorationDsl = createDefaultFooterDecorationDsl()
+
 const {
   route,
   isDecorationPreview,
@@ -201,6 +208,8 @@ const {
 } = useShopLayoutDecoration(props, {
   headerDecorationDsl: ssrHeaderDecorationDsl,
   footerDecorationDsl: ssrFooterDecorationDsl,
+  defaultHeaderDecorationDsl,
+  defaultFooterDecorationDsl,
 })
 
 const hideMobileFooter = computed(() => Boolean(route.meta.hideMobileFooter))

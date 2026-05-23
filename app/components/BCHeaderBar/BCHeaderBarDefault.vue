@@ -106,7 +106,7 @@
 
         <!-- Logo -->
         <NuxtLink :to="localePath('/')" class="flex-shrink-0">
-          <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-12" />
+          <img :src="mallLogoDarkUrl" alt="ECSHOPX Logo" class="h-8 lg:h-12" />
         </NuxtLink>
 
         <!-- 搜索框 - 桌面端 -->
@@ -334,6 +334,7 @@ const userStore = useUserStore()
 const cartStore = useCartStore()
 const localePath = useLocalePath()
 const { t } = useI18n()
+const { mallLogoDarkUrl } = await useMallGlobalSetting()
 
 /**
  * 用户登录状态
@@ -399,7 +400,7 @@ const handleLogout = async () => {
     const userStore = useUserStore()
     const result = await userStore.logout()
     if (result.success) {
-      navigateTo(localePath('/auth/login'))
+      navigateTo(localePath('/'))
     }
   }
 }

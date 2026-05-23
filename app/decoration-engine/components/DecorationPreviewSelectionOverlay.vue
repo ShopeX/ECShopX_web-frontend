@@ -192,7 +192,14 @@ let overlayResizeObserver: ResizeObserver | null = null
 
 const previewPageType = computed<PageType>(() => {
   const k = props.pageType
-  if (k === 'home' || k === 'list' || k === 'detail' || k === 'custom' || k === 'global') {
+  if (
+    k === 'home' ||
+    k === 'list' ||
+    k === 'product_list' ||
+    k === 'detail' ||
+    k === 'custom' ||
+    k === 'global'
+  ) {
     return k
   }
   return 'home'
@@ -243,6 +250,7 @@ const SECTION_TYPE_LABEL: Record<string, string> = {
   footer: '页脚',
   carousel: '轮播',
   'image-hotspot': '图片热区',
+  'native-product-list': '商品列表',
   'product-shelf': '商品货架',
 }
 
@@ -601,13 +609,23 @@ const selectedSectionActionState = computed(() => {
   const sectionOrder = resolveAreaOrder(area)
   const currentIndex = sectionOrder.indexOf(chrome.sectionId)
   const canMove = currentIndex >= 0
+  const locked = isLockedNativeSection(chrome.sectionId)
   return {
     canMoveUp: canMove && currentIndex > 0,
     canMoveDown: canMove && currentIndex < sectionOrder.length - 1,
-    canDuplicate: area === 'template',
-    canRemove: sectionOrder.length > 1,
+    canDuplicate: area === 'template' && !locked,
+    canRemove: sectionOrder.length > 1 && !locked,
   }
 })
+
+function isLockedNativeSection(sectionId: string) {
+  const section = mergedPreviewSections.value[sectionId]
+  return Boolean(
+    section?.type === 'native-product-list' ||
+      section?.settings?.locked === true ||
+      (section as DecorationSection & { locked?: boolean })?.locked === true
+  )
+}
 
 function getBlockOrder(sectionId: string) {
   const section = mergedPreviewSections.value[sectionId]
@@ -741,8 +759,14 @@ const dashedBlockOverlays = computed(() => {
     return []
   }
   return Object.keys(ctx.blockRects.value)
-    .map((key) => ({ key, ...ctx.blockRects.value[key] }))
-    .filter((item) => item.sectionId === sid && item.key !== activeBlockKey.value)
+    .map((key) => {
+      const rect = ctx.blockRects.value[key]
+      return rect ? { key, ...rect } : null
+    })
+    .filter(
+      (item): item is PreviewChromeRect & { key: string } =>
+        Boolean(item && item.sectionId === sid && item.key !== activeBlockKey.value)
+    )
     .map((item) => {
       const rect = toViewportRect(item)
       return {

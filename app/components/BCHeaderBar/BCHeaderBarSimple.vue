@@ -4,7 +4,7 @@
       <div class="container mx-auto h-16 lg:h-20 flex items-center justify-between px-4 lg:px-6">
         <!-- Logo -->
         <NuxtLink to="/" class="flex-shrink-0">
-          <img src="/images/logo/logo.png" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
+          <img :src="mallLogoDarkUrl" alt="ECSHOPX Logo" class="h-8 lg:h-10" />
         </NuxtLink>
 
         <!-- 中间导航菜单 -->
@@ -87,6 +87,7 @@ const router = useRouter()
 const route = useRoute()
 const localePath = useLocalePath()
 const userStore = useUserStore()
+const { mallLogoDarkUrl } = await useMallGlobalSetting()
 
 // 主导航
 const mainNavs = [

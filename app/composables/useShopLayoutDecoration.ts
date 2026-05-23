@@ -6,6 +6,10 @@ import type {
 } from '~/decoration-engine/types/decoration'
 import { EMPTY_DECORATION_DSL, hasDecorationSections } from '~/decoration-engine/types/decoration'
 import { isDecorationPreviewActiveOnRoute } from '~/decoration-engine/composables/useDecorationRouteContext'
+import {
+  createDefaultFooterDecorationDsl,
+  createDefaultHeaderDecorationDsl,
+} from '~/decoration-engine/defaults/defaultDecorationDsl'
 
 /** 与 `layouts/default` 通过 NuxtLayout 传入的装修相关 props 一致 */
 export interface ShopLayoutDecorationBindProps {
@@ -19,6 +23,24 @@ export interface ShopLayoutDecorationBindProps {
 export interface ShopLayoutDecorationFallbacks {
   headerDecorationDsl?: MaybeRef<DecorationDSL | null | undefined>
   footerDecorationDsl?: MaybeRef<DecorationDSL | null | undefined>
+  defaultHeaderDecorationDsl?: MaybeRef<DecorationDSL | null | undefined>
+  defaultFooterDecorationDsl?: MaybeRef<DecorationDSL | null | undefined>
+}
+
+function withDecorationDefault(
+  value: DecorationDSL | null | undefined,
+  fallback: DecorationDSL | null | undefined,
+  defaultDsl: DecorationDSL
+) {
+  if (hasDecorationSections(value)) {
+    return value
+  }
+
+  if (hasDecorationSections(fallback)) {
+    return fallback
+  }
+
+  return defaultDsl
 }
 
 /**
@@ -32,6 +54,23 @@ export function useShopLayoutDecoration(
   fallbacks: ShopLayoutDecorationFallbacks = {}
 ) {
   const route = useRoute()
+
+  const normalizePreviewPageType = (value: unknown): PageType | null => {
+    const k = Array.isArray(value) ? value[0] : value
+    if (
+      k === 'home' ||
+      k === 'list' ||
+      k === 'product_list' ||
+      k === 'detail' ||
+      k === 'custom' ||
+      k === 'header' ||
+      k === 'footer' ||
+      k === 'global'
+    ) {
+      return k
+    }
+    return null
+  }
 
   const isEmbedded = ref(false)
   if (import.meta.client) {
@@ -49,13 +88,16 @@ export function useShopLayoutDecoration(
     () => Boolean(props.decorationPreview) || isDecorationRouteDesignMode.value || isEmbedded.value
   )
 
-  const decorationPreviewSessionKey = computed(() => props.decorationPreviewSessionKey ?? null)
+  const decorationPreviewSessionKey = computed(
+    () => props.decorationPreviewSessionKey ?? normalizePreviewPageType(route.query.pageType)
+  )
 
   const decorationPreviewOverlayPageType = computed<PageType>(() => {
     const k = decorationPreviewSessionKey.value
     if (
       k === 'home' ||
       k === 'list' ||
+      k === 'product_list' ||
       k === 'detail' ||
       k === 'custom' ||
       k === 'header' ||
@@ -69,19 +111,19 @@ export function useShopLayoutDecoration(
 
   const headerDecorationDsl = computed(() => {
     const propValue = props.headerDecorationDsl ?? null
-    if (hasDecorationSections(propValue)) {
-      return propValue
-    }
-
-    return unref(fallbacks.headerDecorationDsl) ?? propValue
+    return withDecorationDefault(
+      propValue,
+      unref(fallbacks.headerDecorationDsl),
+      unref(fallbacks.defaultHeaderDecorationDsl) || createDefaultHeaderDecorationDsl()
+    )
   })
   const footerDecorationDsl = computed(() => {
     const propValue = props.footerDecorationDsl ?? null
-    if (hasDecorationSections(propValue)) {
-      return propValue
-    }
-
-    return unref(fallbacks.footerDecorationDsl) ?? propValue
+    return withDecorationDefault(
+      propValue,
+      unref(fallbacks.footerDecorationDsl),
+      unref(fallbacks.defaultFooterDecorationDsl) || createDefaultFooterDecorationDsl()
+    )
   })
 
   const shouldRenderHeaderDecoration = computed(() =>

@@ -1,151 +1,185 @@
 <template>
-  <div class="min-h-screen bg-white" data-testid="collections-page">
-    <!-- BBC 店铺 Header（仅在携带 shopid 参数时展示） -->
-    <BCShopHeader
-      v-if="shopId"
-      :distributor-id="shopId"
-      :logo="shopInfo.logo"
-      :name="shopInfo.name"
-      :tagline="shopInfo.tagline"
-      :categories="shopInfo.categories"
-      :followed="shopInfo.followed"
-      @follow="onShopFollow"
-      @contact="onShopContact"
-    />
-
-    <!-- 集合封面头部 -->
-    <img src="~/assets/images/banners/banner.png" class="w-full object-cover" />
-
-    <!-- 页面标题 - 移动端优化 -->
-    <!-- <div class="bg-white">
-      <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">全部商品</h1>
-        <p class="mt-1 text-sm text-gray-600">发现您喜欢的商品</p>
-      </div>
-    </div> -->
-
-    <!-- 筛选器 -->
-    <BCProductFilter
-      v-model="productFilterValue"
-      :filter-groups="filterGroups"
-      :show-filter-panel="showFilterPanel"
-      data-testid="collections-filter"
-      @update:show-filter-panel="showFilterPanel = $event"
-      @change="handleFilterChange"
-    />
-
-    <!-- 主内容区域 - 响应式容器 -->
-    <!-- 商品展示区域 -->
-    <div class="bg-white pb-8 flex justify-center">
-      <div class="w-full">
-        <!-- 加载状态 -->
-        <div
-          v-if="(!hasInitialLoadCompleted || pending) && !products.length"
-          class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5"
-          data-testid="collections-loading"
-        >
-          <div
-            v-for="index in productSkeletonCount"
-            :key="`collections-skeleton-${index}`"
-            class="group"
-          >
-            <USkeleton class="aspect-square w-full" />
-            <div class="flex flex-col items-center gap-3 bg-[#f6f6f6] px-6 py-8">
-              <USkeleton class="h-4 w-4/5" />
-              <USkeleton class="h-4 w-3/5" />
-              <USkeleton class="h-4 w-16" />
-            </div>
-          </div>
-        </div>
-
-        <!-- 错误状态 -->
-        <div v-else-if="error" class="text-center py-12" data-testid="collections-error">
-          <div class="text-gray-500 mb-4">
-            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.694-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('c52ec334.866b79') }}</h3>
-          <p class="text-gray-600 mb-4">{{ error.message || t('c52ec334.f70894') }}</p>
-          <UButton @click="refresh()">{{ t('c52ec334.64ca9b') }}</UButton>
-        </div>
-
-        <!-- 空状态 -->
-        <div
-          v-else-if="hasInitialLoadCompleted && !products.length && !pending"
-          class="text-center py-12"
-          data-testid="collections-empty"
-        >
-          <div class="text-gray-400 mb-4">
-            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              />
-            </svg>
-          </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('c52ec334.e3a720') }}</h3>
-          <p class="text-gray-600">{{ t('c52ec334.cbcf4f') }}</p>
-        </div>
-
-        <!-- 商品展示 -->
-        <div v-else>
-          <!-- 商品网格布局 - 固定宽度居中布局 -->
-          <div
-            class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5"
-            data-testid="collections-product-grid"
-          >
-            <BCProductCard
-              v-for="product in products"
-              :key="product.itemId"
-              :product="product"
-              :data-testid="`collections-product-card-${product.itemId}`"
-              loading="lazy"
+  <DefaultLayout
+    :header-decoration-dsl="layoutHeaderDecorationDsl"
+    :footer-decoration-dsl="layoutFooterDecorationDsl"
+    :decoration-preview-session-key="DECORATION_PAGE_TYPE"
+    :highlighted-block="highlightedBlock"
+  >
+    <div class="min-h-screen bg-white" data-testid="collections-page">
+      <DecorationRenderer
+        :dsl="productListRenderDsl"
+        :preview-session-key="DECORATION_PAGE_TYPE"
+        :highlighted-block="highlightedBlock"
+        data-testid="collections-decoration-renderer-page"
+      >
+        <template #product_list>
+          <div data-testid="collections-native-product-list">
+            <!-- BBC 店铺 Header（仅在携带 shopid 参数时展示） -->
+            <BCShopHeader
+              v-if="shopId"
+              :distributor-id="shopId"
+              :logo="shopInfo.logo"
+              :name="shopInfo.name"
+              :tagline="shopInfo.tagline"
+              :categories="shopInfo.categories"
+              :followed="shopInfo.followed"
+              @follow="onShopFollow"
+              @contact="onShopContact"
             />
-          </div>
 
-          <!-- 加载更多触发器（滚动到此处自动加载） -->
-          <div
-            v-if="hasMore"
-            ref="loadMoreTrigger"
-            class="text-center pt-8 pb-4"
-            data-testid="collections-load-more-trigger"
-          >
-            <div
-              v-if="loadingMore"
-              class="flex items-center justify-center gap-2"
-              data-testid="collections-loading-more"
-            >
-              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
-              <span class="text-gray-500 text-sm">{{ t('c52ec334.26b5bd') }}</span>
+            <!-- 页面标题 - 移动端优化 -->
+            <!-- <div class="bg-white">
+              <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900">全部商品</h1>
+                <p class="mt-1 text-sm text-gray-600">发现您喜欢的商品</p>
+              </div>
+            </div> -->
+
+            <!-- 筛选器 -->
+            <BCProductFilter
+              v-model="productFilterValue"
+              :filter-groups="filterGroups"
+              :show-filter-panel="showFilterPanel"
+              data-testid="collections-filter"
+              @update:show-filter-panel="showFilterPanel = $event"
+              @change="handleFilterChange"
+            />
+
+            <!-- 主内容区域 - 响应式容器 -->
+            <!-- 商品展示区域 -->
+            <div class="bg-white pb-8 flex justify-center">
+              <div class="w-full">
+                <!-- 加载状态 -->
+                <div
+                  v-if="(!hasInitialLoadCompleted || pending) && !products.length"
+                  class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5"
+                  data-testid="collections-loading"
+                >
+                  <div
+                    v-for="index in productSkeletonCount"
+                    :key="`collections-skeleton-${index}`"
+                    class="group"
+                  >
+                    <USkeleton class="aspect-square w-full" />
+                    <div class="flex flex-col items-center gap-3 bg-[#f6f6f6] px-6 py-8">
+                      <USkeleton class="h-4 w-4/5" />
+                      <USkeleton class="h-4 w-3/5" />
+                      <USkeleton class="h-4 w-16" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 错误状态 -->
+                <div v-else-if="error" class="text-center py-12" data-testid="collections-error">
+                  <div class="text-gray-500 mb-4">
+                    <svg
+                      class="mx-auto h-12 w-12"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.694-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">
+                    {{ t('c52ec334.866b79') }}
+                  </h3>
+                  <p class="text-gray-600 mb-4">{{ error.message || t('c52ec334.f70894') }}</p>
+                  <UButton @click="refresh()">{{ t('c52ec334.64ca9b') }}</UButton>
+                </div>
+
+                <!-- 空状态 -->
+                <div
+                  v-else-if="hasInitialLoadCompleted && !products.length && !pending"
+                  class="text-center py-12"
+                  data-testid="collections-empty"
+                >
+                  <div class="text-gray-400 mb-4">
+                    <svg
+                      class="mx-auto h-12 w-12"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">
+                    {{ t('c52ec334.e3a720') }}
+                  </h3>
+                  <p class="text-gray-600">{{ t('c52ec334.cbcf4f') }}</p>
+                </div>
+
+                <!-- 商品展示 -->
+                <div v-else>
+                  <!-- 商品网格布局 - 固定宽度居中布局 -->
+                  <div
+                    class="grid grid-cols-2 xl:grid xl:grid-cols-4 2xl:grid-cols-5"
+                    data-testid="collections-product-grid"
+                  >
+                    <BCProductCard
+                      v-for="product in products"
+                      :key="product.itemId"
+                      :product="product"
+                      :data-testid="`collections-product-card-${product.itemId}`"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <!-- 加载更多触发器（滚动到此处自动加载） -->
+                  <div
+                    v-if="hasMore"
+                    ref="loadMoreTrigger"
+                    class="text-center pt-8 pb-4"
+                    data-testid="collections-load-more-trigger"
+                  >
+                    <div
+                      v-if="loadingMore"
+                      class="flex items-center justify-center gap-2"
+                      data-testid="collections-loading-more"
+                    >
+                      <div
+                        class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"
+                      ></div>
+                      <span class="text-gray-500 text-sm">{{ t('c52ec334.26b5bd') }}</span>
+                    </div>
+                  </div>
+
+                  <!-- 到底了提示 -->
+                  <div
+                    v-else-if="products.length > 0"
+                    class="text-center pt-8 pb-4"
+                    data-testid="collections-end-message"
+                  >
+                    <p class="text-gray-400 text-sm">{{ t('c52ec334.942d1f') }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
-          <!-- 到底了提示 -->
-          <div
-            v-else-if="products.length > 0"
-            class="text-center pt-8 pb-4"
-            data-testid="collections-end-message"
-          >
-            <p class="text-gray-400 text-sm">{{ t('c52ec334.942d1f') }}</p>
-          </div>
-        </div>
-      </div>
+        </template>
+      </DecorationRenderer>
     </div>
-  </div>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import BCProductFilter from '~/components/BCProductFilter/BCProductFilter.vue'
 import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
 import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
+import DecorationRenderer from '~/decoration-engine/components/DecorationRenderer.vue'
+import DefaultLayout from '~/layouts/default.vue'
 import type { IProduct } from '~/components/BCProductCard/types'
 import type { IBrand, IItemListParams } from '~/types/api/item'
 import type { ICategory } from '~/components/BCItemFilter/BCItemFilter.vue'
@@ -154,10 +188,91 @@ import { ESortOption } from '~/components/BCProductFilter/types'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
+import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
+import { useDecorationPageDslFetch } from '~/decoration-engine/composables/useDecorationPageDslFetch'
+import { useDecorationRouteContext } from '~/decoration-engine/composables/useDecorationRouteContext'
+import { useHomeDecorationSplit } from '~/decoration-engine/composables/useHomeDecorationSplit'
+import type { DecorationDSL } from '~/decoration-engine/types/decoration'
+
+const DECORATION_PAGE_TYPE = 'product_list' as const satisfies DecorationDSL['pageType']
+const PRODUCT_LIST_NATIVE_SECTION_ID = 'product_list'
+const PRODUCT_LIST_NATIVE_SECTION_TYPE = 'native-product-list'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { isPreview } = useDecorationRouteContext()
+const {
+  dsl: previewDsl,
+  pageDsl: previewPageDsl,
+  headerDsl: previewHeaderDsl,
+  footerDsl: previewFooterDsl,
+  globalDsl: previewGlobalDsl,
+  highlightedBlock,
+} = useDecorationPreview(DECORATION_PAGE_TYPE)
+
+const { ssrDsl } = await useDecorationPageDslFetch({
+  pageType: DECORATION_PAGE_TYPE,
+})
+
+const { headerRenderDsl, footerRenderDsl, pageRenderDsl } = useHomeDecorationSplit({
+  ssrDsl,
+  previewDsl,
+  previewPageDsl,
+  previewHeaderDsl,
+  previewFooterDsl,
+  previewGlobalDsl,
+})
+
+function createProductListNativeSection(): DecorationDSL['sections'][string] {
+  return {
+    type: PRODUCT_LIST_NATIVE_SECTION_TYPE,
+    title: '商品列表',
+    disabled: false,
+    settings: {
+      locked: true,
+    },
+    blocks: {},
+    block_order: [],
+  }
+}
+
+function ensureProductListNativeSection(source: DecorationDSL | null | undefined): DecorationDSL {
+  const fallback: DecorationDSL = {
+    pageType: DECORATION_PAGE_TYPE,
+    pageId: DECORATION_PAGE_TYPE,
+    sections: {
+      [PRODUCT_LIST_NATIVE_SECTION_ID]: createProductListNativeSection(),
+    },
+    order: [PRODUCT_LIST_NATIVE_SECTION_ID],
+  }
+  if (!source?.sections || !Array.isArray(source.order)) {
+    return fallback
+  }
+
+  const sections = {
+    ...source.sections,
+    [PRODUCT_LIST_NATIVE_SECTION_ID]:
+      source.sections[PRODUCT_LIST_NATIVE_SECTION_ID] || createProductListNativeSection(),
+  }
+  const order = source.order.includes(PRODUCT_LIST_NATIVE_SECTION_ID)
+    ? source.order.slice()
+    : [...source.order, PRODUCT_LIST_NATIVE_SECTION_ID]
+
+  return {
+    ...source,
+    pageType: DECORATION_PAGE_TYPE,
+    pageId: source.pageId || DECORATION_PAGE_TYPE,
+    sections,
+    order,
+  }
+}
+
+const productListRenderDsl = computed(() =>
+  ensureProductListNativeSection(pageRenderDsl.value)
+)
+const layoutHeaderDecorationDsl = computed(() => (isPreview.value ? headerRenderDsl.value : null))
+const layoutFooterDecorationDsl = computed(() => (isPreview.value ? footerRenderDsl.value : null))
 
 const mainCategory = computed(() => {
   const routeId = route.params.id
@@ -167,6 +282,7 @@ const mainCategory = computed(() => {
 // 启用页面缓存
 definePageMeta({
   keepalive: true,
+  layout: false,
 })
 
 // SEO 元数据配置

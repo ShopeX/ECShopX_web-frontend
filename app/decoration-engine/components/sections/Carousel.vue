@@ -397,6 +397,10 @@ const stopAutoplay = () => {
 }
 
 const startAutoplay = () => {
+  if (!import.meta.client) {
+    return
+  }
+
   stopAutoplay()
   if (!settings.value.autoplay || !shouldRotate.value) {
     return

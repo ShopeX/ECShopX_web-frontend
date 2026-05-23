@@ -3,7 +3,7 @@
     <div class="container mx-auto h-full flex items-center justify-between px-4">
       <!-- Logo -->
       <NuxtLink :to="localePath('/')" class="flex-shrink-0">
-        <img src="/images/logo/logo.png" alt="Logo" class="h-14" />
+        <img :src="mallLogoDarkUrl" alt="Logo" class="h-14" />
       </NuxtLink>
 
       <!-- 导航菜单 -->
@@ -64,4 +64,5 @@ const cartUI = useCartUIStore()
 const cartStore = useCartStore()
 const localePath = useLocalePath()
 const { t } = useI18n()
+const { mallLogoDarkUrl } = await useMallGlobalSetting()
 </script>

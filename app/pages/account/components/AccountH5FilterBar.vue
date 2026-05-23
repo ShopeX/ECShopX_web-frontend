@@ -223,7 +223,7 @@ async function handleSelect(item: FilterMenuItem) {
       content: t('d53094c8.75c78d'),
       onConfirm: async () => {
         await logout()
-        router.push(localePath('/account/login'))
+        router.push(localePath('/'))
       },
     })
     return

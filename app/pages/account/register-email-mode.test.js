@@ -12,8 +12,8 @@ test('register page exposes phone and email registration tabs', () => {
   assert.match(pageSource, /registerMode = ref<'phone' \| 'email'>\('phone'\)/)
   assert.match(pageSource, /registerMode === 'phone'/)
   assert.match(pageSource, /registerMode === 'email'/)
-  assert.match(pageSource, /手机注册/)
-  assert.match(pageSource, /邮箱注册/)
+  assert.match(pageSource, /t\('5a21f3db\.de46a3'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.921b9f'\)/)
 })
 
 test('email registration form matches figma fields and agreement flow', () => {
@@ -22,13 +22,13 @@ test('email registration form matches figma fields and agreement flow', () => {
   assert.match(pageSource, /emailForm = reactive\(\{[\s\S]*password:\s*''/)
   assert.match(pageSource, /emailForm = reactive\(\{[\s\S]*confirmPassword:\s*''/)
   assert.match(pageSource, /agreedToTerms/)
-  assert.match(pageSource, /请输入电子邮箱/)
-  assert.match(pageSource, /请输入图形验证码/)
-  assert.match(pageSource, /请输入登录密码/)
-  assert.match(pageSource, /请再次确认登录密码/)
-  assert.match(pageSource, /同意协议并注册/)
-  assert.match(pageSource, /《注册协议》/)
-  assert.match(pageSource, /《隐私政策》/)
+  assert.match(pageSource, /t\('5a21f3db\.b457cd'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.e70066'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.209f2b'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.8562a6'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.3179ba'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.df410b'\)/)
+  assert.match(pageSource, /t\('5a21f3db\.be8324'\)/)
 })
 
 test('phone registration matches figma captcha and sms fields', () => {
@@ -39,8 +39,8 @@ test('phone registration matches figma captcha and sms fields', () => {
     pageSource,
     /v-model="phoneForm\.phone"[\s\S]*v-model="phoneForm\.captchaCode"[\s\S]*v-model="phoneForm\.code"[\s\S]*v-model="phoneForm\.password"[\s\S]*v-model="phoneForm\.confirmPassword"/
   )
-  assert.match(pageSource, /placeholder="图片验证码"/)
-  assert.match(pageSource, /placeholder="短信验证码"/)
+  assert.match(pageSource, /:placeholder="t\('5a21f3db\.fcbe6f'\)"/)
+  assert.match(pageSource, /:placeholder="t\('5a21f3db\.eb76c0'\)"/)
   assert.match(
     pageSource,
     /function switchRegisterMode\(mode: 'phone' \| 'email'\) \{[\s\S]*if \(mode === 'phone'\) \{[\s\S]*getCaptcha\('sign', 'member'\)/

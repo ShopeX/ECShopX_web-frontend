@@ -50,9 +50,11 @@ export class AuthApiClient {
     return this.$api
   }
 
-  private assertNewLoginSuccess(response: ILoginResponse & { status?: number; error_message?: string }) {
+  private assertNewLoginSuccess(
+    response: ILoginResponse & { status?: number; error_message?: string }
+  ) {
     if (response?.status === 0 || !response?.token) {
-      const message = response?.error_message || '用户名或密码错误'
+      const message = response?.error_message || '833d19b4.87f936'
       throw new Error(message)
     }
   }

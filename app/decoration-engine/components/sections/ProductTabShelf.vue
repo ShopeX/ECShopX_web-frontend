@@ -9,11 +9,7 @@
         <h2 v-if="settings.title" :class="titleClasses">
           {{ settings.title }}
         </h2>
-        <div
-          v-if="settings.intro"
-          :class="introClasses"
-          v-html="settings.intro"
-        />
+        <div v-if="settings.intro" :class="introClasses" v-html="settings.intro" />
       </div>
 
       <DecorationBlockHost
@@ -34,8 +30,9 @@
                 : 'bg-[var(--section-soft-background)] text-[var(--section-muted-foreground)] hover:opacity-85',
             ]"
             @click="handleTabClick($event, tab.id)"
-            v-html="tab.label"
-          />
+          >
+            {{ tab.label }}
+          </button>
         </div>
 
         <div
@@ -89,7 +86,10 @@ import { useDecorationEditOptional } from '~/decoration-engine/composables/useDe
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
-import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  resolveSectionColorScheme,
+  resolveSectionPaddingClass,
+} from '~/decoration-engine/utils/sectionAppearance'
 
 interface ProductTabShelfSettings {
   title: string
@@ -116,7 +116,13 @@ interface ProductTabItem {
 
 type ProductTabShelfSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge'
 
-const PRODUCT_TAB_SHELF_SIZES: ProductTabShelfSize[] = ['xsmall', 'small', 'medium', 'large', 'xlarge']
+const PRODUCT_TAB_SHELF_SIZES: ProductTabShelfSize[] = [
+  'xsmall',
+  'small',
+  'medium',
+  'large',
+  'xlarge',
+]
 
 const props = defineProps<{
   section: DecorationSection
@@ -126,6 +132,12 @@ const props = defineProps<{
 
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
+const { t } = useI18n()
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+function translateIfGeneratedKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
 const isDecorationPreview = computed(() => Boolean(props.isPreview))
 
 const settings = computed<ProductTabShelfSettings>(() => {
@@ -134,7 +146,9 @@ const settings = computed<ProductTabShelfSettings>(() => {
   const paddingTop = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(String(raw.padding_top))
     ? String(raw.padding_top)
     : 'm'
-  const paddingBottom = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(String(raw.padding_bottom))
+  const paddingBottom = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(
+    String(raw.padding_bottom)
+  )
     ? String(raw.padding_bottom)
     : 'm'
   const size = normalizeSize(raw.size)
@@ -146,8 +160,8 @@ const settings = computed<ProductTabShelfSettings>(() => {
     : 'medium'
 
   return {
-    title: String(raw.title || ''),
-    intro: String(raw.intro || ''),
+    title: translateIfGeneratedKey(String(raw.title || '')),
+    intro: translateIfGeneratedKey(String(raw.intro || '')),
     size,
     alignment: alignment as ProductTabShelfSettings['alignment'],
     columns: normalizeColumns(rawColumns),
@@ -177,15 +191,19 @@ const tabs = computed<ProductTabItem[]>(() =>
       if (!block || block.disabled || block.type !== 'product-tab') return null
 
       const blockSettings = block.settings as Record<string, unknown>
-      const rawProductIds = Array.isArray(blockSettings.product_ids) ? blockSettings.product_ids : []
+      const rawProductIds = Array.isArray(blockSettings.product_ids)
+        ? blockSettings.product_ids
+        : []
       const rawLimit = Number(blockSettings.limit ?? 8)
       const rawSize =
-        blockSettings.size_override === true ? String(blockSettings.size || '') : settings.value.size
+        blockSettings.size_override === true
+          ? String(blockSettings.size || '')
+          : settings.value.size
       const rawColumns = Number(blockSettings.columns ?? settings.value.columns)
 
       return {
         id: blockId,
-        label: String(blockSettings.tab_label || `Tab ${index + 1}`),
+        label: translateIfGeneratedKey(String(blockSettings.tab_label || `Tab ${index + 1}`)),
         productIds: rawProductIds.map((id) => String(id)).filter(Boolean),
         size: normalizeSize(rawSize, settings.value.size),
         columns: normalizeColumns(rawColumns),
@@ -216,7 +234,9 @@ watchEffect(() => {
   }
 })
 
-const activeTab = computed(() => tabs.value.find((tab) => tab.id === activeTabId.value) || tabs.value[0])
+const activeTab = computed(
+  () => tabs.value.find((tab) => tab.id === activeTabId.value) || tabs.value[0]
+)
 
 const activeSize = computed(() => activeTab.value?.size || settings.value.size)
 
@@ -235,7 +255,7 @@ const placeholderProducts = computed<IProduct[]>(() => {
   const limit = activeTab.value?.limit || 8
   return Array.from({ length: Math.min(8, Math.max(2, limit)) }, (_, index) => ({
     itemId: `decoration-placeholder-${index + 1}`,
-    itemName: '产品标题示例',
+    itemName: t('1e2ff869.d40a0d'),
     img: placeholderProductImage,
     imgs: [placeholderProductImage],
     price: 2000,
@@ -348,7 +368,10 @@ function normalizeColumns(value: number): ProductTabShelfSettings['columns'] {
   return 4
 }
 
-function normalizeSize(value: unknown, fallback: ProductTabShelfSize = 'medium'): ProductTabShelfSize {
+function normalizeSize(
+  value: unknown,
+  fallback: ProductTabShelfSize = 'medium'
+): ProductTabShelfSize {
   const nextValue = String(value || '')
   return PRODUCT_TAB_SHELF_SIZES.includes(nextValue as ProductTabShelfSize)
     ? (nextValue as ProductTabShelfSize)

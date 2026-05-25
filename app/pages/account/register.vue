@@ -45,7 +45,7 @@
               "
               @click="switchRegisterMode('phone')"
             >
-              手机注册
+              {{ t('5a21f3db.de46a3') }}
             </button>
             <button
               type="button"
@@ -57,7 +57,7 @@
               "
               @click="switchRegisterMode('email')"
             >
-              邮箱注册
+              {{ t('5a21f3db.921b9f') }}
             </button>
           </div>
 
@@ -73,7 +73,7 @@
                 v-model="phoneForm.phone"
                 type="tel"
                 autocomplete="new-password"
-                placeholder="手机号码"
+                :placeholder="t('5a21f3db.92448a')"
                 class="w-full bg-transparent py-4 text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -83,7 +83,7 @@
                 v-model="phoneForm.captchaCode"
                 type="text"
                 autocomplete="new-password"
-                placeholder="图片验证码"
+                :placeholder="t('5a21f3db.fcbe6f')"
                 class="min-w-0 flex-1 bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
               <button
@@ -95,14 +95,14 @@
                 <img
                   v-if="captcha?.imageData"
                   :src="captcha?.imageData"
-                  alt="图片验证码"
+                  :alt="t('5a21f3db.fcbe6f')"
                   class="h-full w-full object-cover"
                 />
                 <span
                   v-else
                   class="flex h-full w-full items-center justify-center px-2 text-[12px] text-[#4a5565]"
                 >
-                  {{ captchaLoading ? t('5a21f3db.ba1a3a') : '获取验证码' }}
+                  {{ captchaLoading ? t('5a21f3db.ba1a3a') : t('5a21f3db.d369f4') }}
                 </span>
               </button>
             </div>
@@ -112,7 +112,7 @@
                 v-model="phoneForm.code"
                 type="text"
                 autocomplete="new-password"
-                placeholder="短信验证码"
+                :placeholder="t('5a21f3db.eb76c0')"
                 class="min-w-0 flex-1 bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
               <button
@@ -134,7 +134,7 @@
                 v-model="phoneForm.password"
                 type="password"
                 autocomplete="new-password"
-                placeholder="请输入登录密码"
+                :placeholder="t('5a21f3db.209f2b')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -144,7 +144,7 @@
                 v-model="phoneForm.confirmPassword"
                 type="password"
                 autocomplete="new-password"
-                placeholder="请再次确认登录密码"
+                :placeholder="t('5a21f3db.8562a6')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -156,10 +156,10 @@
                 class="h-4 w-4 shrink-0 cursor-pointer appearance-none border border-[#191a1d] checked:border-[#191a1d] checked:bg-[#191a1d]"
               />
               <span>
-                已阅读并同意
-                <NuxtLink to="/terms" class="underline">《注册协议》</NuxtLink>
-                和
-                <NuxtLink to="/privacy" class="underline">《隐私政策》</NuxtLink>
+                {{ t('5a21f3db.b840cb') }}
+                <NuxtLink to="/terms" class="underline">{{ t('5a21f3db.df410b') }}</NuxtLink>
+                {{ t('5a21f3db.ab20cc') }}
+                <NuxtLink to="/privacy" class="underline">{{ t('5a21f3db.be8324') }}</NuxtLink>
               </span>
             </label>
 
@@ -179,16 +179,18 @@
                 class="w-full bg-[#0f0f10] py-4 text-center text-[14px] font-medium leading-5 text-white transition-all hover:bg-opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="isLoading || !agreedToTerms"
               >
-                {{ isLoading ? '注册中...' : '同意协议并注册' }}
+                {{ isLoading ? t('5a21f3db.2f4891') : t('5a21f3db.3179ba') }}
               </button>
               <div class="flex items-center justify-center">
-                <span class="mr-1 text-[12px] leading-4 text-[#4a5565]">已有账号？</span>
+                <span class="mr-1 text-[12px] leading-4 text-[#4a5565]">{{
+                  t('5a21f3db.c3b432')
+                }}</span>
                 <button
                   type="button"
                   class="text-[12px] leading-4 text-[#191a1d] underline transition-colors hover:text-gray-600"
                   @click="goToLogin"
                 >
-                  立即登录
+                  {{ t('5a21f3db.ed2ff8') }}
                 </button>
               </div>
             </div>
@@ -206,7 +208,7 @@
                 v-model="emailForm.email"
                 type="email"
                 autocomplete="new-password"
-                placeholder="请输入电子邮箱"
+                :placeholder="t('5a21f3db.b457cd')"
                 class="w-full bg-transparent py-4 text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -216,7 +218,7 @@
                 v-model="emailForm.captchaCode"
                 type="text"
                 autocomplete="new-password"
-                placeholder="请输入图形验证码"
+                :placeholder="t('5a21f3db.e70066')"
                 class="min-w-0 flex-1 bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
               <button
@@ -228,14 +230,14 @@
                 <img
                   v-if="captcha?.imageData"
                   :src="captcha?.imageData"
-                  alt="请输入图形验证码"
+                  :alt="t('5a21f3db.e70066')"
                   class="h-full w-full object-cover"
                 />
                 <span
                   v-else
                   class="flex h-full w-full items-center justify-center px-2 text-[12px] text-[#4a5565]"
                 >
-                  {{ captchaLoading ? t('5a21f3db.ba1a3a') : '获取验证码' }}
+                  {{ captchaLoading ? t('5a21f3db.ba1a3a') : t('5a21f3db.d369f4') }}
                 </span>
               </button>
             </div>
@@ -245,7 +247,7 @@
                 v-model="emailForm.password"
                 type="password"
                 autocomplete="new-password"
-                placeholder="请输入登录密码"
+                :placeholder="t('5a21f3db.209f2b')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -255,7 +257,7 @@
                 v-model="emailForm.confirmPassword"
                 type="password"
                 autocomplete="new-password"
-                placeholder="请再次确认登录密码"
+                :placeholder="t('5a21f3db.8562a6')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -267,10 +269,10 @@
                 class="h-4 w-4 shrink-0 cursor-pointer appearance-none border border-[#191a1d] checked:border-[#191a1d] checked:bg-[#191a1d]"
               />
               <span>
-                已阅读并同意
-                <NuxtLink to="/terms" class="underline">《注册协议》</NuxtLink>
-                和
-                <NuxtLink to="/privacy" class="underline">《隐私政策》</NuxtLink>
+                {{ t('5a21f3db.b840cb') }}
+                <NuxtLink to="/terms" class="underline">{{ t('5a21f3db.df410b') }}</NuxtLink>
+                {{ t('5a21f3db.ab20cc') }}
+                <NuxtLink to="/privacy" class="underline">{{ t('5a21f3db.be8324') }}</NuxtLink>
               </span>
             </label>
 
@@ -290,16 +292,18 @@
                 class="w-full bg-[#0f0f10] py-4 text-center text-[14px] font-medium leading-5 text-white transition-all hover:bg-opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="isLoading || !agreedToTerms"
               >
-                {{ isLoading ? '注册中...' : '同意协议并注册' }}
+                {{ isLoading ? t('5a21f3db.2f4891') : t('5a21f3db.3179ba') }}
               </button>
               <div class="flex items-center justify-center">
-                <span class="mr-1 text-[12px] leading-4 text-[#4a5565]">已有账号？</span>
+                <span class="mr-1 text-[12px] leading-4 text-[#4a5565]">{{
+                  t('5a21f3db.c3b432')
+                }}</span>
                 <button
                   type="button"
                   class="text-[12px] leading-4 text-[#191a1d] underline transition-colors hover:text-gray-600"
                   @click="goToLogin"
                 >
-                  立即登录
+                  {{ t('5a21f3db.ed2ff8') }}
                 </button>
               </div>
             </div>
@@ -416,13 +420,13 @@ async function handleSendCode() {
   if (!captcha.value) {
     const captchaSuccess = await getCaptcha('sign', 'member')
     if (!captchaSuccess) {
-      error.value = captchaError.value || '获取图形验证码失败，请稍后重试'
+      error.value = captchaError.value || t('5a21f3db.81340f')
       return
     }
   }
 
   if (!phoneForm.captchaCode) {
-    error.value = '请输入图形验证码'
+    error.value = t('5a21f3db.e70066')
     return
   }
 
@@ -481,18 +485,14 @@ function validatePasswordFields(password: string, confirmPassword: string) {
 
 function validateAgreement() {
   if (!agreedToTerms.value) {
-    error.value = '请先阅读并同意注册协议和隐私政策'
+    error.value = t('5a21f3db.cd83ea')
     return false
   }
 
   return true
 }
 
-async function completeRegister(params: {
-  mobile?: string
-  password: string
-  vcode: string
-}) {
+async function completeRegister(params: { mobile?: string; password: string; vcode: string }) {
   try {
     isLoading.value = true
 
@@ -584,30 +584,30 @@ async function handleEmailRegister() {
   successMessage.value = ''
 
   if (!emailForm.email) {
-    error.value = '请输入电子邮箱'
+    error.value = t('5a21f3db.b457cd')
     return
   }
 
   if (!AuthTransformer.validateEmail(emailForm.email)) {
-    error.value = '请输入正确的电子邮箱'
+    error.value = t('5a21f3db.04154b')
     return
   }
 
   if (!captcha.value) {
     const captchaSuccess = await getCaptcha('sign', 'member')
     if (!captchaSuccess) {
-      error.value = captchaError.value || '获取图形验证码失败，请稍后重试'
+      error.value = captchaError.value || t('5a21f3db.81340f')
       return
     }
   }
 
   if (!emailForm.captchaCode) {
-    error.value = '请输入图形验证码'
+    error.value = t('5a21f3db.e70066')
     return
   }
 
   if (!captcha.value?.imageToken) {
-    error.value = '获取图形验证码失败，请稍后重试'
+    error.value = t('5a21f3db.81340f')
     return
   }
 

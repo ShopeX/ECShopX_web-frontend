@@ -75,7 +75,7 @@
                         >
                           <img
                             :src="getPaymentMethodIcon(method)?.src"
-                            :alt="getPaymentMethodIcon(method)?.alt"
+                            :alt="$t(getPaymentMethodIcon(method)?.altKey || '')"
                             :class="getPaymentMethodIcon(method)?.imageClass"
                             class="block max-w-none"
                           />
@@ -325,7 +325,7 @@
             >
               <img
                 :src="selectedPaymentIcon.src"
-                :alt="selectedPaymentIcon.alt"
+                :alt="$t(selectedPaymentIcon.altKey)"
                 :class="selectedPaymentIcon.imageClass"
                 class="block max-w-none"
               />

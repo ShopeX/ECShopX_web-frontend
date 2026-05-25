@@ -133,7 +133,7 @@ const defaultMenuItems = computed<FilterMenuItem[]>(() => {
     },
     {
       key: 'aftersales',
-      label: t('account.aftersalesOrders'),
+      label: t('110ad121.056891'),
       path: localePath('/account/aftersales'),
       nodeId: '2910:6315-aftersales',
     },
@@ -154,7 +154,7 @@ const defaultMenuItems = computed<FilterMenuItem[]>(() => {
   if (isBBC.value) {
     items.push({
       key: 'followStores',
-      label: t('account.followStores'),
+      label: t('1d80cba8.a6c36f'),
       path: localePath('/account/follow-stores'),
       nodeId: '2910:6321-follow-stores',
     })

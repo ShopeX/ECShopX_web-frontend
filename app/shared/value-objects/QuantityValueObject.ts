@@ -25,13 +25,13 @@ export class QuantityValueObject {
 
   private constructor(value: number, min: number = 1, max: number = 9999) {
     if (value < min) {
-      throw new Error(`数量不能小于${min}`)
+      throw new Error('7cdb537c.f5e7f1')
     }
     if (value > max) {
-      throw new Error(`数量不能大于${max}`)
+      throw new Error('7cdb537c.7751b7')
     }
     if (!Number.isInteger(value)) {
-      throw new Error('数量必须是整数')
+      throw new Error('7cdb537c.084485')
     }
     this._value = value
     this._min = min

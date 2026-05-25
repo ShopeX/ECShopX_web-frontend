@@ -104,7 +104,7 @@ export const useUserStore = defineStore('user', {
         console.error('Login error:', error)
         return {
           success: false,
-          error: error.message || '登录失败，请稍后重试',
+          error: error.message || '6314873a.5b8c6c',
         }
       }
     },
@@ -130,7 +130,7 @@ export const useUserStore = defineStore('user', {
         console.error('Phone login error:', error)
         return {
           success: false,
-          error: error.message || '登录失败，请稍后重试',
+          error: error.message || '6314873a.5b8c6c',
         }
       }
     },
@@ -169,7 +169,7 @@ export const useUserStore = defineStore('user', {
     async fetchUserInfo() {
       try {
         if (!this.token) {
-          throw new Error('未登录')
+          throw new Error('6314873a.63e85d')
         }
 
         // 调用获取用户信息 API
@@ -193,7 +193,7 @@ export const useUserStore = defineStore('user', {
 
         return {
           success: false,
-          error: error.message || '获取用户信息失败',
+          error: error.message || '6314873a.dc486e',
         }
       }
     },
@@ -204,7 +204,7 @@ export const useUserStore = defineStore('user', {
     async refreshAuthToken() {
       try {
         if (!this.refreshToken) {
-          throw new Error('无刷新令牌')
+          throw new Error('6314873a.c94677')
         }
 
         // 调用刷新 Token API
@@ -227,7 +227,7 @@ export const useUserStore = defineStore('user', {
 
         return {
           success: false,
-          error: error.message || '刷新令牌失败',
+          error: error.message || '6314873a.a427f5',
         }
       }
     },

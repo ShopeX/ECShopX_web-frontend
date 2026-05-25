@@ -18,7 +18,9 @@
         <div
           class="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px relative min-w-0"
         >
-          <div class="bg-white content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+          <div
+            class="bg-white content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full"
+          >
             <!-- 页面标题 -->
             <div class="relative shrink-0 w-full border-b border-[#f3f4f6] pb-4">
               <h2
@@ -75,7 +77,9 @@
                         :class="star <= review.star ? 'text-[#fdc700]' : 'text-[#e5e7eb]'"
                         fill="currentColor"
                       >
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        <path
+                          d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                        />
                       </svg>
                     </div>
                     <span class="text-[14px] text-[#4a5565]">{{ getStarLabel(review.star) }}</span>
@@ -91,8 +95,14 @@
             </div>
 
             <!-- 空状态 -->
-            <div v-else-if="!loading" class="w-full flex flex-col items-center py-20 text-[#99a1af]">
-              <UIcon name="i-heroicons-chat-bubble-bottom-center-text" class="w-16 h-16 opacity-20 mb-4" />
+            <div
+              v-else-if="!loading"
+              class="w-full flex flex-col items-center py-20 text-[#99a1af]"
+            >
+              <UIcon
+                name="i-heroicons-chat-bubble-bottom-center-text"
+                class="w-16 h-16 opacity-20 mb-4"
+              />
               <p class="text-[14px]">{{ t('de8076e6.2c51b5') }}</p>
             </div>
 
@@ -139,9 +149,9 @@
                   {{ review.itemName }}
                 </h3>
                 <div class="flex flex-col gap-0.5 text-[12px] text-[#4a5565]">
-                  <p v-if="review.skuNo">款号: {{ review.skuNo }}</p>
-                  <p v-if="review.style">款式: {{ review.style }}</p>
-                  <p v-if="review.size">尺寸: {{ review.size }}</p>
+                  <p v-if="review.skuNo">{{ t('7b21da5b.e54891') }}: {{ review.skuNo }}</p>
+                  <p v-if="review.style">{{ t('7b21da5b.568510') }}: {{ review.style }}</p>
+                  <p v-if="review.size">{{ t('7b21da5b.c8339f') }}: {{ review.size }}</p>
                 </div>
               </div>
             </div>
@@ -157,7 +167,9 @@
                     :class="star <= review.star ? 'text-[#fdc700]' : 'text-[#e5e7eb]'"
                     fill="currentColor"
                   >
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    <path
+                      d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -172,7 +184,10 @@
         </div>
 
         <div v-else-if="!loading" class="w-full flex flex-col items-center py-20 text-[#99a1af]">
-          <UIcon name="i-heroicons-chat-bubble-bottom-center-text" class="w-16 h-16 opacity-20 mb-4" />
+          <UIcon
+            name="i-heroicons-chat-bubble-bottom-center-text"
+            class="w-16 h-16 opacity-20 mb-4"
+          />
           <p class="text-[14px]">{{ t('de8076e6.2c51b5') }}</p>
         </div>
       </div>
@@ -204,13 +219,14 @@ const total = ref(0)
 
 function getStarLabel(star: number) {
   const labels: Record<number, string> = {
-    1: '非常差',
-    2: '较差',
-    3: '一般',
-    4: '满意',
-    5: '非常满意',
+    1: '7b21da5b.7334ed',
+    2: '7b21da5b.a3d534',
+    3: '7b21da5b.2ab01e',
+    4: '7b21da5b.195b8a',
+    5: '7b21da5b.67e6ef',
   }
-  return labels[star] || ''
+  const key = labels[star]
+  return key ? t(key) : ''
 }
 
 async function loadData(page = 1) {
@@ -235,7 +251,7 @@ async function loadData(page = 1) {
           size: item.size,
           specName: item.specName,
           star: 5,
-          content: '非常满意，质量很好，物流很快！',
+          content: t('7b21da5b.d4f604'),
           time: '2025-10-30 23:34:23',
         })
       })

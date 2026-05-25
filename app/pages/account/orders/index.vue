@@ -214,12 +214,16 @@
                                 v-for="action in getMobileMoreActions(order)"
                                 :key="`${order.orderId}-${action}`"
                                 type="button"
-                                :disabled="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                                :disabled="
+                                  action === 'aftersales' && isOpeningAftersales(order.orderId)
+                                "
                                 class="flex h-[34px] w-full items-center px-3 text-left text-[12px] leading-4 text-[#191a1d] hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60"
                                 @click.stop="handleMobileMoreAction(action, order)"
                               >
                                 <UIcon
-                                  v-if="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                                  v-if="
+                                    action === 'aftersales' && isOpeningAftersales(order.orderId)
+                                  "
                                   name="i-lucide-loader-circle"
                                   class="mr-1 size-4 animate-spin"
                                 />
@@ -237,7 +241,9 @@
                             v-for="action in getMobileVisibleActions(order)"
                             :key="`${order.orderId}-${action}`"
                             type="button"
-                            :disabled="action === 'aftersales' && isOpeningAftersales(order.orderId)"
+                            :disabled="
+                              action === 'aftersales' && isOpeningAftersales(order.orderId)
+                            "
                             :class="[
                               'flex h-[34px] items-center justify-center text-[12px] font-medium leading-4 transition-colors',
                               isMobilePrimaryAction(action)
@@ -451,7 +457,7 @@ const menuItems = computed(() => {
     { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
     {
       key: 'aftersales',
-      label: t('account.aftersalesOrders'),
+      label: t('110ad121.056891'),
       path: localePath('/account/aftersales'),
     },
     { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
@@ -461,7 +467,7 @@ const menuItems = computed(() => {
   if (isBBC.value) {
     items.push({
       key: 'followStores',
-      label: t('account.followStores'),
+      label: t('1d80cba8.a6c36f'),
       path: localePath('/account/follow-stores'),
     })
   }

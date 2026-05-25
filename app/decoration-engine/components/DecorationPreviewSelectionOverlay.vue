@@ -1,8 +1,6 @@
 <template>
   <Teleport v-if="overlayTarget" :to="overlayTarget">
-    <div
-      class="pointer-events-none fixed inset-0 z-[10050] overflow-visible"
-    >
+    <div class="pointer-events-none fixed inset-0 z-[10050] overflow-visible">
       <div
         v-if="selectedChromeStyle && selectedChrome"
         class="pointer-events-none absolute box-border"
@@ -23,7 +21,7 @@
             type="button"
             :class="selectedSectionActionButtonClass(selectedSectionActionState.canMoveUp)"
             :disabled="!selectedSectionActionState.canMoveUp"
-            aria-label="上移"
+            :aria-label="t('0dbc43d3.315eac')"
             @click.stop.prevent="handleSelectedSectionAction('up')"
           >
             <ArrowUp
@@ -36,7 +34,7 @@
             type="button"
             :class="selectedSectionActionButtonClass(selectedSectionActionState.canMoveDown)"
             :disabled="!selectedSectionActionState.canMoveDown"
-            aria-label="下移"
+            :aria-label="t('0dbc43d3.17acd2')"
             @click.stop.prevent="handleSelectedSectionAction('down')"
           >
             <ArrowDown
@@ -49,7 +47,7 @@
             v-if="selectedSectionActionState.canDuplicate"
             type="button"
             :class="selectedChromeActionButtonClass"
-            aria-label="复制"
+            :aria-label="t('0dbc43d3.79d3ab')"
             @click.stop.prevent="handleSelectedSectionAction('duplicate')"
           >
             <Copy :size="16" :stroke-width="1.8" />
@@ -58,7 +56,7 @@
             v-if="selectedSectionActionState.canRemove"
             type="button"
             :class="selectedChromeActionButtonClass"
-            aria-label="删除"
+            :aria-label="t('0dbc43d3.2f4aad')"
             @click.stop.prevent="handleSelectedSectionAction('remove')"
           >
             <Trash2 :size="16" :stroke-width="1.8" />
@@ -73,7 +71,7 @@
             type="button"
             :class="selectedBlockActionButtonClass(selectedBlockActionState.canMoveUp)"
             :disabled="!selectedBlockActionState.canMoveUp"
-            aria-label="上移"
+            :aria-label="t('0dbc43d3.315eac')"
             @click.stop.prevent="handleSelectedBlockAction('up')"
           >
             <ArrowUp
@@ -86,7 +84,7 @@
             type="button"
             :class="selectedBlockActionButtonClass(selectedBlockActionState.canMoveDown)"
             :disabled="!selectedBlockActionState.canMoveDown"
-            aria-label="下移"
+            :aria-label="t('0dbc43d3.17acd2')"
             @click.stop.prevent="handleSelectedBlockAction('down')"
           >
             <ArrowDown
@@ -95,14 +93,19 @@
               :color="selectedActionIconColor(selectedBlockActionState.canMoveDown)"
             />
           </button>
-          <button type="button" :class="selectedChromeActionButtonClass" aria-label="复制" @click.stop.prevent="handleSelectedBlockAction('duplicate')">
+          <button
+            type="button"
+            :class="selectedChromeActionButtonClass"
+            :aria-label="t('0dbc43d3.79d3ab')"
+            @click.stop.prevent="handleSelectedBlockAction('duplicate')"
+          >
             <Copy :size="16" :stroke-width="1.8" />
           </button>
           <button
             v-if="selectedBlockActionState.canRemove"
             type="button"
             :class="selectedChromeActionButtonClass"
-            aria-label="删除"
+            :aria-label="t('0dbc43d3.2f4aad')"
             @click.stop.prevent="handleSelectedBlockAction('remove')"
           >
             <Trash2 :size="16" :stroke-width="1.8" />
@@ -117,9 +120,7 @@
         <div
           class="pointer-events-none absolute inset-0 rounded-none border-2 border-primary shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]"
         />
-        <div
-          :class="adminSyncedChromeLabelClass"
-        >
+        <div :class="adminSyncedChromeLabelClass">
           {{ adminSyncedChromeLabel }}
         </div>
         <template v-if="adminSyncedChrome.source === 'hover'">
@@ -127,14 +128,16 @@
             type="button"
             data-decoration-add-control="1"
             class="group pointer-events-auto absolute left-1/2 top-0 z-[2] flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center text-white"
-            aria-label="添加"
+            :aria-label="t('0dbc43d3.b58c75')"
             @pointerenter="keepAddControlHover"
             @pointerdown.stop
             @click.stop.prevent="handleAddClick('before', $event)"
           >
             <span class="absolute inset-0 rounded-full bg-primary shadow-sm" />
             <UIcon name="i-heroicons-plus" class="relative h-3.5 w-3.5 shrink-0" />
-            <span class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-75 items-center gap-1 whitespace-nowrap rounded-full bg-primary py-1 pl-1 pr-2 text-xs leading-none text-white opacity-0 shadow-sm transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100">
+            <span
+              class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-75 items-center gap-1 whitespace-nowrap rounded-full bg-primary py-1 pl-1 pr-2 text-xs leading-none text-white opacity-0 shadow-sm transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100"
+            >
               <UIcon name="i-heroicons-plus" class="h-3.5 w-3.5 shrink-0" />
               {{ addButtonLabel }}
             </span>
@@ -143,14 +146,16 @@
             type="button"
             data-decoration-add-control="1"
             class="group pointer-events-auto absolute bottom-0 left-1/2 z-[2] flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center text-white"
-            aria-label="添加"
+            :aria-label="t('0dbc43d3.b58c75')"
             @pointerenter="keepAddControlHover"
             @pointerdown.stop
             @click.stop.prevent="handleAddClick('after', $event)"
           >
             <span class="absolute inset-0 rounded-full bg-primary shadow-sm" />
             <UIcon name="i-heroicons-plus" class="relative h-3.5 w-3.5 shrink-0" />
-            <span class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-75 items-center gap-1 whitespace-nowrap rounded-full bg-primary py-1 pl-1 pr-2 text-xs leading-none text-white opacity-0 shadow-sm transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100">
+            <span
+              class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-75 items-center gap-1 whitespace-nowrap rounded-full bg-primary py-1 pl-1 pr-2 text-xs leading-none text-white opacity-0 shadow-sm transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100"
+            >
               <UIcon name="i-heroicons-plus" class="h-3.5 w-3.5 shrink-0" />
               {{ addButtonLabel }}
             </span>
@@ -218,13 +223,21 @@ const {
   requestDuplicateBlock,
   requestRemoveBlock,
 } = decorationPreviewBundle
+const { t } = useI18n()
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
-const mergedPreviewSections = computed((): Record<string, DecorationSection> => ({
-  ...(decorationPreviewBundle.headerDsl.value?.sections || {}),
-  ...(decorationPreviewBundle.footerDsl.value?.sections || {}),
-  ...(decorationPreviewBundle.globalDsl.value?.sections || {}),
-  ...(decorationPreviewBundle.pageDsl.value?.sections || {}),
-}))
+function translateIfGeneratedKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
+
+const mergedPreviewSections = computed(
+  (): Record<string, DecorationSection> => ({
+    ...(decorationPreviewBundle.headerDsl.value?.sections || {}),
+    ...(decorationPreviewBundle.footerDsl.value?.sections || {}),
+    ...(decorationPreviewBundle.globalDsl.value?.sections || {}),
+    ...(decorationPreviewBundle.pageDsl.value?.sections || {}),
+  })
+)
 
 type DecorationArea = 'header' | 'template' | 'footer'
 
@@ -245,41 +258,41 @@ function getSectionAreaOrder(sectionId: string) {
 }
 
 const SECTION_TYPE_LABEL: Record<string, string> = {
-  'announcement-bar': '公告栏',
-  header: '标头',
-  footer: '页脚',
-  carousel: '轮播',
-  'image-hotspot': '图片热区',
-  'native-product-list': '商品列表',
-  'product-shelf': '商品货架',
+  'announcement-bar': t('0dbc43d3.3921b6'),
+  header: t('0dbc43d3.917f14'),
+  footer: t('0dbc43d3.4eb88f'),
+  carousel: t('0dbc43d3.a5987d'),
+  'image-hotspot': t('0dbc43d3.081a81'),
+  'native-product-list': t('0dbc43d3.437974'),
+  'product-shelf': t('0dbc43d3.4a02ad'),
 }
 
 const BLOCK_TRANSLATION_LABEL: Record<string, string> = {
-  'blocks.header_product_list.name': '商品列表',
-  'blocks.header_collection_product_list.name': '产品系列商品列表',
-  'blocks.mega_menu.name': '大型菜单',
+  'blocks.header_product_list.name': t('0dbc43d3.437974'),
+  'blocks.header_collection_product_list.name': t('0dbc43d3.8926e5'),
+  'blocks.mega_menu.name': t('0dbc43d3.3f8882'),
 }
 
 const BLOCK_TYPE_LABEL: Record<string, string> = {
-  announcement: '公告',
-  image: '图片',
-  video: '视频',
-  hotspot: '热区',
-  'nav-item': '导航菜单',
-  'footer-link': '页脚链接',
-  'footer-menu': '菜单',
-  'footer-image': '图片',
-  'footer-text': '文本',
-  'product-tab': '产品系列',
-  'header-product-list': '商品列表',
-  'header-collection-product-list': '产品系列商品列表',
-  'mega-menu': '大型菜单',
+  announcement: t('0dbc43d3.fa86f1'),
+  image: t('0dbc43d3.20def7'),
+  video: t('0dbc43d3.7fcf42'),
+  hotspot: t('0dbc43d3.50da72'),
+  'nav-item': t('0dbc43d3.ff36f6'),
+  'footer-link': t('0dbc43d3.406baf'),
+  'footer-menu': t('0dbc43d3.4ccbdc'),
+  'footer-image': t('0dbc43d3.20def7'),
+  'footer-text': t('0dbc43d3.97d076'),
+  'product-tab': t('0dbc43d3.81af76'),
+  'header-product-list': t('0dbc43d3.437974'),
+  'header-collection-product-list': t('0dbc43d3.8926e5'),
+  'mega-menu': t('0dbc43d3.3f8882'),
 }
 
 function resolvePreviewLabel(value: unknown): string {
   const text = String(value || '').trim()
   if (!text.startsWith('t:')) {
-    return text
+    return translateIfGeneratedKey(text)
   }
   const key = text.slice(2)
   return BLOCK_TRANSLATION_LABEL[key] || key || text
@@ -304,7 +317,7 @@ function buildPreviewSelectionLabel(
   }
   const st = String(section.title || '').trim()
   if (st) {
-    return st
+    return translateIfGeneratedKey(st)
   }
   return SECTION_TYPE_LABEL[section.type] || section.type || sectionId
 }
@@ -576,11 +589,15 @@ const selectedBlockActionsClass = computed(() => {
   const chrome = selectedChrome.value
   const rect = chrome?.rect ? toViewportRect(chrome.rect) : null
   const viewportWidth = overlayViewportWidth.value
-  const viewportHeight = import.meta.client ? window.innerHeight || document.documentElement?.clientHeight || 0 : 0
+  const viewportHeight = import.meta.client
+    ? window.innerHeight || document.documentElement?.clientHeight || 0
+    : 0
   const actionsWidth = 152
   const actionsHeight = 48
   const gap = 8
-  const canPlaceBelow = Boolean(rect && rect.top + rect.height + actionsHeight + gap <= viewportHeight)
+  const canPlaceBelow = Boolean(
+    rect && rect.top + rect.height + actionsHeight + gap <= viewportHeight
+  )
   const canAlignRight = Boolean(rect && rect.left + rect.width - actionsWidth >= 0)
   return [
     'pointer-events-auto absolute z-[1] flex items-center gap-1 rounded-xl border border-slate-100 bg-white px-2 py-2 shadow-[0_8px_24px_rgba(15,23,42,0.12)]',
@@ -669,7 +686,7 @@ function selectedActionIconColor(enabled: boolean) {
 }
 
 const addButtonLabel = computed(() =>
-  adminSyncedChrome.value?.kind === 'block' ? '添加块' : '添加分区'
+  adminSyncedChrome.value?.kind === 'block' ? t('0dbc43d3.fc318c') : t('0dbc43d3.2e2d33')
 )
 
 function handleSelectedSectionAction(action: 'up' | 'down' | 'duplicate' | 'remove') {
@@ -734,14 +751,22 @@ function handleAddClick(position: 'before' | 'after', event: MouseEvent) {
   handleAddSectionClick(chrome.sectionId, position, event)
 }
 
-function handleAddBlockClick(sectionId: string, blockId: string, position: 'before' | 'after', event: MouseEvent) {
+function handleAddBlockClick(
+  sectionId: string,
+  blockId: string,
+  position: 'before' | 'after',
+  event: MouseEvent
+) {
   const blockOrder = getBlockOrder(sectionId)
   const activeIndex = blockId ? blockOrder.indexOf(blockId) : -1
   const insertIndex =
-    activeIndex >= 0
-      ? activeIndex + (position === 'after' ? 1 : 0)
-      : blockOrder.length || undefined
-  requestAddBlock(sectionId, insertIndex, { clientX: event.clientX, clientY: event.clientY }, resolveDecorationArea(sectionId))
+    activeIndex >= 0 ? activeIndex + (position === 'after' ? 1 : 0) : blockOrder.length || undefined
+  requestAddBlock(
+    sectionId,
+    insertIndex,
+    { clientX: event.clientX, clientY: event.clientY },
+    resolveDecorationArea(sectionId)
+  )
 }
 
 function handleAddSectionClick(sectionId: string, position: 'before' | 'after', event: MouseEvent) {
@@ -749,7 +774,12 @@ function handleAddSectionClick(sectionId: string, position: 'before' | 'after', 
   const order = resolveAreaOrder(area)
   const activeIndex = order.indexOf(sectionId)
   const insertIndex = activeIndex >= 0 ? activeIndex + (position === 'after' ? 1 : 0) : undefined
-  requestAddSection(sectionId, insertIndex, { clientX: event.clientX, clientY: event.clientY }, area)
+  requestAddSection(
+    sectionId,
+    insertIndex,
+    { clientX: event.clientX, clientY: event.clientY },
+    area
+  )
 }
 
 const dashedBlockOverlays = computed(() => {
@@ -763,9 +793,8 @@ const dashedBlockOverlays = computed(() => {
       const rect = ctx.blockRects.value[key]
       return rect ? { key, ...rect } : null
     })
-    .filter(
-      (item): item is PreviewChromeRect & { key: string } =>
-        Boolean(item && item.sectionId === sid && item.key !== activeBlockKey.value)
+    .filter((item): item is PreviewChromeRect & { key: string } =>
+      Boolean(item && item.sectionId === sid && item.key !== activeBlockKey.value)
     )
     .map((item) => {
       const rect = toViewportRect(item)

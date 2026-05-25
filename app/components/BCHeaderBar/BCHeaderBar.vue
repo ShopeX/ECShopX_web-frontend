@@ -6,7 +6,7 @@
         <!-- 搜索按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          aria-label="搜索"
+          :aria-label="t('7812ddcf.e5f71f')"
           data-testid="search-trigger"
           @click="handleSearch"
         >
@@ -16,7 +16,7 @@
         <!-- 菜单按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          aria-label="菜单"
+          :aria-label="t('7812ddcf.4ccbdc')"
           @click="handleMenu"
         >
           <UIcon name="i-heroicons-bars-3" class="w-5 h-5 text-[#191a1d]" />
@@ -36,7 +36,7 @@
         <!-- 购物车按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity relative"
-          aria-label="购物袋"
+          :aria-label="t('7812ddcf.53754b')"
           @click="handleCart"
         >
           <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5 text-[#191a1d]" />
@@ -52,7 +52,7 @@
         <!-- 用户按钮 -->
         <button
           class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          aria-label="用户"
+          :aria-label="t('7812ddcf.1fd02a')"
           @click="handleUser"
         >
           <UIcon name="i-heroicons-user" class="w-5 h-5 text-[#191a1d]" />
@@ -62,7 +62,7 @@
         <div class="relative" ref="languageMenuRef">
           <button
             class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-            aria-label="语言"
+            :aria-label="t('7812ddcf.295bb7')"
             @click="toggleLanguageMenu"
           >
             <UIcon name="i-heroicons-globe-alt" class="w-5 h-5 text-[#191a1d]" />
@@ -124,6 +124,7 @@ const cartStore = useCartStore()
 const { locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 const localePath = useLocalePath()
+const { t } = useI18n()
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
 
 // 定义 emits

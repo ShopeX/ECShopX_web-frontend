@@ -24,7 +24,10 @@ test('Carousel section follows decoration plan contract', () => {
 test('Carousel autoplay never starts during server rendering', () => {
   const source = read('app/decoration-engine/components/sections/Carousel.vue')
 
-  assert.match(source, /const startAutoplay = \(\) => \{[\s\S]*if \(!import\.meta\.client\) \{[\s\S]*return[\s\S]*\}[\s\S]*setInterval/)
+  assert.match(
+    source,
+    /const startAutoplay = \(\) => \{[\s\S]*if \(!import\.meta\.client\) \{[\s\S]*return[\s\S]*\}[\s\S]*setInterval/
+  )
 })
 
 test('ImageHotspot section follows decoration plan contract', () => {
@@ -88,4 +91,12 @@ test('DecorationHeaderSection keeps the locale switcher from the default header'
   assert.match(source, /useSwitchLocalePath/)
   assert.match(source, /i-heroicons-globe-alt/)
   assert.match(source, /switchLanguage/)
+})
+
+test('layout routes decoration header user action through the active locale', () => {
+  const source = read('app/layouts/default.vue')
+
+  assert.match(source, /const localePath = useLocalePath\(\)/)
+  assert.match(source, /router\.push\(localePath\('\/account'\)\)/)
+  assert.doesNotMatch(source, /router\.push\('\/account'\)/)
 })

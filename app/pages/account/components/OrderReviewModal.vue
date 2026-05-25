@@ -64,13 +64,13 @@
                   </p>
                   <div data-testid="review-item-spec" class="flex flex-col gap-[2px]">
                     <p v-if="item.skuNo" class="text-[12px] leading-4 text-[#364153]">
-                      款号: {{ item.skuNo }}
+                      {{ t('2d7e67bc.e54891') }}: {{ item.skuNo }}
                     </p>
                     <p v-if="item.style" class="text-[12px] leading-4 text-[#364153]">
-                      款式: {{ item.style }}
+                      {{ t('2d7e67bc.568510') }}: {{ item.style }}
                     </p>
                     <p v-if="item.size" class="text-[12px] leading-4 text-[#364153]">
-                      尺寸: {{ item.size }}
+                      {{ t('2d7e67bc.c8339f') }}: {{ item.size }}
                     </p>
                     <p
                       v-if="!item.skuNo && !item.style && !item.size && item.specName"
@@ -126,7 +126,7 @@
                   >
                     <img
                       :src="img.preview"
-                      :alt="`图片 ${index + 1}`"
+                      :alt="t('2d7e67bc.b5735e', { index: index + 1 })"
                       class="size-[80px] object-cover border border-[#e5e7eb]"
                       :data-testid="`uploaded-image-${index}`"
                     />

@@ -88,27 +88,32 @@ const route = useRoute()
 const localePath = useLocalePath()
 const userStore = useUserStore()
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
+const { t } = useI18n()
 
 // 主导航
 const mainNavs = [
-  { key: 'skin-care', label: '肌肤护理', path: '/collections/skin-care' },
-  { key: 'beauty-fragrance', label: '美妆香氛', path: '/collections/beauty-fragrance' },
+  { key: 'skin-care', label: t('3bfd871a.3a74c8'), path: '/collections/skin-care' },
+  { key: 'beauty-fragrance', label: t('3bfd871a.265464'), path: '/collections/beauty-fragrance' },
   {
     key: 'fashion-beauty',
-    label: '时尚美妆',
+    label: t('3bfd871a.df1584'),
     path: '/collections/fashion-beauty',
     children: [
-      { key: 'skincare', label: '面部护理', path: '/collections/fashion-beauty/skincare' },
-      { key: 'makeup', label: '彩妆香氛', path: '/collections/fashion-beauty/makeup' },
-      { key: 'perfume', label: '大牌香水', path: '/collections/fashion-beauty/perfume' },
+      {
+        key: 'skincare',
+        label: t('3bfd871a.408136'),
+        path: '/collections/fashion-beauty/skincare',
+      },
+      { key: 'makeup', label: t('3bfd871a.7749b8'), path: '/collections/fashion-beauty/makeup' },
+      { key: 'perfume', label: t('3bfd871a.0aa079'), path: '/collections/fashion-beauty/perfume' },
     ],
   },
-  { key: 'face-care', label: '面部护理', path: '/collections/face-care' },
-  { key: 'sun-protection', label: '防晒隔离', path: '/collections/sun-protection' },
-  { key: 'perfume', label: '香水', path: '/collections/perfume' },
-  { key: 'eye-care', label: '眼部护理', path: '/collections/eye-care' },
-  { key: 'lip-makeup', label: '唇妆', path: '/collections/lip-makeup' },
-  { key: 'points-mall', label: '积分商城', path: '/points-mall' },
+  { key: 'face-care', label: t('3bfd871a.408136'), path: '/collections/face-care' },
+  { key: 'sun-protection', label: t('3bfd871a.70f060'), path: '/collections/sun-protection' },
+  { key: 'perfume', label: t('3bfd871a.be19dd'), path: '/collections/perfume' },
+  { key: 'eye-care', label: t('3bfd871a.4a2112'), path: '/collections/eye-care' },
+  { key: 'lip-makeup', label: t('3bfd871a.6bf846'), path: '/collections/lip-makeup' },
+  { key: 'points-mall', label: t('3bfd871a.a13364'), path: '/points-mall' },
 ]
 
 const handleCartClick = () => {

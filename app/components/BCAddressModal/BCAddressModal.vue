@@ -34,13 +34,11 @@
       >
         <!-- H5 头部：返回 -->
         <div class="flex items-center px-[16px] py-[24px] shrink-0">
-          <button
-            type="button"
-            class="flex items-center gap-[8px] shrink-0"
-            @click="handleClose"
-          >
+          <button type="button" class="flex items-center gap-[8px] shrink-0" @click="handleClose">
             <UIcon name="i-heroicons-chevron-left" class="size-[16px] text-[#191a1d]" />
-            <span class="text-[14px] font-normal leading-[20px] text-[#191a1d]">{{ t('eab46cc2.5f4112') }}</span>
+            <span class="text-[14px] font-normal leading-[20px] text-[#191a1d]">{{
+              t('eab46cc2.5f4112')
+            }}</span>
           </button>
         </div>
 
@@ -107,7 +105,9 @@ const windowWidth = ref(import.meta.client ? window.innerWidth : LG_BREAKPOINT)
 const isDesktop = computed(() => windowWidth.value >= LG_BREAKPOINT)
 
 if (import.meta.client) {
-  const onResize = () => { windowWidth.value = window.innerWidth }
+  const onResize = () => {
+    windowWidth.value = window.innerWidth
+  }
   onMounted(() => window.addEventListener('resize', onResize))
   onUnmounted(() => window.removeEventListener('resize', onResize))
 }
@@ -138,12 +138,12 @@ const formData = ref<IAddressFormData>({
 const isEdit = computed(() => !!props.addressId)
 
 // 国家区号选项
-const countryCodeOptions: ISelectOption[] = [
-  { value: '+86', label: '+86 中国大陆地区' },
-  { value: '+852', label: '+852 香港' },
-  { value: '+853', label: '+853 澳门' },
-  { value: '+886', label: '+886 台湾' },
-]
+const countryCodeOptions = computed<ISelectOption[]>(() => [
+  { value: '+86', label: t('78c41987.8179c6') },
+  { value: '+852', label: t('78c41987.fac4fe') },
+  { value: '+853', label: t('78c41987.38bc56') },
+  { value: '+886', label: t('78c41987.89ae5e') },
+])
 
 // 省份列表
 const provinces = computed<ISelectOption[]>(() => {
@@ -193,7 +193,9 @@ function resolveRegionIds(data: IAddressFormData, regions: IRegionItem[]): IAddr
     if (cityItem) {
       resolved.city = cityItem.id
 
-      const districtItem = cityItem.children?.find((d) => d.label === data.district || d.id === data.district)
+      const districtItem = cityItem.children?.find(
+        (d) => d.label === data.district || d.id === data.district
+      )
       if (districtItem) {
         resolved.district = districtItem.id
       }

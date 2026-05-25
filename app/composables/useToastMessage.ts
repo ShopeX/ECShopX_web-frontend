@@ -69,6 +69,24 @@ export function useToastMessage() {
     }
   }
 
+  const { t } = useI18n()
+  const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+  function translateIfGeneratedKey(value: string) {
+    return generatedKeyPattern.test(value) ? t(value) : value
+  }
+
+  function normalizeOptions(options: string | ToastOptions): string | ToastOptions {
+    if (typeof options === 'string') {
+      return translateIfGeneratedKey(options)
+    }
+
+    return {
+      ...options,
+      message: translateIfGeneratedKey(options.message),
+    }
+  }
+
   return {
     /**
      * 显示 Toast 提示
@@ -83,7 +101,7 @@ export function useToastMessage() {
       }
 
       if (instance && instance.show) {
-        instance.show(options)
+        instance.show(normalizeOptions(options))
       }
     },
 

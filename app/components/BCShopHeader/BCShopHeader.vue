@@ -1,9 +1,6 @@
 <template>
   <!-- H5 store header -->
-  <div
-    class="flex lg:hidden w-full bg-[#f3f4f6] flex-col gap-4 p-4"
-    data-testid="shop-header"
-  >
+  <div class="flex lg:hidden w-full bg-[#f3f4f6] flex-col gap-4 p-4" data-testid="shop-header">
     <!-- Row 1: Store info + Follow/Contact -->
     <div class="flex items-center justify-between">
       <!-- Left: Logo + Name + Tagline -->
@@ -31,7 +28,7 @@
             class="w-4 h-4 text-[#191A1D]"
           />
           <span class="text-[12px] font-medium text-[#191A1D] leading-4 whitespace-nowrap">
-            {{ isFollowed ? '已关注' : '关注店铺' }}
+            {{ isFollowed ? t('612c1a7a.f4f380') : t('612c1a7a.a6c36f') }}
           </span>
         </button>
 
@@ -41,7 +38,9 @@
           @click="emit('contact')"
         >
           <UIcon name="i-heroicons-phone" class="w-4 h-4 text-[#191A1D]" />
-          <span class="text-[12px] font-medium text-[#191A1D] leading-4 whitespace-nowrap">联系客服</span>
+          <span class="text-[12px] font-medium text-[#191A1D] leading-4 whitespace-nowrap">{{
+            t('612c1a7a.b66060')
+          }}</span>
         </button>
       </div>
     </div>
@@ -67,7 +66,9 @@
           class="flex items-center justify-center px-2 py-1 bg-[#0F0F10] h-full shrink-0"
           @click="onSearch"
         >
-          <span class="text-[12px] text-white leading-4 whitespace-nowrap">搜本店</span>
+          <span class="text-[12px] text-white leading-4 whitespace-nowrap">{{
+            t('612c1a7a.58d295')
+          }}</span>
         </button>
       </div>
 
@@ -86,9 +87,7 @@
   </div>
 
   <!-- PC store header -->
-  <div
-    class="hidden lg:flex w-full bg-[#f6f6f6] items-center justify-center px-4"
-  >
+  <div class="hidden lg:flex w-full bg-[#f6f6f6] items-center justify-center px-4">
     <div class="flex flex-1 items-center justify-between py-6">
       <!-- Left: Store Info -->
       <div class="flex items-center gap-4 shrink-0">
@@ -124,7 +123,9 @@
             class="flex items-center justify-center px-2 py-1 bg-[#E5E7EB] h-full"
             @click="onSearch"
           >
-            <span class="text-[12px] text-[#4A5565] leading-4 whitespace-nowrap">搜本店</span>
+            <span class="text-[12px] text-[#4A5565] leading-4 whitespace-nowrap">{{
+              t('612c1a7a.58d295')
+            }}</span>
           </button>
         </div>
 
@@ -146,18 +147,17 @@
         <!-- Follow Button -->
         <button
           class="flex items-center gap-1 px-[17px] py-[9px] border transition-colors"
-          :class="isFollowed
-            ? 'bg-[#0F0F10] border-[#0F0F10] text-white'
-            : 'bg-transparent border-[#0F0F10] text-[#191A1D]'"
+          :class="
+            isFollowed
+              ? 'bg-[#0F0F10] border-[#0F0F10] text-white'
+              : 'bg-transparent border-[#0F0F10] text-[#191A1D]'
+          "
           data-testid="shop-header-follow"
           @click="toggleFollow"
         >
-          <UIcon
-            :name="isFollowed ? 'i-heroicons-check' : 'i-heroicons-heart'"
-            class="w-4 h-4"
-          />
+          <UIcon :name="isFollowed ? 'i-heroicons-check' : 'i-heroicons-heart'" class="w-4 h-4" />
           <span class="text-[12px] font-medium leading-4 whitespace-nowrap">
-            {{ isFollowed ? '已关注' : '关注店铺' }}
+            {{ isFollowed ? t('612c1a7a.f4f380') : t('612c1a7a.a6c36f') }}
           </span>
         </button>
 
@@ -168,7 +168,9 @@
           @click="emit('contact')"
         >
           <UIcon name="i-heroicons-phone" class="w-4 h-4" />
-          <span class="text-[12px] font-medium leading-4 whitespace-nowrap">联系客服</span>
+          <span class="text-[12px] font-medium leading-4 whitespace-nowrap">{{
+            t('612c1a7a.b66060')
+          }}</span>
         </button>
       </div>
     </div>
@@ -186,10 +188,11 @@ const emit = defineEmits<BCShopHeaderEmits>()
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // Search
 const searchKeyword = ref('')
-const searchPlaceholder = '搜索本店商品'
+const searchPlaceholder = computed(() => t('612c1a7a.7ff865'))
 
 function onSearch() {
   const keyword = searchKeyword.value.trim()

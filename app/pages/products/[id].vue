@@ -785,13 +785,18 @@ onMounted(async () => {
 })
 
 // BBC 店铺信息（mock，后续对接 API）
-const shopInfo = {
+const shopInfo = computed(() => ({
   logo: 'https://www.figma.com/api/mcp/asset/efb28441-c97e-49ad-b4ff-9c178ed5ac6e',
-  name: '小米京东自营商城',
-  tagline: '精选镇店好物，快来逛逛',
-  categories: ['耳机', '数码产品', '电脑', '笔记本'],
+  name: t('464b6330.7fa745'),
+  tagline: t('464b6330.ab4097'),
+  categories: [
+    t('464b6330.01b6f8'),
+    t('464b6330.999fea'),
+    t('464b6330.e85597'),
+    t('464b6330.1873ea'),
+  ],
   followed: false,
-}
+}))
 
 function onShopFollow(isFollowed: boolean) {
   console.log('[product-detail] shop follow toggled:', isFollowed)

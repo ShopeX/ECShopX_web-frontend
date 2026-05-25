@@ -227,7 +227,7 @@ const { headerRenderDsl, footerRenderDsl, pageRenderDsl } = useHomeDecorationSpl
 function createProductListNativeSection(): DecorationDSL['sections'][string] {
   return {
     type: PRODUCT_LIST_NATIVE_SECTION_TYPE,
-    title: '商品列表',
+    title: t('c52ec334.437974'),
     disabled: false,
     settings: {
       locked: true,
@@ -268,9 +268,7 @@ function ensureProductListNativeSection(source: DecorationDSL | null | undefined
   }
 }
 
-const productListRenderDsl = computed(() =>
-  ensureProductListNativeSection(pageRenderDsl.value)
-)
+const productListRenderDsl = computed(() => ensureProductListNativeSection(pageRenderDsl.value))
 const layoutHeaderDecorationDsl = computed(() => (isPreview.value ? headerRenderDsl.value : null))
 const layoutFooterDecorationDsl = computed(() => (isPreview.value ? footerRenderDsl.value : null))
 
@@ -762,13 +760,18 @@ watch(
 )
 
 // BBC 店铺信息（mock，后续对接 API）
-const shopInfo = {
+const shopInfo = computed(() => ({
   logo: 'https://www.figma.com/api/mcp/asset/efb28441-c97e-49ad-b4ff-9c178ed5ac6e',
-  name: '小米京东自营商城',
-  tagline: '精选镇店好物，快来逛逛',
-  categories: ['耳机', '数码产品', '电脑', '笔记本'],
+  name: t('c52ec334.7fa745'),
+  tagline: t('c52ec334.ab4097'),
+  categories: [
+    t('c52ec334.01b6f8'),
+    t('c52ec334.999fea'),
+    t('c52ec334.e85597'),
+    t('c52ec334.1873ea'),
+  ],
   followed: false,
-}
+}))
 
 function onShopFollow(isFollowed: boolean) {
   console.log('[collections] shop follow toggled:', isFollowed)

@@ -128,20 +128,24 @@
               <!-- 收货人/手机号 -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-2">
-                  <label class="text-sm font-medium text-[#191a1d] leading-5">{{ $t('checkout.pickupName') }}</label>
+                  <label class="text-sm font-medium text-[#191a1d] leading-5">{{
+                    $t('ee3264ed.ff9089')
+                  }}</label>
                   <input
                     v-model="form.pickupName"
                     type="text"
-                    :placeholder="$t('checkout.pickupNamePlaceholder')"
+                    :placeholder="$t('ee3264ed.1521d9')"
                     class="h-11 w-full bg-[#f3f4f6] border border-transparent px-3 text-[14px] leading-5 text-[#191a1d] outline-none focus:border-[#191a1d]"
                   />
                 </div>
                 <div class="flex flex-col gap-2">
-                  <label class="text-sm font-medium text-[#191a1d] leading-5">{{ $t('checkout.pickupPhone') }}</label>
+                  <label class="text-sm font-medium text-[#191a1d] leading-5">{{
+                    $t('ee3264ed.8098e2')
+                  }}</label>
                   <input
                     v-model="form.pickupPhone"
                     type="tel"
-                    :placeholder="$t('checkout.pickupPhonePlaceholder')"
+                    :placeholder="$t('ee3264ed.6e4f4b')"
                     class="h-11 w-full bg-[#f3f4f6] border border-transparent px-3 text-[14px] leading-5 text-[#191a1d] outline-none focus:border-[#191a1d]"
                   />
                 </div>
@@ -149,19 +153,21 @@
 
               <!-- 查询门店 -->
               <div class="flex flex-col gap-2">
-                <label class="text-sm font-medium text-[#191a1d] leading-5">{{ $t('checkout.queryStore') }}</label>
+                <label class="text-sm font-medium text-[#191a1d] leading-5">{{
+                  $t('ee3264ed.d1b62f')
+                }}</label>
                 <div class="flex gap-4 items-end">
                   <div class="grid grid-cols-2 gap-4 flex-1">
                     <ECSelect
                       :model-value="form.pickupProvince"
                       :options="pickupProvinces"
-                      :placeholder="$t('checkout.selectProvince')"
+                      :placeholder="$t('ee3264ed.3d14d1')"
                       @update:model-value="handlePickupProvinceChange(String($event))"
                     />
                     <ECSelect
                       :model-value="form.pickupCity"
                       :options="pickupCities"
-                      :placeholder="$t('checkout.selectCity')"
+                      :placeholder="$t('ee3264ed.371528')"
                       @update:model-value="form.pickupCity = String($event)"
                     />
                   </div>
@@ -171,7 +177,7 @@
                     class="h-10 shrink-0 bg-[#0f0f10] px-4 text-sm font-medium text-white leading-5 hover:bg-[#191a1d] transition-colors disabled:opacity-50 whitespace-nowrap"
                     @click="handleSearchStores"
                   >
-                    {{ storesLoading ? $t('checkout.searching') : $t('checkout.findNearbyStores') }}
+                    {{ storesLoading ? $t('ee3264ed.4ea9bf') : $t('ee3264ed.e63bb6') }}
                   </button>
                 </div>
               </div>
@@ -201,15 +207,20 @@
                     @change="selectStore(store.id)"
                   />
                   <div class="flex-1 flex flex-col gap-0.5">
-                    <span class="text-sm font-medium text-[#191a1d] leading-5">{{ store.name }}</span>
+                    <span class="text-sm font-medium text-[#191a1d] leading-5">{{
+                      store.name
+                    }}</span>
                     <span class="text-xs text-[#4a5565] leading-4">{{ store.address }}</span>
                     <span class="text-xs text-[#4a5565] leading-4">{{ store.phone }}</span>
                   </div>
                 </label>
               </div>
 
-              <div v-else-if="stores.length === 0 && !storesLoading && hasSearched" class="py-6 text-center text-sm text-[#4a5565]">
-                {{ $t('checkout.noStoresFound') }}
+              <div
+                v-else-if="stores.length === 0 && !storesLoading && hasSearched"
+                class="py-6 text-center text-sm text-[#4a5565]"
+              >
+                {{ $t('ee3264ed.9e6a2d') }}
               </div>
             </div>
           </template>
@@ -249,7 +260,10 @@
               class="flex items-center justify-center outline-none cursor-pointer relative z-[51]"
               @click.stop="showPointsRules = true"
             >
-              <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-[#4a5565] pointer-events-none" />
+              <UIcon
+                name="i-heroicons-information-circle"
+                class="w-4 h-4 text-[#4a5565] pointer-events-none"
+              />
             </button>
 
             <!-- PC 端弹窗 (大屏幕显示) -->
@@ -257,12 +271,18 @@
               v-show="showPointsRules"
               class="hidden lg:block absolute top-[32px] left-[70px] z-[61] bg-white px-[16px] shadow-[0px_2px_6px_0px_#dbdbdb] transition-opacity pointer-events-none"
             >
-              <div class="bg-white flex flex-col gap-[8px] items-start justify-center p-[16px] text-[14px] whitespace-nowrap">
-                <div class="font-medium text-[#0f0f10] leading-[20px]">积分使用规则：</div>
-                <div class="text-[#4a5565] font-normal leading-[20px]">使用条款</div>
+              <div
+                class="bg-white flex flex-col gap-[8px] items-start justify-center p-[16px] text-[14px] whitespace-nowrap"
+              >
+                <div class="font-medium text-[#0f0f10] leading-[20px]">
+                  {{ $t('ee3264ed.2e6e96') }}
+                </div>
                 <div class="text-[#4a5565] font-normal leading-[20px]">
-                  <p class="mb-0">1、积分支付金额不得超过订单应付总额的100%用量；</p>
-                  <p class="mb-0">2、1积分扣1元;</p>
+                  {{ $t('ee3264ed.0f8505') }}
+                </div>
+                <div class="text-[#4a5565] font-normal leading-[20px]">
+                  <p class="mb-0">{{ $t('ee3264ed.d2fec8') }}</p>
+                  <p class="mb-0">{{ $t('ee3264ed.1ae505') }}</p>
                 </div>
               </div>
             </div>
@@ -286,19 +306,29 @@
                   class="lg:hidden relative w-full bg-white flex flex-col gap-[16px] items-start px-[16px] py-[32px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] overflow-clip transform transition-transform"
                 >
                   <div class="flex items-center justify-between w-full mb-2">
-                    <p class="font-medium leading-[20px] text-[20px] text-[#191a1d] whitespace-nowrap">
-                      积分使用规则
+                    <p
+                      class="font-medium leading-[20px] text-[20px] text-[#191a1d] whitespace-nowrap"
+                    >
+                      {{ $t('ee3264ed.117486') }}
                     </p>
-                    <button type="button" class="block cursor-pointer outline-none w-[24px] h-[24px]" @click.stop="showPointsRules = false">
+                    <button
+                      type="button"
+                      class="block cursor-pointer outline-none w-[24px] h-[24px]"
+                      @click.stop="showPointsRules = false"
+                    >
                       <UIcon name="i-heroicons-x-mark" class="w-full h-full text-[#191a1d]" />
                     </button>
                   </div>
-                  <div class="text-[14px] font-normal text-[#4a5565] leading-[20px] w-full text-left">
-                    使用条款
+                  <div
+                    class="text-[14px] font-normal text-[#4a5565] leading-[20px] w-full text-left"
+                  >
+                    {{ $t('ee3264ed.0f8505') }}
                   </div>
-                  <div class="text-[14px] font-normal text-[#4a5565] leading-[20px] w-full text-left">
-                    <p class="mb-1">1、积分支付金额不得超过订单应付总额的100%用量；</p>
-                    <p class="mb-0">2、1积分扣1元;</p>
+                  <div
+                    class="text-[14px] font-normal text-[#4a5565] leading-[20px] w-full text-left"
+                  >
+                    <p class="mb-1">{{ $t('ee3264ed.d2fec8') }}</p>
+                    <p class="mb-0">{{ $t('ee3264ed.1ae505') }}</p>
                   </div>
                 </div>
               </div>
@@ -337,7 +367,6 @@
             />
           </div>
         </div>
-
       </div>
 
       <!-- 右侧：订单摘要 (PC 显示，H5 隐藏) -->
@@ -366,7 +395,10 @@
               <h4 class="text-sm font-medium text-[#101828] leading-5 truncate">
                 {{ item.productName }}
               </h4>
-              <div v-if="item.specName" class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4">
+              <div
+                v-if="item.specName"
+                class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4"
+              >
                 <p v-for="(spec, index) in formatSpec(item.specName)" :key="index">{{ spec }}</p>
               </div>
               <div class="flex items-center justify-between mt-auto">
@@ -466,7 +498,10 @@
               <h4 class="text-sm font-medium text-[#101828] leading-5 truncate">
                 {{ item.productName }}
               </h4>
-              <div v-if="item.specName" class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4">
+              <div
+                v-if="item.specName"
+                class="flex flex-col gap-0.5 text-xs text-[#364153] leading-4"
+              >
                 <p v-for="(spec, index) in formatSpec(item.specName)" :key="index">{{ spec }}</p>
               </div>
               <div class="flex items-center justify-between mt-auto">
@@ -597,7 +632,11 @@ const showPointsRules = ref(false)
 const popoverWrapperRef = ref<HTMLElement | null>(null)
 onMounted(() => {
   document.addEventListener('click', (e) => {
-    if (showPointsRules.value && popoverWrapperRef.value && !popoverWrapperRef.value.contains(e.target as Node)) {
+    if (
+      showPointsRules.value &&
+      popoverWrapperRef.value &&
+      !popoverWrapperRef.value.contains(e.target as Node)
+    ) {
       showPointsRules.value = false
     }
   })

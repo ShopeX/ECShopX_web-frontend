@@ -22,10 +22,7 @@
       </svg>
     </button>
 
-    <span
-      data-testid="review-satisfaction-text"
-      class="text-[14px] leading-5 text-[#4a5565]"
-    >
+    <span data-testid="review-satisfaction-text" class="text-[14px] leading-5 text-[#4a5565]">
       {{ satisfactionText }}
     </span>
   </div>
@@ -46,13 +43,18 @@ const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
 
+const { t } = useI18n()
+
 const satisfactionMap: Record<number, string> = {
-  1: '非常不满意',
-  2: '不满意',
-  3: '一般',
-  4: '满意',
-  5: '非常满意',
+  1: '49f8a834.5d6da6',
+  2: '49f8a834.894cca',
+  3: '49f8a834.2ab01e',
+  4: '49f8a834.195b8a',
+  5: '49f8a834.67e6ef',
 }
 
-const satisfactionText = computed(() => satisfactionMap[props.modelValue] ?? '')
+const satisfactionText = computed(() => {
+  const key = satisfactionMap[props.modelValue]
+  return key ? t(key) : ''
+})
 </script>

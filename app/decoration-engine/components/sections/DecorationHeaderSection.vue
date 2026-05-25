@@ -8,17 +8,13 @@
     <div :class="innerClasses">
       <div class="col-start-1 row-start-1 flex items-center gap-3 lg:gap-6">
         <a v-if="isLogoLeft" :href="logoLink" class="flex items-center">
-          <img
-            :src="logoUrl"
-            :alt="section.title || 'logo'"
-            class="h-10 w-auto object-contain"
-          />
+          <img :src="logoUrl" :alt="section.title || 'logo'" class="h-10 w-auto object-contain" />
         </a>
 
         <button
           type="button"
           class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          aria-label="搜索"
+          :aria-label="t('48ec697b.e5f71f')"
           @click="emit('open-search')"
         >
           <Icon name="i-heroicons-magnifying-glass" class="h-5 w-5" />
@@ -26,26 +22,26 @@
         <button
           type="button"
           class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          aria-label="菜单"
+          :aria-label="t('48ec697b.4ccbdc')"
           @click="emit('open-category-nav')"
         >
           <Icon name="i-heroicons-bars-3" class="h-5 w-5" />
         </button>
       </div>
 
-      <a v-if="!isLogoLeft" :href="logoLink" class="col-start-2 row-start-1 flex items-center justify-self-center">
-        <img
-          :src="logoUrl"
-          :alt="section.title || 'logo'"
-          class="h-10 w-auto object-contain"
-        />
+      <a
+        v-if="!isLogoLeft"
+        :href="logoLink"
+        class="col-start-2 row-start-1 flex items-center justify-self-center"
+      >
+        <img :src="logoUrl" :alt="section.title || 'logo'" class="h-10 w-auto object-contain" />
       </a>
 
       <div class="col-start-3 row-start-1 flex h-5 items-center justify-end gap-3 lg:gap-6">
         <button
           type="button"
           class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          aria-label="购物袋"
+          :aria-label="t('48ec697b.53754b')"
           @click="emit('open-mini-cart')"
         >
           <Icon name="i-heroicons-shopping-bag" class="h-5 w-5" />
@@ -53,7 +49,7 @@
         <button
           type="button"
           class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          aria-label="用户"
+          :aria-label="t('48ec697b.1fd02a')"
           @click="emit('open-user')"
         >
           <Icon name="i-heroicons-user" class="h-5 w-5" />
@@ -67,7 +63,7 @@
           <button
             type="button"
             class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-            aria-label="语言"
+            :aria-label="t('48ec697b.295bb7')"
             @click="toggleLanguageMenu"
           >
             <Icon name="i-heroicons-globe-alt" class="h-5 w-5" />
@@ -90,7 +86,9 @@
                 :key="lang.code"
                 type="button"
                 class="flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors hover:bg-neutral-100"
-                :class="currentLocale === lang.code ? 'font-medium text-neutral-950' : 'text-neutral-600'"
+                :class="
+                  currentLocale === lang.code ? 'font-medium text-neutral-950' : 'text-neutral-600'
+                "
                 @click="switchLanguage(lang.code)"
               >
                 <span>{{ lang.name }}</span>
@@ -109,7 +107,10 @@
 </template>
 
 <script setup lang="ts">
-import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  resolveSectionColorScheme,
+  resolveSectionPaddingClass,
+} from '~/decoration-engine/utils/sectionAppearance'
 import type {
   DecorationHighlightedBlock,
   DecorationSection,
@@ -138,7 +139,9 @@ const logoPosition = computed(() =>
 )
 const isLogoLeft = computed(() => logoPosition.value === 'left')
 const isFullWidth = computed(() => props.section.settings?.full_width === true)
-const showLanguageSelector = computed(() => props.section.settings?.enable_language_selector !== false)
+const showLanguageSelector = computed(
+  () => props.section.settings?.enable_language_selector !== false
+)
 const sectionClasses = computed(() => [
   'w-full',
   resolveSectionPaddingClass(props.section.settings?.padding_top || 'xs', 'top'),
@@ -156,7 +159,7 @@ const sectionStyle = computed(() => {
   }
 })
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 const showLanguageMenu = ref(false)
 const languageMenuRef = ref<HTMLElement | null>(null)

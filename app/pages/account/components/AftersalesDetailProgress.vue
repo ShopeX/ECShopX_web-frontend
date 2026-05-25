@@ -1,7 +1,9 @@
 <template>
   <div class="flex flex-col gap-[32px] pt-[16px] lg:pt-[32px] w-full">
     <div class="flex items-center justify-end w-full">
-      <p class="text-[16px] font-medium leading-5 text-[#191a1d]">{{ statusText }}</p>
+      <p class="text-[16px] font-medium leading-5 text-[#191a1d]">
+        {{ translateIfKey(statusText) }}
+      </p>
     </div>
 
     <div class="flex items-start w-full">
@@ -14,11 +16,23 @@
           <div class="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex items-center">
             <div
               class="h-px flex-1"
-              :class="index === 0 ? 'bg-transparent' : (resolvedSteps[index - 1]?.active && step.active) ? 'bg-[#0f0f10]' : 'bg-[#e5e7eb]'"
+              :class="
+                index === 0
+                  ? 'bg-transparent'
+                  : resolvedSteps[index - 1]?.active && step.active
+                    ? 'bg-[#0f0f10]'
+                    : 'bg-[#e5e7eb]'
+              "
             />
             <div
               class="h-px flex-1"
-              :class="index === resolvedSteps.length - 1 ? 'bg-transparent' : (step.active && resolvedSteps[index + 1]?.active) ? 'bg-[#0f0f10]' : 'bg-[#e5e7eb]'"
+              :class="
+                index === resolvedSteps.length - 1
+                  ? 'bg-transparent'
+                  : step.active && resolvedSteps[index + 1]?.active
+                    ? 'bg-[#0f0f10]'
+                    : 'bg-[#e5e7eb]'
+              "
             />
           </div>
           <div
@@ -27,7 +41,9 @@
           />
         </div>
         <div class="flex flex-col items-center px-[8px]">
-          <p class="w-full text-center text-[14px] leading-5 text-[#191a1d]">{{ step.label }}</p>
+          <p class="w-full text-center text-[14px] leading-5 text-[#191a1d]">
+            {{ translateIfKey(step.label) }}
+          </p>
         </div>
       </div>
     </div>
@@ -52,8 +68,14 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { t } = useI18n()
 
-const defaultProgressLabels = ['提交申请', '等待审核', '等待寄回']
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+const defaultProgressLabels = ['c0a0b852.0830b4', 'c0a0b852.f6324c', 'c0a0b852.265b00']
+
+function translateIfKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
 
 const resolvedSteps = computed(() =>
   props.progressSteps?.length

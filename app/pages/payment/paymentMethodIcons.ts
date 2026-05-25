@@ -1,6 +1,6 @@
 export interface PaymentMethodIconConfig {
   src: string
-  alt: string
+  altKey: string
   wrapperClass: string
   imageClass: string
 }
@@ -8,22 +8,21 @@ export interface PaymentMethodIconConfig {
 export const PAYMENT_METHOD_ICON_MAP: Record<string, PaymentMethodIconConfig> = {
   wxpaypc: {
     src: '/images/payment/wechat-pay.svg',
-    alt: '微信支付图标',
+    altKey: 'f410ffb1.9374f6',
     wrapperClass: 'size-[24px]',
     imageClass: 'size-full',
   },
   alipay: {
     src: '/images/payment/alipay.svg',
-    alt: '支付宝图标',
+    altKey: 'f410ffb1.5ecd69',
     wrapperClass: 'size-[24px]',
     imageClass: 'size-full',
   },
   unionpay: {
     src: '/images/payment/bank-transfer.svg',
-    alt: '银行转账图标',
+    altKey: 'f410ffb1.028bc6',
     wrapperClass: 'relative size-[24px]',
-    imageClass:
-      'absolute left-1/2 top-1/2 h-[12px] w-[24px] -translate-x-1/2 -translate-y-1/2',
+    imageClass: 'absolute left-1/2 top-1/2 h-[12px] w-[24px] -translate-x-1/2 -translate-y-1/2',
   },
 }
 

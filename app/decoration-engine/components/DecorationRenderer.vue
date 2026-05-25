@@ -31,7 +31,7 @@
       v-else-if="isPreview"
       class="flex min-h-[60vh] items-center justify-center px-6 text-center text-sm text-neutral-500"
     >
-      等待装修数据推送中...
+      {{ t('04638e81.15c3d8') }}
     </div>
     <slot v-else />
   </div>
@@ -84,6 +84,7 @@ const props = defineProps<{
   previewSessionKey?: PageType | string | null
   highlightedBlock?: DecorationHighlightedBlock | null
 }>()
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'section-click', sectionId: string): void
@@ -108,9 +109,7 @@ function hasNamedSlot(sectionId: string): boolean {
 
 const { isPreview: routeIsPreview, route } = useDecorationRouteContext()
 /** 路由/embed 优先；仅 `props.isPreview === true` 可在非预览路由下强制预览 */
-const isPreview = computed(
-  () => routeIsPreview.value || props.isPreview === true
-)
+const isPreview = computed(() => routeIsPreview.value || props.isPreview === true)
 const highlightedBlock = toRef(props, 'highlightedBlock') as Readonly<
   Ref<DecorationHighlightedBlock | null | undefined>
 >

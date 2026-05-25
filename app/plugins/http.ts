@@ -10,6 +10,7 @@ export default defineNuxtPlugin({
     const config = useRuntimeConfig()
     const nuxtApp = useNuxtApp()
     const userStore = useUserStore()
+    const t = (key: string) => (nuxtApp.$i18n as any)?.t?.(key) || key
     const countryCodeCookie = useCookie<string>('i18n_redirected')
     const localePath = useLocalePath()
 
@@ -36,7 +37,7 @@ export default defineNuxtPlugin({
      * 创建业务错误
      */
     const createBusinessError = (response: ApiResponse): HttpError => {
-      const error = new Error(response.message || '业务处理失败') as HttpError
+      const error = new Error(response.message || t('f0f85a55.186e5b')) as HttpError
       error.type = ErrorType.BUSINESS_ERROR
       error.code = response.status_code
       error.details = response
@@ -86,26 +87,26 @@ export default defineNuxtPlugin({
 
         switch (error.type) {
           case ErrorType.AUTH_ERROR:
-            toast.show('登录已过期，请重新登录')
+            toast.show(t('f0f85a55.d3ab82'))
             break
           case ErrorType.PERMISSION_ERROR:
-            toast.show('权限不足，无法执行此操作')
+            toast.show(t('f0f85a55.ac1548'))
             break
           case ErrorType.VALIDATION_ERROR:
-            toast.show('请求参数有误')
+            toast.show(t('f0f85a55.bb6cb4'))
             break
           case ErrorType.NETWORK_ERROR:
           case ErrorType.TIMEOUT_ERROR:
-            toast.show('网络连接失败，请检查网络设置')
+            toast.show(t('f0f85a55.7da5ea'))
             break
           case ErrorType.SERVER_ERROR:
-            toast.show('服务器错误，请稍后重试')
+            toast.show(t('f0f85a55.8c4910'))
             break
           case ErrorType.BUSINESS_ERROR:
-            toast.show(error.message || '操作失败')
+            toast.show(error.message || t('f0f85a55.5fa802'))
             break
           default:
-            toast.show(error.message || '请求失败')
+            toast.show(error.message || t('f0f85a55.f50bf4'))
         }
       } catch (err) {
         console.error('[Error Message] Failed to show error message:', err)
@@ -215,7 +216,7 @@ export default defineNuxtPlugin({
 
               // 业务错误：创建并抛出错误
               const error = createBusinessError({
-                message: data.message || '请求失败',
+                message: data.message || t('f0f85a55.f50bf4'),
                 status_code: statusCode,
                 data: data,
               } as ApiResponse)
@@ -256,7 +257,7 @@ export default defineNuxtPlugin({
             response._data?.data?.message ||
             response._data?.message ||
             response.statusText ||
-            '请求失败'
+            t('f0f85a55.f50bf4')
 
           httpError = createHttpError(message, errorType, response.status, response._data)
 
@@ -267,13 +268,16 @@ export default defineNuxtPlugin({
           }
         } else if (error?.message?.includes('timeout')) {
           // 超时错误
-          httpError = createHttpError('请求超时，请检查网络连接', ErrorType.TIMEOUT_ERROR)
+          httpError = createHttpError(t('f0f85a55.9c3dc6'), ErrorType.TIMEOUT_ERROR)
         } else if (error?.message?.includes('fetch') || error?.message?.includes('Network')) {
           // 网络错误
-          httpError = createHttpError('网络连接失败，请检查网络设置', ErrorType.NETWORK_ERROR)
+          httpError = createHttpError(t('f0f85a55.7da5ea'), ErrorType.NETWORK_ERROR)
         } else {
           // 未知错误
-          httpError = createHttpError(error?.message || '未知错误', ErrorType.UNKNOWN_ERROR)
+          httpError = createHttpError(
+            error?.message || t('f0f85a55.974e74'),
+            ErrorType.UNKNOWN_ERROR
+          )
         }
 
         // 检查是否需要跳过全局错误提示

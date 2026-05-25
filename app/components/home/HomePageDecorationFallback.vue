@@ -5,7 +5,9 @@
     <main class="max-w-[1440px] mx-auto px-6 md:px-12 py-16">
       <section class="py-[96px] px-[64px] lg:px-[128px]" data-testid="home-popular-section">
         <div class="text-center mb-[64px]">
-          <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">热门商品</h2>
+          <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">
+            {{ t('4b13a2cf.1f79ba') }}
+          </h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
@@ -20,7 +22,9 @@
 
       <section class="py-[96px] px-[64px] lg:px-[128px]" data-testid="home-new-arrival-section">
         <div class="text-center mb-[64px]">
-          <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">新品</h2>
+          <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">
+            {{ t('4b13a2cf.5f3ca6') }}
+          </h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
@@ -50,21 +54,23 @@
             class="text-white text-lg max-w-2xl font-light italic leading-relaxed"
             data-testid="home-brand-news-quote"
           >
-            “当我听音乐时，我想要求一种平衡的声音，能够揭示每一层，让我更深地沉浸在当下。”
+            {{ t('4b13a2cf.03d9d4') }}
           </p>
           <ECButton
             variant="dark"
             class="mt-8 !bg-white !text-black hover:!bg-gray-100 !rounded-full"
             data-testid="home-brand-news-btn"
           >
-            发现更多
+            {{ t('4b13a2cf.26b2db') }}
           </ECButton>
         </div>
       </section>
 
       <section class="py-[96px] px-[64px] lg:px-[128px]" data-testid="home-brand-news-section">
         <div class="text-center mb-[64px]">
-          <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">品牌资讯</h2>
+          <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">
+            {{ t('4b13a2cf.e67f1e') }}
+          </h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
@@ -78,7 +84,9 @@
       data-testid="home-loading"
       class="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50"
     >
-      <div class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+      <div
+        class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"
+      ></div>
     </div>
   </div>
 </template>
@@ -97,13 +105,15 @@ const props = defineProps<{
   pending: boolean
 }>()
 
+const { t } = useI18n()
+
 const heroItems = computed(() => {
   const config = props.pageConfig?.widgets?.find((w: any) => w.type === 'carousel')
   if (config?.data?.items) {
     return config.data.items.map((item: any) => ({
       image: item.image,
-      title: item.title || '声音可见',
-      subtitle: item.subtitle || '音乐便更有吸引力。舒适度更优秀，悦耳如昔。',
+      title: item.title || t('4b13a2cf.e70b44'),
+      subtitle: item.subtitle || t('4b13a2cf.600a8b'),
       link: item.link || '#',
     }))
   }
@@ -112,44 +122,43 @@ const heroItems = computed(() => {
     {
       image:
         'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/07d7a49559899303b9bea14f2adabd0f3123a12e.png',
-      title: '声音可见',
-      subtitle:
-        '音乐便更有吸引力。舒适度更优秀，悦耳如昔。虚像 Beoplay Eleven无性耳机，每一个音符都细腻如丝。',
+      title: t('4b13a2cf.e70b44'),
+      subtitle: t('4b13a2cf.10a884'),
       link: '/product/1',
     },
   ]
 })
 
-const brandNews = [
+const brandNews = computed(() => [
   {
     id: 1,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('4b13a2cf.fd991f'),
+    summary: t('4b13a2cf.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/07d7a49559899303b9bea14f2adabd0f3123a12e.png',
   },
   {
     id: 2,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('4b13a2cf.fd991f'),
+    summary: t('4b13a2cf.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/499903fe1e08c926b9231a740b55d96768d41d0f.png',
   },
   {
     id: 3,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('4b13a2cf.fd991f'),
+    summary: t('4b13a2cf.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/ddb47e30da9c615963fd4aa5722a61a678e08f5e.png',
   },
   {
     id: 4,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('4b13a2cf.fd991f'),
+    summary: t('4b13a2cf.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/4a239fb9fcf5109253fd99820cdc96bdb98f7229.png',
   },
-]
+])
 
 const popularProducts = computed(() => props.products.slice(0, 4))
 const newArrivals = computed(() => props.products.slice(4, 12))

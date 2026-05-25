@@ -42,7 +42,7 @@ export function getBaseURL(): string {
  */
 export function handleResponse<T>(response: IApiResponse<T>): T {
   if (!response) {
-    throw new Error('响应数据为空')
+    throw new Error('edda4090.25ecc5')
   }
 
   if (response.status_code === undefined) {
@@ -54,5 +54,5 @@ export function handleResponse<T>(response: IApiResponse<T>): T {
     return response.data
   }
 
-  throw new Error(response.message || '请求失败')
+  throw new Error(response.message || 'edda4090.f50bf4')
 }

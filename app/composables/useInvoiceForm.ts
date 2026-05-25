@@ -40,7 +40,7 @@ export function useInvoiceForm(options: UseInvoiceFormOptions = {}) {
   async function submitInvoice(data: IInvoiceFormData) {
     const telephone = data.telephone?.trim() || userStore.userInfo?.mobile?.trim() || ''
     if (!telephone) {
-      invoiceSubmitError.value = t('invoiceForm.phoneRequired')
+      invoiceSubmitError.value = t('21755ff3.837776')
       return false
     }
 
@@ -71,10 +71,10 @@ export function useInvoiceForm(options: UseInvoiceFormOptions = {}) {
 
       invoiceData.value = normalizedData
       invoiceDialogVisible.value = false
-      toast.show(t('invoiceForm.saveSuccess'))
+      toast.show(t('21755ff3.2eac36'))
       return true
     } catch (error: any) {
-      invoiceSubmitError.value = error?.message || t('invoiceForm.submitError')
+      invoiceSubmitError.value = error?.message || t('21755ff3.ca2e80')
       return false
     } finally {
       invoiceLoading.value = false

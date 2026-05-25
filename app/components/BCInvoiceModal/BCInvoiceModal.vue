@@ -16,10 +16,12 @@
             <div class="flex flex-col gap-8">
               <!-- 标题栏 -->
               <div class="flex items-center justify-between">
-                <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">{{ t('invoiceForm.title') }}</h2>
+                <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">
+                  {{ t('77dcc5ed.fe976d') }}
+                </h2>
                 <button
                   type="button"
-                  :aria-label="t('common.close')"
+                  :aria-label="t('77dcc5ed.b15d91')"
                   class="flex size-6 items-center justify-center text-[#191a1d] transition-opacity hover:opacity-70"
                   @click="emitClose"
                 >
@@ -53,7 +55,7 @@
                   class="flex-1 bg-[#0f0f10] py-4 text-[14px] font-medium leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                   @click="handleSubmit"
                 >
-                  {{ loading ? t('ee3264ed.abe2c5') : t('invoiceForm.submit') }}
+                  {{ loading ? t('ee3264ed.abe2c5') : t('77dcc5ed.939d53') }}
                 </button>
               </div>
             </div>
@@ -69,14 +71,18 @@
             >
               <div
                 class="overflow-y-auto px-4 py-8"
-                :class="formData.type === 'enterprise' ? 'max-h-[500px]' : 'max-h-[calc(100vh-120px)]'"
+                :class="
+                  formData.type === 'enterprise' ? 'max-h-[500px]' : 'max-h-[calc(100vh-120px)]'
+                "
               >
                 <div class="flex flex-col gap-8">
                   <div class="flex items-center justify-between">
-                    <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">{{ t('invoiceForm.title') }}</h2>
+                    <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">
+                      {{ t('77dcc5ed.fe976d') }}
+                    </h2>
                     <button
                       type="button"
-                      :aria-label="t('common.close')"
+                      :aria-label="t('77dcc5ed.b15d91')"
                       class="flex size-6 items-center justify-center text-[#191a1d] transition-opacity hover:opacity-70"
                       @click="emitClose"
                     >
@@ -111,7 +117,7 @@
                     class="flex-1 bg-[#0f0f10] py-4 text-[14px] font-medium leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                     @click="handleSubmit"
                   >
-                    {{ loading ? t('ee3264ed.abe2c5') : t('invoiceForm.submit') }}
+                    {{ loading ? t('ee3264ed.abe2c5') : t('77dcc5ed.939d53') }}
                   </button>
                 </div>
               </div>
@@ -202,13 +208,11 @@ function validateForm() {
 
   if (!formData.value.title.trim()) {
     nextErrors.title =
-      formData.value.type === 'individual'
-        ? t('invoiceForm.titleRequired')
-        : t('invoiceForm.companyNameRequired')
+      formData.value.type === 'individual' ? t('77dcc5ed.05274f') : t('77dcc5ed.96e6a2')
   }
 
   if (formData.value.type === 'enterprise' && !formData.value.taxNumber.trim()) {
-    nextErrors.taxNumber = t('invoiceForm.taxNumberRequired')
+    nextErrors.taxNumber = t('77dcc5ed.b0605d')
   }
 
   errors.value = nextErrors

@@ -7,13 +7,22 @@
     </div>
 
     <div data-testid="category-nav-mobile-header" class="flex items-center pb-10 md:hidden">
-      <button type="button" class="flex h-6 w-6 items-center justify-center" aria-label="关闭菜单" @click="handleClose">
+      <button
+        type="button"
+        class="flex h-6 w-6 items-center justify-center"
+        :aria-label="t('df37674e.687724')"
+        @click="handleClose"
+      >
         <UIcon name="i-heroicons-x-mark" class="h-6 w-6 text-[#191a1d]" />
       </button>
     </div>
 
     <div class="min-h-0 flex-1 overflow-y-auto md:hidden">
-      <div v-if="mobileMenuLevel === 'primary'" data-testid="category-nav-mobile-primary" class="flex flex-col gap-8">
+      <div
+        v-if="mobileMenuLevel === 'primary'"
+        data-testid="category-nav-mobile-primary"
+        class="flex flex-col gap-8"
+      >
         <button
           v-for="item in mobilePrimaryItems"
           :key="item.id"
@@ -23,12 +32,24 @@
           @click="openMobilePrimary(item)"
         >
           <span>{{ item.name }}</span>
-          <UIcon v-if="item.children?.length" name="i-heroicons-chevron-right" class="h-5 w-5 text-[#191a1d]" />
+          <UIcon
+            v-if="item.children?.length"
+            name="i-heroicons-chevron-right"
+            class="h-5 w-5 text-[#191a1d]"
+          />
         </button>
       </div>
 
-      <div v-else-if="mobileMenuLevel === 'secondary'" data-testid="category-nav-mobile-secondary" class="flex flex-col gap-8">
-        <button type="button" class="flex items-center gap-2 text-[16px] font-normal leading-6 text-[#4a5565]" @click="goMobileBack">
+      <div
+        v-else-if="mobileMenuLevel === 'secondary'"
+        data-testid="category-nav-mobile-secondary"
+        class="flex flex-col gap-8"
+      >
+        <button
+          type="button"
+          class="flex items-center gap-2 text-[16px] font-normal leading-6 text-[#4a5565]"
+          @click="goMobileBack"
+        >
           <UIcon name="i-heroicons-arrow-left" class="h-5 w-5 text-[#191a1d]" />
           <span>{{ mobileSecondaryTitle }}</span>
         </button>
@@ -41,12 +62,20 @@
           @click="openMobileSecondary(item)"
         >
           <span>{{ item.name }}</span>
-          <UIcon v-if="item.children?.length" name="i-heroicons-chevron-right" class="h-5 w-5 text-[#191a1d]" />
+          <UIcon
+            v-if="item.children?.length"
+            name="i-heroicons-chevron-right"
+            class="h-5 w-5 text-[#191a1d]"
+          />
         </button>
       </div>
 
       <div v-else data-testid="category-nav-mobile-tertiary" class="flex flex-col gap-8">
-        <button type="button" class="flex items-center gap-2 text-[16px] font-normal leading-6 text-[#4a5565]" @click="goMobileBack">
+        <button
+          type="button"
+          class="flex items-center gap-2 text-[16px] font-normal leading-6 text-[#4a5565]"
+          @click="goMobileBack"
+        >
           <UIcon name="i-heroicons-arrow-left" class="h-5 w-5 text-[#191a1d]" />
           <span>{{ mobileTertiaryTitle }}</span>
         </button>
@@ -59,13 +88,22 @@
           @click="handleClose"
         >
           <div class="h-[150px] w-full overflow-hidden bg-[#f3f4f6]">
-            <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="h-full w-full object-cover" />
-            <div v-else class="flex h-full w-full items-center justify-center bg-[#f3f4f6] text-[14px] text-[#4a5565]">{{ item.name }}</div>
+            <img
+              v-if="item.image_url"
+              :src="item.image_url"
+              :alt="item.name"
+              class="h-full w-full object-cover"
+            />
+            <div
+              v-else
+              class="flex h-full w-full items-center justify-center bg-[#f3f4f6] text-[14px] text-[#4a5565]"
+            >
+              {{ item.name }}
+            </div>
           </div>
           <span class="text-[16px] font-medium leading-5 text-[#191a1d]">{{ item.name }}</span>
         </component>
       </div>
-
     </div>
 
     <div class="hidden min-h-0 flex-1 flex-col overflow-hidden md:flex">
@@ -103,7 +141,9 @@
                 v-if="item.children?.length"
                 name="i-heroicons-chevron-right"
                 class="h-5 w-5 text-[#191a1d] transition-opacity"
-                :class="item.id === activePrimaryId ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                :class="
+                  item.id === activePrimaryId ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                "
               />
             </button>
           </div>
@@ -114,9 +154,7 @@
               :key="secondaryItem.id"
               type="button"
               class="group flex items-center justify-between text-left text-[16px] leading-5 text-[#191a1d] transition-opacity hover:opacity-70"
-              :class="
-                secondaryItem.id === activeSecondaryId ? 'font-medium' : 'font-normal'
-              "
+              :class="secondaryItem.id === activeSecondaryId ? 'font-medium' : 'font-normal'"
               @mouseenter="setActiveSecondary(secondaryItem.id)"
               @focus="setActiveSecondary(secondaryItem.id)"
               @click="handleSecondaryAction(secondaryItem)"
@@ -136,7 +174,10 @@
           </div>
           <div v-else class="hidden md:block" />
 
-          <div v-if="tertiaryItems.length" class="flex flex-col self-start md:w-[197px] md:max-w-[197px] gap-8">
+          <div
+            v-if="tertiaryItems.length"
+            class="flex flex-col self-start md:w-[197px] md:max-w-[197px] gap-8"
+          >
             <component
               :is="featureCard.external ? 'a' : NuxtLink"
               v-for="featureCard in tertiaryItems"
@@ -187,11 +228,7 @@
 import { computed, ref, watch } from 'vue'
 import { NuxtLink } from '#components'
 import type { WebMenuItem } from '~/decoration-engine/components/webMenuTypes'
-import {
-  isExternalWebMenuLink,
-  resolveWebMenuItemLink,
-  useWebMenu,
-} from '~/composables/useWebMenu'
+import { isExternalWebMenuLink, resolveWebMenuItemLink, useWebMenu } from '~/composables/useWebMenu'
 
 defineOptions({
   name: 'CategoryNav',
@@ -232,15 +269,105 @@ const mobileActivePrimaryId = ref<number | null>(null)
 const mobileActiveSecondaryId = ref<number | null>(null)
 
 const fallbackCategories = computed<CategoryItem[]>(() => [
-  { id: 1, name: t('df37674e.7c85ce'), link: '/collections/new', external: false, image_url: '', link_type: 'url', link_value: '/collections/new', children: [], sort: 0 },
-  { id: 2, name: t('df37674e.6e4493'), link: '/collections/bags', external: false, image_url: '', link_type: 'url', link_value: '/collections/bags', children: [], sort: 0 },
-  { id: 3, name: t('df37674e.7eff9d'), link: '/collections/women', external: false, image_url: '', link_type: 'url', link_value: '/collections/women', children: [], sort: 0 },
-  { id: 4, name: t('df37674e.6f340b'), link: '/collections/men', external: false, image_url: '', link_type: 'url', link_value: '/collections/men', children: [], sort: 0 },
-  { id: 5, name: t('df37674e.7a502d'), link: '/collections/kids', external: false, image_url: '', link_type: 'url', link_value: '/collections/kids', children: [], sort: 0 },
-  { id: 6, name: t('df37674e.874834'), link: '/collections/travel', external: false, image_url: '', link_type: 'url', link_value: '/collections/travel', children: [], sort: 0 },
-  { id: 7, name: t('df37674e.7035b2'), link: '/collections/jewelry-watches', external: false, image_url: '', link_type: 'url', link_value: '/collections/jewelry-watches', children: [], sort: 0 },
-  { id: 8, name: t('df37674e.8cf901'), link: '/collections/fragrance-makeup', external: false, image_url: '', link_type: 'url', link_value: '/collections/fragrance-makeup', children: [], sort: 0 },
-  { id: 9, name: t('df37674e.259752'), link: '/collections/home-living', external: false, image_url: '', link_type: 'url', link_value: '/collections/home-living', children: [], sort: 0 },
+  {
+    id: 1,
+    name: t('df37674e.7c85ce'),
+    link: '/collections/new',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/new',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 2,
+    name: t('df37674e.6e4493'),
+    link: '/collections/bags',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/bags',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 3,
+    name: t('df37674e.7eff9d'),
+    link: '/collections/women',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/women',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 4,
+    name: t('df37674e.6f340b'),
+    link: '/collections/men',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/men',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 5,
+    name: t('df37674e.7a502d'),
+    link: '/collections/kids',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/kids',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 6,
+    name: t('df37674e.874834'),
+    link: '/collections/travel',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/travel',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 7,
+    name: t('df37674e.7035b2'),
+    link: '/collections/jewelry-watches',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/jewelry-watches',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 8,
+    name: t('df37674e.8cf901'),
+    link: '/collections/fragrance-makeup',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/fragrance-makeup',
+    children: [],
+    sort: 0,
+  },
+  {
+    id: 9,
+    name: t('df37674e.259752'),
+    link: '/collections/home-living',
+    external: false,
+    image_url: '',
+    link_type: 'url',
+    link_value: '/collections/home-living',
+    children: [],
+    sort: 0,
+  },
 ])
 
 function normalizeMenuItem(item: WebMenuItem): CategoryItem {
@@ -324,7 +451,9 @@ const mobileActivePrimary = computed<CategoryItem | null>(
 )
 
 const mobileSecondaryTitle = computed(() => mobileActivePrimary.value?.name || '')
-const mobileSecondaryItems = computed<CategoryItem[]>(() => mobileActivePrimary.value?.children || [])
+const mobileSecondaryItems = computed<CategoryItem[]>(
+  () => mobileActivePrimary.value?.children || []
+)
 
 const mobileActiveSecondary = computed<CategoryItem | null>(
   () => mobileSecondaryItems.value.find((item) => item.id === mobileActiveSecondaryId.value) || null

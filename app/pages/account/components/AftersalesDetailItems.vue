@@ -14,7 +14,7 @@
         />
       </svg>
       <span class="text-[14px] font-medium leading-5 text-[#191a1d]">
-        {{ storeName || '店铺名称' }}
+        {{ storeName || t('d8cfaa2d.0d4934') }}
       </span>
     </div>
 
@@ -37,13 +37,13 @@
             </p>
             <div class="flex flex-col gap-[2px]">
               <p v-if="item.skuNo" class="text-[12px] leading-4 text-[#364153]">
-                款号: {{ item.skuNo }}
+                {{ t('d8cfaa2d.e54891') }}: {{ item.skuNo }}
               </p>
               <p v-if="item.style" class="text-[12px] leading-4 text-[#364153]">
-                款式: {{ item.style }}
+                {{ t('d8cfaa2d.568510') }}: {{ item.style }}
               </p>
               <p v-if="item.size" class="text-[12px] leading-4 text-[#364153]">
-                尺寸: {{ item.size }}
+                {{ t('d8cfaa2d.c8339f') }}: {{ item.size }}
               </p>
               <p
                 v-if="!item.skuNo && !item.style && !item.size && item.specName"
@@ -64,7 +64,7 @@
             </div>
             <div class="flex flex-col items-end justify-center py-px lg:order-1">
               <span class="text-[14px] leading-5 text-[#191a1d] whitespace-nowrap">
-                数量:{{ item.quantity }}
+                {{ t('d8cfaa2d.0bf60b') }}:{{ item.quantity }}
               </span>
             </div>
           </div>
@@ -74,10 +74,12 @@
 
     <div class="hidden lg:flex items-center justify-between pb-[32px]">
       <div class="flex items-center gap-[32px] text-[14px] leading-5 text-[#364153]">
-        <span>数量: {{ itemCount }}</span>
+        <span>{{ t('d8cfaa2d.0bf60b') }}: {{ itemCount }}</span>
         <span>
-          售后金额:
-          <span class="font-medium text-[16px] text-[#191a1d]">¥ {{ formatAmount(refundAmount) }}</span>
+          {{ t('d8cfaa2d.98194d') }}:
+          <span class="font-medium text-[16px] text-[#191a1d]"
+            >¥ {{ formatAmount(refundAmount) }}</span
+          >
         </span>
       </div>
       <div v-if="resolvedButtons.length" class="flex items-center gap-[16px]">
@@ -126,6 +128,8 @@ interface Props {
   actionButtons?: ActionButton[]
 }
 
+const { t } = useI18n()
+
 const props = defineProps<Props>()
 
 defineEmits<{
@@ -136,7 +140,10 @@ const resolvedButtons = computed(() => {
   if (!props.actionButtons || props.actionButtons.length === 0) return []
   return props.actionButtons.map((button, index) => ({
     ...button,
-    primary: typeof button.primary !== 'undefined' ? button.primary : index === props.actionButtons!.length - 1,
+    primary:
+      typeof button.primary !== 'undefined'
+        ? button.primary
+        : index === props.actionButtons!.length - 1,
   }))
 })
 

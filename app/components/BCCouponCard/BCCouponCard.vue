@@ -22,23 +22,23 @@
             <span v-if="coupon.displayPrefix" class="text-base leading-5">{{
               coupon.displayPrefix
             }}</span>
-            <span :class="valueClass">{{ coupon.displayValue }}</span>
-            <span v-if="coupon.displaySuffix" class="text-base leading-5">
-              {{ coupon.displaySuffix }}
+            <span :class="valueClass">{{ displayValueText }}</span>
+            <span v-if="displaySuffixText" class="text-base leading-5">
+              {{ displaySuffixText }}
             </span>
           </div>
-          <p class="text-xs leading-4 text-[#4a5565]">{{ coupon.typeLabel }}</p>
+          <p class="text-xs leading-4 text-[#4a5565]">{{ typeLabelText }}</p>
         </div>
 
         <div class="flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-4">
-          <p class="truncate text-sm font-medium leading-5 text-[#191a1d]">{{ coupon.title }}</p>
+          <p class="truncate text-sm font-medium leading-5 text-[#191a1d]">{{ titleText }}</p>
           <div class="flex items-start gap-2 text-xs leading-4 text-[#4a5565]">
             <span class="shrink-0 text-[#99a1af]">{{ t('29b38e7b.011009') }}</span>
-            <span class="min-w-0 flex-1 break-words">{{ coupon.usageTimeText }}</span>
+            <span class="min-w-0 flex-1 break-words">{{ usageTimeText }}</span>
           </div>
           <div class="flex items-start gap-2 text-xs leading-4 text-[#4a5565]">
             <span class="shrink-0 text-[#99a1af]">{{ t('29b38e7b.602ab6') }}</span>
-            <span class="min-w-0 flex-1 break-words">{{ coupon.ruleText }}</span>
+            <span class="min-w-0 flex-1 break-words">{{ ruleText }}</span>
           </div>
         </div>
       </div>
@@ -95,9 +95,9 @@
             <span v-if="coupon.displayPrefix" class="text-base leading-5">{{
               coupon.displayPrefix
             }}</span>
-            <span :class="valueClass">{{ coupon.displayValue }}</span>
-            <span v-if="coupon.displaySuffix" class="text-base leading-5">
-              {{ coupon.displaySuffix }}
+            <span :class="valueClass">{{ displayValueText }}</span>
+            <span v-if="displaySuffixText" class="text-base leading-5">
+              {{ displaySuffixText }}
             </span>
           </div>
           <p class="text-xs leading-4 text-[#99a1af]">{{ displayAmountHint }}</p>
@@ -106,9 +106,9 @@
         <div class="flex min-w-0 flex-1 items-center">
           <div class="flex min-w-0 flex-1 flex-col justify-center gap-2 px-4">
             <p class="truncate text-sm font-medium leading-5" :class="displayTitleClass">
-              {{ coupon.title }}
+              {{ titleText }}
             </p>
-            <p class="text-xs leading-4 text-[#4a5565]">{{ coupon.ruleText }}</p>
+            <p class="text-xs leading-4 text-[#4a5565]">{{ ruleText }}</p>
             <div class="flex items-center gap-1 text-xs leading-4 text-[#99a1af]">
               <svg
                 class="size-3 shrink-0 text-[#99a1af]"
@@ -229,11 +229,41 @@ const valueClass = computed(() => {
   return 'text-[36px] leading-[36px]'
 })
 
+function translateCouponText(
+  fallback: string | undefined,
+  i18nText: ICouponModel['titleI18n']
+): string {
+  if (!i18nText?.key) return fallback || ''
+  return t(i18nText.key, i18nText.params || {})
+}
+
+const displayValueText = computed(() =>
+  translateCouponText(props.coupon.displayValue, props.coupon.displayValueI18n)
+)
+
+const displaySuffixText = computed(() =>
+  translateCouponText(props.coupon.displaySuffix, props.coupon.displaySuffixI18n)
+)
+
+const typeLabelText = computed(() =>
+  translateCouponText(props.coupon.typeLabel, props.coupon.typeLabelI18n)
+)
+
+const titleText = computed(() => translateCouponText(props.coupon.title, props.coupon.titleI18n))
+
+const usageTimeText = computed(() =>
+  translateCouponText(props.coupon.usageTimeText, props.coupon.usageTimeI18n)
+)
+
+const ruleText = computed(() =>
+  translateCouponText(props.coupon.ruleText, props.coupon.ruleTextI18n)
+)
+
 const displayAmountHint = computed(() => {
   if (props.coupon.cardType === 'gift') {
     return props.coupon.minFee > 0
       ? t('29b38e7b.72206b', { amount: formatDisplayNumber(props.coupon.minFee) })
-      : props.coupon.typeLabel
+      : typeLabelText.value
   }
 
   if (props.coupon.minFee > 0) {
@@ -252,20 +282,25 @@ const selectionIndicatorClass = computed(() =>
 )
 
 const displayValidityText = computed(() => {
-  const usageText = props.coupon.usageTimeText.trim()
+  const usageText = usageTimeText.value.trim()
   if (!usageText) return t('29b38e7b.ba47c8')
 
   if (!props.mobileDisplay) {
     return t('29b38e7b.17e8e9', { value: usageText.replace(/\s*-\s*/g, '-') })
   }
 
-  if (usageText.includes(' - ')) {
-    const parts = usageText.split(' - ')
-    return t('29b38e7b.1aabae', { value: parts[parts.length - 1] })
+  if (props.coupon.usageTimeKind === 'range') {
+    const parts = props.coupon.usageTimeText.split(' - ')
+    return t('29b38e7b.1aabae', { value: parts[parts.length - 1] || usageText })
   }
 
-  if (usageText.startsWith('至 ')) {
-    return t('29b38e7b.e14669', { value: usageText })
+  if (props.coupon.usageTimeKind === 'until') {
+    const date = props.coupon.usageTimeI18n?.params?.date || usageText
+    return t('29b38e7b.1aabae', { value: date })
+  }
+
+  if (props.coupon.usageTimeKind === 'longTerm') {
+    return t('29b38e7b.ba47c8')
   }
 
   return t('29b38e7b.33f8b1', { value: usageText })

@@ -1,4 +1,8 @@
-import type { DecorationBlock, DecorationDSL, DecorationSection } from '~/decoration-engine/types/decoration'
+import type {
+  DecorationBlock,
+  DecorationDSL,
+  DecorationSection,
+} from '~/decoration-engine/types/decoration'
 
 type DefaultBlockInput = {
   type: string
@@ -37,7 +41,11 @@ function createSection(
   }
 }
 
-function createDsl(pageType: DecorationDSL['pageType'], pageId: string, sections: Record<string, DecorationSection>): DecorationDSL {
+function createDsl(
+  pageType: DecorationDSL['pageType'],
+  pageId: string,
+  sections: Record<string, DecorationSection>
+): DecorationDSL {
   return {
     pageType,
     pageId,
@@ -74,22 +82,21 @@ export function createDefaultFooterDecorationDsl(): DecorationDSL {
         {
           type: 'footer-text',
           settings: {
-            title: '品牌介绍',
-            content:
-              '<p><strong>关于我们的品牌</strong></p><p>我们专注于提供高品质商品与贴心服务，为每一次购物带来更好的体验。</p>',
+            title: 'a2f77aaa.add0b7',
+            content: 'a2f77aaa.2da9ae',
             column_span: 4,
           },
         },
         {
           type: 'footer-menu',
           settings: {
-            title: '购物指南',
+            title: 'a2f77aaa.4d9b19',
             menu: null,
             menu_items: [
-              { label: '新品上市', url: '#' },
-              { label: '热销商品', url: '#' },
-              { label: '产品系列', url: '#' },
-              { label: '优惠活动', url: '#' },
+              { label: 'a2f77aaa.5e2186', url: '#' },
+              { label: 'a2f77aaa.34cb57', url: '#' },
+              { label: 'a2f77aaa.81af76', url: '#' },
+              { label: 'a2f77aaa.cd5666', url: '#' },
             ],
             column_span: 2,
           },
@@ -97,13 +104,13 @@ export function createDefaultFooterDecorationDsl(): DecorationDSL {
         {
           type: 'footer-menu',
           settings: {
-            title: '关于我们',
+            title: 'a2f77aaa.3b2e36',
             menu: null,
             menu_items: [
-              { label: '品牌故事', url: '#' },
-              { label: '加入我们', url: '#' },
-              { label: '新闻资讯', url: '#' },
-              { label: '可持续发展', url: '#' },
+              { label: 'a2f77aaa.c0af65', url: '#' },
+              { label: 'a2f77aaa.aee49a', url: '#' },
+              { label: 'a2f77aaa.1df098', url: '#' },
+              { label: 'a2f77aaa.5e2872', url: '#' },
             ],
             column_span: 2,
           },
@@ -111,13 +118,13 @@ export function createDefaultFooterDecorationDsl(): DecorationDSL {
         {
           type: 'footer-menu',
           settings: {
-            title: '客户服务',
+            title: 'a2f77aaa.2039ae',
             menu: null,
             menu_items: [
-              { label: '联系我们', url: '#' },
-              { label: '退换货说明', url: '#' },
-              { label: '服务条款', url: '#' },
-              { label: '配送政策', url: '#' },
+              { label: 'a2f77aaa.0cbf83', url: '#' },
+              { label: 'a2f77aaa.9a10f4', url: '#' },
+              { label: 'a2f77aaa.e38f72', url: '#' },
+              { label: 'a2f77aaa.72801f', url: '#' },
             ],
             column_span: 2,
           },
@@ -125,8 +132,8 @@ export function createDefaultFooterDecorationDsl(): DecorationDSL {
         {
           type: 'footer-text',
           settings: {
-            title: '订阅我们的电子邮件',
-            content: '<p>请留下您的邮箱以获取最新资讯。</p>',
+            title: 'a2f77aaa.3b4325',
+            content: 'a2f77aaa.ee372a',
             column_span: 4,
           },
         },
@@ -135,7 +142,7 @@ export function createDefaultFooterDecorationDsl(): DecorationDSL {
           settings: {
             image: '',
             link: '',
-            alt: '页脚图片',
+            alt: 'a2f77aaa.32e83c',
             column_span: 12,
           },
         },
@@ -144,11 +151,13 @@ export function createDefaultFooterDecorationDsl(): DecorationDSL {
   })
 }
 
-export function createDefaultHomeDecorationDsl(options: { pageId?: string; scene?: string } = {}): DecorationDSL {
+export function createDefaultHomeDecorationDsl(
+  options: { pageId?: string; scene?: string } = {}
+): DecorationDSL {
   return {
     ...createDsl('home', String(options.pageId || 'home'), {
       'main-carousel': createSection('main-carousel', 'main-carousel', {
-        title: '默认轮播',
+        title: 'a2f77aaa.af052e',
         settings: {
           image_height: 'medium',
           enable_auto_play: true,
@@ -163,7 +172,7 @@ export function createDefaultHomeDecorationDsl(options: { pageId?: string; scene
         blocks: [{ type: 'image' }, { type: 'image' }, { type: 'image' }],
       }),
       'image-hotspot': createSection('image-hotspot', 'image-hotspot', {
-        title: '默认热区',
+        title: 'a2f77aaa.db70f7',
         settings: {
           imageWidth: 1200,
           imageHeight: 520,
@@ -174,10 +183,10 @@ export function createDefaultHomeDecorationDsl(options: { pageId?: string; scene
         },
       }),
       'product-tab-shelf': createSection('product-tab-shelf', 'product-tab-shelf', {
-        title: '默认商品分组',
+        title: 'a2f77aaa.620734',
         settings: {
-          title: '精选商品',
-          intro: '<p>发现更多值得购买的好物</p>',
+          title: 'a2f77aaa.a0a9b9',
+          intro: 'a2f77aaa.6d83c3',
           columns: 4,
           size: 'medium',
           alignment: 'center',
@@ -192,7 +201,7 @@ export function createDefaultHomeDecorationDsl(options: { pageId?: string; scene
           {
             type: 'product-tab',
             settings: {
-              tab_label: '新品推荐',
+              tab_label: 'a2f77aaa.343921',
               product_ids: [],
               limit: 8,
             },

@@ -12,10 +12,14 @@
     <div :class="innerClasses">
       <div class="relative w-full" :style="aspectRatioStyle">
         <picture v-if="backgroundImage || mobileBackgroundImage">
-          <source v-if="mobileBackgroundImage" media="(max-width: 767px)" :srcset="mobileBackgroundImage" />
+          <source
+            v-if="mobileBackgroundImage"
+            media="(max-width: 767px)"
+            :srcset="mobileBackgroundImage"
+          />
           <img
             :src="backgroundImage || mobileBackgroundImage"
-            :alt="section.title || 'image hotspot'"
+            :alt="sectionAlt"
             class="absolute inset-0 h-full w-full object-cover"
           />
         </picture>
@@ -43,7 +47,9 @@
             :aria-label="hotspot.label || `hotspot-${hotspot.id}`"
             @click="handleHotspotClick($event, hotspot.id)"
           >
-            <span class="block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm" />
+            <span
+              class="block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm"
+            />
 
             <span
               v-if="hotspot.label"
@@ -71,7 +77,10 @@
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
-import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  resolveSectionColorScheme,
+  resolveSectionPaddingClass,
+} from '~/decoration-engine/utils/sectionAppearance'
 
 interface HotspotBlock {
   id: string
@@ -99,6 +108,15 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+function translateIfGeneratedKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
+
+const sectionAlt = computed(() =>
+  translateIfGeneratedKey(String(props.section.title || 'image hotspot'))
+)
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
 const isMobileViewport = ref(false)
@@ -237,9 +255,17 @@ const resolveHotspotHref = (link: Record<string, unknown>) => {
   return undefined
 }
 const resolveHotspotTarget = (link: Record<string, unknown>) =>
-  !props.isPreview && Number((link as any)?.linkType) === 1 && /^https?:\/\//.test(String((link as any)?.linkUrl || '')) ? '_blank' : undefined
+  !props.isPreview &&
+  Number((link as any)?.linkType) === 1 &&
+  /^https?:\/\//.test(String((link as any)?.linkUrl || ''))
+    ? '_blank'
+    : undefined
 const resolveHotspotRel = (link: Record<string, unknown>) =>
-  !props.isPreview && Number((link as any)?.linkType) === 1 && /^https?:\/\//.test(String((link as any)?.linkUrl || '')) ? 'noopener noreferrer' : undefined
+  !props.isPreview &&
+  Number((link as any)?.linkType) === 1 &&
+  /^https?:\/\//.test(String((link as any)?.linkUrl || ''))
+    ? 'noopener noreferrer'
+    : undefined
 
 const handleHotspotClick = (event: MouseEvent, blockId: string) => {
   if (!props.isPreview) {

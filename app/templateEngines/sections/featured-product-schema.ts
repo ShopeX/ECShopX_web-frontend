@@ -3,7 +3,7 @@ export const featuredProductSchema = {
     {
       name: 'title',
       type: 'text',
-      label: '标题',
+      label: 'f67676b9.32c65d',
     },
   ],
 }

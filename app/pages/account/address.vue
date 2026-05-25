@@ -141,7 +141,7 @@ const menuItems = computed(() => {
     { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
     {
       key: 'aftersales',
-      label: t('account.aftersalesOrders'),
+      label: t('110ad121.056891'),
       path: localePath('/account/aftersales'),
     },
     { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
@@ -151,7 +151,7 @@ const menuItems = computed(() => {
   if (isBBC.value) {
     items.push({
       key: 'followStores',
-      label: t('account.followStores'),
+      label: t('1d80cba8.a6c36f'),
       path: localePath('/account/follow-stores'),
     })
   }

@@ -9,7 +9,7 @@
   >
     <div class="flex flex-col gap-[16px]">
       <p class="text-[16px] font-medium leading-5 text-[#191a1d] text-right">
-        {{ order.statusText }}
+        {{ displayStatusText }}
       </p>
 
       <div class="flex items-center gap-[10px]">
@@ -82,22 +82,25 @@
         <div
           class="flex items-center justify-start gap-[32px] text-[14px] leading-5 text-[#364153] lg:justify-end"
         >
-          <span>{{ t('account.aftersalesItemCount', { count: order.itemCount }) }}</span>
+          <span>{{ t('99fee605.3876bc', { count: order.itemCount }) }}</span>
           <span>
-            {{ t('account.aftersalesRefundAmount') }}:
+            {{ t('99fee605.a0cd4c') }}:
             <span class="font-medium text-[16px] text-[#191a1d]">
               ¥ {{ formatAmount(order.refundAmount) }}
             </span>
           </span>
         </div>
 
-        <div v-if="order.status === 'pending'" class="flex items-center justify-end gap-[16px] w-full lg:w-auto">
+        <div
+          v-if="order.status === 'pending'"
+          class="flex items-center justify-end gap-[16px] w-full lg:w-auto"
+        >
           <button
             type="button"
             class="flex h-[34px] lg:h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[17px] lg:px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
             @click.stop="handleCancelClick"
           >
-            撤销申请
+            {{ t('99fee605.eaffc1') }}
           </button>
         </div>
       </div>
@@ -118,6 +121,12 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+const displayStatusText = computed(() => {
+  const statusText = String(props.order.statusText || '')
+  return generatedKeyPattern.test(statusText) ? t(statusText) : statusText
+})
 
 function openDetail() {
   navigateTo(

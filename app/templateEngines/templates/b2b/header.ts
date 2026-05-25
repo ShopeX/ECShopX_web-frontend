@@ -2,7 +2,7 @@ export default {
   sections: {
     header: {
       type: 'header',
-      title: '页面头部',
+      title: '46519e1e.cd9ea7',
       settings: {
         layout: 'vertical',
       },

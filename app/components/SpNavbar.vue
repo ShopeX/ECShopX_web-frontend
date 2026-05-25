@@ -184,9 +184,9 @@ const { mallLogoDarkUrl } = await useMallGlobalSetting()
 
 // 用户登录状态
 const isLoggedIn = ref(false)
-const userInfo = ref({
-  username: '张三',
-})
+const userInfo = computed(() => ({
+  username: t('1db81bba.615db5'),
+}))
 
 // 搜索相关
 const searchKeyword = ref('')

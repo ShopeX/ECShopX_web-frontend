@@ -24,7 +24,7 @@ export class MoneyValueObject {
 
   private constructor(amount: number) {
     if (amount < 0) {
-      throw new Error('金额不能为负数')
+      throw new Error('7cfd78c5.3b58b6')
     }
     // 保留两位小数，避免浮点数精度问题
     this._amount = Math.round(amount * 100) / 100
@@ -100,7 +100,7 @@ export class MoneyValueObject {
    */
   divide(divisor: number): MoneyValueObject {
     if (divisor === 0) {
-      throw new Error('除数不能为零')
+      throw new Error('7cfd78c5.bd66a0')
     }
     return new MoneyValueObject(this._amount / divisor)
   }

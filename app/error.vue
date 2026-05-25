@@ -5,19 +5,21 @@
         {{ error?.statusCode || '500' }}
       </h1>
       <p class="text-xl text-gray-600 mb-8">
-        {{ error?.message || '发生了一些错误' }}
+        {{ error?.message || t('064c23ca.c7f445') }}
       </p>
       <button
         class="px-4 py-2 bg-[#b22420] text-white rounded hover:opacity-90 transition-opacity"
         @click="handleError"
       >
-        返回首页
+        {{ t('064c23ca.5a1367') }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
+
 const props = defineProps({
   error: Object,
 })

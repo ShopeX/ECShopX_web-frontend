@@ -74,7 +74,10 @@
         v-model:open="showCategoryNav"
         side="left"
         :content="{ style: { width: 'min(100vw, 720px)', maxWidth: '720px' } }"
-        :ui="{ content: 'left-0 inset-y-0 !w-screen md:!w-[720px] !max-w-[720px] bg-default divide-y divide-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none' }"
+        :ui="{
+          content:
+            'left-0 inset-y-0 !w-screen md:!w-[720px] !max-w-[720px] bg-default divide-y divide-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none',
+        }"
       >
         <template #content>
           <BCCategoryNav
@@ -169,6 +172,23 @@ function toCamelCase(str: string): string {
     .replace(/^([A-Z])/, (m) => m.toLowerCase())
 }
 
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+function translateIfGeneratedKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
+
+function translateSchemaConfig(value: unknown): unknown {
+  if (typeof value === 'string') return translateIfGeneratedKey(value)
+  if (Array.isArray(value)) return value.map((item) => translateSchemaConfig(item))
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, translateSchemaConfig(item)])
+    )
+  }
+  return value
+}
+
 const props = withDefaults(defineProps<ShopLayoutDecorationBindProps>(), {
   headerDecorationDsl: null,
   footerDecorationDsl: null,
@@ -180,6 +200,7 @@ const props = withDefaults(defineProps<ShopLayoutDecorationBindProps>(), {
 const emit = defineEmits<{
   (e: 'section-click', sectionId: string): void
 }>()
+const { t } = useI18n()
 
 const [{ dsl: ssrHeaderDecorationDsl }, { dsl: ssrFooterDecorationDsl }] = await Promise.all([
   useDecorationDslFetch({
@@ -226,9 +247,18 @@ const headerMenuId = computed(() => {
 const showCategoryNav = ref(false)
 const showMiniCart = ref(false)
 const showSearchDrawer = ref(false)
-const hotKeywords = ref(['手袋', '双十二', '新品', '手表', '香水彩妆', '珠宝腕表', '手提袋'])
+const hotKeywords = computed(() => [
+  t('de7d1d34.6e4493'),
+  t('de7d1d34.9f351b'),
+  t('de7d1d34.5f3ca6'),
+  t('de7d1d34.abc55f'),
+  t('de7d1d34.3fdf19'),
+  t('de7d1d34.247d42'),
+  t('de7d1d34.89d075'),
+])
 
 const router = useRouter()
+const localePath = useLocalePath()
 
 const handleOpenCategoryNav = () => {
   showCategoryNav.value = true
@@ -243,7 +273,7 @@ const handleOpenSearch = () => {
 }
 
 const handleOpenUser = async () => {
-  await router.push('/account')
+  await router.push(localePath('/account'))
 }
 
 const handleSearch = (keyword: string) => {
@@ -315,17 +345,18 @@ const handleMouseEvent = (e: MouseEvent) => {
 
     if (e.type === 'mousedown') {
       const pos = getAbsolutePosition(widget)
-      const label = widget.getAttribute('data-label') || '产品系列列表'
+      const label = widget.getAttribute('data-label') || t('de7d1d34.6c3721')
 
       const widgetNameAttr = widget.getAttribute('widget-name') || ''
       const widgetNameCamel = widgetNameAttr ? toCamelCase(widgetNameAttr) : ''
 
-      const schemaConfig =
+      const rawSchemaConfig =
         widgetNameCamel && Object.prototype.hasOwnProperty.call(schemaMap, widgetNameCamel)
           ? (schemaMap as Record<string, (typeof schemaMap)[keyof typeof schemaMap]>)[
               widgetNameCamel
             ]
           : undefined
+      const schemaConfig = translateSchemaConfig(rawSchemaConfig)
 
       selectedWidget.value = {
         el: widget,

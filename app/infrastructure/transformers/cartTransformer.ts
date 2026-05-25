@@ -60,10 +60,10 @@ export class CartTransformer {
     return {
       id: apiItem.cart_id || apiItem.id,
       productId: apiItem.item_id || apiItem.goods_id,
-      productName: apiItem.item_name || '未知商品',
+      productName: apiItem.item_name || '77b4648d.2b7890',
       productImage: apiItem.pics || '',
       specId: apiItem.item_id || 'default',
-      specName: apiItem.item_spec_desc || '默认规格',
+      specName: apiItem.item_spec_desc || '77b4648d.064eb9',
       price,
       marketPrice,
       quantity,
@@ -120,9 +120,9 @@ export class CartTransformer {
       cart_id: item.cart_id || '',
       item_id: item.item_id || '',
       goods_id: item.goods_id || '',
-      item_name: item.item_name || '未知商品',
+      item_name: item.item_name || '77b4648d.2b7890',
       pics: item.pics || '',
-      item_spec_desc: item.item_spec_desc || '默认规格',
+      item_spec_desc: item.item_spec_desc || '77b4648d.064eb9',
       price: typeof item.price === 'number' || typeof item.price === 'string' ? item.price : 0,
       market_price:
         typeof item.market_price === 'number' || typeof item.market_price === 'string'

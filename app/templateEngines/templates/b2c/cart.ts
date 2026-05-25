@@ -2,7 +2,7 @@ export default {
   sections: {
     header: {
       type: 'header',
-      title: '购物车页面头部',
+      title: 'e8168f66.a7e25e',
       settings: {
         layout: 'default',
       },

@@ -10,11 +10,11 @@ import type {
 import { OrderTransformer } from './orderTransformer'
 
 const STATUS_TEXT_MAP: Record<Exclude<AftersalesTabKey, 'all'>, string> = {
-  pending: '待处理',
-  processing: '处理中',
-  processed: '已处理',
-  rejected: '已驳回',
-  closed: '已关闭',
+  pending: '36dbcb31.047109',
+  processing: '36dbcb31.5d459d',
+  processed: '36dbcb31.5ad605',
+  rejected: '36dbcb31.dbf36d',
+  closed: '36dbcb31.9c5850',
 }
 
 export class AftersalesTransformer {
@@ -124,7 +124,9 @@ export class AftersalesTransformer {
       try {
         const parsed = JSON.parse(value)
         if (Array.isArray(parsed)) {
-          return parsed.filter((item): item is string => typeof item === 'string' && item.length > 0)
+          return parsed.filter(
+            (item): item is string => typeof item === 'string' && item.length > 0
+          )
         }
       } catch {
         return [value]
@@ -135,7 +137,7 @@ export class AftersalesTransformer {
   }
 
   private static deriveProgressSteps(record: IApiAftersalesRecord): IAftersalesProgressStep[] {
-    const labels = ['提交申请', '等待审核', '等待寄回']
+    const labels = ['36dbcb31.0830b4', '36dbcb31.f6324c', '36dbcb31.265b00']
     const progress = Number(record.progress ?? 0)
     const activeCount = Math.min(labels.length, Math.max(1, progress + 1))
 
@@ -241,7 +243,9 @@ export class AftersalesTransformer {
     const orderInfo = record.app_info?.order_info || record.order_info || {}
     const refundInfo = record.refund_info || {}
     const items = AftersalesTransformer.resolveDetailItems(record)
-    const statusBucket = AftersalesTransformer.normalizeStatusBucket(String(record.aftersales_status ?? ''))
+    const statusBucket = AftersalesTransformer.normalizeStatusBucket(
+      String(record.aftersales_status ?? '')
+    )
 
     return {
       aftersalesId: String(record.aftersales_bn || record.aftersales_id || record.id || ''),
@@ -271,7 +275,9 @@ export class AftersalesTransformer {
       description: String(record.description || ''),
       evidencePics: AftersalesTransformer.normalizeEvidencePics(record.evidence_pic),
       paymentMethod: String(orderInfo.app_pay_type_desc || orderInfo.pay_type || ''),
-      payTime: AftersalesTransformer.formatTimestamp(orderInfo.delivery_time || orderInfo.update_time),
+      payTime: AftersalesTransformer.formatTimestamp(
+        orderInfo.delivery_time || orderInfo.update_time
+      ),
       orderTime: AftersalesTransformer.formatTimestamp(orderInfo.create_time || record.create_time),
       goodsAmount: AftersalesTransformer.normalizeFenAmount(orderInfo.item_fee),
       freightAmount: AftersalesTransformer.normalizeFenAmount(orderInfo.freight_fee),

@@ -35,7 +35,7 @@
         @click="setCurrentIndex(index)"
         class="w-2 h-2 rounded-full transition-colors duration-200"
         :class="index === currentIndex ? 'bg-red-500' : 'bg-white/50'"
-        :aria-label="`切换到第${index + 1}张轮播图`"
+        :aria-label="t('9b1abe6e.37de11', { index: index + 1 })"
       />
     </div>
 
@@ -43,14 +43,14 @@
     <button
       class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 flex items-center justify-center hover:bg-black/30 transition-colors"
       @click="prev"
-      aria-label="上一张轮播图"
+      :aria-label="t('9b1abe6e.7fc2d1')"
     >
       <img src="/icons/arrow-left.svg" alt="" class="w-6 h-6" />
     </button>
     <button
       class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 flex items-center justify-center hover:bg-black/30 transition-colors"
       @click="next"
-      aria-label="下一张轮播图"
+      :aria-label="t('9b1abe6e.7a139f')"
     >
       <img src="/icons/arrow-right.svg" alt="" class="w-6 h-6" />
     </button>
@@ -72,6 +72,7 @@ const props = defineProps<{
 }>()
 
 const { banners } = toRefs(props)
+const { t } = useI18n()
 
 const currentIndex = ref(0)
 const timer = ref<NodeJS.Timeout>()

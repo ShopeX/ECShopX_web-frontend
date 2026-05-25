@@ -11,7 +11,9 @@ export function useFollowedStores() {
   const hasLoaded = ref(false)
   const errorMessage = ref('')
 
-  const isEmpty = computed(() => hasLoaded.value && stores.value.length === 0 && !errorMessage.value)
+  const isEmpty = computed(
+    () => hasLoaded.value && stores.value.length === 0 && !errorMessage.value
+  )
 
   async function loadFollowedStores() {
     loading.value = true
@@ -26,7 +28,7 @@ export function useFollowedStores() {
     } catch (error) {
       console.error('获取关注店铺列表失败:', error)
       stores.value = []
-      errorMessage.value = 'account.followStoresLoadFailed'
+      errorMessage.value = '1d80cba8.a6c36fLoadFailed'
     } finally {
       loading.value = false
       hasLoaded.value = true

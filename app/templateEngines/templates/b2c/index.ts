@@ -2,7 +2,7 @@ export default {
   sections: {
     'carousel-xxxx1': {
       type: 'carousel',
-      title: '轮播图',
+      title: 'f20e01ae.0c0180',
       settings: {
         layout: 'vertical',
       },
@@ -24,12 +24,12 @@ export default {
     },
     'featured-product': {
       type: 'featured-product',
-      title: '推荐商品',
-      description: '推荐商品',
+      title: 'f20e01ae.479ddf',
+      description: 'f20e01ae.479ddf',
       items: [
         {
           id: 1,
-          name: '商品1',
+          name: 'f20e01ae.be95c3',
           price: 100,
           quantity: 1,
         },

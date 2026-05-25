@@ -3,7 +3,7 @@
     <div class="sticky top-0 z-10 shrink-0 lg:hidden">
       <AccountH5FilterBar
         v-model="showMobileMenu"
-        :title="t('account.aftersalesOrders')"
+        :title="t('110ad121.056891')"
         :active-key="activeMenu"
         :menu-items="menuItems"
       />
@@ -75,7 +75,7 @@
                 name="i-heroicons-arrow-path-rounded-square"
                 class="mb-4 h-16 w-16 opacity-20"
               />
-              <p class="text-[14px]">{{ t('account.aftersalesEmpty') }}</p>
+              <p class="text-[14px]">{{ t('110ad121.346f1a') }}</p>
             </div>
 
             <div v-else class="pb-8 lg:pt-[32px]">
@@ -138,12 +138,12 @@ const showMobileMenu = ref(false)
 const isBBC = computed(() => getBusinessMode() === 'bbc')
 
 const tabs = computed<{ key: AftersalesTabKey; label: string }[]>(() => [
-  { key: 'all', label: t('account.aftersalesAll') },
-  { key: 'pending', label: t('account.aftersalesPending') },
-  { key: 'processing', label: t('account.aftersalesProcessing') },
-  { key: 'processed', label: t('account.aftersalesProcessed') },
-  { key: 'rejected', label: t('account.aftersalesRejected') },
-  { key: 'closed', label: t('account.aftersalesClosed') },
+  { key: 'all', label: t('110ad121.dbb4d8') },
+  { key: 'pending', label: t('110ad121.047109') },
+  { key: 'processing', label: t('110ad121.5d459d') },
+  { key: 'processed', label: t('110ad121.5ad605') },
+  { key: 'rejected', label: t('110ad121.dbf36d') },
+  { key: 'closed', label: t('110ad121.9c5850') },
 ])
 
 const menuItems = computed(() => {
@@ -152,7 +152,7 @@ const menuItems = computed(() => {
     { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
     {
       key: 'aftersales',
-      label: t('account.aftersalesOrders'),
+      label: t('110ad121.056891'),
       path: localePath('/account/aftersales'),
     },
     { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
@@ -162,7 +162,7 @@ const menuItems = computed(() => {
   if (isBBC.value) {
     items.push({
       key: 'followStores',
-      label: t('account.followStores'),
+      label: t('1d80cba8.a6c36f'),
       path: localePath('/account/follow-stores'),
     })
   }

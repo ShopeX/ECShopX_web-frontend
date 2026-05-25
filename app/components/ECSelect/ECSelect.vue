@@ -62,10 +62,12 @@ defineOptions({
   inheritAttrs: false,
 })
 
+const { t } = useI18n()
+
 const props = withDefaults(defineProps<ISelectProps>(), {
   modelValue: '',
   options: () => [],
-  placeholder: '请选择',
+  placeholder: '',
   disabled: false,
   size: 'md',
   variant: 'default',
@@ -99,7 +101,7 @@ const displayText = computed(() => {
   if (selectedOption.value) {
     return selectedOption.value.label
   }
-  return props.placeholder
+  return props.placeholder || t('c336232c.708c9d')
 })
 
 // Wrapper 样式

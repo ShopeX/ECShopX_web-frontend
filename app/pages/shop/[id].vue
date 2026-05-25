@@ -21,7 +21,9 @@
         <!-- 热门商品 -->
         <section class="py-[96px] px-[64px] lg:px-[128px]" data-testid="home-popular-section">
           <div class="text-center mb-[64px]">
-            <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">热门商品</h2>
+            <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">
+              {{ t('85ce459a.1f79ba') }}
+            </h2>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
             <BCProductCard
@@ -36,7 +38,9 @@
         <!-- 新品推荐 -->
         <section class="py-[96px] px-[64px] lg:px-[128px]" data-testid="home-new-arrival-section">
           <div class="text-center mb-[64px]">
-            <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">新品</h2>
+            <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">
+              {{ t('85ce459a.5f3ca6') }}
+            </h2>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
             <BCProductCard
@@ -51,7 +55,9 @@
         <!-- 品牌资讯 -->
         <section class="py-[96px] px-[64px] lg:px-[128px]" data-testid="home-brand-news-section">
           <div class="text-center mb-[64px]">
-            <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">品牌资讯</h2>
+            <h2 class="text-[24px] font-normal text-[#191A1D] tracking-[-0.48px]">
+              {{ t('85ce459a.e67f1e') }}
+            </h2>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
             <BCNewsCard v-for="item in brandNews" :key="item.id" :item="item" />
@@ -65,7 +71,9 @@
         data-testid="home-loading"
         class="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50"
       >
-        <div class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        <div
+          class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"
+        ></div>
       </div>
     </div>
   </NuxtLayout>
@@ -79,6 +87,7 @@ import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
 import { useHomeData } from '~/composables/useHomeData'
 
 const route = useRoute()
+const { t } = useI18n()
 const distributorId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
 
 // Read search keyword from URL query param
@@ -91,54 +100,59 @@ definePageMeta({
 })
 
 // Mock store info — replace with API data when available
-const shopInfo = {
+const shopInfo = computed(() => ({
   logo: 'https://www.figma.com/api/mcp/asset/efb28441-c97e-49ad-b4ff-9c178ed5ac6e',
-  name: '小米京东自营商城',
-  tagline: '精选镇店好物，快来逛逛',
-  categories: ['耳机', '数码产品', '电脑', '笔记本'],
+  name: t('85ce459a.7fa745'),
+  tagline: t('85ce459a.ab4097'),
+  categories: [
+    t('85ce459a.01b6f8'),
+    t('85ce459a.999fea'),
+    t('85ce459a.e85597'),
+    t('85ce459a.1873ea'),
+  ],
   followed: false,
-}
+}))
 
-const heroItems = [
+const heroItems = computed(() => [
   {
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/07d7a49559899303b9bea14f2adabd0f3123a12e.png',
-    title: '声音可见',
-    subtitle: '音乐便更有吸引力。舒适度更优秀，悦耳如昔。',
+    title: t('85ce459a.e70b44'),
+    subtitle: t('85ce459a.600a8b'),
     link: '#',
   },
-]
+])
 
-const brandNews = [
+const brandNews = computed(() => [
   {
     id: 1,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('85ce459a.fd991f'),
+    summary: t('85ce459a.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/07d7a49559899303b9bea14f2adabd0f3123a12e.png',
   },
   {
     id: 2,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('85ce459a.fd991f'),
+    summary: t('85ce459a.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/499903fe1e08c926b9231a740b55d96768d41d0f.png',
   },
   {
     id: 3,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('85ce459a.fd991f'),
+    summary: t('85ce459a.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/ddb47e30da9c615963fd4aa5722a61a678e08f5e.png',
   },
   {
     id: 4,
-    title: '终极时尚造型指南：掌握个人风格的艺术',
-    summary: '在时尚的广阔海洋中，每个人都是独特的岛屿，而服装搭配是连接这些岛屿的桥梁。',
+    title: t('85ce459a.fd991f'),
+    summary: t('85ce459a.c1cd38'),
     image:
       'https://www.figma.com/design/clySPKbja8yL0BQnFke6oi/assets/4a239fb9fcf5109253fd99820cdc96bdb98f7229.png',
   },
-]
+])
 
 const popularProducts = computed(() => products.value.slice(0, 4))
 const newArrivals = computed(() => products.value.slice(4, 12))

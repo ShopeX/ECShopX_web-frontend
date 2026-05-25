@@ -8,131 +8,134 @@
     <template v-if="slides.length">
       <div :class="carouselInnerClasses">
         <div class="relative w-full overflow-hidden" :style="carouselViewportStyle">
-        <div
-          class="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
-          :style="trackStyle"
-        >
-          <component
-            :is="resolveSlideTag(slide.link)"
-            v-for="slide in slides"
-            :key="slide.id"
-            :href="resolveSlideHref(slide.link)"
-            :target="resolveSlideTarget(slide.link)"
-            :rel="resolveSlideRel(slide.link)"
-            class="block h-full w-full shrink-0"
-            :class="isActiveSlide(slide.id) ? '' : 'pointer-events-none'"
-            :aria-hidden="!isActiveSlide(slide.id)"
-            :data-section-id="sectionId"
-            :data-block-id="slide.id"
-            @click="handleSlideClick($event, slide.id)"
+          <div
+            class="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
+            :style="trackStyle"
           >
-            <DecorationBlockHost
-              :section-id="sectionId"
-              :block-id="slide.id"
-              root-class="h-full w-full"
+            <component
+              :is="resolveSlideTag(slide.link)"
+              v-for="slide in slides"
+              :key="slide.id"
+              :href="resolveSlideHref(slide.link)"
+              :target="resolveSlideTarget(slide.link)"
+              :rel="resolveSlideRel(slide.link)"
+              class="block h-full w-full shrink-0"
+              :class="isActiveSlide(slide.id) ? '' : 'pointer-events-none'"
+              :aria-hidden="!isActiveSlide(slide.id)"
+              :data-section-id="sectionId"
+              :data-block-id="slide.id"
+              @click="handleSlideClick($event, slide.id)"
             >
-              <img
-                v-if="slide.kind === 'video' && slide.posterUrl && isPreview"
-                :src="slide.posterUrl"
-                :alt="slide.alt"
-                class="h-full w-full object-cover object-center"
-              />
-              <video
-                v-else-if="slide.kind === 'video' && slide.videoUrl"
-                :key="slide.id"
-                :src="slide.videoUrl"
-                :poster="slide.posterUrl || undefined"
-                class="h-full w-full object-cover object-center"
-                autoplay
-                muted
-                playsinline
-                loop
-              />
-              <picture
-                v-else-if="slide.kind === 'image' && (slide.pcImage || slide.mobileImage)"
-                class="block h-full w-full"
+              <DecorationBlockHost
+                :section-id="sectionId"
+                :block-id="slide.id"
+                root-class="h-full w-full"
               >
-                <source v-if="slide.mobileImage" media="(max-width: 767px)" :srcset="slide.mobileImage" />
                 <img
-                  :src="slide.pcImage || slide.mobileImage"
+                  v-if="slide.kind === 'video' && slide.posterUrl && isPreview"
+                  :src="slide.posterUrl"
                   :alt="slide.alt"
                   class="h-full w-full object-cover object-center"
                 />
-              </picture>
-              <div
-                v-else
-                class="flex h-full w-full items-center justify-center bg-neutral-200 text-sm text-neutral-500"
+                <video
+                  v-else-if="slide.kind === 'video' && slide.videoUrl"
+                  :key="slide.id"
+                  :src="slide.videoUrl"
+                  :poster="slide.posterUrl || undefined"
+                  class="h-full w-full object-cover object-center"
+                  autoplay
+                  muted
+                  playsinline
+                  loop
+                />
+                <picture
+                  v-else-if="slide.kind === 'image' && (slide.pcImage || slide.mobileImage)"
+                  class="block h-full w-full"
+                >
+                  <source
+                    v-if="slide.mobileImage"
+                    media="(max-width: 767px)"
+                    :srcset="slide.mobileImage"
+                  />
+                  <img
+                    :src="slide.pcImage || slide.mobileImage"
+                    :alt="slide.alt"
+                    class="h-full w-full object-cover object-center"
+                  />
+                </picture>
+                <div
+                  v-else
+                  class="flex h-full w-full items-center justify-center bg-neutral-200 text-sm text-neutral-500"
+                >
+                  {{ t('8cac7342.cc2e46') }}
+                </div>
+              </DecorationBlockHost>
+            </component>
+          </div>
+
+          <div v-if="shouldShowDots" :class="paginationClass">
+            <template v-if="settings.paginationType === 'counter'">
+              {{ currentIndex + 1 }}/{{ slides.length }}
+            </template>
+            <template v-else-if="settings.paginationType === 'number'">
+              <button
+                v-for="(_, index) in slides"
+                :key="index"
+                type="button"
+                :class="[
+                  'flex items-center justify-center rounded-full transition',
+                  paginationNumberSizeClass,
+                  index === currentIndex
+                    ? 'bg-white text-neutral-900'
+                    : 'text-white/70 hover:text-white',
+                ]"
+                :aria-label="`slide-${index + 1}`"
+                @click.stop="currentIndex = index"
               >
-                {{ t('8cac7342.cc2e46') }}
-              </div>
-            </DecorationBlockHost>
-          </component>
-        </div>
+                {{ index + 1 }}
+              </button>
+            </template>
+            <template v-else>
+              <button
+                v-for="(_, index) in slides"
+                :key="index"
+                type="button"
+                :class="[
+                  'relative overflow-hidden rounded-full bg-neutral-900/25 transition-colors duration-200 hover:bg-neutral-900/45',
+                  paginationDotSizeClass,
+                  index === currentIndex ? 'bg-neutral-900/25' : '',
+                ]"
+                :aria-label="`slide-${index + 1}`"
+                @click.stop="currentIndex = index"
+              >
+                <span
+                  v-if="index === currentIndex"
+                  :key="`${currentIndex}-${settings.interval}`"
+                  class="carousel-pagination-progress absolute inset-y-0 left-0 rounded-full bg-neutral-900"
+                  :style="paginationProgressStyle"
+                />
+              </button>
+            </template>
+          </div>
 
-        <div
-          v-if="shouldShowDots"
-          :class="paginationClass"
-        >
-          <template v-if="settings.paginationType === 'counter'">
-            {{ currentIndex + 1 }}/{{ slides.length }}
-          </template>
-          <template v-else-if="settings.paginationType === 'number'">
+          <template v-if="shouldShowArrows">
             <button
-              v-for="(_, index) in slides"
-              :key="index"
               type="button"
-              :class="[
-                'flex items-center justify-center rounded-full transition',
-                paginationNumberSizeClass,
-                index === currentIndex ? 'bg-white text-neutral-900' : 'text-white/70 hover:text-white'
-              ]"
-              :aria-label="`slide-${index + 1}`"
-              @click.stop="currentIndex = index"
+              class="absolute left-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white transition hover:bg-black/50 group-hover:flex"
+              aria-label="previous-slide"
+              @click.stop="goToPrevious"
             >
-              {{ index + 1 }}
+              <ChevronLeft :size="20" :stroke-width="1.8" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              class="absolute right-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white transition hover:bg-black/50 group-hover:flex"
+              aria-label="next-slide"
+              @click.stop="goToNext"
+            >
+              <ChevronRight :size="20" :stroke-width="1.8" aria-hidden="true" />
             </button>
           </template>
-          <template v-else>
-            <button
-              v-for="(_, index) in slides"
-              :key="index"
-              type="button"
-              :class="[
-                'relative overflow-hidden rounded-full bg-neutral-900/25 transition-colors duration-200 hover:bg-neutral-900/45',
-                paginationDotSizeClass,
-                index === currentIndex ? 'bg-neutral-900/25' : ''
-              ]"
-              :aria-label="`slide-${index + 1}`"
-              @click.stop="currentIndex = index"
-            >
-              <span
-                v-if="index === currentIndex"
-                :key="`${currentIndex}-${settings.interval}`"
-                class="carousel-pagination-progress absolute inset-y-0 left-0 rounded-full bg-neutral-900"
-                :style="paginationProgressStyle"
-              />
-            </button>
-          </template>
-        </div>
-
-        <template v-if="shouldShowArrows">
-          <button
-            type="button"
-            class="absolute left-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white transition hover:bg-black/50 group-hover:flex"
-            aria-label="previous-slide"
-            @click.stop="goToPrevious"
-          >
-            <ChevronLeft :size="20" :stroke-width="1.8" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            class="absolute right-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white transition hover:bg-black/50 group-hover:flex"
-            aria-label="next-slide"
-            @click.stop="goToNext"
-          >
-            <ChevronRight :size="20" :stroke-width="1.8" aria-hidden="true" />
-          </button>
-        </template>
         </div>
       </div>
     </template>
@@ -151,7 +154,10 @@
 
     <div
       v-else
-      :class="['flex h-full min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400', carouselInnerClasses]"
+      :class="[
+        'flex h-full min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400',
+        carouselInnerClasses,
+      ]"
     >
       {{ t('8cac7342.cc2e46') }}
     </div>
@@ -164,7 +170,10 @@ import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { useDecorationRouteContext } from '~/decoration-engine/composables/useDecorationRouteContext'
-import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  resolveSectionColorScheme,
+  resolveSectionPaddingClass,
+} from '~/decoration-engine/utils/sectionAppearance'
 
 interface CarouselSettings {
   autoplay: boolean
@@ -195,6 +204,11 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+function translateIfGeneratedKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
 const { focusBlock } = useDecorationPreview()
 const { isPreview: routeIsPreview } = useDecorationRouteContext()
 const editCtx = useDecorationEditOptional()
@@ -208,9 +222,10 @@ const isDecorationPreview = computed(() => routeIsPreview.value || props.isPrevi
 const settings = computed<CarouselSettings>(() => {
   const raw = props.section.settings as Record<string, unknown>
   const rawHeightValue = raw.height
-  const rawHeight = rawHeightValue === undefined || rawHeightValue === null || rawHeightValue === ''
-    ? Number.NaN
-    : Number(rawHeightValue)
+  const rawHeight =
+    rawHeightValue === undefined || rawHeightValue === null || rawHeightValue === ''
+      ? Number.NaN
+      : Number(rawHeightValue)
   const imageHeight = String(raw.image_height || 'medium')
   const paginationType = String(raw.paginate_type || 'point')
   const paginationSize = String(raw.paginate_size || 'medium')
@@ -257,7 +272,9 @@ const getPreviewParentHeight = () => {
   try {
     const frameElement = window.frameElement as HTMLElement | null
     const parentElement = frameElement?.parentElement
-    return parentElement?.clientHeight || frameElement?.clientHeight || window.parent?.innerHeight || 0
+    return (
+      parentElement?.clientHeight || frameElement?.clientHeight || window.parent?.innerHeight || 0
+    )
   } catch {
     return 0
   }
@@ -287,7 +304,7 @@ const slides = computed<CarouselSlide[]>(() =>
         videoUrl: String(slideSettings.videoUrl || ''),
         posterUrl: String(slideSettings.posterUrl || ''),
         link: String(slideSettings.link || ''),
-        alt: String(slideSettings.alt || props.section.title || ''),
+        alt: translateIfGeneratedKey(String(slideSettings.alt || props.section.title || '')),
       }
     })
     .filter((slide): slide is CarouselSlide => Boolean(slide))
@@ -352,7 +369,9 @@ const shouldShowDots = computed(() => settings.value.showDots && shouldRotate.va
 const shouldShowArrows = computed(() => settings.value.showArrows && shouldRotate.value)
 const paginationClass = computed(() => [
   'absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center text-white',
-  settings.value.paginationType === 'counter' ? paginationCounterSizeClass.value : paginationGapClass.value,
+  settings.value.paginationType === 'counter'
+    ? paginationCounterSizeClass.value
+    : paginationGapClass.value,
 ])
 const paginationGapClass = computed(() => {
   const sizeMap: Record<CarouselSettings['paginationSize'], string> = {

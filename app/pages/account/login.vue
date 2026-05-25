@@ -16,7 +16,7 @@
         <!-- 标题栏 -->
         <div class="flex w-full items-center justify-between py-4">
           <h2 class="text-[20px] font-medium leading-5 text-[#191a1d]">
-            账号登录
+            {{ t('bbf44084.efae77') }}
           </h2>
           <button
             type="button"
@@ -45,7 +45,7 @@
               "
               @click="switchLoginMode('phone')"
             >
-              手机号登录
+              {{ t('bbf44084.cbbfff') }}
             </button>
             <button
               type="button"
@@ -57,7 +57,7 @@
               "
               @click="switchLoginMode('email')"
             >
-              邮箱登录
+              {{ t('bbf44084.fc2898') }}
             </button>
           </div>
 
@@ -76,7 +76,7 @@
                 autocomplete="new-password"
                 autocorrect="off"
                 autocapitalize="off"
-                placeholder="手机号码"
+                :placeholder="t('bbf44084.92448a')"
                 class="w-full bg-transparent py-4 text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -87,7 +87,7 @@
                 type="password"
                 name="phone-password"
                 autocomplete="new-password"
-                placeholder="密码"
+                :placeholder="t('bbf44084.a81052')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -129,7 +129,7 @@
                 autocomplete="new-password"
                 autocorrect="off"
                 autocapitalize="off"
-                placeholder="邮箱地址"
+                :placeholder="t('bbf44084.6ab78f')"
                 class="w-full bg-transparent py-4 text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -140,7 +140,7 @@
                 type="password"
                 name="email-password"
                 autocomplete="new-password"
-                placeholder="密码"
+                :placeholder="t('bbf44084.a81052')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
             </div>
@@ -234,7 +234,8 @@ function getSafeCloseTargetPath() {
       const referrerUrl = new URL(document.referrer)
       const currentUrl = new URL(window.location.href)
       const referrerPath = `${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`
-      if (referrerUrl.origin === currentUrl.origin && isSafeClosePath(referrerPath)) return referrerPath
+      if (referrerUrl.origin === currentUrl.origin && isSafeClosePath(referrerPath))
+        return referrerPath
     } catch {
       return ''
     }
@@ -244,14 +245,7 @@ function getSafeCloseTargetPath() {
 }
 
 // 使用 Composables
-const {
-  isLoading,
-  error,
-  login,
-  loginWithPhone,
-  fetchUserInfo,
-  clearError,
-} = useAuth()
+const { isLoading, error, login, loginWithPhone, fetchUserInfo, clearError } = useAuth()
 
 // 手机密码登录表单
 const phoneForm = reactive({
@@ -311,12 +305,12 @@ async function handleEmailLogin() {
   clearError()
 
   if (!emailForm.email) {
-    error.value = '请输入邮箱地址'
+    error.value = t('bbf44084.2ba4c8')
     return
   }
 
   if (!AuthTransformer.validateEmail(emailForm.email)) {
-    error.value = '请输入正确的邮箱地址'
+    error.value = t('bbf44084.6a5f04')
     return
   }
 
@@ -363,7 +357,6 @@ function handleClose() {
 
   router.replace(toLocalePath('/'))
 }
-
 </script>
 
 <style scoped>

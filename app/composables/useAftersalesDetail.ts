@@ -16,7 +16,7 @@ export function useAftersalesDetail() {
 
   async function fetchAftersalesDetail() {
     if (!aftersalesId.value || !itemId.value) {
-      error.value = t('account.aftersalesLoadFailed')
+      error.value = t('18636536.f8106f')
       toast.show(error.value)
       return
     }
@@ -32,8 +32,8 @@ export function useAftersalesDetail() {
       const record = response?.data || response
       detail.value = AftersalesTransformer.toAftersalesDetailModel(record)
     } catch (err: any) {
-      error.value = err.message || t('account.aftersalesLoadFailed')
-      toast.show(error.value || t('account.aftersalesLoadFailed'))
+      error.value = err.message || t('18636536.f8106f')
+      toast.show(error.value || t('18636536.f8106f'))
     } finally {
       loading.value = false
     }
@@ -44,11 +44,11 @@ export function useAftersalesDetail() {
 
     try {
       await aftersalesApiClient.cancelAftersales(aftersalesId.value, itemId.value)
-      toast.show(t('de8076e6.afad1e') || '撤销成功')
+      toast.show(t('6e17c55c.8e05b0'))
       await fetchAftersalesDetail()
       return true
     } catch (err: any) {
-      toast.show(err.message || '撤销失败')
+      toast.show(err.message || t('6e17c55c.a8301a'))
       return false
     }
   }

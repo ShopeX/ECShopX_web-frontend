@@ -6,7 +6,9 @@
   >
     <!-- 收货人 -->
     <div class="flex flex-col gap-2">
-      <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{ t('78c41987.6aea70') }}</label>
+      <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{
+        t('78c41987.6aea70')
+      }}</label>
       <div class="flex flex-col gap-1">
         <input
           :value="formData.name"
@@ -27,10 +29,17 @@
 
     <!-- 手机号码 -->
     <div class="flex flex-col gap-2">
-      <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{ t('78c41987.92448a') }}</label>
+      <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{
+        t('78c41987.92448a')
+      }}</label>
       <div class="flex gap-[16px]">
-        <div v-if="variant === 'h5'" class="flex items-center gap-[8px] bg-[#f3f4f6] px-[8px] h-[40px] shrink-0">
-          <span class="text-[12px] font-normal text-[#191a1d] leading-[16px] whitespace-nowrap">+86 中国大陆地区</span>
+        <div
+          v-if="variant === 'h5'"
+          class="flex items-center gap-[8px] bg-[#f3f4f6] px-[8px] h-[40px] shrink-0"
+        >
+          <span class="text-[12px] font-normal text-[#191a1d] leading-[16px] whitespace-nowrap">{{
+            t('95ac3bd3.8179c6')
+          }}</span>
           <UIcon name="i-heroicons-chevron-down" class="size-[16px] text-[#191a1d]" />
         </div>
         <div class="flex-1 flex flex-col gap-1">
@@ -52,21 +61,25 @@
     <!-- 省市区 -->
     <div class="flex gap-[16px]">
       <div class="flex-1 flex flex-col gap-2">
-        <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{ t('78c41987.3d14d1') }}</label>
+        <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{
+          t('78c41987.3d14d1')
+        }}</label>
         <ECSelect
           :model-value="formData.province"
           :options="provinces"
           :error="!!errors.province"
           size="md"
           :placeholder="t('78c41987.769048')"
-          @update:model-value="updateField('province', $event); $emit('province-change')"
+          @update:model-value="handleProvinceChange"
         />
         <p v-if="errors.province" class="text-[12px] text-[#d0112f] leading-[16px]">
           {{ errors.province }}
         </p>
       </div>
       <div class="flex-1 flex flex-col gap-2">
-        <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{ t('78c41987.371528') }}</label>
+        <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{
+          t('78c41987.371528')
+        }}</label>
         <ECSelect
           :model-value="formData.city"
           :options="cities"
@@ -74,14 +87,16 @@
           :error="!!errors.city"
           size="md"
           :placeholder="t('78c41987.371528')"
-          @update:model-value="updateField('city', $event); $emit('city-change')"
+          @update:model-value="handleCityChange"
         />
         <p v-if="errors.city" class="text-[12px] text-[#d0112f] leading-[16px]">
           {{ errors.city }}
         </p>
       </div>
       <div class="flex-1 flex flex-col gap-2">
-        <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{ t('78c41987.47c762') }}</label>
+        <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{
+          t('78c41987.47c762')
+        }}</label>
         <ECSelect
           :model-value="formData.district"
           :options="districts"
@@ -99,7 +114,9 @@
 
     <!-- 详细地址 -->
     <div class="flex flex-col gap-2">
-      <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{ t('78c41987.61a0ec') }}</label>
+      <label class="text-[12px] font-normal text-[#4a5565] leading-[16px]">{{
+        t('78c41987.61a0ec')
+      }}</label>
       <div class="flex flex-col gap-1">
         <textarea
           :value="formData.detail"
@@ -118,7 +135,12 @@
     </div>
 
     <!-- 设置为默认地址 -->
-    <ECCheckbox :model-value="formData.isDefault" variant="primary" :label="t('78c41987.03453f')" @update:model-value="updateField('isDefault', $event)" />
+    <ECCheckbox
+      :model-value="formData.isDefault"
+      variant="primary"
+      :label="t('78c41987.03453f')"
+      @update:model-value="updateField('isDefault', $event)"
+    />
 
     <!-- 保存按钮 -->
     <button
@@ -161,6 +183,16 @@ const { t } = useI18n()
 
 function updateField(field: keyof IAddressFormData, value: any) {
   emit('update:formData', { ...props.formData, [field]: value })
+}
+
+function handleProvinceChange(value: any) {
+  updateField('province', value)
+  emit('province-change')
+}
+
+function handleCityChange(value: any) {
+  updateField('city', value)
+  emit('city-change')
 }
 
 function onInput(field: keyof IAddressFormData, event: Event) {

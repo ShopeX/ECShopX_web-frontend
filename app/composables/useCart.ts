@@ -204,6 +204,19 @@ export function useCart() {
 
   // ==================== UI 数据转换 ====================
 
+  const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+  const translateIfGeneratedKey = (value: string): string => {
+    return generatedKeyPattern.test(value) ? t(value) : value
+  }
+
+  const translateErrorMessage = (
+    value: string,
+    params?: Record<string, string | number>
+  ): string => {
+    return generatedKeyPattern.test(value) ? t(value, params || {}) : value
+  }
+
   /**
    * 将模型转换为 UI 展现格式
    */
@@ -214,10 +227,10 @@ export function useCart() {
     return {
       id: item.id,
       productId: item.productId,
-      productName: item.productName,
+      productName: translateIfGeneratedKey(item.productName),
       productImage: item.productImage,
       specId: item.specId,
-      specName: item.specName,
+      specName: translateIfGeneratedKey(item.specName),
       price: item.price.amount,
       priceDisplay: item.price.display,
       marketPrice: item.marketPrice.amount,
@@ -322,7 +335,9 @@ export function useCart() {
 
       return { success: true }
     } catch (err: any) {
-      const errorMsg = err.message || t('5e601ea3.6452a0')
+      const errorMsg = err.message
+        ? translateErrorMessage(err.message, err.details)
+        : t('5e601ea3.6452a0')
       toast.show(errorMsg)
       return { success: false, error: errorMsg }
     }

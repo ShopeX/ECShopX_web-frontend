@@ -20,8 +20,9 @@
                 <div
                   v-if="item.title"
                   :class="['font-semibold leading-7 text-current', item.titleSizeClass]"
-                  v-html="item.title"
-                />
+                >
+                  {{ item.title }}
+                </div>
                 <div
                   v-if="item.content"
                   :class="['mt-3 leading-6 text-current opacity-70', item.contentSizeClass]"
@@ -34,8 +35,9 @@
                 <div
                   v-if="item.title"
                   :class="['font-semibold leading-7 text-current', item.sizeClass]"
-                  v-html="item.title"
-                />
+                >
+                  {{ item.title }}
+                </div>
                 <ul
                   :class="['mt-3 space-y-3 leading-6 text-current opacity-70', item.itemSizeClass]"
                 >
@@ -109,6 +111,12 @@ const props = defineProps<{
   isPreview?: boolean
   highlightedBlock?: DecorationHighlightedBlock | null
 }>()
+const { t } = useI18n()
+const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+function translateIfGeneratedKey(value: string) {
+  return generatedKeyPattern.test(value) ? t(value) : value
+}
 
 const sectionClasses = computed(() => [
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
@@ -164,7 +172,9 @@ const footerBlocks = computed(
             blockId,
             kind: 'menu',
             rootClass: spanClass(columnSpan),
-            title: String(settings.title || menu?.name || menuData?.name || ''),
+            title: translateIfGeneratedKey(
+              String(settings.title || menu?.name || menuData?.name || '')
+            ),
             menuItems: normalizeMenuItems(menuData?.items || settings.menu_items),
             sizeClass: resolveTextSizeClass(settings.size, 'small'),
             itemSizeClass: resolveMenuItemSizeClass(settings.size),
@@ -192,8 +202,8 @@ const footerBlocks = computed(
           blockId,
           kind: 'text',
           rootClass: spanClass(columnSpan),
-          title: String(settings.title || ''),
-          content: String(settings.content || ''),
+          title: translateIfGeneratedKey(String(settings.title || '')),
+          content: translateIfGeneratedKey(String(settings.content || '')),
           titleSizeClass: resolveTextSizeClass(settings.title_size, 'medium'),
           contentSizeClass: resolveTextSizeClass(settings.content_size, 'small'),
           alignmentClass: resolveTextAlignmentClass(settings.alignment),
@@ -319,7 +329,7 @@ function normalizeMenuItems(value: unknown) {
       }
 
       return {
-        label: String(item?.label || item?.title || ''),
+        label: translateIfGeneratedKey(String(item?.label || item?.title || '')),
         url: String(item?.url || '#'),
       }
     })

@@ -16,6 +16,11 @@ export function useOrderDetail() {
   const toast = useToastMessage()
   const { confirm } = useModal()
   const { t } = useI18n()
+  const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+  function translateIfGeneratedKey(value: string) {
+    return generatedKeyPattern.test(value) ? t(value) : value
+  }
 
   const order = ref<any | null>(null)
   const loading = ref(false)
@@ -68,6 +73,8 @@ export function useOrderDetail() {
       order.value = {
         ...detailModel,
         statusText: getOrderStatusText(detailModel.status),
+        shippingMethod: translateIfGeneratedKey(detailModel.shippingMethod || ''),
+        invoiceInfo: translateIfGeneratedKey(detailModel.invoiceInfo || ''),
       }
     } catch (err: any) {
       error.value = err.message || t('433a5846.f95aed')
@@ -197,7 +204,7 @@ export function useOrderDetail() {
     if (Array.isArray(info) && info.length === 0) return ''
     if (typeof info === 'string' && (info.trim() === '[]' || info.trim() === '{}')) return ''
     if (typeof info === 'object' && Object.keys(info).length === 0) return ''
-    
+
     return info
   })
 

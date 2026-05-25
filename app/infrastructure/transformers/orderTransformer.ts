@@ -106,9 +106,12 @@ export class OrderTransformer {
       const assignByKey = (key: string, val: unknown) => {
         const value = typeof val === 'string' ? val : ''
         if (!value) return
-        if (key.includes('款号') || key.toLowerCase().includes('sku')) result.skuNo = result.skuNo || value
-        if (key.includes('款式') || key.toLowerCase().includes('style')) result.style = result.style || value
-        if (key.includes('尺寸') || key.toLowerCase().includes('size')) result.size = result.size || value
+        if (key.includes('款号') || key.toLowerCase().includes('sku'))
+          result.skuNo = result.skuNo || value
+        if (key.includes('款式') || key.toLowerCase().includes('style'))
+          result.style = result.style || value
+        if (key.includes('尺寸') || key.toLowerCase().includes('size'))
+          result.size = result.size || value
       }
 
       Object.entries(parsed).forEach(([k, v]) => {
@@ -251,14 +254,14 @@ export class OrderTransformer {
    */
   static getOrderStatusText(status: string): string {
     const statusMap: Record<string, string> = {
-      pending_payment: '待付款',
-      pending_shipment: '待发货',
-      shipped: '待收货',
-      completed: '已完成',
-      cancelled: '已取消',
-      pending_pickup: '待自提',
-      after_sales: '售后中',
-      pending_review: '待评价',
+      pending_payment: '3803dc9a.818d78',
+      pending_shipment: '3803dc9a.d8476e',
+      shipped: '3803dc9a.4933ca',
+      completed: '3803dc9a.fad522',
+      cancelled: '3803dc9a.2111cc',
+      pending_pickup: '3803dc9a.25d532',
+      after_sales: '3803dc9a.a19124',
+      pending_review: '3803dc9a.a48b28',
     }
     return statusMap[status] || status
   }
@@ -403,16 +406,16 @@ export class OrderTransformer {
     const base = OrderTransformer.toOrderModel(raw)
 
     const shippingMethodMap: Record<string, string> = {
-      express: '快递配送',
-      logistics: '快递配送',
-      ziti: '门店自提',
-      merchant: '商家配送',
+      express: '3803dc9a.790974',
+      logistics: '3803dc9a.790974',
+      ziti: '3803dc9a.7f549e',
+      merchant: '3803dc9a.0bb9f8',
     }
 
     const invoiceTypeMap: Record<string, string> = {
-      normal: '需要发票',
-      electronic: '电子发票',
-      no: '不需要发票',
+      normal: '3803dc9a.8e839e',
+      electronic: '3803dc9a.ac84ee',
+      no: '3803dc9a.84754e',
     }
 
     return {

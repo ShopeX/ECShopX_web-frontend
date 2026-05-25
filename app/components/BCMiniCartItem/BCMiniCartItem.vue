@@ -54,7 +54,7 @@
         <p
           class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] truncate"
         >
-          款号:{{ item.productId }}
+          {{ t('0ab56a3e.e54891') }}:{{ item.productId }}
         </p>
       </div>
 
@@ -63,7 +63,7 @@
         <p
           class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] truncate"
         >
-          款式:{{ item.specName }}
+          {{ t('0ab56a3e.568510') }}:{{ item.specName }}
         </p>
       </div>
 
@@ -72,7 +72,7 @@
         <p
           class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] truncate"
         >
-          尺寸:小号
+          {{ t('0ab56a3e.c8339f') }}:{{ t('0ab56a3e.85533e') }}
         </p>
       </div>
 
@@ -82,13 +82,13 @@
           <p
             class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#4a5565] mb-0 truncate"
           >
-            价格 : {{ item.priceDisplay }}
+            {{ t('0ab56a3e.0e9fd9') }}: {{ item.priceDisplay }}
           </p>
           <p
             v-if="item.hasDiscount"
             class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[14px] text-[#d0112f] truncate"
           >
-            折后价:{{ item.subtotalDisplay }}
+            {{ t('0ab56a3e.894991') }}:{{ item.subtotalDisplay }}
           </p>
         </div>
       </div>
@@ -163,6 +163,8 @@ interface Props {
   item: ICartUI['items'][number]
   loading?: boolean
 }
+
+const { t } = useI18n()
 
 defineProps<Props>()
 

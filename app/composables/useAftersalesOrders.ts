@@ -47,8 +47,8 @@ export function useAftersalesOrders() {
       currentPage.value = page
       currentStatus.value = status
     } catch (err: any) {
-      error.value = err.message || t('account.aftersalesLoadFailed')
-      toast.show(error.value || t('account.aftersalesLoadFailed'))
+      error.value = err.message || t('18636536.f8106f')
+      toast.show(error.value || t('18636536.f8106f'))
     } finally {
       hasLoaded.value = true
       loading.value = false
@@ -69,11 +69,11 @@ export function useAftersalesOrders() {
     loading.value = true
     try {
       await aftersalesApiClient.cancelAftersales(aftersalesId, itemId)
-      toast.show(t('de8076e6.afad1e') || '撤销成功')
+      toast.show(t('18636536.8e05b0'))
       await refresh()
       return true
     } catch (err: any) {
-      toast.show(err.message || '撤销失败')
+      toast.show(err.message || t('18636536.a8301a'))
       return false
     } finally {
       loading.value = false

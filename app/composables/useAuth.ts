@@ -25,6 +25,11 @@ import type { ILoginRequest, IPhoneLoginRequest, ICaptchaResponse } from '~/type
 export function useAuth() {
   const userStore = useUserStore()
   const { t } = useI18n()
+  const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
+
+  function translateIfGeneratedKey(value: string): string {
+    return generatedKeyPattern.test(value) ? t(value) : value
+  }
 
   // 状态管理
   const isLoading = ref(false)
@@ -85,13 +90,13 @@ export function useAuth() {
       const result = await userStore.login(params)
 
       if (!result.success) {
-        error.value = result.error || t('211553ea.b6076a')
+        error.value = result.error ? translateIfGeneratedKey(result.error) : t('211553ea.b6076a')
         return false
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message || t('211553ea.5b8c6c')
+      error.value = err.message ? translateIfGeneratedKey(err.message) : t('211553ea.5b8c6c')
       console.error('Login error:', err)
       return false
     } finally {
@@ -111,13 +116,13 @@ export function useAuth() {
       const result = await userStore.loginWithPhone(params)
 
       if (!result.success) {
-        error.value = result.error || t('211553ea.b6076a')
+        error.value = result.error ? translateIfGeneratedKey(result.error) : t('211553ea.b6076a')
         return false
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message || t('211553ea.5b8c6c')
+      error.value = err.message ? translateIfGeneratedKey(err.message) : t('211553ea.5b8c6c')
       console.error('Phone login error:', err)
       return false
     } finally {

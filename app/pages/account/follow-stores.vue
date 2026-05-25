@@ -3,7 +3,7 @@
     <div class="sticky top-0 z-10 shrink-0 lg:hidden">
       <AccountH5FilterBar
         v-model="showMobileMenu"
-        :title="t('account.followStores')"
+        :title="t('1d80cba8.a6c36f')"
         :active-key="activeMenu"
         :menu-items="menuItems"
       />
@@ -23,7 +23,7 @@
           <div class="w-full bg-white px-4 py-6 lg:px-0 lg:py-0">
             <div class="mb-4 w-full lg:mb-4">
               <h2 class="text-[16px] font-medium leading-5 text-[#191a1d]">
-                {{ t('account.followStores') }}
+                {{ t('1d80cba8.a6c36f') }}
               </h2>
             </div>
 
@@ -43,7 +43,9 @@
                       <USkeleton class="h-9 flex-1" />
                     </div>
                   </div>
-                  <div class="mt-4 grid grid-cols-2 gap-3 lg:mt-0 lg:flex lg:flex-1 lg:px-4 lg:py-4">
+                  <div
+                    class="mt-4 grid grid-cols-2 gap-3 lg:mt-0 lg:flex lg:flex-1 lg:px-4 lg:py-4"
+                  >
                     <div v-for="item in 4" :key="item" class="space-y-2">
                       <USkeleton class="aspect-square w-full lg:h-[120px] lg:w-[120px]" />
                       <USkeleton class="h-4 w-full" />
@@ -65,7 +67,7 @@
               v-else-if="isEmpty"
               class="flex min-h-[240px] items-center justify-center text-[14px] text-[#6b7280]"
             >
-              {{ t('account.followStoresEmpty') }}
+              {{ t('1d80cba8.0b8897') }}
             </div>
 
             <div v-else class="space-y-4">
@@ -109,7 +111,7 @@ const menuItems = computed(() => {
     { key: 'orders', label: t('de8076e6.a73872'), path: localePath('/account/orders') },
     {
       key: 'aftersales',
-      label: t('account.aftersalesOrders'),
+      label: t('110ad121.056891'),
       path: localePath('/account/aftersales'),
     },
     { key: 'coupons', label: t('ee3264ed.2f3635'), path: localePath('/account/coupons') },
@@ -119,7 +121,7 @@ const menuItems = computed(() => {
   if (isBBC.value) {
     items.push({
       key: 'followStores',
-      label: t('account.followStores'),
+      label: t('1d80cba8.a6c36f'),
       path: localePath('/account/follow-stores'),
     })
   }

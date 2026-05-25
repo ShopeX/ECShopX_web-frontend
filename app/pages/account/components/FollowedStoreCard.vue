@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="w-full border border-[#e5e7eb] bg-white"
-    data-testid="follow-store-card"
-  >
+  <div class="w-full border border-[#e5e7eb] bg-white" data-testid="follow-store-card">
     <div class="hidden w-full items-stretch lg:flex">
       <div class="flex w-[284px] shrink-0 flex-col items-center border-r border-[#e5e7eb] px-4">
         <div class="flex w-full flex-col items-center gap-6 px-4 py-6">
@@ -36,7 +33,7 @@
               @click="handleEnterStore"
             >
               <UIcon name="i-heroicons-building-storefront" class="h-4 w-4" />
-              <span class="text-[12px] font-medium leading-4">{{ t('account.enterStore') }}</span>
+              <span class="text-[12px] font-medium leading-4">{{ t('38b40b9e.8f822c') }}</span>
             </button>
             <button
               type="button"
@@ -45,9 +42,7 @@
               @click="emit('contact', store)"
             >
               <UIcon name="i-heroicons-phone" class="h-4 w-4" />
-              <span class="text-[12px] font-medium leading-4">{{
-                t('account.contactStore')
-              }}</span>
+              <span class="text-[12px] font-medium leading-4">{{ t('38b40b9e.b66060') }}</span>
             </button>
           </div>
         </div>
@@ -105,7 +100,7 @@
           @click="handleEnterStore"
         >
           <UIcon name="i-heroicons-building-storefront" class="h-4 w-4" />
-          <span class="text-[12px] font-medium leading-4">{{ t('account.enterStore') }}</span>
+          <span class="text-[12px] font-medium leading-4">{{ t('38b40b9e.8f822c') }}</span>
         </button>
         <button
           type="button"
@@ -114,7 +109,7 @@
           @click="emit('contact', store)"
         >
           <UIcon name="i-heroicons-phone" class="h-4 w-4" />
-          <span class="text-[12px] font-medium leading-4">{{ t('account.contactStore') }}</span>
+          <span class="text-[12px] font-medium leading-4">{{ t('38b40b9e.b66060') }}</span>
         </button>
       </div>
 

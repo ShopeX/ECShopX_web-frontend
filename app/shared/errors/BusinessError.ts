@@ -80,7 +80,7 @@ export class BusinessError extends Error {
    * 创建资源不存在错误
    */
   static notFound(resource: string, id: string): BusinessError {
-    return new BusinessError(`${resource}不存在`, BusinessErrorType.NOT_FOUND, 'NOT_FOUND', {
+    return new BusinessError('05b9590b.39891f', BusinessErrorType.NOT_FOUND, 'NOT_FOUND', {
       resource,
       id,
     })
@@ -91,7 +91,7 @@ export class BusinessError extends Error {
    */
   static alreadyExists(resource: string, id: string): BusinessError {
     return new BusinessError(
-      `${resource}已存在`,
+      '05b9590b.8a026c',
       BusinessErrorType.ALREADY_EXISTS,
       'ALREADY_EXISTS',
       {
@@ -118,7 +118,7 @@ export class BusinessError extends Error {
    */
   static insufficientStock(productName: string, stock: number): BusinessError {
     return new BusinessError(
-      `商品 ${productName} 库存不足，仅剩 ${stock} 件`,
+      '05b9590b.8b73b7',
       BusinessErrorType.INSUFFICIENT_STOCK,
       'INSUFFICIENT_STOCK',
       { productName, stock }
@@ -130,7 +130,7 @@ export class BusinessError extends Error {
    */
   static quantityInvalid(quantity: number, min: number = 1): BusinessError {
     return new BusinessError(
-      `商品数量必须大于 ${min}，当前值: ${quantity}`,
+      '05b9590b.58ad7b',
       BusinessErrorType.INVALID_QUANTITY,
       'INVALID_QUANTITY',
       { quantity, min }
@@ -145,7 +145,7 @@ export class BusinessError extends Error {
   format(): string {
     let message = `[${this.type}] ${this.message}`
     if (this.details) {
-      message += `\n详情: ${JSON.stringify(this.details, null, 2)}`
+      message += `\n${JSON.stringify(this.details, null, 2)}`
     }
     return message
   }

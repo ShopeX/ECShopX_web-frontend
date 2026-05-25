@@ -19,10 +19,10 @@
   </div>
   <!-- 只有在没有可用模板时才显示错误（API 和默认模板都失败） -->
   <div v-else-if="error" class="p-4 text-center text-red-500">
-    加载模板失败: {{ error.message }}
+    {{ t('ef0d380c.40d1ac') }} {{ error.message }}
   </div>
   <!-- 没有模板也没有错误时显示空状态 -->
-  <div v-else class="p-4 text-center text-gray-400">暂无模板</div>
+  <div v-else class="p-4 text-center text-gray-400">{{ t('ef0d380c.86ab9b') }}</div>
 </template>
 
 <script setup lang="ts">
@@ -41,6 +41,7 @@ logger.info('namedSlotKeys', namedSlotKeys.value)
 const props = defineProps<{
   template: string
 }>()
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'loaded', template: any): void

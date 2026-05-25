@@ -44,7 +44,7 @@
               data-testid="home-hero-discover-btn"
               @click="handleLink(item.link)"
             >
-              {{ item.buttonText || '发现更多' }}
+              {{ item.buttonText || t('87d5d24b.26b2db') }}
             </ECButton>
           </div>
         </div>
@@ -69,6 +69,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import ECButton from '../ECButton/ECButton.vue'
+
+const { t } = useI18n()
 
 interface BannerItem {
   image: string

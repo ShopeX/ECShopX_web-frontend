@@ -8,7 +8,7 @@
       >
         <UIcon name="i-heroicons-chevron-left" class="h-5 w-5 shrink-0 lg:h-6 lg:w-6" />
         <span class="text-[16px] font-medium leading-5 lg:text-[24px] lg:leading-[48px]">
-          返回售后订单列表
+          {{ t('932460cc.bbe66f') }}
         </span>
       </button>
     </div>
@@ -48,7 +48,7 @@
             :progress-steps="detail.progressSteps"
           />
 
-  <AftersalesDetailItems
+          <AftersalesDetailItems
             :store-name="detail.storeName"
             :items="detail.items"
             :item-count="detail.itemCount"
@@ -59,26 +59,26 @@
         </div>
 
         <div class="hidden w-[320px] shrink-0 flex-col gap-[32px] lg:flex">
-          <AftersalesDetailInfoSection title="收货人信息" :rows="receiverRows" />
-          <AftersalesDetailInfoSection title="售后原因" :rows="reasonRows" />
-          <AftersalesDetailInfoSection title="支付信息" :rows="paymentRows" />
-          <AftersalesDetailInfoSection title="订单信息" :rows="orderRows" />
+          <AftersalesDetailInfoSection :title="t('932460cc.aec344')" :rows="receiverRows" />
+          <AftersalesDetailInfoSection :title="t('932460cc.160adc')" :rows="reasonRows" />
+          <AftersalesDetailInfoSection :title="t('932460cc.02b157')" :rows="paymentRows" />
+          <AftersalesDetailInfoSection :title="t('932460cc.a6d10d')" :rows="orderRows" />
         </div>
       </div>
 
       <div class="flex flex-col gap-[32px] px-4 py-[32px] lg:hidden">
-        <AftersalesDetailInfoSection title="收货人信息" :rows="receiverRows" />
-        <AftersalesDetailInfoSection title="售后原因" :rows="reasonRows" />
-        <AftersalesDetailInfoSection title="支付信息" :rows="paymentRows" />
-        <AftersalesDetailInfoSection title="订单信息" :rows="orderRows" />
+        <AftersalesDetailInfoSection :title="t('932460cc.aec344')" :rows="receiverRows" />
+        <AftersalesDetailInfoSection :title="t('932460cc.160adc')" :rows="reasonRows" />
+        <AftersalesDetailInfoSection :title="t('932460cc.02b157')" :rows="paymentRows" />
+        <AftersalesDetailInfoSection :title="t('932460cc.a6d10d')" :rows="orderRows" />
       </div>
 
       <div class="lg:hidden">
-        <AftersalesDetailSummary
-          :item-count="detail.itemCount"
-          :paid-amount="detail.paidAmount"
-        />
-        <div v-if="resolvedActionButtons.length" class="flex items-center justify-end gap-[16px] px-4 pb-[32px]">
+        <AftersalesDetailSummary :item-count="detail.itemCount" :paid-amount="detail.paidAmount" />
+        <div
+          v-if="resolvedActionButtons.length"
+          class="flex items-center justify-end gap-[16px] px-4 pb-[32px]"
+        >
           <button
             v-for="button in resolvedActionButtons"
             :key="button.type"
@@ -107,14 +107,13 @@ definePageMeta({
   layout: 'default',
 })
 
+const { t } = useI18n()
 const localePath = useLocalePath()
 const { detail, loading, error, fetchAftersalesDetail, cancelAftersales } = useAftersalesDetail()
 
 const defaultActionButtons = computed(() => {
   if (detail.value?.status === 'pending') {
-    return [
-      { type: 'cancel', name: '撤销申请', primary: false }
-    ]
+    return [{ type: 'cancel', name: t('932460cc.eaffc1'), primary: false }]
   }
   return []
 })
@@ -128,35 +127,39 @@ const resolvedActionButtons = computed(() =>
 )
 
 function handleAction(action: any) {
-  if (action?.type === 'cancel' || action?.action === 'close' || action?.name === '撤销申请') {
+  if (
+    action?.type === 'cancel' ||
+    action?.action === 'close' ||
+    action?.name === t('932460cc.eaffc1')
+  ) {
     cancelAftersales()
   }
 }
 
 const receiverRows = computed(() => [
-  { label: '收货人', value: detail.value?.receiverName || '' },
-  { label: '手机号', value: detail.value?.receiverMobile || '' },
-  { label: '地址', value: detail.value?.receiverAddress || '', multiline: true },
+  { label: t('932460cc.6aea70'), value: detail.value?.receiverName || '' },
+  { label: t('932460cc.8098e2'), value: detail.value?.receiverMobile || '' },
+  { label: t('932460cc.765048'), value: detail.value?.receiverAddress || '', multiline: true },
 ])
 
 const reasonRows = computed(() => [
-  { label: '售后原因', value: detail.value?.reason || '' },
-  { label: '退款说明', value: detail.value?.description || '' },
+  { label: t('932460cc.160adc'), value: detail.value?.reason || '' },
+  { label: t('932460cc.f1c0db'), value: detail.value?.description || '' },
 ])
 
 const paymentRows = computed(() => [
-  { label: '付款方式', value: detail.value?.paymentMethod || '' },
-  { label: '付款时间', value: detail.value?.payTime || '' },
+  { label: t('932460cc.598fb8'), value: detail.value?.paymentMethod || '' },
+  { label: t('932460cc.590c95'), value: detail.value?.payTime || '' },
 ])
 
 const orderRows = computed(() => [
-  { label: '订单编号', value: detail.value?.orderId || '', copyable: true },
-  { label: '下单时间', value: detail.value?.orderTime || '' },
-  { label: '商品总金额', value: formatAmount(detail.value?.goodsAmount) },
-  { label: '运费', value: formatAmount(detail.value?.freightAmount) },
-  { label: '优惠', value: formatAmount(detail.value?.discountAmount) },
-  { label: '积分抵扣', value: formatAmount(detail.value?.pointDeductionAmount) },
-  { label: '实付金额', value: formatAmount(detail.value?.paidAmount) },
+  { label: t('932460cc.3e8657'), value: detail.value?.orderId || '', copyable: true },
+  { label: t('932460cc.2240cc'), value: detail.value?.orderTime || '' },
+  { label: t('932460cc.a03deb'), value: formatAmount(detail.value?.goodsAmount) },
+  { label: t('932460cc.9a935b'), value: formatAmount(detail.value?.freightAmount) },
+  { label: t('932460cc.f06ebf'), value: formatAmount(detail.value?.discountAmount) },
+  { label: t('932460cc.d443a9'), value: formatAmount(detail.value?.pointDeductionAmount) },
+  { label: t('932460cc.94a7de'), value: formatAmount(detail.value?.paidAmount) },
 ])
 
 function formatAmount(amount?: number) {

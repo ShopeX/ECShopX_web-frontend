@@ -18,7 +18,11 @@ function createModalContainer() {
 /**
  * 创建弹窗实例
  */
-function createModalInstance(options: IModalOptions, appContext?: AppContext): IModalInstance {
+function createModalInstance(
+  options: IModalOptions,
+  defaultTexts: { title: string; confirm: string; cancel: string },
+  appContext?: AppContext
+): IModalInstance {
   // 如果不在客户端环境，返回空实例
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     console.warn('useModal: 只能在客户端环境中使用')
@@ -41,17 +45,20 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
     // 创建 VNode
     vnode = h(ECModal, {
       modelValue: true,
-      title: options.title || '提示',
+      title: options.title || defaultTexts.title,
       content: options.content || '',
       // 不传 width 时由 ECModal 使用 Figma H5 响应式宽度（min(480px, 100vw-2rem)）
-      ...(options.width != null && options.width !== ''
-        ? { width: options.width }
-        : {}),
+      ...(options.width != null && options.width !== '' ? { width: options.width } : {}),
       showClose: options.showClose !== false,
       maskClosable: options.maskClosable !== false,
       confirmText:
-        options.confirmButton !== false ? options.confirmButton?.text || '确定' : undefined,
-      cancelText: options.cancelButton !== false ? options.cancelButton?.text || '取消' : undefined,
+        options.confirmButton !== false
+          ? options.confirmButton?.text || defaultTexts.confirm
+          : undefined,
+      cancelText:
+        options.cancelButton !== false
+          ? options.cancelButton?.text || defaultTexts.cancel
+          : undefined,
       showConfirm: options.confirmButton !== false,
       showCancel: options.cancelButton !== false,
       'onUpdate:modelValue': (value: boolean) => {
@@ -144,6 +151,13 @@ function createModalInstance(options: IModalOptions, appContext?: AppContext): I
  * 使用弹窗 Composable
  */
 export function useModal() {
+  const { t } = useI18n()
+  const defaultTexts = {
+    title: t('96bd48e0.02d981'),
+    confirm: t('96bd48e0.38cf16'),
+    cancel: t('96bd48e0.625fb2'),
+  }
+
   // 获取当前应用上下文
   let appContext: AppContext | undefined
 
@@ -163,7 +177,7 @@ export function useModal() {
   const confirm = (options: IModalOptions | string): IModalInstance => {
     const modalOptions: IModalOptions = typeof options === 'string' ? { content: options } : options
 
-    const instance = createModalInstance(modalOptions, appContext)
+    const instance = createModalInstance(modalOptions, defaultTexts, appContext)
     instance.show()
     return instance
   }
@@ -177,7 +191,7 @@ export function useModal() {
         ? { content: options, cancelButton: false }
         : { ...options, cancelButton: false }
 
-    const instance = createModalInstance(modalOptions, appContext)
+    const instance = createModalInstance(modalOptions, defaultTexts, appContext)
     instance.show()
     return instance
   }

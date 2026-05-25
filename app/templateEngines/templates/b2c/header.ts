@@ -2,7 +2,7 @@ export default {
   sections: {
     header: {
       type: 'header',
-      title: '购物车商品列表',
+      title: '6f5da47b.72dc82',
       settings: {
         layout: 'vertical',
       },
@@ -12,7 +12,7 @@ export default {
           settings: {
             layout: 'vertical',
           },
-          name: '底部栏',
+          name: '6f5da47b.0b5857',
         },
       },
       block_order: ['footer'],

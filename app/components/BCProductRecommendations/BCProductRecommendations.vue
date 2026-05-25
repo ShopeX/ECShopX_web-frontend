@@ -13,7 +13,7 @@
               activeTab === 'recommended' ? 'text-[#191a1d]' : 'text-[#4a5565] lg:font-normal'
             "
           >
-            猜你喜欢
+            {{ t('c23b194b.e86a4d') }}
           </h2>
           <!-- 移动端和PC端都显示的底部边框 -->
           <div
@@ -32,7 +32,7 @@
               activeTab === 'recent' ? 'text-[#191a1d] font-medium' : 'text-[#4a5565] font-normal',
             ]"
           >
-            最近浏览
+            {{ t('c23b194b.3debde') }}
           </h2>
           <!-- 移动端和PC端都显示的底部边框 -->
           <div
@@ -120,6 +120,8 @@
 
 <script setup lang="ts">
 import type { ProductRecommendation } from './types'
+
+const { t } = useI18n()
 
 interface Props {
   recommendedProducts?: ProductRecommendation[]

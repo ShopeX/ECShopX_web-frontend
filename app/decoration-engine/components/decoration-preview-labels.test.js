@@ -60,6 +60,23 @@ test('preview selection overlay hides duplicate for header and footer sections',
 
 test('preview selection overlay deduplicates dashed block overlays by block key', () => {
   assert.match(source, /const blockRectMap = new Map/)
+  assert.match(source, /const currentSection = mergedPreviewSections\.value\[sid\]/)
+  assert.match(source, /const currentBlockIds = new Set\(currentSection\?\.block_order \|\| \[\]\)/)
+  assert.match(source, /currentBlockIds\.has\(item\.blockId\)/)
+  assert.match(source, /item\.key === `\$\{sid\}::\$\{item\.blockId\}`/)
   assert.match(source, /blockRectMap\.set\(item\.key, item\)/)
   assert.match(source, /Array\.from\(blockRectMap\.values\(\)\)/)
+})
+
+test('preview selection overlay hides duplicated hover chrome for selected item', () => {
+  assert.match(source, /const isAdminSyncedChromeSameAsSelected = computed/)
+  assert.match(source, /adminChrome\.kind !== selected\.kind/)
+  assert.match(source, /adminChrome\.sectionId !== selected\.sectionId/)
+  assert.match(source, /adminChrome\.blockId === \(selected\.kind === 'block' \? selected\.blockId : ''\)/)
+  assert.match(
+    source,
+    /v-if="adminSyncedChromeStyle && adminSyncedChrome && !isAdminSyncedChromeSameAsSelected"/
+  )
+  assert.match(source, /isAdminSyncedChromeSameAsSelected && adminSyncedChrome\?\.source === 'hover'/)
+  assert.match(source, /<template v-if="adminSyncedChrome\.source === 'hover'">/)
 })

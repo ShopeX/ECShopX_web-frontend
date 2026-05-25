@@ -111,9 +111,47 @@
             <Trash2 :size="16" :stroke-width="1.8" />
           </button>
         </div>
+        <template v-if="isAdminSyncedChromeSameAsSelected && adminSyncedChrome?.source === 'hover'">
+          <button
+            type="button"
+            data-decoration-add-control="1"
+            class="group pointer-events-auto absolute left-1/2 top-0 z-[2] flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center text-white"
+            :aria-label="t('0dbc43d3.b58c75')"
+            @pointerenter="keepAddControlHover"
+            @pointerdown.stop
+            @click.stop.prevent="handleAddClick('before', $event)"
+          >
+            <span class="absolute inset-0 rounded-full bg-primary shadow-sm" />
+            <UIcon name="i-heroicons-plus" class="relative h-3.5 w-3.5 shrink-0" />
+            <span
+              class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-75 items-center gap-1 whitespace-nowrap rounded-full bg-primary py-1 pl-1 pr-2 text-xs leading-none text-white opacity-0 shadow-sm transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100"
+            >
+              <UIcon name="i-heroicons-plus" class="h-3.5 w-3.5 shrink-0" />
+              {{ addButtonLabel }}
+            </span>
+          </button>
+          <button
+            type="button"
+            data-decoration-add-control="1"
+            class="group pointer-events-auto absolute bottom-0 left-1/2 z-[2] flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center text-white"
+            :aria-label="t('0dbc43d3.b58c75')"
+            @pointerenter="keepAddControlHover"
+            @pointerdown.stop
+            @click.stop.prevent="handleAddClick('after', $event)"
+          >
+            <span class="absolute inset-0 rounded-full bg-primary shadow-sm" />
+            <UIcon name="i-heroicons-plus" class="relative h-3.5 w-3.5 shrink-0" />
+            <span
+              class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-75 items-center gap-1 whitespace-nowrap rounded-full bg-primary py-1 pl-1 pr-2 text-xs leading-none text-white opacity-0 shadow-sm transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100"
+            >
+              <UIcon name="i-heroicons-plus" class="h-3.5 w-3.5 shrink-0" />
+              {{ addButtonLabel }}
+            </span>
+          </button>
+        </template>
       </div>
       <div
-        v-if="adminSyncedChromeStyle && adminSyncedChrome"
+        v-if="adminSyncedChromeStyle && adminSyncedChrome && !isAdminSyncedChromeSameAsSelected"
         class="pointer-events-none absolute box-border"
         :style="adminSyncedChromeStyle"
       >
@@ -412,15 +450,15 @@ watch(
 
 const activeBlockKey = computed(() => {
   const ctx = editContext.value
-  const hb = ctx.hoveredBlock.value
-  const hbId = hb?.blockId != null ? String(hb.blockId).trim() : ''
-  if (hb?.sectionId && hbId) {
-    return `${hb.sectionId}::${hbId}`
-  }
   const hl = ctx.highlightedBlock.value
   const hlId = hl?.blockId != null ? String(hl.blockId).trim() : ''
   if (hl?.sectionId && hlId) {
     return `${hl.sectionId}::${hlId}`
+  }
+  const hb = ctx.hoveredBlock.value
+  const hbId = hb?.blockId != null ? String(hb.blockId).trim() : ''
+  if (hb?.sectionId && hbId) {
+    return `${hb.sectionId}::${hbId}`
   }
   return ''
 })
@@ -527,6 +565,21 @@ const adminSyncedChromeStyle = computed(() => {
 })
 
 const selectedChromeStyle = computed(() => toChromeStyle(selectedChrome.value))
+
+const isAdminSyncedChromeSameAsSelected = computed(() => {
+  const adminChrome = adminSyncedChrome.value
+  const selected = selectedChrome.value
+  if (!adminChrome || !selected || adminChrome.kind !== selected.kind) {
+    return false
+  }
+  if (adminChrome.sectionId !== selected.sectionId) {
+    return false
+  }
+  if (adminChrome.kind === 'block') {
+    return adminChrome.blockId === (selected.kind === 'block' ? selected.blockId : '')
+  }
+  return true
+})
 
 const adminSyncedChromeLabel = computed(() => {
   const c = adminSyncedChrome.value
@@ -788,6 +841,8 @@ const dashedBlockOverlays = computed(() => {
   if (!sid) {
     return []
   }
+  const currentSection = mergedPreviewSections.value[sid]
+  const currentBlockIds = new Set(currentSection?.block_order || [])
   const blockRectMap = new Map<string, PreviewChromeRect & { key: string }>()
   Object.keys(ctx.blockRects.value)
     .map((key) => {
@@ -795,7 +850,13 @@ const dashedBlockOverlays = computed(() => {
       return rect ? { key, ...rect } : null
     })
     .filter((item): item is PreviewChromeRect & { key: string } =>
-      Boolean(item && item.sectionId === sid && item.key !== activeBlockKey.value)
+      Boolean(
+        item &&
+          item.sectionId === sid &&
+          currentBlockIds.has(item.blockId) &&
+          item.key === `${sid}::${item.blockId}` &&
+          item.key !== activeBlockKey.value
+      )
     )
     .forEach((item) => {
       blockRectMap.set(item.key, item)

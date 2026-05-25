@@ -14,9 +14,9 @@ test('preview selection overlay uses block type labels for block labels', () => 
   assert.match(source, /BLOCK_TRANSLATION_LABEL/)
   assert.match(source, /blocks\.header_product_list\.name/)
   assert.match(source, /BLOCK_TYPE_LABEL\[block\.type\]/)
-  assert.match(source, /'footer-menu': '菜单'/)
-  assert.match(source, /'footer-image': '图片'/)
-  assert.match(source, /'footer-text': '文本'/)
+  assert.match(source, /'footer-menu': t\('0dbc43d3\.4ccbdc'\)/)
+  assert.match(source, /'footer-image': t\('0dbc43d3\.20def7'\)/)
+  assert.match(source, /'footer-text': t\('0dbc43d3\.97d076'\)/)
 })
 
 test('preview selection overlay is fixed and converts document rects to viewport rects', () => {
@@ -56,4 +56,10 @@ test('preview selection overlay hides duplicate for header and footer sections',
   assert.match(source, /selectedSectionActionState\.canDuplicate/)
   assert.match(source, /v-if="selectedSectionActionState\.canDuplicate"/)
   assert.match(source, /area === 'template'/)
+})
+
+test('preview selection overlay deduplicates dashed block overlays by block key', () => {
+  assert.match(source, /const blockRectMap = new Map/)
+  assert.match(source, /blockRectMap\.set\(item\.key, item\)/)
+  assert.match(source, /Array\.from\(blockRectMap\.values\(\)\)/)
 })

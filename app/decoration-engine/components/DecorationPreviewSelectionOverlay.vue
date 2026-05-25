@@ -788,7 +788,8 @@ const dashedBlockOverlays = computed(() => {
   if (!sid) {
     return []
   }
-  return Object.keys(ctx.blockRects.value)
+  const blockRectMap = new Map<string, PreviewChromeRect & { key: string }>()
+  Object.keys(ctx.blockRects.value)
     .map((key) => {
       const rect = ctx.blockRects.value[key]
       return rect ? { key, ...rect } : null
@@ -796,6 +797,11 @@ const dashedBlockOverlays = computed(() => {
     .filter((item): item is PreviewChromeRect & { key: string } =>
       Boolean(item && item.sectionId === sid && item.key !== activeBlockKey.value)
     )
+    .forEach((item) => {
+      blockRectMap.set(item.key, item)
+    })
+
+  return Array.from(blockRectMap.values())
     .map((item) => {
       const rect = toViewportRect(item)
       return {

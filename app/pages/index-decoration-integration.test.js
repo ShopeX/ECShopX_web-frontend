@@ -87,6 +87,15 @@ test('nuxt config exposes decoration env and decoration preview route rules', ()
   assert.match(source, /designMode=1/)
 })
 
+test('preview postMessage target origin follows embedding admin referrer', () => {
+  const source = read('app/decoration-engine/composables/useDecorationPreview.ts')
+
+  assert.match(source, /new URL\(document\.referrer\)\.origin/)
+  assert.match(source, /origins\.includes\(referrerOrigin\)/)
+  assert.match(source, /if \(origins\.length === 1\)/)
+  assert.doesNotMatch(source, /const fromList = allowedOrigins\.value\[0\]/)
+})
+
 test('web no longer ships local decoration proxy routes after direct H5 integration', () => {
   assert.ok(
     !existsSync(path.resolve(cwd, 'app/server/api/decoration/[pageType].get.ts')),

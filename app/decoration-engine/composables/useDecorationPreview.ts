@@ -218,18 +218,24 @@ export function useDecorationPreview(pageTypeSource: MaybeRefOrGetter<PageType> 
   )
 
   const targetOrigin = computed(() => {
-    const fromList = allowedOrigins.value[0]
-    if (fromList) {
-      return fromList
-    }
-
-    // 未配 NUXT_PUBLIC_DECORATION_ADMIN_ORIGIN 时，从嵌入后台的 referrer 推断父窗口 origin（生产同样需要，否则无法 postMessage PREVIEW_READY）
+    // 优先从嵌入后台的 referrer 推断父窗口 origin。
+    // NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS 支持多个后台域名时，不能固定取第一个，
+    // 否则本地后台嵌入线上 web 时会把 PREVIEW_READY 发到线上后台 origin，浏览器直接丢弃。
+    const origins = allowedOrigins.value
     if (import.meta.client && typeof document !== 'undefined' && document.referrer) {
       try {
-        return new URL(document.referrer).origin
+        const referrerOrigin = new URL(document.referrer).origin
+        if (!origins.length || origins.includes(referrerOrigin)) {
+          return referrerOrigin
+        }
+        return ''
       } catch {
         /* noop */
       }
+    }
+
+    if (origins.length === 1) {
+      return origins[0]
     }
 
     return ''

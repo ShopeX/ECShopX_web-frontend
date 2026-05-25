@@ -220,7 +220,7 @@ const handleCart = () => {
  */
 const handleGrid = () => {
   // TODO: 实现网格视图功能
-  console.log('grid view')
+  console.log('网格视图')
 }
 
 /**

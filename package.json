@@ -1,5 +1,6 @@
 {
   "name": "ecshopx-website",
+  "version": "4.6.1",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.13.0",
@@ -45,6 +46,5 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.3.3",
     "vue-tsc": "^2.0.6"
-  },
-  "version": "4.6.1"
+  }
 }

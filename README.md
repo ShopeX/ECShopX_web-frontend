@@ -1,108 +1,43 @@
-# ECshopX Web
+<p align="center"><img width="600" height="416" alt="logo2" src="logo.png" /></p>
 
-基于 Nuxt 4 的新一代电商解决方案。
+### <p align="center">Desktop Frontend</p>
 
-## 环境要求
+# Getting started
 
-- Node.js >= 20.19.0
-- pnpm >= 10.13.0
+Node.js (current LTS) and pnpm are required to run the project. To be sure about the version compatibility you can enable Node's corepack.
 
-## 开发环境设置
+### Installation
 
-1. 安装依赖：
-
-```bash
-pnpm install
+```
+cd ECShopX_web-frontend
+pnpm i
 ```
 
-2. 配置环境变量：
+### Configure the .env file
 
-复制环境变量示例文件并根据需要修改：
-
-```bash
-cp .env.example .env.development
+```shell
+# Backend API Base URL
+NUXT_PUBLIC_API_BASE=
 ```
 
-### 环境变量说明
+### Run project
 
-#### 应用配置
-
-- `NUXT_APP_NAME`: 应用名称
-- `NUXT_APP_TITLE`: 页面标题
-- `NUXT_APP_DESCRIPTION`: 应用描述
-
-#### API 配置
-
-- `NUXT_PUBLIC_API_BASE`: API 基础路径
-- `NUXT_PUBLIC_API_TIMEOUT`: API 超时时间（毫秒）
-
-#### SaaS 配置
-
-- `NUXT_PUBLIC_SAAS`: 是否启用 SaaS 模式
-- `NUXT_PUBLIC_COMPANY_ID`: 公司 ID（非 SaaS 模式使用）
-
-#### 上传配置
-
-- `NUXT_PUBLIC_UPLOAD_URL`: 上传接口地址
-- `NUXT_PUBLIC_UPLOAD_MAX_SIZE`: 最大上传大小（字节）
-- `NUXT_PUBLIC_UPLOAD_ACCEPT`: 允许上传的文件类型
-
-#### 缓存配置
-
-- `NUXT_PUBLIC_CACHE_TTL`: 缓存有效期（秒）
-
-## 开发
-
-启动开发服务器：
-
-```bash
+```
 pnpm dev
 ```
 
-## 构建
+### Build packages
 
-构建生产版本：
-
-```bash
+```
 pnpm build
 ```
 
-## 部署
+## License
 
-预览生产版本：
+Each ECShopX source file included in this distribution is licensed under the Apache License 2.0, together with the additional terms imposed by ShopeX.
 
-```bash
-pnpm preview
-```
+Open Software License (Apache 2.0) – Please see LICENSE.txt for the full text of the Apache 2.0 license.
 
-## 目录结构
+每个包含在本发行版中的 ECShopX 源文件，均依据 Apache 2.0 开源许可证与ShopeX商派附加条款进行授权。
 
-```
-ecshopx-web/
-├── app/                # 源代码目录
-│   ├── api/           # API 接口
-│   ├── assets/        # 静态资源
-│   ├── components/    # 组件
-│   ├── composables/   # 组合式函数
-│   ├── layouts/       # 布局
-│   ├── pages/         # 页面
-│   ├── plugins/       # 插件
-│   ├── public/        # 公共文件
-│   ├── server/        # 服务端
-│   ├── stores/        # 状态管理
-│   ├── types/         # 类型定义
-│   └── utils/         # 工具函数
-├── .env.example       # 环境变量示例
-├── .gitignore        # Git 忽略配置
-├── nuxt.config.ts    # Nuxt 配置
-├── package.json      # 项目配置
-├── pnpm-lock.yaml    # 依赖锁定
-├── tailwind.config.ts # Tailwind 配置
-└── tsconfig.json     # TypeScript 配置
-```
-
-## 注意事项
-
-1. 不要在代码中硬编码环境变量，使用 `useRuntimeConfig()` 获取配置
-2. 生产环境部署前需要设置正确的环境变量
-3. 敏感信息（如 `NUXT_COOKIE_SECRET`）不要提交到代码仓库
+开源软件许可协议（Apache 2.0） —— 请参阅 LICENSE.txt 文件以获取 Apache 2.0 协议的完整文本。

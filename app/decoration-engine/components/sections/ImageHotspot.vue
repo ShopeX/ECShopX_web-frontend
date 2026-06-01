@@ -20,7 +20,8 @@
           <img
             :src="backgroundImage || mobileBackgroundImage"
             :alt="sectionAlt"
-            class="absolute inset-0 h-full w-full object-cover"
+            class="absolute inset-0 h-full w-full object-contain"
+            @load="handleImageLoad"
           />
         </picture>
         <div
@@ -48,11 +49,15 @@
             @click="handleHotspotClick($event, hotspot.id)"
           >
             <span
-              class="block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm"
+              :class="
+                props.isPreview
+                  ? 'block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm'
+                  : 'block h-full w-full'
+              "
             />
 
             <span
-              v-if="hotspot.label"
+              v-if="props.isPreview && hotspot.label"
               class="pointer-events-none absolute -top-3 left-1/2 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full bg-black/75 px-3 py-1 text-xs text-white group-hover:block"
             >
               {{ hotspot.label }}
@@ -101,6 +106,11 @@ interface HotspotBlock {
   }
 }
 
+interface ImageDimensions {
+  width: number
+  height: number
+}
+
 const props = defineProps<{
   section: DecorationSection
   sectionId: string
@@ -108,6 +118,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
 function translateIfGeneratedKey(value: string) {
@@ -120,6 +131,7 @@ const sectionAlt = computed(() =>
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
 const isMobileViewport = ref(false)
+const loadedImageDimensions = ref<Record<string, ImageDimensions>>({})
 
 const updateViewport = () => {
   if (!import.meta.client) return
@@ -130,8 +142,8 @@ const sectionSettings = computed(() => {
   const raw = props.section.settings as Record<string, unknown>
   const imageWidth = Number(raw.imageWidth ?? 1200)
   const imageHeight = Number(raw.imageHeight ?? 600)
-  const pcImage = String(raw.pc_image || '')
-  const mobileImage = String(raw.mobile_image || '')
+  const pcImage = String(raw.pc_image || raw.imageUrl || raw.image_url || raw.image || '')
+  const mobileImage = String(raw.mobile_image || raw.mobileImage || raw.mobile_image_url || '')
   const pcHotspots = Array.isArray(raw.pc_hotspots) ? raw.pc_hotspots : []
   const mobileHotspots = Array.isArray(raw.mobile_hotspots) ? raw.mobile_hotspots : []
   const legacyHotspots = Array.isArray(raw.hotspot) ? raw.hotspot : []
@@ -149,6 +161,11 @@ const sectionSettings = computed(() => {
 
 const backgroundImage = computed(() => sectionSettings.value.pcImage)
 const mobileBackgroundImage = computed(() => sectionSettings.value.mobileImage)
+const currentImageSource = computed(() =>
+  isMobileViewport.value && mobileBackgroundImage.value
+    ? mobileBackgroundImage.value
+    : backgroundImage.value || mobileBackgroundImage.value
+)
 const sectionClasses = computed(() => [
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
@@ -163,9 +180,31 @@ const sectionStyle = computed(() => {
     '--section-foreground': scheme.foreground,
   }
 })
-const aspectRatioStyle = computed(() => ({
-  aspectRatio: `${sectionSettings.value.imageWidth} / ${sectionSettings.value.imageHeight}`,
-}))
+const aspectRatioStyle = computed(() => {
+  const loadedDimensions = loadedImageDimensions.value[currentImageSource.value]
+  const width = loadedDimensions?.width || sectionSettings.value.imageWidth
+  const height = loadedDimensions?.height || sectionSettings.value.imageHeight
+
+  return {
+    aspectRatio: `${width} / ${height}`,
+  }
+})
+
+function handleImageLoad(event: Event) {
+  const image = event.currentTarget as HTMLImageElement | null
+  const imageSource = image?.currentSrc || currentImageSource.value
+  if (!image || !imageSource) return
+
+  const width = image.naturalWidth || 0
+  const height = image.naturalHeight || 0
+  if (width <= 0 || height <= 0) return
+
+  loadedImageDimensions.value = {
+    ...loadedImageDimensions.value,
+    [imageSource]: { width, height },
+    [currentImageSource.value]: { width, height },
+  }
+}
 
 const toPercent = (value: unknown) => {
   const numberValue = Number(value) || 0
@@ -211,6 +250,8 @@ const activeHotspots = computed<HotspotBlock[]>(() => {
     const y = toPercent(rect.y)
     const width = toPercent(rect.width)
     const height = toPercent(rect.height)
+    const shape: HotspotBlock['shape'] = item?.shape === 'rect' ? 'rect' : 'circle'
+
     return {
       id: item?.id || `hotspot_${index}`,
       rect: { x, y, width, height },
@@ -222,7 +263,7 @@ const activeHotspots = computed<HotspotBlock[]>(() => {
         title: item?.title || '',
       },
       label: String(item?.label || ''),
-      shape: item?.shape === 'rect' ? 'rect' : 'circle',
+      shape,
       style: {
         left: `${x}%`,
         top: `${y}%`,
@@ -249,23 +290,59 @@ const placeholderHighlightBlockId = computed(() => {
 
 const resolveHotspotTag = (link: Record<string, unknown>) =>
   resolveHotspotHref(link) && !props.isPreview ? 'a' : 'button'
+
+function normalizeLinkPath(path: string) {
+  const value = String(path || '').trim()
+  if (!value) return undefined
+  if (/^(https?:)?\/\//i.test(value)) return value
+  if (value.startsWith('/')) return localePath(value as any)
+  return localePath(`/${value}` as any)
+}
+
+function resolveInternalHotspotHref(link: Record<string, unknown>) {
+  const linkPage = String(link?.linkPage || link?.page || '').trim()
+  const explicitPath = String(link?.path || link?.url || '').trim()
+  const rawId = String(link?.id || link?.linkValue || link?.value || '').trim()
+
+  if (explicitPath) {
+    return normalizeLinkPath(explicitPath)
+  }
+
+  switch (linkPage) {
+    case 'custom_page':
+      return rawId ? localePath(`/custom/${rawId}` as any) : undefined
+    case 'goods':
+    case 'product':
+      return rawId ? localePath(`/products/${rawId}` as any) : undefined
+    case 'sale_category':
+    case 'collection':
+      return rawId ? localePath(`/collections/${rawId}` as any) : undefined
+    case 'category':
+      return rawId ? localePath(`/category/${rawId}` as any) : undefined
+    case 'shop':
+      return rawId ? localePath(`/shop/${rawId}` as any) : undefined
+    default:
+      return rawId ? normalizeLinkPath(rawId) : undefined
+  }
+}
+
 const resolveHotspotHref = (link: Record<string, unknown>) => {
   if (props.isPreview) return undefined
-  if (Number(link?.linkType) === 1) return String(link?.linkUrl || '') || undefined
-  return undefined
+  if (Number(link?.linkType) === 1) {
+    return String(link?.linkUrl || '').trim() || undefined
+  }
+  return resolveInternalHotspotHref(link)
 }
+
+function isExternalHotspotHref(link: Record<string, unknown>) {
+  const href = resolveHotspotHref(link)
+  return Boolean(href && /^(https?:)?\/\//i.test(href))
+}
+
 const resolveHotspotTarget = (link: Record<string, unknown>) =>
-  !props.isPreview &&
-  Number((link as any)?.linkType) === 1 &&
-  /^https?:\/\//.test(String((link as any)?.linkUrl || ''))
-    ? '_blank'
-    : undefined
+  !props.isPreview && isExternalHotspotHref(link) ? '_blank' : undefined
 const resolveHotspotRel = (link: Record<string, unknown>) =>
-  !props.isPreview &&
-  Number((link as any)?.linkType) === 1 &&
-  /^https?:\/\//.test(String((link as any)?.linkUrl || ''))
-    ? 'noopener noreferrer'
-    : undefined
+  !props.isPreview && isExternalHotspotHref(link) ? 'noopener noreferrer' : undefined
 
 const handleHotspotClick = (event: MouseEvent, blockId: string) => {
   if (!props.isPreview) {

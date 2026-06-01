@@ -52,27 +52,34 @@
         </div>
 
         <div
-          v-else-if="products.length"
-          class="grid grid-cols-2 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
-          :style="gridStyle"
+          v-else-if="displayedProducts.length"
+          class="relative"
         >
-          <BCProductCard
-            v-for="product in products"
-            :key="product.itemId"
-            :product="product"
-            mode="popular"
-            :show-price="settings.showPrice"
-            :show-add-cart="settings.showAddCart"
-            disable-appear-animation
-          />
+          <div
+            class="grid grid-cols-2 transition-opacity duration-200 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
+            :class="pending ? 'opacity-70' : 'opacity-100'"
+            :style="gridStyle"
+          >
+            <BCProductCard
+              v-for="product in displayedProducts"
+              :key="product.itemId"
+              :product="product"
+              mode="popular"
+              :show-price="settings.showPrice"
+              :show-add-cart="settings.showAddCart"
+              disable-appear-animation
+            />
+          </div>
+
         </div>
 
         <div
           v-else-if="pending"
-          class="flex min-h-[200px] items-center justify-center text-sm text-neutral-500"
-        >
-          Loading...
-        </div>
+          class="min-h-[200px]"
+          :style="gridStyle"
+        />
+
+        <div v-else class="min-h-[200px]" />
       </DecorationBlockHost>
     </div>
   </section>
@@ -242,6 +249,8 @@ const activeSize = computed(() => activeTab.value?.size || settings.value.size)
 
 const activeColumns = computed(() => activeTab.value?.columns || settings.value.columns)
 
+const displayedProducts = ref<IProduct[]>([])
+
 const queryKey = computed(() => {
   const tab = activeTab.value
   if (!tab) return `${props.sectionId}-empty`
@@ -271,6 +280,23 @@ const placeholderProductImage =
     '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="#F0F0F0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#D3D3D3" font-family="Arial, sans-serif" font-size="64" font-weight="600">ECX</text></svg>'
   )
 
+async function loadProductsForTab(tab: ProductTabItem): Promise<IProduct[]> {
+  const productIds = tab.productIds.slice(0, tab.limit)
+  if (!productIds.length) return []
+
+  const batchItems = await itemApiClient.getItemsBatch(productIds)
+  const normalizedBatchItems = Array.isArray(batchItems)
+    ? batchItems
+    : Array.isArray(batchItems?.data)
+      ? batchItems.data
+      : []
+  const validBatchItems = ProductTransformer.validateProductList(
+    normalizedBatchItems
+  )
+
+  return ProductTransformer.toModelList(validBatchItems)
+}
+
 const { data: productsData, pending } = await useAsyncData(
   () => `product-tab-shelf-${queryKey.value}`,
   async (): Promise<IProduct[]> => {
@@ -278,18 +304,7 @@ const { data: productsData, pending } = await useAsyncData(
     if (!tab || !tab.productIds.length) return []
 
     try {
-      const detailItems = await Promise.all(
-        tab.productIds.slice(0, tab.limit).map((id) =>
-          itemApiClient
-            .getItemDetail({ id })
-            .then((item) => (ProductTransformer.validateProduct(item) ? item : null))
-            .catch(() => null)
-        )
-      )
-
-      return detailItems
-        .filter((item): item is NonNullable<typeof item> => Boolean(item))
-        .map((item) => ProductTransformer.toModel(item))
+      return await loadProductsForTab(tab)
     } catch {
       return []
     }
@@ -302,6 +317,14 @@ const { data: productsData, pending } = await useAsyncData(
 )
 
 const products = computed(() => productsData.value || [])
+
+watch(
+  products,
+  (nextProducts) => {
+    displayedProducts.value = nextProducts
+  },
+  { immediate: true }
+)
 
 const sectionOuterClasses = computed(() => [
   'w-full',

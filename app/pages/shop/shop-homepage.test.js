@@ -28,6 +28,12 @@ test('ItemApiClient.getItemList passes distributor_id query param when provided'
   assert.match(itemClientSource, /distributor_id.*params\.distributor_id/)
 })
 
+test('ItemApiClient exposes batch item lookup by item_ids', () => {
+  assert.match(itemClientSource, /async getItemsBatch\(/)
+  assert.match(itemClientSource, /\/wxapp\/goods\/items\/batch/)
+  assert.match(itemClientSource, /item_ids/)
+})
+
 test('useHomeData accepts optional distributorId parameter', () => {
   assert.match(homeDataSource, /function useHomeData\s*\(\s*distributorId\?/)
 })
@@ -46,4 +52,25 @@ test('shop page renders hero banner, popular products, new arrivals and brand ne
   assert.match(shopPageSource, /data-testid="home-new-arrival-section"/)
   assert.match(shopPageSource, /data-testid="home-brand-news-section"/)
   assert.match(shopPageSource, /WCHeroBanner/)
+})
+
+test('ProductTabShelf uses batch item lookup instead of per-item detail requests', () => {
+  const source = readFileSync(
+    path.resolve(process.cwd(), 'app/decoration-engine/components/sections/ProductTabShelf.vue'),
+    'utf8'
+  )
+
+  assert.match(source, /getItemsBatch/)
+  assert.doesNotMatch(source, /getItemDetail\(\{ id \}\)/)
+  assert.doesNotMatch(source, /displayedProducts\.value = \[\]/)
+})
+
+test('ProductTransformer supports batch payload field shapes', () => {
+  const source = readFileSync(
+    path.resolve(process.cwd(), 'app/infrastructure/transformers/productTransformer.ts'),
+    'utf8'
+  )
+
+  assert.match(source, /item_name/)
+  assert.match(source, /JSON\.parse/)
 })

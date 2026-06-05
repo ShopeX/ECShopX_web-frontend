@@ -1,6 +1,6 @@
 {
   "name": "ecshopx-website",
-  "version": "4.6.1",
+  "version": "4.6.2",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.13.0",

@@ -2,6 +2,11 @@ import type { IProductListItem } from '~/types/api/item'
 import type { IProduct } from '~/components/BCProductCard/types'
 import { MoneyValueObject, DiscountValueObject } from '~/shared/value-objects'
 
+type ProductLike = Partial<IProductListItem> & {
+  item_name?: string
+  pics?: string[] | string
+}
+
 /**
  * 商品数据转换器
  *
@@ -29,6 +34,49 @@ import { MoneyValueObject, DiscountValueObject } from '~/shared/value-objects'
  * ```
  */
 export class ProductTransformer {
+  private static normalizePics(pics: ProductLike['pics']): string[] {
+    if (Array.isArray(pics)) {
+      return pics.filter((pic): pic is string => typeof pic === 'string' && Boolean(pic))
+    }
+
+    if (typeof pics !== 'string' || !pics) {
+      return []
+    }
+
+    try {
+      const parsed = JSON.parse(pics)
+      return Array.isArray(parsed)
+        ? parsed.filter((pic): pic is string => typeof pic === 'string' && Boolean(pic))
+        : []
+    } catch {
+      return [pics]
+    }
+  }
+
+  private static normalizeProduct(apiProduct: ProductLike): IProductListItem | null {
+    const itemName = apiProduct.itemName || apiProduct.item_name
+    const pics = this.normalizePics(apiProduct.pics)
+    const price =
+      typeof apiProduct.price === 'number'
+        ? apiProduct.price
+        : Number(apiProduct.price)
+
+    if (!apiProduct.item_id || !itemName || Number.isNaN(price)) {
+      return null
+    }
+
+    return {
+      ...(apiProduct as IProductListItem),
+      itemName,
+      pics,
+      price,
+      activity_price:
+        typeof apiProduct.activity_price === 'number' ? apiProduct.activity_price : 0,
+      member_price: typeof apiProduct.member_price === 'number' ? apiProduct.member_price : 0,
+      sales: typeof apiProduct.sales === 'number' ? apiProduct.sales : 0,
+    }
+  }
+
   /**
    * API 响应 → UI 数据模型
    *
@@ -37,16 +85,34 @@ export class ProductTransformer {
    * @param apiProduct - API 返回的商品数据
    * @returns UI 数据模型
    */
-  static toModel(apiProduct: IProductListItem): IProduct {
+  static toModel(apiProduct: ProductLike): IProduct {
+    const normalizedProduct = this.normalizeProduct(apiProduct)
+
+    if (!normalizedProduct) {
+      return {
+        itemId: '',
+        itemName: '',
+        img: '',
+        imgs: [],
+        price: 0,
+        activityPrice: 0,
+        memberPrice: 0,
+        sales: 0,
+        specId: undefined,
+        specName: undefined,
+        stock: undefined,
+      }
+    }
+
     return {
-      itemId: apiProduct.item_id,
-      itemName: apiProduct.itemName,
-      img: apiProduct.pics?.[0] || '',
-      imgs: apiProduct.pics || [],
-      price: apiProduct.price || 0,
-      activityPrice: apiProduct.activity_price || 0,
-      memberPrice: apiProduct.member_price || 0,
-      sales: apiProduct.sales || 0,
+      itemId: normalizedProduct.item_id,
+      itemName: normalizedProduct.itemName,
+      img: normalizedProduct.pics?.[0] || '',
+      imgs: normalizedProduct.pics || [],
+      price: normalizedProduct.price || 0,
+      activityPrice: normalizedProduct.activity_price || 0,
+      memberPrice: normalizedProduct.member_price || 0,
+      sales: normalizedProduct.sales || 0,
       // 注意：API 返回的数据中可能没有规格和库存信息
       // 这些字段在商品详情中才有，列表中为可选
       specId: undefined,
@@ -61,8 +127,11 @@ export class ProductTransformer {
    * @param apiProducts - API 返回的商品列表
    * @returns UI 数据模型列表
    */
-  static toModelList(apiProducts: IProductListItem[]): IProduct[] {
-    return apiProducts.map((item) => this.toModel(item))
+  static toModelList(apiProducts: ProductLike[]): IProduct[] {
+    return apiProducts
+      .map((item) => this.normalizeProduct(item))
+      .filter((item): item is IProductListItem => Boolean(item))
+      .map((item) => this.toModel(item))
   }
 
   /**
@@ -71,8 +140,8 @@ export class ProductTransformer {
    * @param item - 商品数据（可能不完整）
    * @returns 是否有效
    */
-  static validateProduct(item: Partial<IProductListItem>): item is IProductListItem {
-    return !!(item.item_id && item.itemName && typeof item.price === 'number')
+  static validateProduct(item: ProductLike): item is IProductListItem {
+    return Boolean(this.normalizeProduct(item))
   }
 
   /**
@@ -81,7 +150,9 @@ export class ProductTransformer {
    * @param items - 商品列表
    * @returns 有效的商品列表
    */
-  static validateProductList(items: Partial<IProductListItem>[]): IProductListItem[] {
-    return items.filter((item) => this.validateProduct(item)) as IProductListItem[]
+  static validateProductList(items: ProductLike[]): IProductListItem[] {
+    return items
+      .map((item) => this.normalizeProduct(item))
+      .filter((item): item is IProductListItem => Boolean(item))
   }
 }

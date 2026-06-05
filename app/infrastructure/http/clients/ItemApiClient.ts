@@ -98,6 +98,28 @@ export class ItemApiClient {
   }
 
   /**
+   * 批量获取商品
+   *
+   * @param itemIds - 商品 ID 列表
+   * @returns 原始 API 响应
+   */
+  async getItemsBatch(itemIds: Array<string | number>): Promise<any[]> {
+    const normalizedIds = itemIds.map((id) => String(id)).filter(Boolean)
+
+    if (!normalizedIds.length) {
+      return []
+    }
+
+    return this.http('/wxapp/goods/items/batch', {
+      method: 'GET',
+      query: {
+        item_ids: normalizedIds.join(','),
+      },
+      cache: 'default',
+    })
+  }
+
+  /**
    * 搜索商品
    *
    * @param keyword - 搜索关键词

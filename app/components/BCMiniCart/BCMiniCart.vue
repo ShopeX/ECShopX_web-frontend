@@ -226,6 +226,7 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const route = useRoute()
 const localePath = useLocalePath()
 const { t } = useI18n()
 const { cartUI, loading, loadCart, toggleItemSelection, toggleAllSelection, updateQuantity } =
@@ -283,7 +284,12 @@ async function handleQuantityChange(itemId: string, quantity: number) {
 function handleCheckout() {
   if (!cartUI.value.canCheckout) return
   handleClose()
-  router.push(localePath('/checkout'))
+  const checkoutPath = localePath('/checkout')
+  if (route.path === checkoutPath) {
+    router.replace({ path: checkoutPath, query: { t: Date.now().toString() } })
+  } else {
+    router.push(checkoutPath)
+  }
 }
 
 /**

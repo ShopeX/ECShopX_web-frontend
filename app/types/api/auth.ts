@@ -142,6 +142,18 @@ export interface ILoginResponse {
 }
 
 /**
+ * 忘记密码请求
+ */
+export interface IForgotPasswordRequest {
+  /** 手机号 */
+  mobile: string
+  /** 新密码 */
+  password: string
+  /** 短信验证码 */
+  vcode: string
+}
+
+/**
  * 登出请求
  */
 export interface ILogoutRequest {

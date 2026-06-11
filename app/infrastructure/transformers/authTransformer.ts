@@ -92,15 +92,17 @@ export class AuthTransformer {
    * @param apiResponse - API 返回的短信验证码响应
    * @returns 短信验证码响应模型
    */
-  static toSmsCodeModel(apiResponse: { data: ISmsCodeResponseData }): ISmsCodeResponse {
-    const data = apiResponse.data
-    // 根据 status_code 判断是否成功 (200 表示成功)
-    const success = data.status_code === 200
+  static toSmsCodeModel(apiResponse: { data: ISmsCodeResponseData } | ISmsCodeResponseData): ISmsCodeResponse {
+    const data =
+      apiResponse && typeof apiResponse === 'object' && 'data' in apiResponse && apiResponse.data
+        ? apiResponse.data
+        : (apiResponse as ISmsCodeResponseData)
+    const success = data.status_code === 200 || !data.status_code
 
     return {
       success: success,
       message: data.message || '',
-      expiresIn: 300, // 默认 5 分钟
+      expiresIn: 300,
     }
   }
 

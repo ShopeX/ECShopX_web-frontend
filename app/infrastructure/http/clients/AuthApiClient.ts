@@ -4,6 +4,7 @@ import type {
   IMemberRegisterRequest,
   IEmailMemberRegisterRequest,
   ISmsCodeRequest,
+  IForgotPasswordRequest,
   ILoginResponse,
   ISmsCodeResponseData,
   ICaptchaRequest,
@@ -244,6 +245,20 @@ export class AuthApiClient {
    * const { token } = response  // 已自动解包
    * ```
    */
+  /**
+   * 忘记密码 - 重置密码
+   */
+  async forgotPassword(params: IForgotPasswordRequest): Promise<any> {
+    return this.http('/wxapp/member/reset/password', {
+      method: 'POST',
+      body: {
+        mobile: params.mobile,
+        password: params.password,
+        vcode: params.vcode,
+      },
+    })
+  }
+
   async refreshToken(refreshToken: string): Promise<ILoginResponse> {
     return this.http('/wxapp/auth/refresh', {
       method: 'POST',

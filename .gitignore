@@ -34,3 +34,4 @@ test-results
 playwright/.cache
 
 .codegraph
+.cursor

@@ -157,9 +157,9 @@
               />
               <span>
                 {{ t('5a21f3db.b840cb') }}
-                <NuxtLink to="/terms" class="underline">{{ t('5a21f3db.df410b') }}</NuxtLink>
+                <NuxtLink :to="`${localePath('/protocol' as any)}?type=member_register`" class="underline" target="_blank">{{ t('5a21f3db.df410b') }}</NuxtLink>
                 {{ t('5a21f3db.ab20cc') }}
-                <NuxtLink to="/privacy" class="underline">{{ t('5a21f3db.be8324') }}</NuxtLink>
+                <NuxtLink :to="`${localePath('/protocol' as any)}?type=privacy`" class="underline" target="_blank">{{ t('5a21f3db.be8324') }}</NuxtLink>
               </span>
             </label>
 
@@ -270,9 +270,9 @@
               />
               <span>
                 {{ t('5a21f3db.b840cb') }}
-                <NuxtLink to="/terms" class="underline">{{ t('5a21f3db.df410b') }}</NuxtLink>
+                <NuxtLink :to="`${localePath('/protocol' as any)}?type=member_register`" class="underline" target="_blank">{{ t('5a21f3db.df410b') }}</NuxtLink>
                 {{ t('5a21f3db.ab20cc') }}
-                <NuxtLink to="/privacy" class="underline">{{ t('5a21f3db.be8324') }}</NuxtLink>
+                <NuxtLink :to="`${localePath('/protocol' as any)}?type=privacy`" class="underline" target="_blank">{{ t('5a21f3db.be8324') }}</NuxtLink>
               </span>
             </label>
 

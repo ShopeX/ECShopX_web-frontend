@@ -458,9 +458,9 @@
           <ECCheckbox v-model="agreeTerms" size="sm">
             <span class="text-xs text-[#4a5565] leading-4">
               {{ $t('ee3264ed.6a9b1b') }}
-              <a href="#" class="underline">{{ $t('ee3264ed.cc953a') }}</a>
+              <NuxtLink :to="`${localePath('/protocol' as any)}?type=privacy`" class="underline" target="_blank">{{ $t('ee3264ed.cc953a') }}</NuxtLink>
               {{ $t('ee3264ed.271965') }}
-              <a href="#" class="underline">{{ $t('ee3264ed.970337') }}</a>
+              <NuxtLink :to="`${localePath('/protocol' as any)}?type=member_register`" class="underline" target="_blank">{{ $t('ee3264ed.970337') }}</NuxtLink>
             </span>
           </ECCheckbox>
 
@@ -558,9 +558,9 @@
         <ECCheckbox v-model="agreeTerms" size="sm">
           <span class="text-xs text-[#4a5565] leading-4">
             {{ $t('ee3264ed.6a9b1b') }}
-            <a href="#" class="underline">{{ $t('ee3264ed.cc953a') }}</a>
+            <NuxtLink :to="localePath('/protocol?type=privacy')" class="underline" target="_blank">{{ $t('ee3264ed.cc953a') }}</NuxtLink>
             {{ $t('ee3264ed.271965') }}
-            <a href="#" class="underline">{{ $t('ee3264ed.970337') }}</a>
+            <NuxtLink :to="localePath('/protocol?type=member_register')" class="underline" target="_blank">{{ $t('ee3264ed.970337') }}</NuxtLink>
           </span>
         </ECCheckbox>
 
@@ -627,6 +627,8 @@ definePageMeta({
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
+const localePath = useLocalePath()
 const showPointsRules = ref(false)
 
 const popoverWrapperRef = ref<HTMLElement | null>(null)
@@ -787,6 +789,15 @@ onMounted(async () => {
   await refreshCheckoutPageData()
   loadRegionData()
 })
+
+watch(
+  () => route.query.t,
+  async (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) {
+      await refreshCheckoutPageData()
+    }
+  }
+)
 
 function handleAddAddress() {
   editingAddressId.value = undefined

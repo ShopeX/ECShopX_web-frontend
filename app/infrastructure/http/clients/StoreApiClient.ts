@@ -47,6 +47,16 @@ export class StoreApiClient {
       params,
     })
   }
+
+  /**
+   * 获取协议内容（隐私政策、销售条款等）
+   */
+  async getProtocol(type: string): Promise<{ content: string; title: string }> {
+    return this.http('/wxapp/shops/protocol', {
+      method: 'GET',
+      params: { type },
+    })
+  }
 }
 
 export const storeApiClient = new StoreApiClient()

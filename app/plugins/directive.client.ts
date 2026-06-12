@@ -1,7 +1,33 @@
-import { useToastMessage } from '~/composables/useToastMessage'
+import { h, render } from 'vue'
+import ECToast from '~/components/ECToast/ECToast.vue'
+
+let toastInstance: any = null
+
+function getToastInstance() {
+  if (!toastInstance) {
+    let container = document.getElementById('copy-toast-container')
+    if (!container) {
+      container = document.createElement('div')
+      container.id = 'copy-toast-container'
+      document.body.appendChild(container)
+    }
+    const vnode = h(ECToast)
+    render(vnode, container)
+    toastInstance = vnode.component?.exposed
+  }
+  return toastInstance
+}
 
 export default defineNuxtPlugin((nuxtApp) => {
   const t = (key: string) => (nuxtApp.$i18n as any)?.t?.(key) || key
+
+  function showToast(message: string) {
+    const instance = getToastInstance()
+    if (instance && instance.show) {
+      instance.show(message)
+    }
+  }
+
   nuxtApp.vueApp.directive('copy', {
     mounted(el: any, binding: any) {
       el.$copyHandler = async () => {
@@ -12,7 +38,6 @@ export default defineNuxtPlugin((nuxtApp) => {
           if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(textToCopy)
           } else {
-            // Fallback for non-secure contexts (e.g. 0.0.0.0:3000 instead of localhost)
             const textArea = document.createElement('textarea')
             textArea.value = textToCopy
             textArea.style.position = 'fixed'
@@ -24,12 +49,10 @@ export default defineNuxtPlugin((nuxtApp) => {
             textArea.remove()
             if (!successful) throw new Error('execCommand failed')
           }
-          const toast = useToastMessage()
-          toast.show(t('e9b26ce6.20a495'))
+          showToast(t('e9b26ce6.20a495'))
         } catch (err) {
           console.error('Failed to copy text', err)
-          const toast = useToastMessage()
-          toast.show(t('e9b26ce6.5154ae'))
+          showToast(t('e9b26ce6.5154ae'))
         }
       }
       el.addEventListener('click', el.$copyHandler)
@@ -56,10 +79,10 @@ export default defineNuxtPlugin((nuxtApp) => {
             textArea.remove()
             if (!successful) throw new Error('execCommand failed')
           }
-          useToastMessage().show(t('e9b26ce6.20a495'))
+          showToast(t('e9b26ce6.20a495'))
         } catch (err) {
           console.error('Failed to copy text', err)
-          useToastMessage().show(t('e9b26ce6.5154ae'))
+          showToast(t('e9b26ce6.5154ae'))
         }
       }
       el.addEventListener('click', el.$copyHandler)

@@ -92,6 +92,16 @@
               />
             </div>
 
+            <div class="flex justify-end">
+              <button
+                type="button"
+                class="text-[12px] leading-4 text-[#4a5565] transition-colors hover:text-[#191a1d]"
+                @click="goToForgotPassword"
+              >
+                {{ t('a3f7c9d1.forgotPwd') }}
+              </button>
+            </div>
+
             <div v-if="error" class="border border-red-200 bg-red-50 p-3 text-sm text-red-600">
               {{ error }}
             </div>
@@ -143,6 +153,16 @@
                 :placeholder="t('bbf44084.a81052')"
                 class="w-full bg-transparent text-[14px] font-normal leading-5 text-[#4a5565] outline-none placeholder-[#4a5565]"
               />
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                type="button"
+                class="text-[12px] leading-4 text-[#4a5565] transition-colors hover:text-[#191a1d]"
+                @click="goToForgotPassword"
+              >
+                {{ t('a3f7c9d1.forgotPwd') }}
+              </button>
             </div>
 
             <div v-if="error" class="border border-red-200 bg-red-50 p-3 text-sm text-red-600">
@@ -343,6 +363,13 @@ function switchLoginMode(mode: 'phone' | 'email') {
  */
 function goToRegister() {
   router.push(toLocalePath('/account/register'))
+}
+
+/**
+ * 前往忘记密码页面
+ */
+function goToForgotPassword() {
+  router.push(toLocalePath('/account/forgot-password'))
 }
 
 /**

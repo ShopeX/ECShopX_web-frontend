@@ -94,10 +94,16 @@
                 >
                   <!-- 状态与店铺（Figma: 16px medium #191a1d + 店铺 14px medium，gap-10px） -->
                   <div class="flex flex-col gap-[16px]">
-                    <p class="text-[16px] font-medium leading-5 text-[#191a1d]">
-                      {{ order.statusText }}
-                    </p>
-                    <div class="flex items-center gap-[10px]">
+                    <div class="flex items-center justify-between">
+                      <p class="text-[16px] font-medium leading-5 text-[#191a1d]">
+                        {{ order.statusText }}
+                      </p>
+                      <div class="flex items-center gap-[16px] text-[12px] leading-4 text-[#4a5565]">
+                        <span>{{ t('de8076e6.1e8dc2') }}: {{ order.orderId }}</span>
+                        <span v-if="order.orderTime">{{ t('de8076e6.2240cc') }}: {{ order.orderTime }}</span>
+                      </div>
+                    </div>
+                    <div v-if="order.storeName" class="flex items-center gap-[10px]">
                       <svg
                         class="w-5 h-5 text-[#191a1d] shrink-0"
                         viewBox="0 0 20 19"
@@ -111,7 +117,7 @@
                         />
                       </svg>
                       <span class="text-[14px] font-medium leading-5 text-[#191a1d]">
-                        {{ t('de8076e6.0d4934') }}
+                        {{ order.storeName }}
                       </span>
                     </div>
                   </div>

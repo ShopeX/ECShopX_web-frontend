@@ -296,7 +296,8 @@ export class OrderTransformer {
   static toOrderModel(apiOrder: any) {
     // 基础信息转换
     const orderId = String(apiOrder.order_id || '')
-    const orderTime = apiOrder.create_time || apiOrder.order_time || ''
+    const rawTime = apiOrder.create_time || apiOrder.order_time || ''
+    const orderTime = OrderTransformer.formatTimestamp(rawTime)
     const totalAmount = Number(apiOrder.total_fee || apiOrder.total_amount || 0) / 100 // 分转元
     const items = (apiOrder.item_infos || apiOrder.items || []).map(
       OrderTransformer.toOrderItemModel
@@ -352,6 +353,7 @@ export class OrderTransformer {
     return {
       orderId,
       orderTime,
+      storeName: apiOrder.distributor_name || apiOrder.store_name || apiOrder.shop_name || '',
       status,
       statusText: OrderTransformer.getOrderStatusText(status),
       items,
@@ -376,6 +378,21 @@ export class OrderTransformer {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
+  }
+
+  private static formatTimestamp(value: string | number): string {
+    if (!value) return ''
+    const num = Number(value)
+    if (isNaN(num)) return String(value)
+    const ms = num < 1e12 ? num * 1000 : num
+    const date = new Date(ms)
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    const h = String(date.getHours()).padStart(2, '0')
+    const min = String(date.getMinutes()).padStart(2, '0')
+    const s = String(date.getSeconds()).padStart(2, '0')
+    return `${y}-${m}-${d} ${h}:${min}:${s}`
   }
 
   /**

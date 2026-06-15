@@ -265,7 +265,7 @@ function getSafeCloseTargetPath() {
 }
 
 // 使用 Composables
-const { isLoading, error, login, loginWithPhone, fetchUserInfo, clearError } = useAuth()
+const { isLoading, error, login, loginWithPhone, clearError } = useAuth()
 
 // 手机密码登录表单
 const phoneForm = reactive({
@@ -312,8 +312,6 @@ async function handlePhoneLogin() {
   })
 
   if (success) {
-    await fetchUserInfo()
-    // 登录成功，跳转到首页或来源页
     router.push(getSafeRedirectPath() || toLocalePath('/'))
   }
 }
@@ -347,8 +345,6 @@ async function handleEmailLogin() {
   })
 
   if (success) {
-    await fetchUserInfo()
-    // 登录成功，跳转到首页或来源页
     router.push(getSafeRedirectPath() || toLocalePath('/'))
   }
 }

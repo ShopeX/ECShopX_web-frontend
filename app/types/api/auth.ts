@@ -125,6 +125,8 @@ export interface IUserInfo {
   username?: string
   /** 手机号 */
   mobile: string
+  /** 邮箱 */
+  email?: string
   /** 头像 */
   avatar?: string
 }

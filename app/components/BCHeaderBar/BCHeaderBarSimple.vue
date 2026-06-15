@@ -62,13 +62,11 @@
           >
             <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5" />
           </button>
-          <button
-            class="hover:text-gray-600 transition-colors"
-            aria-label="User Account"
+          <HeaderUserEntry
+            guest-aria-label="User Account"
+            variant="simple"
             @click="handleUserClick"
-          >
-            <UIcon name="i-heroicons-user" class="w-5 h-5" />
-          </button>
+          />
         </div>
       </div>
     </div>
@@ -81,14 +79,12 @@
  * 用于登录、注册等简单页面的头部
  * 包含 Logo、导航菜单和功能图标
  */
-import { useUserStore } from '~/stores/user'
+import HeaderUserEntry from '~/components/BCHeaderBar/HeaderUserEntry.vue'
 
 const router = useRouter()
-const route = useRoute()
-const localePath = useLocalePath()
-const userStore = useUserStore()
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
 const { t } = useI18n()
+const { openUserCenter } = useHeaderUser('/member')
 
 // 主导航
 const mainNavs = [
@@ -120,26 +116,7 @@ const handleCartClick = () => {
   router.push('/cart')
 }
 
-const redirectToLogin = async () => {
-  await router.push({
-    path: localePath('/account/login'),
-    query: { redirect: route.fullPath },
-  })
-}
-
-const handleUserClick = async () => {
-  if (userStore.token && !userStore.userInfo) {
-    const result = await userStore.fetchUserInfo()
-    if (!result.success) {
-      await redirectToLogin()
-      return
-    }
-  }
-
-  if (userStore.isLoggedIn) {
-    await router.push(localePath('/member'))
-  } else {
-    await redirectToLogin()
-  }
+const handleUserClick = () => {
+  void openUserCenter()
 }
 </script>

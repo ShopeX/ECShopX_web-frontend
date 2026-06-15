@@ -7,6 +7,8 @@ import type {
   ICaptchaResponse,
 } from '~/types/api/auth'
 
+const INVALID_AVATAR_URL = '/images/default-avatar.png'
+
 /**
  * 转换后的登录数据模型
  */
@@ -78,11 +80,15 @@ export class AuthTransformer {
       throw new Error('Invalid user info: missing user_id')
     }
 
+    const member = apiResponse.memberInfo as IUserInfo & Record<string, unknown>
+    const avatar = String(member.avatar || '').trim()
+
     return {
-      user_id: apiResponse.memberInfo.user_id,
-      username: apiResponse.memberInfo.username || '',
-      mobile: apiResponse.memberInfo.mobile || '',
-      avatar: apiResponse.memberInfo.avatar || this.getDefaultAvatar(),
+      user_id: member.user_id,
+      username: String(member.username || ''),
+      mobile: String(member.mobile || ''),
+      email: String(member.email || ''),
+      avatar: avatar && avatar !== INVALID_AVATAR_URL ? avatar : '',
     }
   }
 

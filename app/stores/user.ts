@@ -10,6 +10,12 @@ export type UserInfo = IUserInfo & {
   isPlusVip?: boolean
 }
 
+type FetchUserInfoResult =
+  | { success: true; data: UserInfo }
+  | { success: false; error: string }
+
+let fetchUserInfoTask: Promise<FetchUserInfoResult> | null = null
+
 /**
  * 用户状态接口
  */
@@ -74,6 +80,10 @@ export const useUserStore = defineStore('user', {
       const cookieToken = useCookie('token', { maxAge: 60 * 60 * 24 * 7 }) // 7天过期
       const cookieRefreshToken = useCookie('refreshToken', { maxAge: 60 * 60 * 24 * 30 }) // 30天过期
 
+      if (token !== this.token) {
+        this.userInfo = null
+      }
+
       this.token = token
       this.refreshToken = refreshToken
       this.isLoggedIn = !!token
@@ -84,22 +94,34 @@ export const useUserStore = defineStore('user', {
     },
 
     /**
+     * 登录成功后写入 token 并拉取最新会员资料
+     */
+    async completeLogin(loginData: ILoginModel) {
+      this.isLoggedIn = true
+      this.setToken(loginData.token, loginData.refreshToken)
+
+      const profileResult = await this.fetchUserInfo()
+      if (!profileResult.success) {
+        return profileResult
+      }
+
+      return { success: true as const, data: loginData }
+    },
+
+    /**
      * 账号密码登录
      */
     async login(params: ILoginRequest) {
       try {
+        this.userInfo = null
+
         // 调用登录 API
         const response = await authApiClient.login(params)
 
         // 转换数据（传递 response.data）
         const loginData = AuthTransformer.toLoginModel(response)
 
-        // 更新状态
-        this.isLoggedIn = true
-        // this.userInfo = loginData.userInfo
-        this.setToken(loginData.token, loginData.refreshToken)
-
-        return { success: true, data: loginData }
+        return await this.completeLogin(loginData)
       } catch (error: any) {
         console.error('Login error:', error)
         return {
@@ -114,18 +136,15 @@ export const useUserStore = defineStore('user', {
      */
     async loginWithPhone(params: IPhoneLoginRequest) {
       try {
+        this.userInfo = null
+
         // 调用手机登录 API
         const response = await authApiClient.loginWithPhone(params)
 
         // 转换数据（传递 response.data）
         const loginData = AuthTransformer.toLoginModel(response)
 
-        // 更新状态
-        this.isLoggedIn = true
-        this.userInfo = loginData.userInfo ?? null
-        this.setToken(loginData.token, loginData.refreshToken)
-
-        return { success: true, data: loginData }
+        return await this.completeLogin(loginData)
       } catch (error: any) {
         console.error('Phone login error:', error)
         return {
@@ -166,7 +185,21 @@ export const useUserStore = defineStore('user', {
     /**
      * 获取用户信息
      */
-    async fetchUserInfo() {
+    async fetchUserInfo(): Promise<FetchUserInfoResult> {
+      if (fetchUserInfoTask) {
+        return fetchUserInfoTask
+      }
+
+      fetchUserInfoTask = this.fetchUserInfoInternal()
+
+      try {
+        return await fetchUserInfoTask
+      } finally {
+        fetchUserInfoTask = null
+      }
+    },
+
+    async fetchUserInfoInternal(): Promise<FetchUserInfoResult> {
       try {
         if (!this.token) {
           throw new Error('6314873a.63e85d')
@@ -182,7 +215,7 @@ export const useUserStore = defineStore('user', {
         this.userInfo = userInfo
         this.isLoggedIn = true
 
-        return { success: true, data: userInfo }
+        return { success: true as const, data: userInfo }
       } catch (error: any) {
         console.error('Fetch user info error:', error)
 
@@ -192,7 +225,7 @@ export const useUserStore = defineStore('user', {
         this.setToken(null, null)
 
         return {
-          success: false,
+          success: false as const,
           error: error.message || '6314873a.dc486e',
         }
       }

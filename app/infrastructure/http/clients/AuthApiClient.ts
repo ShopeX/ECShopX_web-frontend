@@ -229,7 +229,7 @@ export class AuthApiClient {
   async getUserInfo(): Promise<IGetUserInfoResponse> {
     return this.http('/wxapp/member', {
       method: 'GET',
-      cache: 'default',
+      cache: 'no-store',
     })
   }
 

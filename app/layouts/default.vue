@@ -259,6 +259,7 @@ const hotKeywords = computed(() => [
 
 const router = useRouter()
 const localePath = useLocalePath()
+const { openUserCenter } = useHeaderUser()
 
 const handleOpenCategoryNav = () => {
   showCategoryNav.value = true
@@ -272,8 +273,8 @@ const handleOpenSearch = () => {
   showSearchDrawer.value = true
 }
 
-const handleOpenUser = async () => {
-  await router.push(localePath('/account'))
+const handleOpenUser = () => {
+  void openUserCenter()
 }
 
 const handleSearch = (keyword: string) => {

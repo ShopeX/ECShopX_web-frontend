@@ -49,14 +49,11 @@
           </span>
         </button>
 
-        <!-- 用户按钮 -->
-        <button
-          class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          :aria-label="t('7812ddcf.1fd02a')"
+        <HeaderUserEntry
+          :guest-aria-label="t('7812ddcf.1fd02a')"
+          variant="bar"
           @click="handleUser"
-        >
-          <UIcon name="i-heroicons-user" class="w-5 h-5 text-[#191a1d]" />
-        </button>
+        />
 
         <!-- 语言按钮 -->
         <div class="relative" ref="languageMenuRef">
@@ -114,18 +111,17 @@
  * HeaderBar 组件
  */
 
+import HeaderUserEntry from '~/components/BCHeaderBar/HeaderUserEntry.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { LOCALE_DEFINITIONS } from '~/shared/localeConfig'
 
 const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
 const cartStore = useCartStore()
 const { locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
-const localePath = useLocalePath()
 const { t } = useI18n()
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
+const { openUserCenter } = useHeaderUser()
 
 // 定义 emits
 const emit = defineEmits<{
@@ -226,29 +222,7 @@ const handleGrid = () => {
 /**
  * 处理用户点击
  */
-const redirectToLogin = async () => {
-  const currentPath = route.fullPath
-  await router.push({
-    path: localePath('/account/login'),
-    query: {
-      redirect: currentPath,
-    },
-  })
-}
-
-const handleUser = async () => {
-  if (userStore.token && !userStore.userInfo) {
-    const result = await userStore.fetchUserInfo()
-    if (!result.success) {
-      await redirectToLogin()
-      return
-    }
-  }
-
-  if (userStore.isLoggedIn) {
-    await router.push(localePath('/account'))
-  } else {
-    await redirectToLogin()
-  }
+const handleUser = () => {
+  void openUserCenter()
 }
 </script>

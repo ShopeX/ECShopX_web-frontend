@@ -50,11 +50,11 @@
       <div class="col-start-3 row-start-1 flex h-5 items-center justify-end gap-3 lg:gap-6">
         <button
           type="button"
-          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          :aria-label="t('48ec697b.53754b')"
+          class="relative flex h-5 w-5 items-center justify-center self-stretch text-current transition-opacity hover:opacity-70"
+          :aria-label="cartAriaLabel"
           @click="emit('open-mini-cart')"
         >
-          <Icon name="i-heroicons-shopping-bag" class="h-5 w-5" />
+          <ECShoppingBagIcon class="h-[18px] w-[17px]" :count="cartItemCount" />
         </button>
         <HeaderUserEntry
           :guest-aria-label="t('48ec697b.1fd02a')"
@@ -140,6 +140,12 @@ const emit = defineEmits<{
 
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
 const localePath = useLocalePath()
+const cartStore = useCartStore()
+const cartItemCount = computed(() => cartStore.totalItems || 0)
+const cartAriaLabel = computed(() => {
+  const label = t('48ec697b.53754b')
+  return cartItemCount.value > 0 ? `${label} (${cartItemCount.value})` : label
+})
 
 const logoUrl = computed(() => String(props.section.settings.logoUrl || mallLogoDarkUrl.value))
 const logoLink = computed(() => String(props.section.settings.logoLink || '/'))

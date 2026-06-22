@@ -74,8 +74,18 @@
             class="content-stretch flex flex-col items-start relative shrink-0 w-full"
           >
             <BCCartItem
+              class="hidden lg:block"
               :item="item"
               :loading="loading"
+              @toggle-selection="handleToggleSelection"
+              @quantity-change="handleQuantityChange"
+              @remove="handleRemove"
+            />
+            <BCMiniCartItem
+              class="lg:hidden"
+              :item="item"
+              :loading="loading"
+              show-remove
               @toggle-selection="handleToggleSelection"
               @quantity-change="handleQuantityChange"
               @remove="handleRemove"
@@ -196,6 +206,7 @@
  */
 import { ECCheckbox } from '~/components/ECCheckbox'
 import BCCartItem from '~/components/BCCartItem/BCCartItem.vue'
+import BCMiniCartItem from '~/components/BCMiniCartItem/BCMiniCartItem.vue'
 
 definePageMeta({
   layout: 'default',

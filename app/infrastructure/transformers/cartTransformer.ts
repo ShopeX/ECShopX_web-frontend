@@ -60,6 +60,7 @@ export class CartTransformer {
     return {
       id: apiItem.cart_id || apiItem.id,
       productId: apiItem.item_id || apiItem.goods_id,
+      productBn: apiItem.item_bn || '',
       productName: apiItem.item_name || '77b4648d.2b7890',
       productImage: apiItem.pics || '',
       specId: apiItem.item_id || 'default',

@@ -1,9 +1,9 @@
 <template>
   <div
-    class="bg-white content-stretch flex flex-col items-start justify-between p-[32px] relative size-full"
+    class="relative flex size-full flex-col items-start justify-between bg-white px-4 py-8 lg:px-8 lg:py-0"
   >
     <!-- 顶部区域 -->
-    <div class="relative shrink-0 w-full">
+    <div class="relative w-full shrink-0 lg:pt-8">
       <div
         class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[16px] items-start relative w-full"
       >
@@ -77,9 +77,9 @@
     </div>
 
     <!-- 底部区域 -->
-    <div v-if="!cartUI.isEmpty" class="relative shrink-0 w-full">
+    <div v-if="!cartUI.isEmpty" class="relative w-full shrink-0 lg:pb-8">
       <div
-        class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[16px] items-start pb-0 pt-[24px] px-0 relative w-full"
+        class="relative flex w-full flex-col items-start gap-4 px-0 pb-0 pt-6 lg:gap-4 lg:pt-4"
       >
         <!-- 全选 -->
         <div

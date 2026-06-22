@@ -195,7 +195,7 @@
                       v-if="specValue.spec_image_url"
                       :src="specValue.spec_image_url"
                       :alt="specValue.spec_value_name"
-                      class="w-full h-full object-cover"
+                      class="w-full h-full object-contain"
                     />
                   </button>
                 </div>

@@ -10,8 +10,10 @@ export interface IProduct {
   img: string
   /** 图片列表 */
   imgs: readonly string[]
-  /** 原价（分） */
+  /** 销售价（分） */
   price: number
+  /** 市场价 / 划线价（分） */
+  marketPrice: number
   /** 活动价（分） */
   activityPrice: number
   /** 会员价（分） */

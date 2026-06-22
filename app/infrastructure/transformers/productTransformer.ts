@@ -72,6 +72,8 @@ export class ProductTransformer {
       price,
       activity_price:
         typeof apiProduct.activity_price === 'number' ? apiProduct.activity_price : 0,
+      market_price:
+        typeof apiProduct.market_price === 'number' ? apiProduct.market_price : 0,
       member_price: typeof apiProduct.member_price === 'number' ? apiProduct.member_price : 0,
       sales: typeof apiProduct.sales === 'number' ? apiProduct.sales : 0,
     }
@@ -96,6 +98,7 @@ export class ProductTransformer {
         imgs: [],
         price: 0,
         activityPrice: 0,
+        marketPrice: 0,
         memberPrice: 0,
         sales: 0,
         specId: undefined,
@@ -111,6 +114,7 @@ export class ProductTransformer {
       imgs: normalizedProduct.pics || [],
       price: normalizedProduct.price || 0,
       activityPrice: normalizedProduct.activity_price || 0,
+      marketPrice: normalizedProduct.market_price || 0,
       memberPrice: normalizedProduct.member_price || 0,
       sales: normalizedProduct.sales || 0,
       // 注意：API 返回的数据中可能没有规格和库存信息

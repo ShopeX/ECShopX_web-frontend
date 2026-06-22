@@ -269,6 +269,7 @@ const placeholderProducts = computed<IProduct[]>(() => {
     imgs: [placeholderProductImage],
     price: 2000,
     activityPrice: 0,
+    marketPrice: 0,
     memberPrice: 0,
     sales: 0,
   }))

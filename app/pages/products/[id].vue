@@ -153,9 +153,12 @@
               >
                 {{ product.title }}
               </h1>
-              <div class="text-xl lg:text-2xl font-medium leading-8 lg:leading-9 text-[#191a1d]">
-                ¥{{ product.price.toLocaleString() }}
-              </div>
+              <BCProductPrice
+                :sale-price-cents="currentSalePriceCents"
+                :market-price-cents="currentMarketPriceCents"
+                :member-price-cents="currentMemberPriceCents"
+                size="lg"
+              />
             </div>
             <button class="w-6 h-6 shrink-0" :aria-pressed="isFavorite" @click="toggleFavorite">
               <UIcon
@@ -313,9 +316,8 @@
     <div
       class="lg:hidden sticky bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] px-4 py-4 flex items-center gap-6 z-50 shadow-lg"
     >
-      <!-- 价格 -->
       <p class="text-base font-medium leading-5 text-[#191a1d] shrink-0">
-        ¥{{ product.price.toLocaleString() }}
+        ¥{{ formatPriceYuan(currentFinalPriceCents) }}
       </p>
 
       <!-- 按钮组 -->
@@ -341,6 +343,7 @@
 
 <script setup lang="ts">
 import BCProductRecommendations from '~/components/BCProductRecommendations/BCProductRecommendations.vue'
+import BCProductPrice from '~/components/BCProductPrice/BCProductPrice.vue'
 import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
 import type { ProductRecommendation } from '~/components/BCProductRecommendations/types'
 import { collectApiClient } from '~/infrastructure/http/clients/CollectApiClient'
@@ -675,23 +678,30 @@ const currentStock = computed(() => {
   return matchedSpecItem ? matchedSpecItem.store : data.store || 0
 })
 
-// 计算当前价格
-const currentPrice = computed(() => {
+const resolveItemPriceCents = (field: 'price' | 'market_price' | 'member_price') => {
   if (!rawProductData.value) return 0
 
   const data = rawProductData.value as any
 
   if (data.nospec === 1 || !data.spec_items || data.spec_items.length === 0) {
-    return (data.activity_price || data.price) / 100
+    return data[field] || 0
   }
 
   const matchedSpecItem = data.spec_items.find(
     (item: any) => item.custom_spec_id === currentSpecIdString.value
   )
 
-  return matchedSpecItem
-    ? (matchedSpecItem.activity_price || matchedSpecItem.price) / 100
-    : data.price / 100
+  return matchedSpecItem ? matchedSpecItem[field] || 0 : data[field] || 0
+}
+
+const currentSalePriceCents = computed(() => resolveItemPriceCents('price'))
+const currentMarketPriceCents = computed(() => resolveItemPriceCents('market_price'))
+const currentMemberPriceCents = computed(() => resolveItemPriceCents('member_price'))
+
+const { finalPriceCents: currentFinalPriceCents, formatPriceYuan } = useProductPriceDisplay({
+  salePriceCents: currentSalePriceCents,
+  marketPriceCents: currentMarketPriceCents,
+  memberPriceCents: currentMemberPriceCents,
 })
 
 const addToCart = async () => {

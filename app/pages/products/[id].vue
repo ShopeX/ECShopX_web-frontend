@@ -169,62 +169,83 @@
             </button>
           </div>
 
-          <!-- 动态规格选择器 -->
-          <div v-if="product.specs.length > 0" class="flex flex-col gap-4 w-full lg:max-w-[376px]">
-            <template v-for="(spec, specIndex) in product.specs" :key="spec.spec_name">
-              <div class="flex flex-col gap-4 lg:gap-6">
-                <h3 class="text-sm font-normal leading-5 text-[#4a5565]">{{ spec.spec_name }}</h3>
+          <!-- 规格与数量 -->
+          <div class="flex w-full flex-col lg:max-w-[376px]">
+            <div v-if="product.specs.length > 0" class="flex flex-col gap-4">
+              <template v-for="(spec, specIndex) in product.specs" :key="spec.spec_name">
+                <div class="flex flex-col gap-4 lg:gap-6">
+                  <h3 class="text-sm font-normal leading-5 text-[#4a5565]">{{ spec.spec_name }}</h3>
 
-                <!-- 如果有规格图片，显示图片样式选择器 -->
-                <div
-                  v-if="spec.spec_values.some((v) => v.spec_image_url)"
-                  class="flex gap-2 flex-wrap"
-                >
-                  <button
-                    v-for="specValue in spec.spec_values"
-                    :key="specValue.spec_value_id"
-                    class="w-20 h-20 border transition-all overflow-hidden"
-                    :class="
-                      isSpecValueSelected(spec.spec_name, specValue.spec_value_id)
-                        ? 'border-[#191a1d]'
-                        : 'border-transparent'
-                    "
-                    @click="selectSpecValue(spec.spec_name, specValue.spec_value_id)"
+                  <!-- 如果有规格图片，显示图片样式选择器 -->
+                  <div
+                    v-if="spec.spec_values.some((v) => v.spec_image_url)"
+                    class="flex flex-wrap gap-2"
                   >
-                    <img
-                      v-if="specValue.spec_image_url"
-                      :src="specValue.spec_image_url"
-                      :alt="specValue.spec_value_name"
-                      class="w-full h-full object-contain"
-                    />
-                  </button>
+                    <button
+                      v-for="specValue in spec.spec_values"
+                      :key="specValue.spec_value_id"
+                      class="h-20 w-20 overflow-hidden border transition-all"
+                      :class="
+                        isSpecValueSelected(spec.spec_name, specValue.spec_value_id)
+                          ? 'border-[#191a1d]'
+                          : 'border-transparent'
+                      "
+                      @click="selectSpecValue(spec.spec_name, specValue.spec_value_id)"
+                    >
+                      <img
+                        v-if="specValue.spec_image_url"
+                        :src="specValue.spec_image_url"
+                        :alt="specValue.spec_value_name"
+                        class="h-full w-full object-contain"
+                      />
+                    </button>
+                  </div>
+
+                  <!-- 如果没有规格图片，显示文字选择器 -->
+                  <div v-else class="grid grid-cols-2 border-l border-t border-[#e5e7eb]">
+                    <button
+                      v-for="specValue in spec.spec_values"
+                      :key="specValue.spec_value_id"
+                      class="flex h-[38.4px] items-center justify-center border-b border-r border-[#e5e7eb] px-3 text-sm leading-5 tracking-[-0.1504px] text-[#191a1d] transition-all lg:px-4"
+                      :class="
+                        isSpecValueSelected(spec.spec_name, specValue.spec_value_id)
+                          ? 'border-[#0f0f10] bg-[#f3f4f6]'
+                          : ''
+                      "
+                      @click="selectSpecValue(spec.spec_name, specValue.spec_value_id)"
+                    >
+                      {{ specValue.spec_custom_value_name || specValue.spec_value_name }}
+                    </button>
+                  </div>
                 </div>
 
-                <!-- 如果没有规格图片，显示文字选择器 -->
-                <div v-else class="grid grid-cols-2 border-l border-t border-[#e5e7eb]">
-                  <button
-                    v-for="specValue in spec.spec_values"
-                    :key="specValue.spec_value_id"
-                    class="h-[38.4px] px-3 lg:px-4 border-r border-b border-[#e5e7eb] flex items-center justify-center text-sm leading-5 tracking-[-0.1504px] text-[#191a1d] transition-all"
-                    :class="
-                      isSpecValueSelected(spec.spec_name, specValue.spec_value_id)
-                        ? 'bg-[#f3f4f6] border-[#0f0f10]'
-                        : ''
-                    "
-                    @click="selectSpecValue(spec.spec_name, specValue.spec_value_id)"
-                  >
-                    {{ specValue.spec_custom_value_name || specValue.spec_value_name }}
-                  </button>
-                </div>
-              </div>
+                <!-- 分隔线（最后一个规格不显示） -->
+                <div v-if="specIndex < product.specs.length - 1" class="h-px w-full" />
+              </template>
+            </div>
 
-              <!-- 分隔线（最后一个规格不显示） -->
-              <div v-if="specIndex < product.specs.length - 1" class="h-px w-full" />
-            </template>
+            <!-- 数量选择器：Figma 4003:5246 -->
+            <div class="flex w-full items-center gap-6 self-stretch py-6">
+              <p
+                class="min-w-0 flex-1 font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#4a5565]"
+              >
+                {{ t('ee3264ed.0bf60b') }}
+              </p>
+              <QuantityStepper
+                class="shrink-0"
+                full-width
+                :quantity="quantity"
+                :min="1"
+                :max="quantityMax"
+                :loading="isAddingToCart"
+                @decrease="decreaseQuantity"
+                @increase="increaseQuantity"
+              />
+            </div>
           </div>
 
           <!-- Action Buttons - PC端内嵌 -->
-          <div class="hidden lg:flex flex-col gap-4">
+          <div class="hidden w-full flex-col gap-4 lg:flex lg:max-w-[376px]">
             <button
               class="w-full px-0 py-4 text-sm font-medium leading-5 text-white bg-[#0f0f10] hover:bg-[#2a2a2a] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               :disabled="isAddingToCart"
@@ -345,6 +366,7 @@
 import BCProductRecommendations from '~/components/BCProductRecommendations/BCProductRecommendations.vue'
 import BCProductPrice from '~/components/BCProductPrice/BCProductPrice.vue'
 import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
+import QuantityStepper from '~/components/BCMiniCartItem/QuantityStepper.vue'
 import type { ProductRecommendation } from '~/components/BCProductRecommendations/types'
 import { collectApiClient } from '~/infrastructure/http/clients/CollectApiClient'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
@@ -678,6 +700,33 @@ const currentStock = computed(() => {
   return matchedSpecItem ? matchedSpecItem.store : data.store || 0
 })
 
+const quantityMax = computed(() => {
+  const stock = currentStock.value
+  return stock > 0 ? stock : 1
+})
+
+function decreaseQuantity() {
+  if (quantity.value > 1) {
+    quantity.value -= 1
+  }
+}
+
+function increaseQuantity() {
+  if (quantity.value < quantityMax.value) {
+    quantity.value += 1
+  }
+}
+
+watch(currentSpecIdString, () => {
+  quantity.value = 1
+})
+
+watch(currentStock, (stock) => {
+  if (stock > 0 && quantity.value > stock) {
+    quantity.value = stock
+  }
+})
+
 const resolveItemPriceCents = (field: 'price' | 'market_price' | 'member_price') => {
   if (!rawProductData.value) return 0
 
@@ -749,7 +798,7 @@ const buyNow = async () => {
       try {
         const result = await addToCartAction({
           cart_type: 'fastbuy', // 立即购买,
-          num: 1,
+          num: quantity.value,
           distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
           item_id: realItemId.value,
           shop_type: 'distributor',

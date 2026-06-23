@@ -1,12 +1,8 @@
 <template>
-  <div
-    class="flex h-10 items-center border border-[#e5e7eb] bg-white p-px"
-    :class="fullWidth ? 'w-full' : ''"
-  >
+  <div class="box-border flex h-10 w-[120px] items-center border border-[#e5e7eb] bg-white">
     <button
       type="button"
-      class="flex h-[38px] w-10 items-center justify-center hover:bg-gray-50 disabled:opacity-30"
-      :class="fullWidth ? 'grow' : ''"
+      class="flex h-[38px] min-w-0 flex-1 items-center justify-center hover:bg-gray-50 disabled:opacity-30"
       :disabled="quantity <= min || loading"
       @click="$emit('decrease')"
     >
@@ -21,16 +17,17 @@
       </svg>
     </button>
 
-    <div class="flex h-[38px] w-10 items-center justify-center">
-      <span class="font-['Inter'] text-sm font-medium leading-5 tracking-[-0.15px] text-[#101828]">
+    <div class="flex h-[38px] w-10 shrink-0 items-center justify-center">
+      <span
+        class="font-['Inter'] text-sm font-medium leading-5 tracking-[-0.0107em] text-[#191a1d]"
+      >
         {{ quantity }}
       </span>
     </div>
 
     <button
       type="button"
-      class="flex h-[38px] w-10 items-center justify-center hover:bg-gray-50 disabled:opacity-30"
-      :class="fullWidth ? 'grow' : ''"
+      class="flex h-[38px] min-w-0 flex-1 items-center justify-center hover:bg-gray-50 disabled:opacity-30"
       :disabled="quantity >= max || loading"
       @click="$emit('increase')"
     >

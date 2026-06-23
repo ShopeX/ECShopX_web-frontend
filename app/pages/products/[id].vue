@@ -209,7 +209,7 @@
                       class="flex h-[38.4px] items-center justify-center border-b border-r border-[#e5e7eb] px-3 text-sm leading-5 tracking-[-0.1504px] text-[#191a1d] transition-all lg:px-4"
                       :class="
                         isSpecValueSelected(spec.spec_name, specValue.spec_value_id)
-                          ? 'border-[#0f0f10] bg-[#f3f4f6]'
+                          ? 'border-[#0f0f10] bg-[#e5e7eb]'
                           : ''
                       "
                       @click="selectSpecValue(spec.spec_name, specValue.spec_value_id)"

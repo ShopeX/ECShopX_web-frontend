@@ -10,7 +10,7 @@
       统一用同一 relative 容器：有/无底图都叠加热区；无热区时在预览下可用整块占位承接 BLOCK_HIGHLIGHT。
     -->
     <div :class="innerClasses">
-      <div class="relative w-full" :style="aspectRatioStyle">
+      <div class="relative w-full">
         <picture v-if="backgroundImage || mobileBackgroundImage">
           <source
             v-if="mobileBackgroundImage"
@@ -20,13 +20,12 @@
           <img
             :src="backgroundImage || mobileBackgroundImage"
             :alt="sectionAlt"
-            class="absolute inset-0 h-full w-full object-contain"
-            @load="handleImageLoad"
+            class="block w-full h-auto"
           />
         </picture>
         <div
           v-else
-          class="absolute inset-0 flex min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"
+          class="flex min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"
         >
           {{ t('44646d39.9bb1a6') }}
         </div>
@@ -48,13 +47,7 @@
             :aria-label="hotspot.label || `hotspot-${hotspot.id}`"
             @click="handleHotspotClick($event, hotspot.id)"
           >
-            <span
-              :class="
-                props.isPreview
-                  ? 'block h-full w-full rounded border border-white/80 bg-black/10 shadow-sm'
-                  : 'block h-full w-full'
-              "
-            />
+            <span class="block h-full w-full" />
 
             <span
               v-if="props.isPreview && hotspot.label"
@@ -106,11 +99,6 @@ interface HotspotBlock {
   }
 }
 
-interface ImageDimensions {
-  width: number
-  height: number
-}
-
 const props = defineProps<{
   section: DecorationSection
   sectionId: string
@@ -131,7 +119,6 @@ const sectionAlt = computed(() =>
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
 const isMobileViewport = ref(false)
-const loadedImageDimensions = ref<Record<string, ImageDimensions>>({})
 
 const updateViewport = () => {
   if (!import.meta.client) return
@@ -140,8 +127,6 @@ const updateViewport = () => {
 
 const sectionSettings = computed(() => {
   const raw = props.section.settings as Record<string, unknown>
-  const imageWidth = Number(raw.imageWidth ?? 1200)
-  const imageHeight = Number(raw.imageHeight ?? 600)
   const pcImage = String(raw.pc_image || raw.imageUrl || raw.image_url || raw.image || '')
   const mobileImage = String(raw.mobile_image || raw.mobileImage || raw.mobile_image_url || '')
   const pcHotspots = Array.isArray(raw.pc_hotspots) ? raw.pc_hotspots : []
@@ -154,18 +139,11 @@ const sectionSettings = computed(() => {
     pcHotspots,
     mobileHotspots,
     legacyHotspots,
-    imageWidth: Number.isFinite(imageWidth) && imageWidth > 0 ? imageWidth : 1200,
-    imageHeight: Number.isFinite(imageHeight) && imageHeight > 0 ? imageHeight : 600,
   }
 })
 
 const backgroundImage = computed(() => sectionSettings.value.pcImage)
 const mobileBackgroundImage = computed(() => sectionSettings.value.mobileImage)
-const currentImageSource = computed(() =>
-  isMobileViewport.value && mobileBackgroundImage.value
-    ? mobileBackgroundImage.value
-    : backgroundImage.value || mobileBackgroundImage.value
-)
 const sectionClasses = computed(() => [
   resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
   resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
@@ -180,31 +158,6 @@ const sectionStyle = computed(() => {
     '--section-foreground': scheme.foreground,
   }
 })
-const aspectRatioStyle = computed(() => {
-  const loadedDimensions = loadedImageDimensions.value[currentImageSource.value]
-  const width = loadedDimensions?.width || sectionSettings.value.imageWidth
-  const height = loadedDimensions?.height || sectionSettings.value.imageHeight
-
-  return {
-    aspectRatio: `${width} / ${height}`,
-  }
-})
-
-function handleImageLoad(event: Event) {
-  const image = event.currentTarget as HTMLImageElement | null
-  const imageSource = image?.currentSrc || currentImageSource.value
-  if (!image || !imageSource) return
-
-  const width = image.naturalWidth || 0
-  const height = image.naturalHeight || 0
-  if (width <= 0 || height <= 0) return
-
-  loadedImageDimensions.value = {
-    ...loadedImageDimensions.value,
-    [imageSource]: { width, height },
-    [currentImageSource.value]: { width, height },
-  }
-}
 
 const toPercent = (value: unknown) => {
   const numberValue = Number(value) || 0

@@ -46,4 +46,12 @@ describe('ImageHotspot', () => {
     )
     expect(source).not.toContain('absolute inset-0 flex min-h-[200px]')
   })
+
+  it('does not wrap hotspots as standalone selectable blocks', () => {
+    expect(source).toContain('v-for="hotspot in activeHotspots"')
+    expect(source).toContain('class="group absolute z-[1] flex items-center justify-center"')
+    expect(source).toContain(':style="hotspot.style"')
+    expect(source).not.toContain(':block-id="hotspot.id"')
+    expect(source).not.toContain('focusBlock')
+  })
 })

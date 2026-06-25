@@ -30,13 +30,11 @@
           {{ t('44646d39.9bb1a6') }}
         </div>
 
-        <DecorationBlockHost
+        <div
           v-for="hotspot in activeHotspots"
           :key="hotspot.id"
-          :section-id="sectionId"
-          :block-id="hotspot.id"
-          :root-style="hotspot.style"
-          :root-class="'group absolute z-[1] flex items-center justify-center'"
+          class="group absolute z-[1] flex items-center justify-center"
+          :style="hotspot.style"
         >
           <component
             :is="resolveHotspotTag(hotspot.link)"
@@ -45,7 +43,7 @@
             :target="resolveHotspotTarget(hotspot.link)"
             :rel="resolveHotspotRel(hotspot.link)"
             :aria-label="hotspot.label || `hotspot-${hotspot.id}`"
-            @click="handleHotspotClick($event, hotspot.id)"
+            @click="handleHotspotClick"
           >
             <span class="block h-full w-full" />
 
@@ -56,7 +54,7 @@
               {{ hotspot.label }}
             </span>
           </component>
-        </DecorationBlockHost>
+        </div>
 
         <DecorationBlockHost
           v-if="isPreview && placeholderHighlightBlockId"
@@ -74,7 +72,6 @@
 <script setup lang="ts">
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { useDecorationEditOptional } from '~/decoration-engine/composables/useDecorationEditContext'
-import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
@@ -116,7 +113,6 @@ function translateIfGeneratedKey(value: string) {
 const sectionAlt = computed(() =>
   translateIfGeneratedKey(String(props.section.title || 'image hotspot'))
 )
-const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
 const isMobileViewport = ref(false)
 
@@ -297,14 +293,12 @@ const resolveHotspotTarget = (link: Record<string, unknown>) =>
 const resolveHotspotRel = (link: Record<string, unknown>) =>
   !props.isPreview && isExternalHotspotHref(link) ? 'noopener noreferrer' : undefined
 
-const handleHotspotClick = (event: MouseEvent, blockId: string) => {
+const handleHotspotClick = (event: MouseEvent) => {
   if (!props.isPreview) {
     return
   }
 
   event.preventDefault()
-  event.stopPropagation()
-  focusBlock(props.sectionId, blockId)
 }
 
 onMounted(() => {

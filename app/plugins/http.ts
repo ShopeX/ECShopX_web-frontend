@@ -3,11 +3,13 @@ import type { ApiResponse, HttpError } from '~/types/http'
 import { ErrorType } from '~/types/http'
 import { useUserStore } from '~/stores/user'
 import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
+import { resolveCompanyId } from '~/utils/company'
 
 export default defineNuxtPlugin({
   name: 'http',
   setup() {
     const config = useRuntimeConfig()
+    const companyId = resolveCompanyId()
     const nuxtApp = useNuxtApp()
     const userStore = useUserStore()
     const t = (key: string) => (nuxtApp.$i18n as any)?.t?.(key) || key
@@ -148,8 +150,8 @@ export default defineNuxtPlugin({
             // ✅ 在转换为 URLSearchParams 之前，先添加全局参数 company_id、country_code 到 body
             const bodyData =
               typeof options.body === 'object' ? { ...(options.body as Record<string, any>) } : {}
-            if (!(options as any).skipCompanyId && config.public.companyId) {
-              bodyData.company_id = config.public.companyId
+            if (!(options as any).skipCompanyId && companyId) {
+              bodyData.company_id = companyId
             }
             if (!(options as any).skipCountryCode) {
               bodyData.country_code = getCountryCode()
@@ -167,8 +169,8 @@ export default defineNuxtPlugin({
         } else {
           // ✅ GET 请求或没有 body 的请求：company_id、country_code 添加到 query 参数
           const query = { ...(options.query as Record<string, any>) }
-          if (!(options as any).skipCompanyId && config.public.companyId) {
-            query.company_id = config.public.companyId
+          if (!(options as any).skipCompanyId && companyId) {
+            query.company_id = companyId
           }
           if (!(options as any).skipCountryCode) {
             query.country_code = getCountryCode()

@@ -1,4 +1,5 @@
 import { useRuntimeConfig } from '#imports'
+import { resolveCompanyId } from '~/utils/company'
 
 /**
  * API 响应数据接口
@@ -25,8 +26,7 @@ export function getAuthHeaders(): Record<string, string> {
  * 获取公司ID
  */
 export function getCompanyId(): string | undefined {
-  const config = useRuntimeConfig()
-  return config.public.companyId
+  return resolveCompanyId()
 }
 
 /**

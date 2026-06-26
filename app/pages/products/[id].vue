@@ -421,7 +421,7 @@ interface ISpec {
 
 // 状态管理
 const quantity = ref(1)
-const openAccordion = ref<string | null>('details')
+const openAccordion = ref<string | null>(null)
 const currentImageIndex = ref(0) // 当前显示的大图索引
 const thumbnailStartIndex = ref(0) // 缩略图开始显示的索引
 const imageTransitionName = ref<'slide-left' | 'slide-right'>('slide-right') // 图片切换动画方向

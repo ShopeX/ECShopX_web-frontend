@@ -23,6 +23,7 @@ export type PaymentExecutionType =
   | 'wechat_jsapi'
   | 'wechat_h5'
   | 'alipay_wap'
+  | 'external_redirect'
 
 export interface PaymentClientRuntime {
   platform: PaymentClientPlatform
@@ -110,6 +111,10 @@ export function resolvePaymentExecutionType({
   runtime: PaymentClientRuntime
   selectedPayType: string
 }): PaymentExecutionType {
+  if (normalizePayType(selectedPayType) === 'doumenintl') {
+    return 'external_redirect'
+  }
+
   if (isWechatPayType(selectedPayType)) {
     if (runtime.platform === 'pc') {
       return 'qrcode'
@@ -452,6 +457,15 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
           }
           const paymentUrl = extractPaymentRedirectUrl(data)
           if (openPaymentUrl(paymentUrl)) {
+            countdownEndAt.value = Date.now() + COUNTDOWN_DEFAULT_MS
+            startPolling()
+            return
+          }
+          break
+        }
+        case 'external_redirect': {
+          const payUrl = data?.pay_url || extractPaymentRedirectUrl(data)
+          if (openPaymentUrl(payUrl)) {
             countdownEndAt.value = Date.now() + COUNTDOWN_DEFAULT_MS
             startPolling()
             return

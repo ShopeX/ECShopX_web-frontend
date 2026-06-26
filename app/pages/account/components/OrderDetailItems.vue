@@ -48,7 +48,7 @@
               data-testid="item-price"
               class="text-[14px] leading-5 text-[#191a1d] w-full lg:w-auto text-right lg:whitespace-nowrap"
             >
-              ¥ {{ formatAmount(item.price) }}
+              ¥ {{ formatAmount(item.displayPrice || item.price) }}
             </span>
           </div>
           <!-- H5: 数量在下；PC: quantity 在左（order-1） -->

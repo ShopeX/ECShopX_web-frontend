@@ -36,13 +36,13 @@
           {{ product.itemName }}
         </h2>
 
-        <!-- 价格区域 -->
-        <div v-if="showPrice" class="sp-product-card__price w-full flex flex-col items-center">
-          <ECPrice
-            :amount="getCurrentPrice()"
-            class-name="text-[#191a1d] font-sans"
-            symbol-class="text-sm leading-5"
-            amount-class="text-sm font-normal leading-5"
+        <div v-if="showPrice" class="sp-product-card__price w-full flex justify-center">
+          <BCProductPrice
+            :sale-price-cents="props.product.price"
+            :market-price-cents="props.product.marketPrice"
+            :member-price-cents="props.product.memberPrice"
+            size="sm"
+            layout="inline"
           />
         </div>
 
@@ -59,8 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import ECPrice from '../ECPrice/ECPrice.vue'
 import type { IProduct } from './types'
+import BCProductPrice from '../BCProductPrice/BCProductPrice.vue'
 import { useToastMessage } from '~/composables/useToastMessage'
 import { useCart } from '~/composables/useCart'
 import { useIntersectionObserver } from '@vueuse/core'
@@ -120,35 +120,6 @@ const { addToCart, isItemLoading } = useCart()
 
 // Toast 消息
 const toast = useToastMessage()
-
-// 获取当前有效价格（优先级：活动价 > 会员价 > 原价）
-const getCurrentPrice = (): number => {
-  if (props.product.activityPrice && props.product.activityPrice > 0) {
-    return props.product.activityPrice
-  }
-
-  if (props.product.memberPrice && props.product.memberPrice > 0) {
-    return props.product.memberPrice
-  }
-
-  return props.product.price || 0
-}
-
-// 是否显示原价（当有优惠时）
-const showOriginalPrice = computed(() => {
-  const currentPrice = getCurrentPrice()
-  return currentPrice < props.product.price && props.product.price > 0
-})
-
-// 格式化价格
-const formatPrice = (price: number): string => {
-  if (!price || price <= 0) return '0.00'
-
-  return price.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-}
 
 // 图片加载错误处理
 const handleImageError = (event: Event) => {

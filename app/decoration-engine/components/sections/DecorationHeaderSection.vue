@@ -7,9 +7,12 @@
   >
     <div :class="innerClasses">
       <div class="col-start-1 row-start-1 flex items-center gap-3 lg:gap-6">
-        <a v-if="isLogoLeft" :href="logoLink" class="flex items-center">
+        <a v-if="isLogoLeft && isExternalLogoLink" :href="logoLink" class="flex items-center">
           <img :src="logoUrl" :alt="section.title || 'logo'" class="h-10 w-auto object-contain" />
         </a>
+        <NuxtLink v-else-if="isLogoLeft" :to="resolvedLogoLink" class="flex items-center">
+          <img :src="logoUrl" :alt="section.title || 'logo'" class="h-10 w-auto object-contain" />
+        </NuxtLink>
 
         <button
           type="button"
@@ -30,30 +33,34 @@
       </div>
 
       <a
-        v-if="!isLogoLeft"
+        v-if="!isLogoLeft && isExternalLogoLink"
         :href="logoLink"
         class="col-start-2 row-start-1 flex items-center justify-self-center"
       >
         <img :src="logoUrl" :alt="section.title || 'logo'" class="h-10 w-auto object-contain" />
       </a>
+      <NuxtLink
+        v-else-if="!isLogoLeft"
+        :to="resolvedLogoLink"
+        class="col-start-2 row-start-1 flex items-center justify-self-center"
+      >
+        <img :src="logoUrl" :alt="section.title || 'logo'" class="h-10 w-auto object-contain" />
+      </NuxtLink>
 
       <div class="col-start-3 row-start-1 flex h-5 items-center justify-end gap-3 lg:gap-6">
         <button
           type="button"
-          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          :aria-label="t('48ec697b.53754b')"
+          class="relative flex h-5 w-5 items-center justify-center self-stretch text-current transition-opacity hover:opacity-70"
+          :aria-label="cartAriaLabel"
           @click="emit('open-mini-cart')"
         >
-          <Icon name="i-heroicons-shopping-bag" class="h-5 w-5" />
+          <ECShoppingBagIcon class="h-[18px] w-[17px]" :count="cartItemCount" />
         </button>
-        <button
-          type="button"
-          class="flex h-5 w-5 items-center justify-center text-current transition-opacity hover:opacity-70"
-          :aria-label="t('48ec697b.1fd02a')"
+        <HeaderUserEntry
+          :guest-aria-label="t('48ec697b.1fd02a')"
+          variant="decoration"
           @click="emit('open-user')"
-        >
-          <Icon name="i-heroicons-user" class="h-5 w-5" />
-        </button>
+        />
         <div
           v-if="showLanguageSelector"
           ref="languageMenuRef"
@@ -107,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+import HeaderUserEntry from '~/components/BCHeaderBar/HeaderUserEntry.vue'
 import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
@@ -131,9 +139,18 @@ const emit = defineEmits<{
 }>()
 
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
+const localePath = useLocalePath()
+const cartStore = useCartStore()
+const cartItemCount = computed(() => cartStore.totalItems || 0)
+const cartAriaLabel = computed(() => {
+  const label = t('48ec697b.53754b')
+  return cartItemCount.value > 0 ? `${label} (${cartItemCount.value})` : label
+})
 
 const logoUrl = computed(() => String(props.section.settings.logoUrl || mallLogoDarkUrl.value))
 const logoLink = computed(() => String(props.section.settings.logoLink || '/'))
+const isExternalLogoLink = computed(() => /^https?:\/\//i.test(logoLink.value))
+const resolvedLogoLink = computed(() => localePath(logoLink.value as any))
 const logoPosition = computed(() =>
   props.section.settings?.logo_position === 'left' ? 'left' : 'center'
 )

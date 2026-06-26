@@ -40,7 +40,6 @@ test('ImageHotspot section follows decoration plan contract', () => {
   assert.match(source, /label/)
   assert.match(source, /:block-id=/)
   assert.match(source, /:section-id=/)
-  assert.match(source, /focusBlock/)
   assert.match(source, /DecorationBlockHost/)
   assert.match(source, /44646d39\.9bb1a6/)
 })

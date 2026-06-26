@@ -35,28 +35,18 @@
       <div class="flex items-center justify-end gap-3 lg:gap-6 h-5">
         <!-- 购物车按钮 -->
         <button
-          class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity relative"
-          :aria-label="t('7812ddcf.53754b')"
+          class="relative flex h-5 w-5 items-center justify-center self-stretch hover:opacity-70 transition-opacity"
+          :aria-label="cartAriaLabel"
           @click="handleCart"
         >
-          <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5 text-[#191a1d]" />
-          <!-- 购物车数量徽章 - 移动端显示 -->
-          <span
-            v-if="cartItemCount > 0"
-            class="absolute -top-1 -right-1 lg:hidden bg-[#191a1d] text-white text-[10px] font-medium leading-5 px-1 min-w-[16px] h-4 flex items-center justify-center rounded-sm"
-          >
-            {{ cartItemCount > 99 ? '99+' : cartItemCount }}
-          </span>
+          <ECShoppingBagIcon class="h-[18px] w-[17px] text-[#191a1d]" :count="cartItemCount" />
         </button>
 
-        <!-- 用户按钮 -->
-        <button
-          class="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
-          :aria-label="t('7812ddcf.1fd02a')"
+        <HeaderUserEntry
+          :guest-aria-label="t('7812ddcf.1fd02a')"
+          variant="bar"
           @click="handleUser"
-        >
-          <UIcon name="i-heroicons-user" class="w-5 h-5 text-[#191a1d]" />
-        </button>
+        />
 
         <!-- 语言按钮 -->
         <div class="relative" ref="languageMenuRef">
@@ -114,18 +104,17 @@
  * HeaderBar 组件
  */
 
+import HeaderUserEntry from '~/components/BCHeaderBar/HeaderUserEntry.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { LOCALE_DEFINITIONS } from '~/shared/localeConfig'
 
 const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
 const cartStore = useCartStore()
 const { locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
-const localePath = useLocalePath()
 const { t } = useI18n()
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
+const { openUserCenter } = useHeaderUser()
 
 // 定义 emits
 const emit = defineEmits<{
@@ -143,6 +132,10 @@ const currentLocale = computed(() => locale.value)
 
 // 购物车商品数量
 const cartItemCount = computed(() => cartStore.totalItems || 0)
+const cartAriaLabel = computed(() => {
+  const label = t('7812ddcf.53754b')
+  return cartItemCount.value > 0 ? `${label} (${cartItemCount.value})` : label
+})
 
 // 可用语言列表（从配置中获取）
 const availableLocales = LOCALE_DEFINITIONS.map(({ code, name }) => ({ code, name }))
@@ -226,29 +219,7 @@ const handleGrid = () => {
 /**
  * 处理用户点击
  */
-const redirectToLogin = async () => {
-  const currentPath = route.fullPath
-  await router.push({
-    path: localePath('/account/login'),
-    query: {
-      redirect: currentPath,
-    },
-  })
-}
-
-const handleUser = async () => {
-  if (userStore.token && !userStore.userInfo) {
-    const result = await userStore.fetchUserInfo()
-    if (!result.success) {
-      await redirectToLogin()
-      return
-    }
-  }
-
-  if (userStore.isLoggedIn) {
-    await router.push(localePath('/account'))
-  } else {
-    await redirectToLogin()
-  }
+const handleUser = () => {
+  void openUserCenter()
 }
 </script>

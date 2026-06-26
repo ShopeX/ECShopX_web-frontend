@@ -6,6 +6,7 @@ import { MoneyValueObject, QuantityValueObject } from '~/shared/value-objects'
 export interface ICartItemModel {
   id: string
   productId: string
+  productBn?: string
   productName: string
   productImage: string
   specId: string

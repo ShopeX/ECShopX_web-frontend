@@ -22,7 +22,12 @@
             </NuxtLink>
           </div>
           <div v-else class="flex items-center space-x-2">
-            <span>{{ userInfo?.username }}</span>
+            <HeaderUserIdentity
+              :login-display-label="isProfileReady ? loginDisplayLabel : ''"
+              :user-avatar-url="userAvatarUrl"
+              :show-user-avatar-image="showUserAvatarImage && isProfileReady"
+              avatar-shell-class="bg-white/10"
+            />
             <span v-if="userInfo?.isPlusVip" class="text-xs bg-yellow-600 px-1 rounded">PLUS</span>
           </div>
         </div>
@@ -234,7 +239,13 @@
               </NuxtLink>
             </div>
             <div v-else class="flex items-center space-x-2">
-              <span class="font-medium">{{ userInfo?.username }}</span>
+              <HeaderUserIdentity
+                :login-display-label="isProfileReady ? loginDisplayLabel : ''"
+                :user-avatar-url="userAvatarUrl"
+                :show-user-avatar-image="showUserAvatarImage && isProfileReady"
+                avatar-shell-class="bg-gray-100"
+                label-class="font-medium"
+              />
               <span v-if="userInfo?.isPlusVip" class="text-xs bg-yellow-600 text-white px-1 rounded"
                 >PLUS</span
               >
@@ -315,6 +326,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import HeaderUserIdentity from '~/components/BCHeaderBar/HeaderUserIdentity.vue'
 import { useUserStore } from '~/stores/user'
 import { useCartStore } from '~/stores/cart'
 
@@ -335,11 +347,8 @@ const cartStore = useCartStore()
 const localePath = useLocalePath()
 const { t } = useI18n()
 const { mallLogoDarkUrl } = await useMallGlobalSetting()
-
-/**
- * 用户登录状态
- */
-const isLoggedIn = computed(() => userStore.isLoggedIn)
+const { isLoggedIn, isProfileReady, loginDisplayLabel, userAvatarUrl, showUserAvatarImage } =
+  useHeaderUser()
 
 /**
  * 用户信息

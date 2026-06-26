@@ -48,6 +48,7 @@ export interface ICartUI {
   items: {
     id: string
     productId: string
+    productBn?: string
     productName: string
     productImage: string
     specId: string
@@ -227,6 +228,7 @@ export function useCart() {
     return {
       id: item.id,
       productId: item.productId,
+      productBn: item.productBn || '',
       productName: translateIfGeneratedKey(item.productName),
       productImage: item.productImage,
       specId: item.specId,

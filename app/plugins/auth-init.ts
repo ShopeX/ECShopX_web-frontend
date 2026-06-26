@@ -16,8 +16,8 @@ export default defineNuxtPlugin({
     const userStore = useUserStore()
     const cartStore = useCartStore()
 
-    // 1. 初始化用户状态 (fetchUserInfo 如果有 token)
-    if (userStore.token && !userStore.userInfo) {
+    // 1. 会员资料仅在客户端拉取，避免 SSR 灌入不完整 profile 导致「先邮箱后手机号」闪烁
+    if (userStore.token && import.meta.client) {
       try {
         await userStore.fetchUserInfo()
       } catch (e) {

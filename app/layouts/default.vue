@@ -90,7 +90,15 @@
         </template>
       </USlideover>
 
-      <USlideover v-model:open="showMiniCart" side="right">
+      <USlideover
+        v-model:open="showMiniCart"
+        side="right"
+        :content="{ style: { width: 'min(100vw, 560px)', maxWidth: '560px' } }"
+        :ui="{
+          content:
+            'right-0 inset-y-0 !w-screen lg:!w-[560px] !max-w-[560px] bg-default divide-y divide-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none',
+        }"
+      >
         <template #content>
           <BCMiniCart v-model="showMiniCart" @close="showMiniCart = false" />
         </template>
@@ -259,6 +267,7 @@ const hotKeywords = computed(() => [
 
 const router = useRouter()
 const localePath = useLocalePath()
+const { openUserCenter } = useHeaderUser()
 
 const handleOpenCategoryNav = () => {
   showCategoryNav.value = true
@@ -272,8 +281,8 @@ const handleOpenSearch = () => {
   showSearchDrawer.value = true
 }
 
-const handleOpenUser = async () => {
-  await router.push(localePath('/account'))
+const handleOpenUser = () => {
+  void openUserCenter()
 }
 
 const handleSearch = (keyword: string) => {

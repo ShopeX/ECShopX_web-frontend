@@ -280,6 +280,9 @@
           :item-fee="order.itemFee"
           :freight-fee="order.freightFee"
           :discount-fee="order.discountFee"
+          :promotion-discount="order.promotionDiscount"
+          :coupon-discount="order.couponDiscount"
+          :member-discount="order.memberDiscount"
           :point-fee="order.pointFee"
           :total-fee="order.totalFee"
         />
@@ -343,6 +346,9 @@
           :item-fee="order.itemFee"
           :freight-fee="order.freightFee"
           :discount-fee="order.discountFee"
+          :promotion-discount="order.promotionDiscount"
+          :coupon-discount="order.couponDiscount"
+          :member-discount="order.memberDiscount"
           :point-fee="order.pointFee"
           :total-fee="order.totalFee"
         />

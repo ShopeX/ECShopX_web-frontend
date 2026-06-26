@@ -14,9 +14,12 @@ describe('ImageHotspot', () => {
     expect(source).toContain("legacyHotspots")
   })
 
-  it('shows hotspot visual overlay only in preview mode', () => {
+  it('keeps hotspot visual layer transparent in preview mode', () => {
     expect(source).toContain("props.isPreview")
-    expect(source).toContain("border border-white/80 bg-black/10 shadow-sm")
+    expect(source).toContain('class="block h-full w-full"')
+    expect(source).not.toContain("border border-white/80")
+    expect(source).not.toContain("bg-black/10")
+    expect(source).not.toContain("shadow-sm")
   })
 
   it('resolves both external and internal hotspot links', () => {
@@ -27,12 +30,28 @@ describe('ImageHotspot', () => {
     expect(source).toContain("localePath(`/products/${rawId}` as any)")
   })
 
-  it('uses loaded image dimensions to preserve poster ratio without cropping', () => {
-    expect(source).toContain("@load=\"handleImageLoad\"")
-    expect(source).toContain("naturalWidth")
-    expect(source).toContain("naturalHeight")
-    expect(source).toContain("loadedImageDimensions")
-    expect(source).toContain("object-contain")
+  it('renders poster self-adaptively without JS aspect-ratio', () => {
+    expect(source).toContain('class="block w-full h-auto"')
+    expect(source).not.toContain('aspectRatioStyle')
+    expect(source).not.toContain('handleImageLoad')
+    expect(source).not.toContain('loadedImageDimensions')
+    expect(source).not.toContain('naturalWidth')
+    expect(source).not.toContain('object-contain')
     expect(source).not.toContain("object-cover")
+  })
+
+  it('keeps the no-image placeholder in normal flow with a minimum height', () => {
+    expect(source).toContain(
+      'class="flex min-h-[200px] items-center justify-center bg-neutral-100 text-sm text-neutral-400"'
+    )
+    expect(source).not.toContain('absolute inset-0 flex min-h-[200px]')
+  })
+
+  it('does not wrap hotspots as standalone selectable blocks', () => {
+    expect(source).toContain('v-for="hotspot in activeHotspots"')
+    expect(source).toContain('class="group absolute z-[1] flex items-center justify-center"')
+    expect(source).toContain(':style="hotspot.style"')
+    expect(source).not.toContain(':block-id="hotspot.id"')
+    expect(source).not.toContain('focusBlock')
   })
 })

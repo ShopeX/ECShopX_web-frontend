@@ -88,8 +88,12 @@ export interface IOfflineBankAccountItem {
   id?: string | number
   account_id?: string | number
   account_name?: string
+  bank_account_name?: string
   bank_name?: string
+  bank_account_no?: string
   account_number?: string
+  china_ums_no?: string
+  pic?: string
   [key: string]: any
 }
 

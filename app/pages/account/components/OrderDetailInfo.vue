@@ -49,17 +49,23 @@
         }}</span>
         <span class="text-[14px] font-medium leading-5 text-[#191a1d]">¥ {{ freightFee }}</span>
       </div>
-      <div v-if="hasDiscount" class="flex items-center justify-between">
+      <div v-if="hasPromotionDiscount" class="flex items-center justify-between">
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
-          t('ee3264ed.f06ebf')
+          t('a2f77aaa.cd5666')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">¥ {{ discountFee }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- ¥ {{ promotionDiscount }}</span>
+      </div>
+      <div v-if="hasCouponDiscount" class="flex items-center justify-between">
+        <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
+          t('ee3264ed.2f3635')
+        }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- ¥ {{ couponDiscount }}</span>
       </div>
       <div v-if="hasPointFee" class="flex items-center justify-between">
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
           t('ee3264ed.d443a9')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">¥ {{ pointFee }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- ¥ {{ pointFee }}</span>
       </div>
       <!-- 实付金额 -->
       <div class="flex items-center justify-between">
@@ -83,14 +89,22 @@ interface Props {
   createTime: string
   itemFee: string
   freightFee: string
-  discountFee: string
+  discountFee?: string
+  promotionDiscount: string
+  couponDiscount: string
+  memberDiscount?: string
   pointFee: string
   totalFee: string
 }
 
 const props = defineProps<Props>()
 
-const hasDiscount = computed(() => parseFloat(props.discountFee.replace(',', '')) > 0)
-const hasPointFee = computed(() => parseFloat(props.pointFee.replace(',', '')) > 0)
+function parseAmount(value?: string) {
+  return parseFloat(String(value || '0').replace(/,/g, '')) || 0
+}
+
+const hasPromotionDiscount = computed(() => parseAmount(props.promotionDiscount) > 0)
+const hasCouponDiscount = computed(() => parseAmount(props.couponDiscount) > 0)
+const hasPointFee = computed(() => parseAmount(props.pointFee) > 0)
 
 </script>

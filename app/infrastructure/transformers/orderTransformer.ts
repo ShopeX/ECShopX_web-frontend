@@ -74,6 +74,13 @@ export interface IAddressModel {
 }
 
 export class OrderTransformer {
+  private static formatMoney(amount: number): string {
+    return Number(amount || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  }
+
   private static extractSkuFields(apiItem: any) {
     const direct = {
       skuNo: String(apiItem.sku_no ?? apiItem.item_no ?? ''),
@@ -270,9 +277,12 @@ export class OrderTransformer {
    * 转换订单商品项（含款号/款式/尺寸，用于订单列表与 Figma 对齐）
    */
   static toOrderItemModel(apiItem: any) {
-    const price = Number(apiItem.price || 0) / 100 // 分转元
+    const lineTotalPrice = Number(apiItem.total_fee ?? apiItem.price ?? 0) / 100
+    const salePrice = Number(apiItem.sale_price ?? 0) / 100
     const quantity = OrderTransformer.resolveItemQuantity(apiItem)
     const leftAftersalesNum = Number(apiItem.left_aftersales_num ?? quantity)
+    const isEmployeePurchase = apiItem.order_class === 'employee_purchase'
+    const displayPrice = isEmployeePurchase && salePrice > 0 ? salePrice : lineTotalPrice
 
     return {
       detailId: String(apiItem.id || apiItem.item_id || ''),
@@ -285,8 +295,12 @@ export class OrderTransformer {
       size: apiItem.spec_size ?? apiItem.size ?? '',
       quantity,
       leftAftersalesNum,
-      price,
-      subtotal: price * quantity,
+      price: lineTotalPrice,
+      salePrice,
+      orderClass: apiItem.order_class ?? '',
+      displayPrice,
+      subtotal: displayPrice * quantity,
+      subtotalDisplay: OrderTransformer.formatMoney(displayPrice * quantity),
     }
   }
 
@@ -299,8 +313,11 @@ export class OrderTransformer {
     const rawTime = apiOrder.create_time || apiOrder.order_time || ''
     const orderTime = OrderTransformer.formatTimestamp(rawTime)
     const totalAmount = Number(apiOrder.total_fee || apiOrder.total_amount || 0) / 100 // 分转元
-    const items = (apiOrder.item_infos || apiOrder.items || []).map(
-      OrderTransformer.toOrderItemModel
+    const items = (apiOrder.item_infos || apiOrder.items || []).map((item: any) =>
+      OrderTransformer.toOrderItemModel({
+        ...item,
+        order_class: apiOrder.order_class || apiOrder.orderClass || '',
+      })
     )
     const orderLeftAftersalesNum = Number(apiOrder.left_aftersales_num ?? NaN)
 
@@ -444,9 +461,13 @@ export class OrderTransformer {
         [raw.receiver_state, raw.receiver_city, raw.receiver_district, raw.receiver_address]
           .filter(Boolean)
           .join(' '),
-      itemFee: OrderTransformer.formatFen(raw.item_fee ?? 0),
+      itemFee: OrderTransformer.formatFen(raw.item_fee_new ?? raw.item_fee ?? 0),
+      marketFee: OrderTransformer.formatFen(raw.market_fee ?? 0),
       freightFee: OrderTransformer.formatFen(raw.freight_fee ?? 0),
       discountFee: OrderTransformer.formatFen(raw.discount_fee ?? 0),
+      promotionDiscount: OrderTransformer.formatFen(raw.promotion_discount ?? 0),
+      couponDiscount: OrderTransformer.formatFen(raw.coupon_discount ?? 0),
+      memberDiscount: OrderTransformer.formatFen(raw.member_discount ?? 0),
       pointFee: OrderTransformer.formatFen(raw.point_fee ?? 0),
       totalFee: OrderTransformer.formatFen(Number(raw.total_fee || raw.total_amount || 0)),
       logisticsNo: raw.logistics_no ?? raw.delivery_code ?? '',

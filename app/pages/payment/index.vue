@@ -115,9 +115,9 @@
                     @click="selectedBankAccountId = bank.id"
                   >
                     <img
-                      :src="bankAccountIconSrc"
+                      :src="bank.logo || '/images/payment/bank-account.svg'"
                       :alt="bank.bankName"
-                      class="h-12 w-12 shrink-0"
+                      class="h-12 w-12 shrink-0 rounded-full object-cover bg-[#f3f4f6]"
                     />
                     <div class="min-w-0 flex-1">
                       <p class="text-[14px] leading-5 text-[#101828]">
@@ -128,6 +128,9 @@
                       </p>
                       <p class="text-[14px] leading-5 text-[#4a5565] break-all">
                         {{ $t('eab46cc2.52093d') }}{{ bank.accountNumber }}
+                      </p>
+                      <p v-if="bank.unionNumber" class="text-[14px] leading-5 text-[#4a5565] break-all">
+                        银联号：{{ bank.unionNumber }}
                       </p>
                     </div>
                     <span
@@ -427,6 +430,8 @@ interface BankAccountOption {
   accountName: string
   bankName: string
   accountNumber: string
+  unionNumber: string
+  logo: string
 }
 
 interface VoucherFileItem {
@@ -468,7 +473,6 @@ const {
   retry,
 } = usePayment(orderIdRef)
 
-const bankAccountIconSrc = '/images/payment/bank-account.svg'
 const uploadVoucherIconSrc = '/images/payment/upload-voucher.svg'
 const fallbackAmountText = computed(() => (loadingOrder.value ? t('eab46cc2.26b5bd') : '¥ 0.00'))
 const BANK_TRANSFER_METHOD_KEYWORDS = [
@@ -577,17 +581,21 @@ function mapOfflineBankAccounts(response: any): BankAccountOption[] {
   return list
     .map((item: any, index: number) => {
       // 与接口约定一致：bank_account_name=用户名，bank_account_no=账户，bank_name=银行名称
-      const accountName = item?.bank_account_name ?? ''
+      const accountName = item?.bank_account_name ?? item?.account_name ?? ''
       const bankName = item?.bank_name ?? ''
-      const accountNumber = item?.bank_account_no ?? ''
+      const accountNumber = item?.bank_account_no ?? item?.account_number ?? ''
+      const unionNumber = item?.china_ums_no ?? ''
+      const logo = item?.pic ?? item?.logo ?? item?.bank_logo ?? ''
 
-      if (!accountName && !bankName && !accountNumber) return null
+      if (!accountName && !bankName && !accountNumber && !unionNumber) return null
 
       return {
         id: String(item?.id ?? item?.account_id ?? item?.bank_account_id ?? index),
         accountName: String(accountName),
         bankName: String(bankName),
         accountNumber: String(accountNumber),
+        unionNumber: String(unionNumber),
+        logo: String(logo),
       }
     })
     .filter(Boolean) as BankAccountOption[]

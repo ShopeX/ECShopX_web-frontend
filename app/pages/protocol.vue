@@ -1,16 +1,6 @@
 <template>
   <div class="min-h-screen bg-white">
     <div class="mx-auto max-w-[800px] px-4 py-8 lg:px-8 lg:py-12">
-      <!-- 返回按钮 -->
-      <button
-        type="button"
-        class="mb-6 flex items-center gap-1 text-[14px] text-[#4a5565] transition-colors hover:text-[#191a1d]"
-        @click="router.back()"
-      >
-        <UIcon name="i-heroicons-arrow-left" class="h-4 w-4" />
-        {{ t('f3a1b2c4.back') }}
-      </button>
-
       <!-- 加载状态 -->
       <div v-if="loading" class="flex items-center justify-center py-20">
         <span class="text-[14px] text-[#4a5565]">{{ t('f3a1b2c4.loading') }}</span>
@@ -44,14 +34,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { storeApiClient } from '~/infrastructure/http/clients'
 
 definePageMeta({
   layout: 'default',
 })
 
-const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
 

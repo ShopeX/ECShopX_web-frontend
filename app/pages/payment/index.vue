@@ -363,6 +363,34 @@
       </section>
 
       <section
+        v-if="isExternalWaiting"
+        class="flex-1 flex flex-col items-center justify-center px-4 lg:px-32 py-8"
+        data-testid="payment-waiting"
+      >
+        <div class="flex flex-col items-center gap-4 max-w-[400px] w-full text-center">
+          <p class="text-[24px] font-medium leading-[36px] text-[#191a1d]">
+            {{ $t('eab46cc2.8f5d9e') }}
+          </p>
+          <span class="text-[16px] font-medium leading-5 text-[#191a1d]">
+            {{ selectedMethodName }}
+          </span>
+          <p class="text-[14px] leading-5 text-[#4a5565]">
+            {{ $t('eab46cc2.e04fae') }}
+          </p>
+          <p class="text-[14px] leading-5 text-[#4a5565]">
+            {{ $t('eab46cc2.b7071d') }} {{ remainingTimeText }}
+          </p>
+          <button
+            type="button"
+            class="inline-flex items-center justify-center bg-white border border-[#0f0f10] text-[#191a1d] px-8 py-4 text-[14px] font-medium leading-5"
+            @click="reopenExternalPay"
+          >
+            {{ $t('eab46cc2.970b75') }}
+          </button>
+        </div>
+      </section>
+
+      <section
         v-if="payResult === 'success'"
         class="flex-1 flex flex-col items-center px-4 lg:px-32 py-8 w-full"
         data-testid="payment-success"
@@ -465,11 +493,14 @@ const {
   hasOrderId,
   canPay,
   showQrcode,
+  isExternalWaiting,
   orderAmountFormatted,
+  remainingTimeText,
   selectedMethodName,
   loadPaymentMethods,
   loadOrderInfo,
   payNow,
+  reopenExternalPay,
   retry,
 } = usePayment(orderIdRef)
 
@@ -487,7 +518,11 @@ const BANK_TRANSFER_METHOD_KEYWORDS = [
   '银行转账',
 ]
 const showIdleContent = computed(
-  () => !showQrcode.value && payResult.value !== 'success' && payResult.value !== 'fail'
+  () =>
+    !showQrcode.value &&
+    !isExternalWaiting.value &&
+    payResult.value !== 'success' &&
+    payResult.value !== 'fail'
 )
 
 function normalizeMethodValue(value?: string) {

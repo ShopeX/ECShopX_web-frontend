@@ -23,6 +23,7 @@ export type PaymentExecutionType =
   | 'wechat_jsapi'
   | 'wechat_h5'
   | 'alipay_wap'
+  | 'external_redirect'
 
 export interface PaymentClientRuntime {
   platform: PaymentClientPlatform
@@ -110,6 +111,10 @@ export function resolvePaymentExecutionType({
   runtime: PaymentClientRuntime
   selectedPayType: string
 }): PaymentExecutionType {
+  if (normalizePayType(selectedPayType) === 'doumenintl') {
+    return 'external_redirect'
+  }
+
   if (isWechatPayType(selectedPayType)) {
     if (runtime.platform === 'pc') {
       return 'qrcode'
@@ -179,6 +184,18 @@ function submitPaymentForm(payment: string, target: '_self' | '_blank' = '_self'
 function openPaymentUrl(url: string) {
   if (!import.meta.client || typeof window === 'undefined' || !url) return false
   window.location.assign(url)
+  return true
+}
+
+function openPaymentUrlInNewTab(url: string) {
+  if (
+    !url ||
+    (typeof import.meta.client !== 'undefined' && !import.meta.client) ||
+    typeof window === 'undefined'
+  ) {
+    return false
+  }
+  window.open(url, '_blank')
   return true
 }
 
@@ -257,6 +274,8 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
   const pollTimer = ref<ReturnType<typeof setInterval> | null>(null)
   const countdownEndAt = ref<number>(0)
   const countdownTick = ref(0)
+  const externalPayUrl = ref('')
+  const isExternalWaiting = ref(false)
 
   const hasOrderId = computed(() => !!orderIdValue.value)
   const canPay = computed(
@@ -359,6 +378,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
       const status = normalizePaymentStatus(data?.payStatus ?? data?.orderInfo?.order_status ?? '')
       if (isPaymentSuccessStatus(status)) {
         payResult.value = 'success'
+        isExternalWaiting.value = false
         stopPolling()
         return true
       }
@@ -377,6 +397,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
         const hasPaid = await checkPaymentResult()
         if (!hasPaid) {
           payResult.value = 'fail'
+          isExternalWaiting.value = false
           error.value = t('eab46cc2.201d09')
         }
         return
@@ -393,6 +414,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     payResult.value = 'pending'
     paymentCode.value = ''
     paymentCodeImage.value = ''
+    isExternalWaiting.value = false
     try {
       const runtime = getPaymentClientRuntime()
       const res = await paymentApiClient.getOrderPaymentInfo({
@@ -458,15 +480,35 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
           }
           break
         }
+        case 'external_redirect': {
+          const payUrl = data?.pay_url || extractPaymentRedirectUrl(data)
+          if (openPaymentUrlInNewTab(payUrl)) {
+            externalPayUrl.value = payUrl
+            isExternalWaiting.value = true
+            payResult.value = 'pending'
+            countdownEndAt.value = Date.now() + COUNTDOWN_DEFAULT_MS
+            startPolling()
+            return
+          }
+          break
+        }
       }
 
       payResult.value = 'fail'
+      isExternalWaiting.value = false
       error.value = t('9233eff9.874265')
     } catch (e: any) {
       payResult.value = 'fail'
+      isExternalWaiting.value = false
       error.value = e?.message ?? t('9233eff9.bd87f5')
     } finally {
       loading.value = false
+    }
+  }
+
+  function reopenExternalPay() {
+    if (externalPayUrl.value) {
+      openPaymentUrlInNewTab(externalPayUrl.value)
     }
   }
 
@@ -476,6 +518,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     paymentCode.value = ''
     paymentCodeImage.value = ''
     countdownEndAt.value = 0
+    isExternalWaiting.value = false
     stopPolling()
   }
 
@@ -499,6 +542,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
       paymentCodeImage.value = ''
       payResult.value = 'idle'
       countdownEndAt.value = 0
+      isExternalWaiting.value = false
       stopPolling()
     }
   })
@@ -542,6 +586,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     hasOrderId,
     canPay,
     showQrcode,
+    isExternalWaiting,
     orderAmountDisplay,
     orderAmountFormatted,
     remainingTimeText,
@@ -549,6 +594,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     loadPaymentMethods,
     loadOrderInfo,
     payNow,
+    reopenExternalPay,
     retry,
     stopPolling,
   }

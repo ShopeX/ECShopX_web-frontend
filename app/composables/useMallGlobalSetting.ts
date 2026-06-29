@@ -13,13 +13,19 @@ export async function useMallGlobalSetting() {
       return (await templateApiClient.getLoginPageSetting()) || {}
     },
     {
+      // Fetch on the client so company_id resolves from window.location.hostname.
       default: () => setting.value,
+      server: false,
     }
   )
 
-  if (data.value) {
-    setting.value = data.value
-  }
+  watch(
+    data,
+    (val) => {
+      if (val) setting.value = val
+    },
+    { immediate: true }
+  )
 
   const mallLogoLightUrl = computed(
     () => setting.value.logo_light || setting.value.logo || DEFAULT_LOGO_URL
@@ -41,4 +47,3 @@ export async function useMallGlobalSetting() {
     refresh,
   }
 }
-

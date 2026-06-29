@@ -5,7 +5,14 @@ const DEFAULT_LOGO_URL = '/images/logo/logo.png'
 const DEFAULT_LOGIN_BACKGROUND_URL = '/assets/images/login-bg.png'
 
 export async function useMallGlobalSetting() {
-  const setting = useState<IMallGlobalSetting>('mall-global-setting', () => ({}))
+  const settingCache = useCookie<IMallGlobalSetting>('mall-global-setting-cache', {
+    maxAge: 60 * 60 * 24 * 7,
+    sameSite: 'lax',
+  })
+  const setting = useState<IMallGlobalSetting>(
+    'mall-global-setting',
+    () => settingCache.value || {}
+  )
 
   const { data, pending, error, refresh } = await useAsyncData(
     'mall-global-setting',
@@ -22,7 +29,10 @@ export async function useMallGlobalSetting() {
   watch(
     data,
     (val) => {
-      if (val) setting.value = val
+      if (val) {
+        setting.value = val
+        settingCache.value = val
+      }
     },
     { immediate: true }
   )

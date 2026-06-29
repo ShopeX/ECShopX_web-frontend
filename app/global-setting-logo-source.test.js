@@ -18,6 +18,8 @@ test('mall global setting composable fetches once and exposes logo/background fa
 
   const source = readSource(file)
   assert.match(source, /useAsyncData\(/)
+  assert.match(source, /server:\s*false/)
+  assert.match(source, /watch\(\s*data/)
   assert.match(source, /useState<.*mall-global-setting/)
   assert.match(source, /templateApiClient\.getLoginPageSetting\(\)/)
   assert.match(source, /logo_light/)

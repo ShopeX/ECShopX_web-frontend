@@ -1,0 +1,86 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ItemApiClient } from './ItemApiClient'
+
+const httpMock = vi.fn()
+
+vi.stubGlobal('useNuxtApp', () => ({
+  $api: httpMock,
+}))
+
+vi.stubGlobal('useRuntimeConfig', () => ({
+  public: {
+    businessMode: 'b2c',
+  },
+}))
+
+describe('ItemApiClient.getItemList', () => {
+  beforeEach(() => {
+    httpMock.mockReset()
+    httpMock.mockResolvedValue({})
+  })
+
+  const baseParams = {
+    page: '1',
+    pageSize: '20',
+    item_type: 'normal',
+    main_category: '6875',
+    is_tdk: '1',
+    type: '0',
+  }
+
+  it('sends category_id in b2c mode', async () => {
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      public: {
+        businessMode: 'b2c',
+      },
+    }))
+
+    const client = new ItemApiClient()
+    await client.getItemList(baseParams)
+
+    expect(httpMock).toHaveBeenCalledTimes(1)
+    expect(httpMock).toHaveBeenCalledWith('/wxapp/goods/items', {
+      method: 'GET',
+      query: expect.objectContaining({
+        page: '1',
+        pageSize: '20',
+        item_type: 'normal',
+        category_id: '6875',
+        is_tdk: '1',
+        type: '0',
+      }),
+      cache: 'default',
+    })
+
+    const query = httpMock.mock.calls[0]?.[1]?.query
+    expect(query.main_category).toBeUndefined()
+  })
+
+  it('keeps main_category in bbc mode', async () => {
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      public: {
+        businessMode: 'bbc',
+      },
+    }))
+
+    const client = new ItemApiClient()
+    await client.getItemList(baseParams)
+
+    expect(httpMock).toHaveBeenCalledTimes(1)
+    expect(httpMock).toHaveBeenCalledWith('/wxapp/goods/items', {
+      method: 'GET',
+      query: expect.objectContaining({
+        page: '1',
+        pageSize: '20',
+        item_type: 'normal',
+        main_category: '6875',
+        is_tdk: '1',
+        type: '0',
+      }),
+      cache: 'default',
+    })
+
+    const query = httpMock.mock.calls[0]?.[1]?.query
+    expect(query.category_id).toBeUndefined()
+  })
+})

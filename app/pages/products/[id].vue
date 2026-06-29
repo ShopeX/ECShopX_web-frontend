@@ -294,46 +294,6 @@
               />
             </div>
           </div>
-
-          <!-- Additional Info Accordion 1 (配送信息) -->
-          <div class="border-b border-[#e5e7eb]">
-            <button
-              class="w-full flex items-center justify-between py-4 text-sm lg:text-base font-normal lg:font-medium leading-5 lg:leading-6 text-[#364153]"
-              @click="toggleAccordion('info1')"
-            >
-              <span>{{ $t('464b6330.d4327c') }}</span>
-              <UIcon
-                name="i-heroicons-chevron-down"
-                class="w-4 h-4 lg:w-6 lg:h-6 transition-transform"
-                :class="openAccordion === 'info1' ? 'rotate-180' : ''"
-              />
-            </button>
-            <div v-if="openAccordion === 'info1'" class="pb-4 lg:pb-12">
-              <div class="text-sm lg:text-base leading-5 lg:leading-6 text-[#364153]">
-                {{ $t('464b6330.d4327c') }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Additional Info Accordion 2 (配送信息) -->
-          <div class="border-b border-[#e5e7eb]">
-            <button
-              class="w-full flex items-center justify-between py-4 text-sm lg:text-base font-normal lg:font-medium leading-5 lg:leading-6 text-[#364153]"
-              @click="toggleAccordion('info2')"
-            >
-              <span>{{ $t('464b6330.d4327c') }}</span>
-              <UIcon
-                name="i-heroicons-chevron-down"
-                class="w-4 h-4 lg:w-6 lg:h-6 transition-transform"
-                :class="openAccordion === 'info2' ? 'rotate-180' : ''"
-              />
-            </button>
-            <div v-if="openAccordion === 'info2'" class="pb-4 lg:pb-12">
-              <div class="text-sm lg:text-base leading-5 lg:leading-6 text-[#364153]">
-                {{ $t('464b6330.d4327c') }}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -62,7 +62,7 @@
             <div v-if="selectedReason === 'other'" class="flex flex-col gap-[8px]">
               <textarea
                 v-model="otherReason"
-                class="h-[56px] w-full resize-none border-0 bg-[#f3f4f6] px-[8px] py-[12px] text-[14px] leading-5 text-[#191a1d] placeholder-[#99a1af] outline-none focus:ring-0"
+                class="h-[80px] w-full resize-none border-0 bg-[#f3f4f7] px-[12px] py-[8px] text-[14px] leading-5 text-[#191a1d] placeholder-[#99a1af] outline-none focus:ring-0"
                 :placeholder="t('a208bce0.122878')"
                 :aria-invalid="Boolean(errorMessage)"
                 :disabled="loading"
@@ -80,7 +80,7 @@
           >
             <button
               type="button"
-              class="flex h-[36px] min-w-0 flex-1 items-center justify-center border border-[#0f0f10] bg-white px-[24px] text-[14px] font-medium leading-5 text-[#191a1d] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 lg:h-[37px] lg:flex-none lg:px-[72px]"
+              class="flex h-[52px] min-w-0 flex-1 items-center justify-center border border-[#0f0f10] bg-white px-[24px] text-[14px] font-medium leading-5 text-[#191a1d] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 lg:h-[37px] lg:flex-none lg:px-[72px]"
               :disabled="loading"
               @click="handleClose"
             >
@@ -88,7 +88,7 @@
             </button>
             <button
               type="button"
-              class="flex h-[36px] min-w-0 flex-1 items-center justify-center bg-[#0f0f10] px-[24px] text-[14px] font-medium leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 lg:h-[37px] lg:flex-none lg:px-[72px]"
+              class="flex h-[52px] min-w-0 flex-1 items-center justify-center bg-[#0f0f10] px-[24px] text-[14px] font-medium leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 lg:h-[37px] lg:flex-none lg:px-[72px]"
               :disabled="loading"
               @click="handleSubmit"
             >
@@ -120,7 +120,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const selectedReason = ref<CancelOrderReasonValue>(CANCEL_ORDER_REASONS[0].value)
+const defaultReason: CancelOrderReasonValue = 'other'
+const selectedReason = ref<CancelOrderReasonValue>(defaultReason)
 const otherReason = ref('')
 const errorMessage = ref('')
 
@@ -142,7 +143,7 @@ watch(
   () => props.visible,
   (visible) => {
     if (visible) {
-      selectedReason.value = CANCEL_ORDER_REASONS[0].value
+      selectedReason.value = defaultReason
       otherReason.value = ''
       errorMessage.value = ''
     }

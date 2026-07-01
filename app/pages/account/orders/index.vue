@@ -279,7 +279,7 @@
                           v-if="order.canCancel"
                           type="button"
                           class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
-                          @click.stop="cancelOrder(order.orderId)"
+                          @click.stop="cancelOrder(order)"
                         >
                           {{ t('de8076e6.b21b5e') }}
                         </button>
@@ -388,6 +388,13 @@
       @close="aftersalesVisible = false"
       @submitted="loadOrders(currentStatus, currentPage)"
     />
+
+    <BCCancelOrderReasonModal
+      :visible="reasonModalVisible"
+      :loading="cancelSubmitting"
+      @close="closeReasonModal"
+      @submit="submitCancel"
+    />
   </div>
 </template>
 
@@ -432,9 +439,13 @@ const {
   logisticsTrackingNo,
   logisticsCompany,
   logisticsTraces,
+  reasonModalVisible,
+  cancelSubmitting,
   loadOrders,
   changeStatus,
   cancelOrder,
+  submitCancel,
+  closeReasonModal,
   confirmReceipt,
   deleteOrder,
   payNow,
@@ -570,7 +581,7 @@ function handleMobileAction(action: MobileOrderAction, order: any) {
       openReview(order)
       break
     case 'cancel':
-      cancelOrder(order.orderId)
+      cancelOrder(order)
       break
     case 'delete':
       deleteOrder(order.orderId)

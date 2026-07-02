@@ -46,6 +46,7 @@ import type {
 } from '~/decoration-engine/types/decoration'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 interface ProductShelfSettings {
   title: string
@@ -71,7 +72,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const settings = computed<ProductShelfSettings>(() => {
-  const raw = props.section.settings as Record<string, unknown>
+  const raw = resolveSectionSettings('product-shelf', props.section.settings)
   const rawColumns = Number(raw.columns ?? 4)
   const rawLimit = Number(raw.limit ?? 8)
   const rawItemIds = Array.isArray(raw.itemIds) ? raw.itemIds : []

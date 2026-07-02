@@ -104,6 +104,7 @@ import type {
   DecorationHighlightedBlock,
   DecorationSection,
 } from '~/decoration-engine/types/decoration'
+import { resolveBlockSettings, resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 const props = defineProps<{
   section: DecorationSection
@@ -119,16 +120,17 @@ function translateIfGeneratedKey(value: string) {
 }
 
 const sectionClasses = computed(() => [
-  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
-  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+  resolveSectionPaddingClass(sectionSettings.value.padding_top, 'top'),
+  resolveSectionPaddingClass(sectionSettings.value.padding_bottom, 'bottom'),
 ])
+const sectionSettings = computed(() => resolveSectionSettings('footer', props.section.settings))
 const sectionInnerClasses = computed(() => [
-  props.section.settings?.full_width === false
+  sectionSettings.value.full_width === false
     ? 'mx-auto max-w-[1440px] px-6 md:px-12'
     : 'w-full max-w-none px-6 md:px-12',
 ])
 const sectionStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const scheme = resolveSectionColorScheme(sectionSettings.value.color_scheme)
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,
@@ -139,7 +141,9 @@ const footerMenuIds = computed(() =>
   props.section.block_order
     .map((blockId) => props.section.blocks[blockId])
     .filter((block) => block?.type === 'footer-menu' && !block.disabled)
-    .map((block) => resolveWebMenuRequestValue((block?.settings as Record<string, unknown>)?.menu))
+    .map((block) =>
+      resolveWebMenuRequestValue(resolveBlockSettings(block?.type || '', block?.settings).menu)
+    )
     .filter(Boolean)
 )
 
@@ -161,7 +165,7 @@ const footerBlocks = computed(
           return null
         }
 
-        const settings = block.settings as Record<string, unknown>
+        const settings = resolveBlockSettings(block.type, block.settings)
         const columnSpan = normalizeColumnSpan(settings.column_span)
 
         if (block.type === 'footer-menu') {

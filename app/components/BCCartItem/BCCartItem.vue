@@ -52,14 +52,16 @@
               </p>
             </div>
             <div class="relative shrink-0 mt-2">
-              <p
-                class="font-['Noto_Sans_SC'] font-normal leading-[20px] text-[#364153] text-[14px]"
-              >
-                {{ t('9864a2ba.b388f8') }}
-                <span class="font-['Inter'] font-medium text-[16px] ml-1">{{
-                  item.priceDisplay
-                }}</span>
-              </p>
+              <BCCartLinePrice
+                :sale-price-cents="item.salePriceCents"
+                :member-price-cents="item.memberPriceCents"
+                :market-price-cents="item.marketPriceCents"
+                :effective-price-display="item.effectivePriceDisplay"
+                :market-price-display="item.marketPriceDisplay"
+                :has-member-price-layout="item.hasMemberPriceLayout"
+                :has-market-discount="item.hasMarketDiscount"
+                variant="cart-page"
+              />
             </div>
             <div v-if="!item.canBePurchased" class="text-xs text-red-500 mt-1">
               {{ t('9864a2ba.502a91') }}
@@ -166,6 +168,7 @@
 
 <script setup lang="ts">
 import { ECCheckbox } from '~/components/ECCheckbox'
+import { BCCartLinePrice } from '~/components/BCCartLinePrice'
 import type { ICartUI } from '~/composables/useCart'
 
 interface Props {

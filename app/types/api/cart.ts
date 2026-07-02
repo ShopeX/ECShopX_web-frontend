@@ -26,6 +26,12 @@ export interface ICartItem {
   price: string | number
   /** 市场价 */
   market_price?: string | number
+  /** 会员价（分） */
+  member_price?: string | number
+  /** 活动价（分） */
+  activity_price?: string | number
+  /** 组合价（分） */
+  package_price?: string | number
   /** 数量 */
   num: number
   /** 库存 */

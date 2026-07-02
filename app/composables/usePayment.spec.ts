@@ -68,4 +68,33 @@ describe('doumen_intl external redirect waiting state', () => {
 
     expect(window.open).toHaveBeenCalledWith(payUrl, '_blank')
   })
+
+  it('marks external payment as unconfirmed instead of failed when polling times out', async () => {
+    const payment = usePayment(ref('order-1'))
+    payment.selectedPayType.value = 'doumen_intl'
+
+    await payment.payNow()
+
+    vi.advanceTimersByTime(65000)
+    await vi.runOnlyPendingTimersAsync()
+
+    expect(payment.payResult.value).toBe('unconfirmed')
+    expect(payment.isExternalWaiting.value).toBe(false)
+    expect(payment.error.value).toBeNull()
+  })
+
+  it('marks payment success when manual recheck finds a paid order', async () => {
+    const payment = usePayment(ref('order-1'))
+    payment.selectedPayType.value = 'doumen_intl'
+
+    await payment.payNow()
+    vi.advanceTimersByTime(65000)
+    await vi.runOnlyPendingTimersAsync()
+
+    vi.mocked(paymentApiClient.getOrderInfo).mockResolvedValue({ data: { payStatus: 'paid' } })
+    await payment.recheckPaymentResult()
+
+    expect(payment.payResult.value).toBe('success')
+    expect(payment.isExternalWaiting.value).toBe(false)
+  })
 })

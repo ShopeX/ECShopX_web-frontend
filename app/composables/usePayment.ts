@@ -270,7 +270,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
   const loadingMethods = ref(false)
   const loadingOrder = ref(false)
   const error = ref<string | null>(null)
-  const payResult = ref<'idle' | 'pending' | 'success' | 'fail'>('idle')
+  const payResult = ref<'idle' | 'pending' | 'success' | 'fail' | 'unconfirmed'>('idle')
   const pollTimer = ref<ReturnType<typeof setInterval> | null>(null)
   const countdownEndAt = ref<number>(0)
   const countdownTick = ref(0)
@@ -368,6 +368,12 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     }
   }
 
+  function markPaymentUnconfirmed() {
+    payResult.value = 'unconfirmed'
+    isExternalWaiting.value = false
+    error.value = null
+  }
+
   async function checkPaymentResult(): Promise<boolean> {
     const id = orderIdValue.value
     if (!id) return false
@@ -396,9 +402,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
         stopPolling()
         const hasPaid = await checkPaymentResult()
         if (!hasPaid) {
-          payResult.value = 'fail'
-          isExternalWaiting.value = false
-          error.value = t('eab46cc2.201d09')
+          markPaymentUnconfirmed()
         }
         return
       }
@@ -512,6 +516,19 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     }
   }
 
+  async function recheckPaymentResult() {
+    loading.value = true
+    error.value = null
+    try {
+      const hasPaid = await checkPaymentResult()
+      if (!hasPaid) {
+        markPaymentUnconfirmed()
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
   function retry() {
     error.value = null
     payResult.value = 'idle'
@@ -595,6 +612,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     loadOrderInfo,
     payNow,
     reopenExternalPay,
+    recheckPaymentResult,
     retry,
     stopPolling,
   }

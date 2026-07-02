@@ -195,8 +195,8 @@ export const useCartStore = defineStore('cart', {
       cartUI.setActionLoading(itemId, true)
       try {
         await cartApiClient.removeCartItem(itemId)
-        // ✅ 成功：静默更新汇总数据，保持已删除的商品状态
-        await this.loadCart({ silent: true, summaryOnly: true })
+        // 删除成功后重新拉取列表与汇总，保持与购物车页一致
+        await this.loadCart({ silent: true })
       } catch (error) {
         // ❌ 失败：恢复商品到原位置
         console.error('Failed to remove item:', error)

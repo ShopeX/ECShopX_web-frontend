@@ -71,7 +71,7 @@
           v-if="showRemove"
           type="button"
           class="self-start font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#191a1d] hover:text-red-600"
-          @click="showConfirm = true"
+          @click="handleRemoveClick"
         >
           {{ t('9864a2ba.2f4aad') }}
         </button>
@@ -162,7 +162,7 @@
       </p>
     </div>
 
-    <div class="flex h-10 w-[120px] shrink-0 items-center justify-end">
+    <div class="flex w-[120px] shrink-0 flex-col items-end gap-2">
       <QuantityStepper
         class="w-full"
         :quantity="item.quantity"
@@ -173,11 +173,19 @@
         @decrease="$emit('quantity-change', item.id, item.quantity - 1)"
         @increase="$emit('quantity-change', item.id, item.quantity + 1)"
       />
+      <button
+        v-if="showRemove"
+        type="button"
+        class="font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#191a1d] hover:text-red-600"
+        @click="handleRemoveClick"
+      >
+        {{ t('9864a2ba.2f4aad') }}
+      </button>
     </div>
   </div>
 
   <ECModal
-    v-if="showRemove"
+    v-if="showRemove && !externalRemoveConfirm"
     v-model="showConfirm"
     :title="t('9864a2ba.2f4aad')"
     :content="t('9864a2ba.3e3483')"
@@ -194,6 +202,8 @@ interface Props {
   item: ICartUI['items'][number]
   loading?: boolean
   showRemove?: boolean
+  /** 由父级（如购物袋抽屉）统一弹出确认框，避免被 Slideover 遮挡 */
+  externalRemoveConfirm?: boolean
 }
 
 const props = defineProps<Props>()
@@ -201,6 +211,7 @@ const emit = defineEmits<{
   (e: 'toggle-selection', itemId: string): void
   (e: 'quantity-change', itemId: string, quantity: number): void
   (e: 'remove', itemId: string): void
+  (e: 'request-remove', itemId: string): void
 }>()
 
 const { t } = useI18n()
@@ -243,6 +254,14 @@ const specLines = computed(() => {
 
   return [{ label: t('9864a2ba.a74053').replace(':', ''), value: specName }]
 })
+
+function handleRemoveClick() {
+  if (props.externalRemoveConfirm) {
+    emit('request-remove', props.item.id)
+    return
+  }
+  showConfirm.value = true
+}
 
 function handleConfirmRemove() {
   showConfirm.value = false

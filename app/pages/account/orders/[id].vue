@@ -196,7 +196,7 @@
             <span>
               {{ t('de8076e6.450efd') }}:
               <span class="font-medium text-[16px] text-[#191a1d]">
-                ¥ {{ formatAmount(order.totalAmount) }}
+                {{ formatAmount(order.totalAmount) }}
               </span>
             </span>
           </div>
@@ -366,7 +366,7 @@
         <span>
           {{ t('ee3264ed.de8e9a') }}：
           <span class="font-medium text-[16px] text-[#191a1d]">
-            ¥ {{ formatAmount(order.totalAmount) }}
+            {{ formatAmount(order.totalAmount) }}
           </span>
         </span>
       </div>
@@ -431,6 +431,7 @@ import OrderLogisticsDialog from '../components/OrderLogisticsDialog.vue'
 import OrderReviewModal from '../components/OrderReviewModal.vue'
 import AftersalesPanel from '../components/AftersalesPanel.vue'
 import type { AftersalesPanelItem } from '../components/AftersalesFormContent.vue'
+import { formatMoneyYuan } from '~/utils/currencyFormat'
 
 definePageMeta({
   layout: 'default',
@@ -487,10 +488,7 @@ const paymentMethodText = computed(() => {
 })
 
 function formatAmount(amount: number) {
-  return Number(amount || 0).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
+  return formatMoneyYuan(Number(amount || 0))
 }
 
 function handleViewLogistics() {

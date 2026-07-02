@@ -7,9 +7,9 @@
         >
           {{ t('464b6330.8fdd6f') }}
         </span>
-        <span :class="primaryPriceClass">¥{{ formatPriceYuan(memberPriceCents) }}</span>
+        <span :class="primaryPriceClass">{{ formatMoneyFen(memberPriceCents) }}</span>
       </div>
-      <span :class="secondaryPriceClass">¥{{ formatPriceYuan(salePriceCents) }}</span>
+      <span :class="secondaryPriceClass">{{ formatMoneyFen(salePriceCents) }}</span>
     </template>
     <div
       v-else
@@ -19,9 +19,9 @@
           : 'flex flex-col items-start gap-0.5',
       ]"
     >
-      <span :class="primaryPriceClass">¥{{ formatPriceYuan(salePriceCents) }}</span>
+      <span :class="primaryPriceClass">{{ formatMoneyFen(salePriceCents) }}</span>
       <span v-if="showMarketPrice" :class="marketPriceClass">
-        ¥{{ formatPriceYuan(marketPriceCents) }}
+        {{ formatMoneyFen(marketPriceCents) }}
       </span>
     </div>
   </div>
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { useProductPriceDisplay } from '~/composables/useProductPriceDisplay'
+import { formatMoneyFen } from '~/utils/currencyFormat'
 
 interface Props {
   salePriceCents: number
@@ -52,7 +53,7 @@ const salePriceCents = computed(() => props.salePriceCents)
 const marketPriceCents = computed(() => props.marketPriceCents)
 const memberPriceCents = computed(() => props.memberPriceCents)
 
-const { hasMemberPrice, showMarketPrice, formatPriceYuan } = useProductPriceDisplay({
+const { hasMemberPrice, showMarketPrice } = useProductPriceDisplay({
   salePriceCents,
   marketPriceCents,
   memberPriceCents,

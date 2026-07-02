@@ -41,31 +41,31 @@
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
           t('1cc0f760.a03deb')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">¥ {{ itemFee }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">{{ formatAmount(itemFee) }}</span>
       </div>
       <div class="flex items-center justify-between">
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
           t('ee3264ed.9a935b')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">¥ {{ freightFee }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">{{ formatAmount(freightFee) }}</span>
       </div>
       <div v-if="hasPromotionDiscount" class="flex items-center justify-between">
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
           t('a2f77aaa.cd5666')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- ¥ {{ promotionDiscount }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- {{ formatAmount(promotionDiscount) }}</span>
       </div>
       <div v-if="hasCouponDiscount" class="flex items-center justify-between">
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
           t('ee3264ed.2f3635')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- ¥ {{ couponDiscount }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- {{ formatAmount(couponDiscount) }}</span>
       </div>
       <div v-if="hasPointFee" class="flex items-center justify-between">
         <span class="text-[14px] leading-5 text-[#4a5565] whitespace-nowrap">{{
           t('ee3264ed.d443a9')
         }}</span>
-        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- ¥ {{ pointFee }}</span>
+        <span class="text-[14px] font-medium leading-5 text-[#191a1d]">- {{ formatAmount(pointFee) }}</span>
       </div>
       <!-- 实付金额 -->
       <div class="flex items-center justify-between">
@@ -73,7 +73,7 @@
           t('1cc0f760.94a7de')
         }}</span>
         <span data-testid="total-fee" class="text-[16px] font-medium leading-5 text-[#191a1d]"
-          >¥ {{ totalFee }}</span
+          >{{ formatAmount(totalFee) }}</span
         >
       </div>
     </div>
@@ -82,6 +82,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { formatOrderAmountDisplay } from '~/utils/currencyFormat'
 const { t } = useI18n()
 
 interface Props {
@@ -107,4 +108,7 @@ const hasPromotionDiscount = computed(() => parseAmount(props.promotionDiscount)
 const hasCouponDiscount = computed(() => parseAmount(props.couponDiscount) > 0)
 const hasPointFee = computed(() => parseAmount(props.pointFee) > 0)
 
+function formatAmount(value: string) {
+  return formatOrderAmountDisplay(value)
+}
 </script>

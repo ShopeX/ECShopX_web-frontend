@@ -311,7 +311,7 @@
       class="lg:hidden sticky bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] px-4 py-4 flex items-center gap-6 z-50 shadow-lg"
     >
       <p class="text-base font-medium leading-5 text-[#191a1d] shrink-0">
-        ¥{{ formatPriceYuan(currentFinalPriceCents) }}
+        {{ formatDisplayFromFen(currentFinalPriceCents) }}
       </p>
 
       <!-- 按钮组 -->
@@ -721,7 +721,7 @@ const currentSalePriceCents = computed(() => resolveItemPriceCents('price'))
 const currentMarketPriceCents = computed(() => resolveItemPriceCents('market_price'))
 const currentMemberPriceCents = computed(() => resolveItemPriceCents('member_price'))
 
-const { finalPriceCents: currentFinalPriceCents, formatPriceYuan } = useProductPriceDisplay({
+const { finalPriceCents: currentFinalPriceCents, formatDisplayFromFen } = useProductPriceDisplay({
   salePriceCents: currentSalePriceCents,
   marketPriceCents: currentMarketPriceCents,
   memberPriceCents: currentMemberPriceCents,

@@ -20,11 +20,10 @@
 
       <div class="flex items-baseline gap-2 mb-2">
         <div class="text-red-500">
-          <span class="text-xs">¥</span>
-          <span class="text-lg font-medium">{{ formatPrice(info.price) }}</span>
+          <span class="text-lg font-medium">{{ formatMoneyFen(info.price) }}</span>
         </div>
         <div v-if="info.market_price" class="text-xs text-gray-400 line-through">
-          ¥{{ formatPrice(info.market_price) }}
+          {{ formatMoneyFen(info.market_price) }}
         </div>
       </div>
 
@@ -39,6 +38,8 @@
 </template>
 
 <script setup>
+import { formatMoneyFen } from '~/utils/currencyFormat'
+
 const { t, localePath } = useI18n()
 
 const props = defineProps({
@@ -47,11 +48,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-// 格式化价格
-const formatPrice = (price) => {
-  return (price / 100).toFixed(2)
-}
 
 // 跳转到详情页 - 使用 navigateTo 替代 useRouter（SSR 安全）
 const navigateToDetail = () => {

@@ -11,11 +11,19 @@ import { ref, computed } from 'vue'
 import { orderApiClient } from '~/infrastructure/http/clients/OrderApiClient'
 import { OrderTransformer } from '~/infrastructure/transformers/orderTransformer'
 import { OrderStatus, type ILogisticsTrace } from '~/types/api/order'
+import type { OrderCancelTarget } from '~/composables/useOrderCancel'
 
 export function useOrders() {
   const toast = useToastMessage()
   const { confirm } = useModal()
   const { t } = useI18n()
+  const {
+    reasonModalVisible,
+    cancelSubmitting,
+    requestCancel,
+    submitCancel,
+    closeReasonModal,
+  } = useOrderCancel()
 
   // 状态
   const orders = ref<any[]>([])
@@ -158,27 +166,8 @@ export function useOrders() {
   /**
    * 取消订单
    */
-  async function cancelOrder(orderId: string) {
-    return new Promise<boolean>((resolve) => {
-      confirm({
-        title: t('de8076e6.b21b5e'),
-        content: t('f62e8236.2baf23'),
-        onConfirm: async () => {
-          try {
-            await orderApiClient.cancelOrder(orderId)
-            toast.show(t('f62e8236.5af500'))
-            await refresh()
-            resolve(true)
-          } catch (err: any) {
-            toast.show(err.message || t('f62e8236.c623f1'))
-            resolve(false)
-          }
-        },
-        onCancel: () => {
-          resolve(false)
-        },
-      })
-    })
+  async function cancelOrder(order: OrderCancelTarget) {
+    return requestCancel(order, refresh)
   }
 
   /**
@@ -332,6 +321,8 @@ export function useOrders() {
     logisticsTrackingNo,
     logisticsCompany,
     logisticsTraces,
+    reasonModalVisible,
+    cancelSubmitting,
 
     // 方法
     loadOrders,
@@ -339,6 +330,8 @@ export function useOrders() {
     loadMore,
     refresh,
     cancelOrder,
+    submitCancel,
+    closeReasonModal,
     confirmReceipt,
     deleteOrder,
     payNow,

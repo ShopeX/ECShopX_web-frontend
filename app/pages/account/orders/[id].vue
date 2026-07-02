@@ -409,6 +409,13 @@
       @close="aftersalesVisible = false"
       @submitted="fetchOrderDetail(orderId)"
     />
+
+    <BCCancelOrderReasonModal
+      :visible="reasonModalVisible"
+      :loading="cancelSubmitting"
+      @close="closeReasonModal"
+      @submit="submitCancel"
+    />
   </div>
 </template>
 
@@ -455,9 +462,13 @@ const {
   logisticsLoading,
   logisticsError,
   logisticsTraces,
+  reasonModalVisible,
+  cancelSubmitting,
   displayInvoiceInfo,
   fetchOrderDetail,
   cancelOrder,
+  submitCancel,
+  closeReasonModal,
   confirmReceipt,
   payNow,
   viewLogistics,

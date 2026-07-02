@@ -1047,5 +1047,17 @@
   "a3f7c9d1.inputConfirmPwd": "Please confirm your password",
   "a3f7c9d1.pwdMismatch": "Passwords do not match",
   "a3f7c9d1.backToLogin": "Back to Login",
-  "a3f7c9d1.forgotPwd": "Forgot password?"
+  "a3f7c9d1.forgotPwd": "Forgot password?",
+  "a208bce0.1fece8": "Select a cancellation reason",
+  "a208bce0.b21b5e": "Cancel order",
+  "a208bce0.3bd30a": "Please select a reason for canceling the order so we can serve you better.",
+  "a208bce0.78d83c": "No longer want it",
+  "a208bce0.d5505c": "Bought too many / bought by mistake",
+  "a208bce0.bea53b": "Bought too many",
+  "a208bce0.5a0afc": "Other",
+  "a208bce0.122878": "Enter your reason",
+  "a208bce0.6f2f64": "Please enter a cancellation reason",
+  "a208bce0.4085e5": "Do not cancel",
+  "a208bce0.98cb95": "Confirm cancellation",
+  "a208bce0.595db5": "Close cancel order dialog"
 }

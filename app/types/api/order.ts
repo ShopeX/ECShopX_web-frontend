@@ -134,6 +134,8 @@ export interface IOrderDetailModel {
   orderTime: string
   status: string
   statusText: string
+  payStatus: string
+  isPaid: boolean
   items: any[]
   totalAmount: number
   receiverName: string

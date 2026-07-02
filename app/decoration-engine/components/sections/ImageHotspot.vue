@@ -76,6 +76,7 @@ import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
 } from '~/decoration-engine/utils/sectionAppearance'
+import { createDecorationLinkResolver } from '~/decoration-engine/utils/resolveDecorationLink'
 
 interface HotspotBlock {
   id: string
@@ -104,6 +105,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+const decorationLink = createDecorationLinkResolver((path) => localePath(path as any))
 const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
 function translateIfGeneratedKey(value: string) {
@@ -237,61 +239,19 @@ const placeholderHighlightBlockId = computed(() => {
   return hb.blockId
 })
 
+const resolveHotspotHref = (link: Record<string, unknown>) =>
+  decorationLink.resolveHref(link, { preview: props.isPreview })
+
 const resolveHotspotTag = (link: Record<string, unknown>) =>
   resolveHotspotHref(link) && !props.isPreview ? 'a' : 'button'
 
-function normalizeLinkPath(path: string) {
-  const value = String(path || '').trim()
-  if (!value) return undefined
-  if (/^(https?:)?\/\//i.test(value)) return value
-  if (value.startsWith('/')) return localePath(value as any)
-  return localePath(`/${value}` as any)
-}
-
-function resolveInternalHotspotHref(link: Record<string, unknown>) {
-  const linkPage = String(link?.linkPage || link?.page || '').trim()
-  const explicitPath = String(link?.path || link?.url || '').trim()
-  const rawId = String(link?.id || link?.linkValue || link?.value || '').trim()
-
-  if (explicitPath) {
-    return normalizeLinkPath(explicitPath)
-  }
-
-  switch (linkPage) {
-    case 'custom_page':
-      return rawId ? localePath(`/custom/${rawId}` as any) : undefined
-    case 'goods':
-    case 'product':
-      return rawId ? localePath(`/products/${rawId}` as any) : undefined
-    case 'sale_category':
-    case 'collection':
-      return rawId ? localePath(`/collections/${rawId}` as any) : undefined
-    case 'category':
-      return rawId ? localePath(`/category/${rawId}` as any) : undefined
-    case 'shop':
-      return rawId ? localePath(`/shop/${rawId}` as any) : undefined
-    default:
-      return rawId ? normalizeLinkPath(rawId) : undefined
-  }
-}
-
-const resolveHotspotHref = (link: Record<string, unknown>) => {
-  if (props.isPreview) return undefined
-  if (Number(link?.linkType) === 1) {
-    return String(link?.linkUrl || '').trim() || undefined
-  }
-  return resolveInternalHotspotHref(link)
-}
-
-function isExternalHotspotHref(link: Record<string, unknown>) {
-  const href = resolveHotspotHref(link)
-  return Boolean(href && /^(https?:)?\/\//i.test(href))
-}
-
 const resolveHotspotTarget = (link: Record<string, unknown>) =>
-  !props.isPreview && isExternalHotspotHref(link) ? '_blank' : undefined
+  decorationLink.isExternalHref(link, { preview: props.isPreview }) ? '_blank' : undefined
+
 const resolveHotspotRel = (link: Record<string, unknown>) =>
-  !props.isPreview && isExternalHotspotHref(link) ? 'noopener noreferrer' : undefined
+  decorationLink.isExternalHref(link, { preview: props.isPreview })
+    ? 'noopener noreferrer'
+    : undefined
 
 const handleHotspotClick = (event: MouseEvent) => {
   if (!props.isPreview) {

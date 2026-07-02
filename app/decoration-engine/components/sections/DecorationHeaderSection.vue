@@ -1,6 +1,6 @@
 <template>
   <header
-    class="border-b border-neutral-200 bg-[var(--section-background)] text-[var(--section-foreground)]"
+    class="bg-[var(--section-background)] text-[var(--section-foreground)]"
     :class="sectionClasses"
     :style="sectionStyle"
     data-section-type="header"

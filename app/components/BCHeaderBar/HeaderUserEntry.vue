@@ -56,7 +56,7 @@ const variantClass = computed(() => {
       return {
         guestButtonClass: 'text-current',
         loggedInButtonClass: 'max-w-[120px] text-current lg:max-w-[200px]',
-        avatarShellClass: 'bg-neutral-100',
+        avatarShellClass: '',
         labelClass: 'text-xs lg:text-sm',
         iconClass: '',
       }

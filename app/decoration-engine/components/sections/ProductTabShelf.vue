@@ -148,6 +148,13 @@ function translateIfGeneratedKey(value: string) {
 }
 const isDecorationPreview = computed(() => Boolean(props.isPreview))
 
+function sortProductsByTabOrder(products: IProduct[], productIds: string[]) {
+  const productOrderMap = new Map(products.map((product) => [String(product.itemId), product]))
+  return productIds
+    .map((itemId) => productOrderMap.get(String(itemId)))
+    .filter((product): product is IProduct => Boolean(product))
+}
+
 const settings = computed<ProductTabShelfSettings>(() => {
   const raw = resolveSectionSettings('product-tab-shelf', props.section.settings)
   const rawColumns = Number(raw.columns ?? 4)
@@ -296,7 +303,7 @@ async function loadProductsForTab(tab: ProductTabItem): Promise<IProduct[]> {
     normalizedBatchItems
   )
 
-  return ProductTransformer.toModelList(validBatchItems)
+  return sortProductsByTabOrder(ProductTransformer.toModelList(validBatchItems), productIds)
 }
 
 const { data: productsData, pending } = await useAsyncData(

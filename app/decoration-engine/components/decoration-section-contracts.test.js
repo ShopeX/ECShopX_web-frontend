@@ -75,6 +75,16 @@ test('ProductTabShelf section follows decoration plan contract', () => {
   assert.match(registry, /'product-tab-shelf'/)
 })
 
+test('ProductTabShelf keeps products in decoration product_ids order', () => {
+  const source = read('app/decoration-engine/components/sections/ProductTabShelf.vue')
+
+  assert.match(source, /sortProductsByTabOrder/)
+  assert.match(source, /productOrderMap/)
+  assert.match(source, /String\(product\.itemId\)/)
+  assert.match(source, /tab\.productIds/)
+  assert.match(source, /sortProductsByTabOrder\(ProductTransformer\.toModelList\(validBatchItems\),\s*productIds\)/)
+})
+
 test('DecorationFooterSection uses single-column mobile layout and desktop spans', () => {
   const source = read('app/decoration-engine/components/sections/DecorationFooterSection.vue')
 

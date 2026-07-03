@@ -15,6 +15,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "vitest run",
+    "sync:ai-widget": "cp -v ${AI_WIDGET_DIST:-$HOME/data/httpd/ecx/Java/ai-assistant/ai-assistant-widget/dist}/widget-h5.js public/ai-assistant-embed/widget-h5.js",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore . --fix",
     "format": "prettier --write .",

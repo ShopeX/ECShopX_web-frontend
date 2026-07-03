@@ -33,6 +33,9 @@ playwright-report
 test-results
 playwright/.cache
 
+# Generated AI assistant widget
+public/ai-assistant-embed/widget-h5.js
+
 .codegraph
 .cursor
 docs

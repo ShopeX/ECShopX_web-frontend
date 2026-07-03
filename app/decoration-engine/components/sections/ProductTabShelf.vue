@@ -97,6 +97,7 @@ import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
 } from '~/decoration-engine/utils/sectionAppearance'
+import { resolveBlockSettings, resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 interface ProductTabShelfSettings {
   title: string
@@ -148,7 +149,7 @@ function translateIfGeneratedKey(value: string) {
 const isDecorationPreview = computed(() => Boolean(props.isPreview))
 
 const settings = computed<ProductTabShelfSettings>(() => {
-  const raw = props.section.settings as Record<string, unknown>
+  const raw = resolveSectionSettings('product-tab-shelf', props.section.settings)
   const rawColumns = Number(raw.columns ?? 4)
   const paddingTop = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(String(raw.padding_top))
     ? String(raw.padding_top)
@@ -197,7 +198,7 @@ const tabs = computed<ProductTabItem[]>(() =>
       const block = props.section.blocks?.[blockId]
       if (!block || block.disabled || block.type !== 'product-tab') return null
 
-      const blockSettings = block.settings as Record<string, unknown>
+      const blockSettings = resolveBlockSettings(block.type, block.settings)
       const rawProductIds = Array.isArray(blockSettings.product_ids)
         ? blockSettings.product_ids
         : []
@@ -329,8 +330,8 @@ watch(
 
 const sectionOuterClasses = computed(() => [
   'w-full',
-  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
-  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+  resolveSectionPaddingClass(settings.value.paddingTop, 'top'),
+  resolveSectionPaddingClass(settings.value.paddingBottom, 'bottom'),
   'bg-[var(--section-background)] text-[var(--section-foreground)]',
 ])
 const sectionInnerClasses = computed(() => [
@@ -339,7 +340,8 @@ const sectionInnerClasses = computed(() => [
     : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
 ])
 const sectionThemeStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const raw = resolveSectionSettings('product-tab-shelf', props.section.settings)
+  const scheme = resolveSectionColorScheme(raw.color_scheme)
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,

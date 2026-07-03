@@ -77,6 +77,7 @@ import {
   resolveSectionPaddingClass,
 } from '~/decoration-engine/utils/sectionAppearance'
 import { createDecorationLinkResolver } from '~/decoration-engine/utils/resolveDecorationLink'
+import { resolveBlockSettings, resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 interface HotspotBlock {
   id: string
@@ -124,9 +125,9 @@ const updateViewport = () => {
 }
 
 const sectionSettings = computed(() => {
-  const raw = props.section.settings as Record<string, unknown>
-  const pcImage = String(raw.pc_image || raw.imageUrl || raw.image_url || raw.image || '')
-  const mobileImage = String(raw.mobile_image || raw.mobileImage || raw.mobile_image_url || '')
+  const raw = resolveSectionSettings('image-hotspot', props.section.settings)
+  const pcImage = String(raw.pc_image || '')
+  const mobileImage = String(raw.mobile_image || '')
   const pcHotspots = Array.isArray(raw.pc_hotspots) ? raw.pc_hotspots : []
   const mobileHotspots = Array.isArray(raw.mobile_hotspots) ? raw.mobile_hotspots : []
   const legacyHotspots = Array.isArray(raw.hotspot) ? raw.hotspot : []
@@ -143,14 +144,24 @@ const sectionSettings = computed(() => {
 const backgroundImage = computed(() => sectionSettings.value.pcImage)
 const mobileBackgroundImage = computed(() => sectionSettings.value.mobileImage)
 const sectionClasses = computed(() => [
-  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
-  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+  resolveSectionPaddingClass(
+    resolveSectionSettings('image-hotspot', props.section.settings).padding_top,
+    'top'
+  ),
+  resolveSectionPaddingClass(
+    resolveSectionSettings('image-hotspot', props.section.settings).padding_bottom,
+    'bottom'
+  ),
 ])
 const innerClasses = computed(() => [
-  props.section.settings?.full_width === true ? 'w-full' : 'mx-auto max-w-[1440px]',
+  resolveSectionSettings('image-hotspot', props.section.settings).full_width === true
+    ? 'w-full'
+    : 'mx-auto max-w-[1440px]',
 ])
 const sectionStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const scheme = resolveSectionColorScheme(
+    resolveSectionSettings('image-hotspot', props.section.settings).color_scheme
+  )
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,
@@ -174,7 +185,9 @@ const activeHotspots = computed<HotspotBlock[]>(() => {
       ? sectionSettings.value.legacyHotspots
       : props.section.block_order.map((blockId) => {
           const block = props.section.blocks[blockId]
-          const settings = block?.settings as Record<string, unknown> | undefined
+          const settings = block
+            ? resolveBlockSettings(block.type, block.settings)
+            : undefined
 
           return settings
             ? {

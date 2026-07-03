@@ -16,6 +16,13 @@ export function useOrderDetail() {
   const toast = useToastMessage()
   const { confirm } = useModal()
   const { t } = useI18n()
+  const {
+    reasonModalVisible,
+    cancelSubmitting,
+    requestCancel,
+    submitCancel,
+    closeReasonModal,
+  } = useOrderCancel()
   const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
   function translateIfGeneratedKey(value: string) {
@@ -97,24 +104,7 @@ export function useOrderDetail() {
 
   async function cancelOrder() {
     if (!order.value) return
-    return new Promise<boolean>((resolve) => {
-      confirm({
-        title: t('de8076e6.b21b5e'),
-        content: t('f62e8236.2baf23'),
-        onConfirm: async () => {
-          try {
-            await orderApiClient.cancelOrder(order.value.orderId)
-            toast.show(t('f62e8236.5af500'))
-            await fetchOrderDetail(order.value.orderId)
-            resolve(true)
-          } catch (err: any) {
-            toast.show(err.message || t('f62e8236.c623f1'))
-            resolve(false)
-          }
-        },
-        onCancel: () => resolve(false),
-      })
-    })
+    return requestCancel(order.value, () => fetchOrderDetail(order.value.orderId))
   }
 
   async function confirmReceipt() {
@@ -218,12 +208,16 @@ export function useOrderDetail() {
     logisticsError,
     logisticsTraces,
     invoiceDialogVisible,
+    reasonModalVisible,
+    cancelSubmitting,
     invoiceLoading,
     invoiceSubmitError,
     invoiceData,
     displayInvoiceInfo,
     fetchOrderDetail,
     cancelOrder,
+    submitCancel,
+    closeReasonModal,
     confirmReceipt,
     applyAftersales,
     applyInvoice,

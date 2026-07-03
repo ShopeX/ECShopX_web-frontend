@@ -20,6 +20,24 @@ pnpm i
 NUXT_PUBLIC_API_BASE=
 ```
 
+### Cloud Deployment: Backend API Base URL
+
+When deploying to a server or cloud host, requests fail until `NUXT_PUBLIC_API_BASE` points at your **own** backend instead of the default.
+
+- **Which variable / file?** Set `NUXT_PUBLIC_API_BASE` in `.env`. If it is left empty the app falls back to `/api`, so requests hit the frontend host itself.
+- **Do I need the port?** Only when the backend is reached directly on a non-standard port — the PHP API listens on `8005` by default. Behind a domain proxied by Nginx on 80/443, omit the port.
+- **Rebuild after every change.** `NUXT_PUBLIC_*` variables are embedded at build time. After editing the env file you must re-run the build. Run it from the project root (where `package.json` lives). 
+
+```shell
+# Behind a domain (Nginx on 80/443) — no port needed, end with /api/h5app
+NUXT_PUBLIC_API_BASE=https://your-domain.com/api/h5app
+# Direct public IP on a non-standard port — include the port
+NUXT_PUBLIC_API_BASE=http://1.2.3.4:8005/api/h5app
+
+# Rebuild after changing the value
+pnpm build
+```
+
 ### Run project
 
 ```

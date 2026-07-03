@@ -266,59 +266,32 @@
             </button>
           </div>
 
-          <!-- Accordion Sections -->
-          <div class="border-t border-white w-full lg:max-w-[376px]">
-            <div class="flex flex-col">
-              <!-- Product Details Accordion -->
-              <div class="border-b border-[#e5e7eb]">
-                <button
-                  class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
-                  @click="toggleAccordion('details')"
-                >
-                  <span>{{ $t('464b6330.b4f5db') }}</span>
-                  <UIcon
-                    name="i-heroicons-chevron-down"
-                    class="w-4 h-4 transition-transform"
-                    :class="openAccordion === 'details' ? 'rotate-180' : ''"
-                  />
-                </button>
-                <div v-if="openAccordion === 'details'" class="pb-3 lg:pb-4">
-                  <div
-                    class="product-description text-sm leading-5 text-[#364153]"
-                    v-html="product.description"
-                  />
-                </div>
-              </div>
+        </div>
+      </div>
+    </div>
 
-              <!-- Additional Info Accordion 1 -->
-              <!-- <div class="border-b border-[#e5e7eb]">
-                <button
-                  class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
-                  @click="toggleAccordion('info1')"
-                >
-                  <span>{{ $t('464b6330.d4327c') }}</span>
-                  <UIcon
-                    name="i-heroicons-chevron-down"
-                    class="w-4 h-4 transition-transform"
-                    :class="openAccordion === 'info1' ? 'rotate-180' : ''"
-                  />
-                </button>
-              </div> -->
-
-              <!-- Additional Info Accordion 2 -->
-              <!-- <div class="border-b border-[#e5e7eb]">
-                <button
-                  class="w-full flex items-center justify-between py-3 lg:py-4 text-sm leading-5 text-[#364153]"
-                  @click="toggleAccordion('info2')"
-                >
-                  <span>{{ $t('464b6330.d4327c') }}</span>
-                  <UIcon
-                    name="i-heroicons-chevron-down"
-                    class="w-4 h-4 transition-transform"
-                    :class="openAccordion === 'info2' ? 'rotate-180' : ''"
-                  />
-                </button>
-              </div> -->
+    <!-- 商品描述 / 图文详情区 (PC & H5 响应式) -->
+    <div class="w-full bg-white px-4 lg:px-32 py-6 lg:py-12">
+      <div class="border-t border-white w-full">
+        <div class="flex flex-col">
+          <!-- Product Details Accordion -->
+          <div class="border-b border-[#e5e7eb]">
+            <button
+              class="w-full flex items-center justify-between py-4 text-sm lg:text-base font-normal lg:font-medium leading-5 lg:leading-6 text-[#364153]"
+              @click="toggleAccordion('details')"
+            >
+              <span>{{ $t('464b6330.b4f5db') }}</span>
+              <UIcon
+                name="i-heroicons-chevron-down"
+                class="w-4 h-4 lg:w-6 lg:h-6 transition-transform"
+                :class="openAccordion === 'details' ? 'rotate-180' : ''"
+              />
+            </button>
+            <div v-if="openAccordion === 'details'" class="pb-4 lg:pb-12">
+              <div
+                class="product-description text-sm lg:text-base leading-5 lg:leading-6 text-[#364153]"
+                v-html="product.description"
+              />
             </div>
           </div>
         </div>
@@ -338,7 +311,7 @@
       class="lg:hidden sticky bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] px-4 py-4 flex items-center gap-6 z-50 shadow-lg"
     >
       <p class="text-base font-medium leading-5 text-[#191a1d] shrink-0">
-        ¥{{ formatPriceYuan(currentFinalPriceCents) }}
+        {{ formatDisplayFromFen(currentFinalPriceCents) }}
       </p>
 
       <!-- 按钮组 -->
@@ -373,6 +346,7 @@ import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { RecommendLikeTransformer } from '~/infrastructure/transformers/recommendLikeTransformer'
 import type { IItem } from '~/types/api/item'
 import { logger } from '~/utils/log'
+import { resolveItemDescription } from '~/utils/productDescription'
 
 const route = useRoute()
 const router = useRouter()
@@ -501,7 +475,7 @@ const product = computed(() => {
   return {
     title: data.itemName,
     price: data.price / 100, // 转换为元
-    description: data.brief || (data as any).intro || t('464b6330.415547'),
+    description: resolveItemDescription(data, t('464b6330.415547')),
     images: data.pics || [],
     specs,
   }
@@ -747,7 +721,7 @@ const currentSalePriceCents = computed(() => resolveItemPriceCents('price'))
 const currentMarketPriceCents = computed(() => resolveItemPriceCents('market_price'))
 const currentMemberPriceCents = computed(() => resolveItemPriceCents('member_price'))
 
-const { finalPriceCents: currentFinalPriceCents, formatPriceYuan } = useProductPriceDisplay({
+const { finalPriceCents: currentFinalPriceCents, formatDisplayFromFen } = useProductPriceDisplay({
   salePriceCents: currentSalePriceCents,
   marketPriceCents: currentMarketPriceCents,
   memberPriceCents: currentMemberPriceCents,
@@ -927,7 +901,8 @@ function onShopContact() {
 }
 
 .product-description :deep(p) {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
 }
 
 .product-description :deep(p:last-child) {
@@ -935,10 +910,12 @@ function onShopContact() {
 }
 
 .product-description :deep(img) {
+  display: block;
+  width: 100%;
   max-width: 100%;
   height: auto;
-  border-radius: 0.375rem;
-  margin: 0.75rem 0;
+  border-radius: 0;
+  margin: 1.5rem auto;
 }
 
 .product-description :deep(ul),

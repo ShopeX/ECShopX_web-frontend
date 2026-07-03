@@ -14,6 +14,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "test": "vitest run",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore . --fix",
     "format": "prettier --write .",
@@ -45,6 +46,7 @@
     "sass": "^1.71.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.3.3",
+    "vitest": "^4.1.9",
     "vue-tsc": "^2.0.6"
   }
 }

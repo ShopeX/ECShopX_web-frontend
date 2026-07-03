@@ -46,18 +46,46 @@ export const useCartStore = defineStore('cart', {
           // 我们需要小心处理，或者直接再次通过 Transformer
           // 最安全的方法是把缓存中的数据当做 Partial<ICartItem> 再次处理
           initialItems = rawItems.map((item) => {
+            const salePrice = MoneyValueObject.of(item.price.amount || item.price)
+            const effectivePrice = MoneyValueObject.of(
+              item.effectivePrice?.amount ?? (item.price.amount || item.price)
+            )
             return {
               ...item,
-              price: MoneyValueObject.of(item.price.amount || item.price),
+              price: salePrice,
               marketPrice: MoneyValueObject.of(item.marketPrice.amount || item.marketPrice),
+              memberPrice: item.memberPrice
+                ? MoneyValueObject.of(item.memberPrice.amount || item.memberPrice)
+                : null,
+              activityPrice: item.activityPrice
+                ? MoneyValueObject.of(item.activityPrice.amount || item.activityPrice)
+                : null,
+              packagePrice: item.packagePrice
+                ? MoneyValueObject.of(item.packagePrice.amount || item.packagePrice)
+                : null,
+              effectivePrice,
               quantity: QuantityValueObject.of(item.quantity.value || item.quantity, 1, item.stock),
             }
           })
           initialInvalidItems = rawInvalidItems.map((item) => {
+            const salePrice = MoneyValueObject.of(item.price.amount || item.price)
+            const effectivePrice = MoneyValueObject.of(
+              item.effectivePrice?.amount ?? (item.price.amount || item.price)
+            )
             return {
               ...item,
-              price: MoneyValueObject.of(item.price.amount || item.price),
+              price: salePrice,
               marketPrice: MoneyValueObject.of(item.marketPrice.amount || item.marketPrice),
+              memberPrice: item.memberPrice
+                ? MoneyValueObject.of(item.memberPrice.amount || item.memberPrice)
+                : null,
+              activityPrice: item.activityPrice
+                ? MoneyValueObject.of(item.activityPrice.amount || item.activityPrice)
+                : null,
+              packagePrice: item.packagePrice
+                ? MoneyValueObject.of(item.packagePrice.amount || item.packagePrice)
+                : null,
+              effectivePrice,
               quantity: QuantityValueObject.of(item.quantity.value || item.quantity, 1, item.stock),
             }
           })
@@ -195,8 +223,8 @@ export const useCartStore = defineStore('cart', {
       cartUI.setActionLoading(itemId, true)
       try {
         await cartApiClient.removeCartItem(itemId)
-        // ✅ 成功：静默更新汇总数据，保持已删除的商品状态
-        await this.loadCart({ silent: true, summaryOnly: true })
+        // 删除成功后重新拉取列表与汇总，保持与购物车页一致
+        await this.loadCart({ silent: true })
       } catch (error) {
         // ❌ 失败：恢复商品到原位置
         console.error('Failed to remove item:', error)

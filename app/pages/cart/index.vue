@@ -67,29 +67,31 @@
             />
           </div>
 
-          <!-- 商品列表 -->
+          <!-- 商品列表：BCMiniCartItem 为多根节点，class 无法整组件隐藏，需外层包裹 -->
           <div
             v-for="item in cartUI.items"
             :key="item.id"
             class="content-stretch flex flex-col items-start relative shrink-0 w-full"
           >
-            <BCCartItem
-              class="hidden lg:block"
-              :item="item"
-              :loading="loading"
-              @toggle-selection="handleToggleSelection"
-              @quantity-change="handleQuantityChange"
-              @remove="handleRemove"
-            />
-            <BCMiniCartItem
-              class="lg:hidden"
-              :item="item"
-              :loading="loading"
-              show-remove
-              @toggle-selection="handleToggleSelection"
-              @quantity-change="handleQuantityChange"
-              @remove="handleRemove"
-            />
+            <div class="hidden w-full lg:block">
+              <BCCartItem
+                :item="item"
+                :loading="loading"
+                @toggle-selection="handleToggleSelection"
+                @quantity-change="handleQuantityChange"
+                @remove="handleRemove"
+              />
+            </div>
+            <div class="w-full lg:hidden">
+              <BCMiniCartItem
+                :item="item"
+                :loading="loading"
+                show-remove
+                @toggle-selection="handleToggleSelection"
+                @quantity-change="handleQuantityChange"
+                @remove="handleRemove"
+              />
+            </div>
           </div>
 
           <!-- 失效商品列表 -->

@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { formatMoneyFen } from '~/utils/currencyFormat'
 
 interface ProductPriceRefs {
   salePriceCents: Ref<number>
@@ -45,10 +46,13 @@ export function useProductPriceDisplay({
     })
   }
 
+  const formatDisplayFromFen = (priceCents: number) => formatMoneyFen(priceCents)
+
   return {
     hasMemberPrice,
     showMarketPrice,
     finalPriceCents,
     formatPriceYuan,
+    formatDisplayFromFen,
   }
 }

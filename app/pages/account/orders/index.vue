@@ -164,7 +164,7 @@
                           <span
                             class="text-[14px] leading-5 text-[#191a1d] text-right lg:order-2 lg:w-auto lg:whitespace-nowrap"
                           >
-                            ¥ {{ formatAmount(item.price) }}
+                            {{ formatAmount(item.price) }}
                           </span>
                           <span
                             class="text-[14px] leading-5 text-[#191a1d] text-right lg:order-1 lg:w-auto lg:whitespace-nowrap"
@@ -187,7 +187,7 @@
                       <span
                         >{{ t('de8076e6.450efd') }}:
                         <span class="font-medium text-[16px] text-[#191a1d]"
-                          >¥ {{ formatAmount(order.totalAmount) }}</span
+                          >{{ formatAmount(order.totalAmount) }}</span
                         ></span
                       >
                     </div>
@@ -279,7 +279,7 @@
                           v-if="order.canCancel"
                           type="button"
                           class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
-                          @click.stop="cancelOrder(order.orderId)"
+                          @click.stop="cancelOrder(order)"
                         >
                           {{ t('de8076e6.b21b5e') }}
                         </button>
@@ -388,6 +388,13 @@
       @close="aftersalesVisible = false"
       @submitted="loadOrders(currentStatus, currentPage)"
     />
+
+    <BCCancelOrderReasonModal
+      :visible="reasonModalVisible"
+      :loading="cancelSubmitting"
+      @close="closeReasonModal"
+      @submit="submitCancel"
+    />
   </div>
 </template>
 
@@ -398,6 +405,7 @@ import { useAftersalesReasonOptions } from '~/composables/useAftersalesReasonOpt
 import { getBusinessMode } from '~/composables/useTemplate'
 import { orderApiClient } from '~/infrastructure/http/clients/OrderApiClient'
 import { OrderTransformer } from '~/infrastructure/transformers/orderTransformer'
+import { formatMoneyYuan } from '~/utils/currencyFormat'
 import { OrderStatus } from '~/types/api/order'
 import { useOrders } from '~/composables/useOrders'
 import AccountMenu from '../components/AccountMenu.vue'
@@ -432,9 +440,13 @@ const {
   logisticsTrackingNo,
   logisticsCompany,
   logisticsTraces,
+  reasonModalVisible,
+  cancelSubmitting,
   loadOrders,
   changeStatus,
   cancelOrder,
+  submitCancel,
+  closeReasonModal,
   confirmReceipt,
   deleteOrder,
   payNow,
@@ -570,7 +582,7 @@ function handleMobileAction(action: MobileOrderAction, order: any) {
       openReview(order)
       break
     case 'cancel':
-      cancelOrder(order.orderId)
+      cancelOrder(order)
       break
     case 'delete':
       deleteOrder(order.orderId)
@@ -612,10 +624,7 @@ function getTotalQuantity(order: any) {
 }
 
 function formatAmount(amount: number) {
-  return Number(amount || 0).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
+  return formatMoneyYuan(Number(amount || 0))
 }
 
 function handlePageChange(page: number) {

@@ -1,9 +1,9 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="body" :disabled="inline">
     <Transition name="modal-fade">
       <div
         v-if="visible"
-        class="fixed inset-0 z-50 flex items-center justify-center"
+        :class="overlayClass"
         @click.self="handleMaskClick"
       >
         <!-- 遮罩层 -->
@@ -112,6 +112,8 @@ interface Props {
   showCancel?: boolean
   /** 是否显示底部 */
   showFooter?: boolean
+  /** 在父容器内渲染，避免 Drawer/Slideover 的 modal 层拦截外部点击 */
+  inline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -125,6 +127,7 @@ const props = withDefaults(defineProps<Props>(), {
   showConfirm: true,
   showCancel: true,
   showFooter: true,
+  inline: false,
 })
 
 const emit = defineEmits<{
@@ -181,6 +184,12 @@ const showConfirmButton = computed(() => {
 const displayTitle = computed(() => {
   return props.title || t('3e6ed17a.02d981')
 })
+
+const overlayClass = computed(() =>
+  props.inline
+    ? 'absolute inset-0 z-50 flex items-center justify-center'
+    : 'fixed inset-0 z-[100] flex items-center justify-center'
+)
 
 // 取消按钮文本
 const cancelButtonText = computed(() => {

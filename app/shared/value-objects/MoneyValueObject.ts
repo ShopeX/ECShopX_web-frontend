@@ -1,3 +1,5 @@
+import { formatMoneyYuan } from '~/utils/currencyFormat'
+
 /**
  * 金额值对象
  *
@@ -59,17 +61,7 @@ export class MoneyValueObject {
    * 格式化显示（带货币符号和千分位）
    */
   get display(): string {
-    return `¥${this.formatWithThousandsSeparator(this._amount)}`
-  }
-
-  /**
-   * 千分位格式化
-   */
-  private formatWithThousandsSeparator(amount: number): string {
-    const fixed = amount.toFixed(2)
-    const [integerPart, decimalPart] = fixed.split('.')
-    const formattedInteger = (integerPart || '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    return `${formattedInteger}.${decimalPart || '00'}`
+    return formatMoneyYuan(this._amount)
   }
 
   // ==================== 不可变操作（返回新对象） ====================

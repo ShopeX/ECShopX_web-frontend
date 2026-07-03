@@ -29,6 +29,7 @@
  */
 
 import { MoneyValueObject, QuantityValueObject, DiscountValueObject } from '~/shared/value-objects'
+import { hasCartMemberPriceLayout } from '~/utils/cartItemPrice'
 import { BusinessError } from '~/shared/errors'
 import { useCartUIStore } from '~/stores/cartUI'
 import { cartApiClient } from '~/infrastructure/http/clients'
@@ -55,8 +56,14 @@ export interface ICartUI {
     specName: string
     price: number
     priceDisplay: string
+    salePriceCents: number
+    memberPriceCents: number
     marketPrice: number
+    marketPriceCents: number
     marketPriceDisplay: string
+    effectivePriceDisplay: string
+    hasMemberPriceLayout: boolean
+    hasMarketDiscount: boolean
     quantity: number
     quantityMin: number
     quantityMax: number
@@ -135,7 +142,7 @@ export function useCart() {
    * 计算商品小计
    */
   const calculateItemSubtotal = (item: ICartItemModel): MoneyValueObject => {
-    return item.price.multiply(item.quantity.value)
+    return item.effectivePrice.multiply(item.quantity.value)
   }
 
   /**
@@ -224,6 +231,17 @@ export function useCart() {
   const mapToUIItem = (item: ICartItemModel) => {
     const subtotal = calculateItemSubtotal(item)
     const discount = calculateDiscount(item)
+    const salePriceCents = Math.round(item.price.amount * 100)
+    const memberPriceCentsForLayout = item.memberPrice
+      ? Math.round(item.memberPrice.amount * 100)
+      : null
+    const memberPriceCents = memberPriceCentsForLayout ?? 0
+    const marketPriceCents = Math.round(item.marketPrice.amount * 100)
+    const hasMemberPriceLayout = hasCartMemberPriceLayout(
+      salePriceCents,
+      memberPriceCentsForLayout
+    )
+    const hasMarketDiscount = !hasMemberPriceLayout && discount.hasDiscount()
 
     return {
       id: item.id,
@@ -233,10 +251,16 @@ export function useCart() {
       productImage: item.productImage,
       specId: item.specId,
       specName: translateIfGeneratedKey(item.specName),
-      price: item.price.amount,
-      priceDisplay: item.price.display,
+      price: item.effectivePrice.amount,
+      priceDisplay: item.effectivePrice.display,
+      salePriceCents,
+      memberPriceCents,
       marketPrice: item.marketPrice.amount,
+      marketPriceCents,
       marketPriceDisplay: item.marketPrice.display,
+      effectivePriceDisplay: item.effectivePrice.display,
+      hasMemberPriceLayout,
+      hasMarketDiscount,
       quantity: item.quantity.value,
       quantityMin: item.quantity.min,
       quantityMax: item.quantity.max,
@@ -245,7 +269,7 @@ export function useCart() {
       subtotal: subtotal.amount,
       subtotalDisplay: subtotal.display,
       canBePurchased: canItemBePurchased(item),
-      hasDiscount: discount.hasDiscount(),
+      hasDiscount: hasMemberPriceLayout || hasMarketDiscount,
       discountPercent: discount.percent,
     }
   }

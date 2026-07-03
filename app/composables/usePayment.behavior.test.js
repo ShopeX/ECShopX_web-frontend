@@ -55,9 +55,10 @@ test('payment composable does not reload order info when switching payment metho
   assert.doesNotMatch(paymentComposableSource, /if \(isPaymentFailureStatus\(status\)\) \{/)
   assert.match(
     paymentComposableSource,
-    /if \(Date\.now\(\) - startedAt > POLL_TIMEOUT_MS\) \{[\s\S]*const hasPaid = await checkPaymentResult\(\)[\s\S]*if \(!hasPaid\) \{[\s\S]*payResult\.value = 'fail'/
+    /if \(Date\.now\(\) - startedAt > POLL_TIMEOUT_MS\) \{[\s\S]*const hasPaid = await checkPaymentResult\(\)[\s\S]*if \(!hasPaid\) \{[\s\S]*markPaymentUnconfirmed\(\)/
   )
   assert.doesNotMatch(paymentComposableSource, /payResult\.value = 'timeout'/)
+  assert.match(paymentComposableSource, /payResult\.value = 'unconfirmed'/)
   assert.doesNotMatch(paymentComposableSource, /retry\(\) \{[\s\S]*payNow\(\)/)
   assert.doesNotMatch(
     paymentComposableSource,
@@ -103,6 +104,15 @@ test('payment page renders failure with result layout instead of modal', () => {
   assert.match(paymentPageSource, /\{\{ \$t\('eab46cc2\.4548cc'\) \}\}/)
   assert.match(paymentPageSource, /@click="retry"/)
   assert.doesNotMatch(paymentPageSource, /<ECModal/)
+})
+
+test('payment page renders unconfirmed result with recheck and external pay actions', () => {
+  assert.match(paymentPageSource, /v-if="payResult === 'unconfirmed'"/)
+  assert.match(paymentPageSource, /data-testid="payment-unconfirmed"/)
+  assert.match(paymentPageSource, /@click="recheckPaymentResult"/)
+  assert.match(paymentPageSource, /@click="reopenExternalPay"/)
+  assert.match(paymentPageSource, /eab46cc2\.unconfirmedTitle/)
+  assert.match(paymentPageSource, /eab46cc2\.unconfirmedDesc/)
 })
 
 test('payment page disables keepalive so stale pay state is not restored on re-entry', () => {

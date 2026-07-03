@@ -737,17 +737,8 @@ function formatSpec(specString: string): string[] {
     .filter(Boolean)
 }
 
-// 运费显示文本
-const freightDisplayText = computed(() => {
-  if (
-    freightDisplay.value === '免费' ||
-    freightDisplay.value === 'Free' ||
-    freightDisplay.value === '¥ 0'
-  ) {
-    return t('ee3264ed.aa2c91')
-  }
-  return freightDisplay.value
-})
+// 运费显示文本（useCheckout 已在运费为 0 时返回翻译文案）
+const freightDisplayText = computed(() => freightDisplay.value)
 
 // 是否可以提交
 const canSubmit = computed(() => {

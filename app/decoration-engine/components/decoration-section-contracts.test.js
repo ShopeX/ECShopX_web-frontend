@@ -18,6 +18,8 @@ test('Carousel section follows decoration plan contract', () => {
   assert.match(source, /data-section-id/)
   assert.match(source, /focusBlock/)
   assert.match(source, /DecorationBlockHost/)
+  assert.match(source, /resolveDecorationLink/)
+  assert.match(source, /linkType/)
   assert.match(source, /8cac7342\.cc2e46/)
 })
 

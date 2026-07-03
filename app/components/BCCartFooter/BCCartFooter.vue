@@ -49,7 +49,7 @@
         <div class="flex items-baseline gap-2">
           <span class="text-sm text-gray-600">{{ t('79fdede9.0304c1') }}</span>
           <span class="text-2xl font-semibold text-red-600">
-            ¥{{ formatPrice(selectedTotal) }}
+            {{ formatMoneyYuan(selectedTotal / 100) }}
           </span>
         </div>
 
@@ -68,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatMoneyYuan } from '~/utils/currencyFormat'
+
 /**
  * 购物车底部操作栏组件
  *
@@ -109,14 +111,4 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits<Emits>()
 const { t } = useI18n()
-
-/**
- * 格式化价格
- *
- * @param price - 价格（分）
- * @returns 格式化后的价格字符串
- */
-function formatPrice(price: number): string {
-  return (price / 100).toFixed(2)
-}
 </script>

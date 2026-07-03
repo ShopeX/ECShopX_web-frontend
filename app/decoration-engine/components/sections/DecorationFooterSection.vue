@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="border-t border-neutral-200 bg-[var(--section-background)] text-[var(--section-foreground)]"
+    class="bg-[var(--section-background)] text-[var(--section-foreground)]"
     :class="sectionClasses"
     :style="sectionStyle"
     data-section-type="footer"

@@ -23,11 +23,11 @@ describe('ImageHotspot', () => {
   })
 
   it('resolves both external and internal hotspot links', () => {
-    expect(source).toContain("linkType")
-    expect(source).toContain("linkUrl")
-    expect(source).toContain("linkPage")
-    expect(source).toContain("resolveInternalHotspotHref")
-    expect(source).toContain("localePath(`/products/${rawId}` as any)")
+    expect(source).toContain('linkType')
+    expect(source).toContain('linkUrl')
+    expect(source).toContain('linkPage')
+    expect(source).toContain('resolveDecorationLink')
+    expect(source).toContain('decorationLink.resolveHref')
   })
 
   it('renders poster self-adaptively without JS aspect-ratio', () => {

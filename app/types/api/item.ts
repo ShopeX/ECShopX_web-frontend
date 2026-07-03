@@ -7,6 +7,8 @@ export interface IItem {
   item_bn: string
   itemName: string
   brief: string
+  intro?: string | null
+
 
   // 图片信息
   pics: string[]

@@ -1,5 +1,6 @@
 import { MoneyValueObject } from '~/shared/value-objects'
 import type { IApiTrackerPullTrace } from '~/types/api/order'
+import { isPaidOrder } from '~/utils/orderCancel'
 import { CouponDisplayTransformer, type ICouponModel } from './couponDisplayTransformer'
 
 /**
@@ -313,6 +314,8 @@ export class OrderTransformer {
     const rawTime = apiOrder.create_time || apiOrder.order_time || ''
     const orderTime = OrderTransformer.formatTimestamp(rawTime)
     const totalAmount = Number(apiOrder.total_fee || apiOrder.total_amount || 0) / 100 // 分转元
+    const payStatus = String(apiOrder.pay_status ?? apiOrder.payStatus ?? apiOrder.order_status ?? '')
+    const isPaid = isPaidOrder({ payStatus })
     const items = (apiOrder.item_infos || apiOrder.items || []).map((item: any) =>
       OrderTransformer.toOrderItemModel({
         ...item,
@@ -371,6 +374,8 @@ export class OrderTransformer {
       orderId,
       orderTime,
       storeName: apiOrder.distributor_name || apiOrder.store_name || apiOrder.shop_name || '',
+      payStatus,
+      isPaid,
       status,
       statusText: OrderTransformer.getOrderStatusText(status),
       items,

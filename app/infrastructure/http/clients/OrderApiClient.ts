@@ -7,6 +7,8 @@
  * - 返回原始 API 响应
  */
 
+import type { CancelOrderPayload } from '~/utils/orderCancel'
+
 export interface ICalculateOrderRequest {
   distributor_id: string
   shop_id?: string
@@ -203,10 +205,10 @@ export class OrderApiClient {
   /**
    * 取消订单
    */
-  async cancelOrder(orderId: string): Promise<any> {
+  async cancelOrder(payload: CancelOrderPayload): Promise<any> {
     return this.http('/wxapp/order/cancel', {
       method: 'POST',
-      body: { order_id: orderId },
+      body: payload,
     })
   }
 

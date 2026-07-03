@@ -69,8 +69,11 @@
             :key="item.id"
             :item="item"
             :loading="loading"
+            show-remove
+            external-remove-confirm
             @toggle-selection="handleToggleSelection"
             @quantity-change="handleQuantityChange"
+            @request-remove="handleRequestRemove"
           />
         </div>
       </div>
@@ -191,6 +194,15 @@
         </div>
       </div>
     </div>
+
+    <ECModal
+      v-model="showRemoveConfirm"
+      inline
+      :title="t('9864a2ba.2f4aad')"
+      :content="t('9864a2ba.3e3483')"
+      :confirm-text="t('9864a2ba.2f4aad')"
+      @confirm="handleConfirmRemove"
+    />
   </div>
 </template>
 
@@ -229,11 +241,13 @@ const router = useRouter()
 const route = useRoute()
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { cartUI, loading, loadCart, toggleItemSelection, toggleAllSelection, updateQuantity } =
+const { cartUI, loading, loadCart, toggleItemSelection, toggleAllSelection, updateQuantity, removeItem } =
   useCart()
 
 // 追踪是否完成首次加载
 const initialized = ref(false)
+const showRemoveConfirm = ref(false)
+const removingItemId = ref<string | null>(null)
 
 /**
  * 监听 modelValue 变化，打开时加载购物车数据
@@ -276,6 +290,32 @@ async function handleToggleAll() {
  */
 async function handleQuantityChange(itemId: string, quantity: number) {
   await updateQuantity(itemId, quantity)
+}
+
+/**
+ * 打开删除确认（弹窗挂在抽屉根节点，避免被 Slideover 遮挡）
+ */
+function handleRequestRemove(itemId: string) {
+  removingItemId.value = itemId
+  showRemoveConfirm.value = true
+}
+
+/**
+ * 删除商品
+ */
+async function handleRemove(itemId: string) {
+  await removeItem(itemId)
+}
+
+async function handleConfirmRemove() {
+  if (!removingItemId.value) return
+  const itemId = removingItemId.value
+  try {
+    await handleRemove(itemId)
+  } finally {
+    removingItemId.value = null
+    showRemoveConfirm.value = false
+  }
 }
 
 /**

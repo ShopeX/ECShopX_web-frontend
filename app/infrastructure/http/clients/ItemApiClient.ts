@@ -56,11 +56,14 @@ export class ItemApiClient {
    * ```
    */
   async getItemList(params: IItemListParams): Promise<any> {
+    const businessMode = useRuntimeConfig().public.businessMode || 'b2c'
     const apiParams = {
       page: params.page,
       pageSize: params.pageSize,
       item_type: params.item_type,
-      main_category: params.main_category,
+      ...(businessMode === 'b2c'
+        ? { category_id: params.main_category }
+        : { main_category: params.main_category }),
       is_tdk: params.is_tdk,
       type: params.type,
       // company_id 由 HTTP 插件自动添加，无需手动传递

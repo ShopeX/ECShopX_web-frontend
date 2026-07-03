@@ -1,6 +1,11 @@
 import type { ICartItem } from '~/types/api/cart'
 import type { ICartItemModel } from '~/types/cart'
-import { MoneyValueObject, QuantityValueObject, DiscountValueObject } from '~/shared/value-objects'
+import { MoneyValueObject, QuantityValueObject } from '~/shared/value-objects'
+import {
+  parseCartPriceCents,
+  resolveCartEffectivePriceCents,
+  type CartItemPriceRaw,
+} from '~/utils/cartItemPrice'
 
 /**
  * 购物车数据转换器（轻量级 DDD）
@@ -30,6 +35,14 @@ import { MoneyValueObject, QuantityValueObject, DiscountValueObject } from '~/sh
  * ```
  */
 export class CartTransformer {
+  private static toMoneyFromCents(value: unknown): MoneyValueObject | null {
+    const cents = parseCartPriceCents(value)
+    if (cents === null) {
+      return null
+    }
+    return MoneyValueObject.of(cents / 100)
+  }
+
   /**
    * API 数据 → 应用模型
    *
@@ -38,23 +51,17 @@ export class CartTransformer {
    * @param apiItem - API 返回的购物车商品
    * @returns 应用模型（包含值对象）
    */
-  static toModel(apiItem: any): ICartItemModel {
-    // ✅ 修复：匹配真实的 API 字段名
-    // 价格从字符串转为数字，并从分转为元（除以100）
-    const priceInCents =
-      typeof apiItem.price === 'string' ? parseFloat(apiItem.price) : apiItem.price
-    const marketPriceInCents =
-      typeof apiItem.market_price === 'string'
-        ? parseFloat(apiItem.market_price)
-        : apiItem.market_price || priceInCents
-
-    // 从分转为元
-    const priceValue = priceInCents / 100
-    const marketPriceValue = marketPriceInCents / 100
-
-    // ✅ 转换为值对象（值对象负责验证和业务规则）
-    const price = MoneyValueObject.of(priceValue)
-    const marketPrice = MoneyValueObject.of(marketPriceValue)
+  static toModel(apiItem: CartItemPriceRaw & Record<string, any>): ICartItemModel {
+    const priceRaw = apiItem as CartItemPriceRaw
+    const salePrice = this.toMoneyFromCents(priceRaw.price) ?? MoneyValueObject.zero()
+    const marketPrice =
+      this.toMoneyFromCents(priceRaw.market_price) ??
+      salePrice
+    const memberPrice = this.toMoneyFromCents(priceRaw.member_price)
+    const activityPrice = this.toMoneyFromCents(priceRaw.activity_price)
+    const packagePrice = this.toMoneyFromCents(priceRaw.package_price)
+    const effectivePrice =
+      this.toMoneyFromCents(resolveCartEffectivePriceCents(priceRaw)) ?? salePrice
     const quantity = QuantityValueObject.of(apiItem.num || 1, 1, apiItem.store || 0)
 
     return {
@@ -65,8 +72,12 @@ export class CartTransformer {
       productImage: apiItem.pics || '',
       specId: apiItem.item_id || 'default',
       specName: apiItem.item_spec_desc || '77b4648d.064eb9',
-      price,
+      price: salePrice,
       marketPrice,
+      memberPrice,
+      activityPrice,
+      packagePrice,
+      effectivePrice,
       quantity,
       stock: apiItem.store || 0,
       selected: apiItem.is_checked ?? false,

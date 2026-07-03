@@ -48,7 +48,7 @@
               data-testid="item-price"
               class="text-[14px] leading-5 text-[#191a1d] w-full lg:w-auto text-right lg:whitespace-nowrap"
             >
-              ¥ {{ formatAmount(item.displayPrice || item.price) }}
+              {{ formatAmount(item.displayPrice || item.price) }}
             </span>
           </div>
           <!-- H5: 数量在下；PC: quantity 在左（order-1） -->
@@ -69,6 +69,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatMoneyYuan } from '~/utils/currencyFormat'
+
 const { t } = useI18n()
 
 interface Props {
@@ -78,9 +80,6 @@ interface Props {
 defineProps<Props>()
 
 function formatAmount(amount: number) {
-  return Number(amount || 0).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
+  return formatMoneyYuan(Number(amount || 0))
 }
 </script>

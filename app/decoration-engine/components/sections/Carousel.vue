@@ -174,6 +174,11 @@ import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
 } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  createDecorationLinkResolver,
+  normalizeDecorationLink,
+  type DecorationLinkValue,
+} from '~/decoration-engine/utils/resolveDecorationLink'
 
 interface CarouselSettings {
   autoplay: boolean
@@ -193,7 +198,7 @@ interface CarouselSlide {
   mobileImage: string
   videoUrl: string
   posterUrl: string
-  link: string
+  link: Record<string, unknown>
   alt: string
 }
 
@@ -204,6 +209,8 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const localePath = useLocalePath()
+const slideLinkResolver = createDecorationLinkResolver((path) => localePath(path as any))
 const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
 function translateIfGeneratedKey(value: string) {
@@ -303,7 +310,7 @@ const slides = computed<CarouselSlide[]>(() =>
         mobileImage: String(slideSettings.mobile_image || ''),
         videoUrl: String(slideSettings.videoUrl || ''),
         posterUrl: String(slideSettings.posterUrl || ''),
-        link: String(slideSettings.link || ''),
+        link: normalizeDecorationLink(slideSettings.link as DecorationLinkValue),
         alt: translateIfGeneratedKey(String(slideSettings.alt || props.section.title || '')),
       }
     })
@@ -446,12 +453,16 @@ const goToNext = () => {
   currentIndex.value = (currentIndex.value + 1) % slides.value.length
 }
 
-const resolveSlideTag = (link: string) => (link && !props.isPreview ? 'a' : 'div')
-const resolveSlideHref = (link: string) => (link && !props.isPreview ? link : undefined)
-const resolveSlideTarget = (link: string) =>
-  !props.isPreview && /^https?:\/\//.test(link) ? '_blank' : undefined
-const resolveSlideRel = (link: string) =>
-  !props.isPreview && /^https?:\/\//.test(link) ? 'noopener noreferrer' : undefined
+const resolveSlideTag = (link: DecorationLinkValue) =>
+  slideLinkResolver.resolveHref(link, { preview: props.isPreview }) && !props.isPreview ? 'a' : 'div'
+const resolveSlideHref = (link: DecorationLinkValue) =>
+  slideLinkResolver.resolveHref(link, { preview: props.isPreview })
+const resolveSlideTarget = (link: DecorationLinkValue) =>
+  slideLinkResolver.isExternalHref(link, { preview: props.isPreview }) ? '_blank' : undefined
+const resolveSlideRel = (link: DecorationLinkValue) =>
+  slideLinkResolver.isExternalHref(link, { preview: props.isPreview })
+    ? 'noopener noreferrer'
+    : undefined
 
 const handleSlideClick = (event: MouseEvent, blockId: string) => {
   if (!props.isPreview) {

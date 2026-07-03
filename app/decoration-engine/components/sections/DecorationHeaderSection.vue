@@ -1,6 +1,6 @@
 <template>
   <header
-    class="border-b border-neutral-200 bg-[var(--section-background)] text-[var(--section-foreground)]"
+    class="bg-[var(--section-background)] text-[var(--section-foreground)]"
     :class="sectionClasses"
     :style="sectionStyle"
     data-section-type="header"
@@ -54,7 +54,7 @@
           :aria-label="cartAriaLabel"
           @click="emit('open-mini-cart')"
         >
-          <ECShoppingBagIcon class="h-[18px] w-[17px]" :count="cartItemCount" />
+          <ECShoppingBagIcon class="h-[18px] w-[17px] text-current" :count="cartItemCount" />
         </button>
         <HeaderUserEntry
           :guest-aria-label="t('48ec697b.1fd02a')"

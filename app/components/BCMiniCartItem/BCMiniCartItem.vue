@@ -60,18 +60,22 @@
           {{ line.label }}:{{ line.value }}
         </p>
 
-        <p class="font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#364153]">
-          {{ t('9864a2ba.b388f8') }}
-          <span class="ml-1 font-['Inter'] text-base font-medium leading-5 text-[#364153]">
-            {{ item.priceDisplay }}
-          </span>
-        </p>
+        <BCCartLinePrice
+          :sale-price-cents="item.salePriceCents"
+          :member-price-cents="item.memberPriceCents"
+          :market-price-cents="item.marketPriceCents"
+          :effective-price-display="item.effectivePriceDisplay"
+          :market-price-display="item.marketPriceDisplay"
+          :has-member-price-layout="item.hasMemberPriceLayout"
+          :has-market-discount="item.hasMarketDiscount"
+          variant="mini-h5"
+        />
 
         <button
           v-if="showRemove"
           type="button"
           class="self-start font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#191a1d] hover:text-red-600"
-          @click="showConfirm = true"
+          @click="handleRemoveClick"
         >
           {{ t('9864a2ba.2f4aad') }}
         </button>
@@ -151,18 +155,19 @@
         {{ t('ee3264ed.0bf60b') }}:{{ item.quantity }}
       </p>
 
-      <p class="font-['Noto_Sans_SC'] text-sm font-normal leading-5">
-        <span class="text-[#4a5565]">{{ t('0ab56a3e.0e9fd9') }}:</span>
-        <span class="font-['Inter'] text-[#4a5565]">{{ originalPriceDisplay }}</span>
-        <template v-if="item.hasDiscount">
-          <br />
-          <span class="text-[#d0112f]">{{ t('0ab56a3e.894991') }}:</span>
-          <span class="font-['Inter'] text-[#d0112f]">{{ item.priceDisplay }}</span>
-        </template>
-      </p>
+      <BCCartLinePrice
+        :sale-price-cents="item.salePriceCents"
+        :member-price-cents="item.memberPriceCents"
+        :market-price-cents="item.marketPriceCents"
+        :effective-price-display="item.effectivePriceDisplay"
+        :market-price-display="item.marketPriceDisplay"
+        :has-member-price-layout="item.hasMemberPriceLayout"
+        :has-market-discount="item.hasMarketDiscount"
+        variant="mini-pc"
+      />
     </div>
 
-    <div class="flex h-10 w-[120px] shrink-0 items-center justify-end">
+    <div class="flex w-[120px] shrink-0 flex-col items-end gap-2">
       <QuantityStepper
         class="w-full"
         :quantity="item.quantity"
@@ -173,11 +178,19 @@
         @decrease="$emit('quantity-change', item.id, item.quantity - 1)"
         @increase="$emit('quantity-change', item.id, item.quantity + 1)"
       />
+      <button
+        v-if="showRemove"
+        type="button"
+        class="font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#191a1d] hover:text-red-600"
+        @click="handleRemoveClick"
+      >
+        {{ t('9864a2ba.2f4aad') }}
+      </button>
     </div>
   </div>
 
   <ECModal
-    v-if="showRemove"
+    v-if="showRemove && !externalRemoveConfirm"
     v-model="showConfirm"
     :title="t('9864a2ba.2f4aad')"
     :content="t('9864a2ba.3e3483')"
@@ -188,12 +201,15 @@
 
 <script setup lang="ts">
 import QuantityStepper from './QuantityStepper.vue'
+import { BCCartLinePrice } from '~/components/BCCartLinePrice'
 import type { ICartUI } from '~/composables/useCart'
 
 interface Props {
   item: ICartUI['items'][number]
   loading?: boolean
   showRemove?: boolean
+  /** 由父级（如购物袋抽屉）统一弹出确认框，避免被 Slideover 遮挡 */
+  externalRemoveConfirm?: boolean
 }
 
 const props = defineProps<Props>()
@@ -201,6 +217,7 @@ const emit = defineEmits<{
   (e: 'toggle-selection', itemId: string): void
   (e: 'quantity-change', itemId: string, quantity: number): void
   (e: 'remove', itemId: string): void
+  (e: 'request-remove', itemId: string): void
 }>()
 
 const { t } = useI18n()
@@ -212,13 +229,6 @@ const styleNoText = computed(() => {
   const bn = props.item.productBn?.trim()
   if (bn) return bn
   return props.item.productId || ''
-})
-
-const originalPriceDisplay = computed(() => {
-  if (props.item.hasDiscount && props.item.marketPriceDisplay) {
-    return props.item.marketPriceDisplay
-  }
-  return props.item.priceDisplay
 })
 
 const specLines = computed(() => {
@@ -243,6 +253,14 @@ const specLines = computed(() => {
 
   return [{ label: t('9864a2ba.a74053').replace(':', ''), value: specName }]
 })
+
+function handleRemoveClick() {
+  if (props.externalRemoveConfirm) {
+    emit('request-remove', props.item.id)
+    return
+  }
+  showConfirm.value = true
+}
 
 function handleConfirmRemove() {
   showConfirm.value = false

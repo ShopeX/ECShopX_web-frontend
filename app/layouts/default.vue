@@ -59,6 +59,8 @@
         <BCFooter />
       </div>
 
+      <BCAiAssistantFab v-if="shouldRenderAiAssistantFab" />
+
       <USlideover v-model:open="showSearchDrawer" side="left">
         <template #content>
           <BCSearchDrawer
@@ -145,6 +147,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import BCFooter from '~/components/BCFooter/BCFooter.vue'
+import BCAiAssistantFab from '~/components/BCAiAssistantFab/BCAiAssistantFab.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
 import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
 import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
@@ -255,6 +258,16 @@ const headerMenuId = computed(() => {
 const showCategoryNav = ref(false)
 const showMiniCart = ref(false)
 const showSearchDrawer = ref(false)
+const isAiAssistantRoute = computed(
+  () => route.path.includes('/ai-assistant') || String(route.name || '').includes('ai-assistant')
+)
+const shouldRenderAiAssistantFab = computed(
+  () =>
+    !isDecorationPreview.value &&
+    !isDecorationRouteDesignMode.value &&
+    String(route.query.designMode || '') !== '1' &&
+    !isAiAssistantRoute.value
+)
 const hotKeywords = computed(() => [
   t('de7d1d34.6e4493'),
   t('de7d1d34.9f351b'),

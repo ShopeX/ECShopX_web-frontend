@@ -130,6 +130,12 @@ export default defineNuxtConfig({
       businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // bbc 或 b2c
       decorationAdminOrigins:
         process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS || '',
+      aiAssistant: process.env.NUXT_PUBLIC_AI_ASSISTANT || '',
+      aiBaseUrl: process.env.NUXT_PUBLIC_AI_BASE_URL || '',
+      aiAssistantBackendUrl:
+        process.env.NUXT_PUBLIC_AI_ASSISTANT_BACKEND_URL || '',
+      aiEmbedPageUrl: process.env.NUXT_PUBLIC_AI_EMBED_PAGE_URL || '',
+      aiTenantId: process.env.NUXT_PUBLIC_AI_TENANT_ID || '',
     },
   },
 

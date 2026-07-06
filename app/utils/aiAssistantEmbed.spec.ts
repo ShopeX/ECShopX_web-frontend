@@ -169,6 +169,16 @@ describe('aiAssistantEmbed', () => {
     vi.stubGlobal('window', originalWindow)
   })
 
+  it('treats noopener popup calls as handled even when the browser returns no handle', () => {
+    const originalWindow = globalThis.window
+    const open = vi.fn(() => null)
+    vi.stubGlobal('window', { open })
+
+    expect(openAiAssistantInNewWindow('https://ai.example/embed/index.html')).toBe(true)
+
+    vi.stubGlobal('window', originalWindow)
+  })
+
   it('posts auth payload to the explicit embed origin', () => {
     const postMessage = vi.fn()
     const payload = buildAiAssistantAuthPayload({ token: 'token-a' })

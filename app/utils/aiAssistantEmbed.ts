@@ -129,8 +129,8 @@ export function buildAiAssistantOpenUrl(input: {
 
 export function openAiAssistantInNewWindow(url: string): boolean {
   if (!url || typeof window === 'undefined') return false
-  const opened = window.open(url, '_blank', 'noopener,noreferrer')
-  return Boolean(opened)
+  window.open(url, '_blank', 'noopener,noreferrer')
+  return true
 }
 
 export function postAiAssistantAuthToEmbed(

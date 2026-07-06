@@ -21,27 +21,19 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useUserStore } from '~/stores/user'
-import { resolveCompanyId } from '~/utils/company'
 import {
-  buildAiAssistantAuthPayload,
-  buildAiAssistantOpenUrl,
-  buildAiEmbedPageUrl,
   isAiAssistantEnabled,
-  isMobileWebUserAgent,
-  openAiAssistantInNewWindow,
   resolveAiAssistantBackendUrl,
-  resolveDistributorIdFromRoute,
   type AiAssistantPublicConfig,
 } from '~/utils/aiAssistantEmbed'
+import { resolveAiAssistantFabDisplay } from '~/utils/aiAssistantWidgetConfig'
 
 defineOptions({ name: 'BCAiAssistantFab' })
 
+const emit = defineEmits<{ open: [] }>()
+
 const config = useRuntimeConfig()
 const route = useRoute()
-const router = useRouter()
-const localePath = useLocalePath()
-const userStore = useUserStore()
 
 const mounted = ref(false)
 const fabIconUrl = ref('')
@@ -52,23 +44,6 @@ const backend = computed(() => resolveAiAssistantBackendUrl(aiConfig.value))
 const enabled = computed(() => isAiAssistantEnabled(aiConfig.value.aiAssistant))
 const isAiAssistantRoute = computed(
   () => route.path.includes('/ai-assistant') || String(route.name || '').includes('ai-assistant')
-)
-
-const payload = computed(() =>
-  buildAiAssistantAuthPayload({
-    token: userStore.token,
-    companyId: resolveCompanyId(),
-    tenantId: aiConfig.value.aiTenantId,
-    distributorId: resolveDistributorIdFromRoute(route),
-  })
-)
-
-const assistantUrl = computed(() =>
-  buildAiAssistantOpenUrl({
-    embedPageUrl: buildAiEmbedPageUrl(aiConfig.value),
-    backend: backend.value,
-    payload: payload.value,
-  })
 )
 
 const shouldShow = computed(() => mounted.value && enabled.value && !isAiAssistantRoute.value)
@@ -82,18 +57,9 @@ function buildAvatarAssetUrl(avatar: string): string {
 }
 
 function applyAvatarConfig(value: unknown) {
-  if (!value || typeof value !== 'object') return
-
-  const data = 'data' in value && value.data && typeof value.data === 'object' ? value.data : value
-  const avatar = String(
-    ('default_avatar' in data && data.default_avatar) ||
-      ('defaultAvatar' in data && data.defaultAvatar) ||
-      ''
-  ).trim()
-
-  if (!avatar || ['fox', 'robot', 'cat'].includes(avatar)) return
-
-  fabIconUrl.value = /^(https?:|data:|\/)/i.test(avatar) ? avatar : buildAvatarAssetUrl(avatar)
+  const display = resolveAiAssistantFabDisplay(value, buildAvatarAssetUrl)
+  fabIconUrl.value = display.iconUrl
+  fabText.value = display.text
 }
 
 async function loadFabConfig() {
@@ -114,16 +80,7 @@ async function loadFabConfig() {
 
 function openAssistant() {
   if (!import.meta.client) return
-
-  if (isMobileWebUserAgent(window.navigator.userAgent)) {
-    void router.push(localePath('/ai-assistant'))
-    return
-  }
-
-  const opened = openAiAssistantInNewWindow(assistantUrl.value)
-  if (!opened) {
-    window.location.href = assistantUrl.value
-  }
+  emit('open')
 }
 
 onMounted(() => {

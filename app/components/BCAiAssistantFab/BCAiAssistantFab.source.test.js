@@ -7,19 +7,19 @@ const source = readFileSync(
   'utf8'
 )
 
-test('AI assistant FAB follows enabled, client-only, and split-open contracts', () => {
+test('AI assistant FAB follows enabled, client-only, and drawer-open contracts', () => {
   expect(source).toMatch(/defineOptions\(\{\s*name:\s*'BCAiAssistantFab'/)
+  expect(source).toMatch(/defineEmits<\{\s*open:\s*\[\]\s*\}>/)
   expect(source).toMatch(/isAiAssistantEnabled/)
   expect(source).toMatch(/resolveAiAssistantBackendUrl/)
-  expect(source).toMatch(/resolveCompanyId/)
-  expect(source).toMatch(/resolveDistributorIdFromRoute/)
-  expect(source).toMatch(/buildAiAssistantOpenUrl/)
+  expect(source).toMatch(/resolveAiAssistantFabDisplay/)
+  expect(source).toMatch(/fabText\.value = display\.text/)
   expect(source).toMatch(/data-testid="ai-assistant-fab"/)
   expect(source).toMatch(/<ClientOnly>/)
   expect(source).toMatch(/mounted\.value/)
-  expect(source).toMatch(/isMobileWebUserAgent\(window\.navigator\.userAgent\)/)
-  expect(source).toMatch(/router\.push\(localePath\('\/ai-assistant'\)\)/)
-  expect(source).toMatch(/openAiAssistantInNewWindow/)
-  expect(source).toMatch(/window\.location\.href\s*=\s*assistantUrl\.value/)
+  expect(source).toMatch(/emit\('open'\)/)
+  expect(source).not.toMatch(/router\.push\(localePath\('\/ai-assistant'\)\)/)
+  expect(source).not.toMatch(/openAiAssistantInNewWindow/)
+  expect(source).not.toMatch(/window\.location\.href\s*=\s*assistantUrl\.value/)
   expect(source).toMatch(/catch/)
 })

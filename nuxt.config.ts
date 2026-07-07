@@ -121,6 +121,8 @@ export default defineNuxtConfig({
 
   // 运行时配置
   runtimeConfig: {
+    // 仅 SSR 使用，通过 NUXT_API_BASE 注入（Docker 内网地址）
+    apiBase: process.env.NUXT_API_BASE || '',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
       companyId: process.env.NUXT_PUBLIC_COMPANY_ID,

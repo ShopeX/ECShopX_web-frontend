@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.8.2](https://ms-git.ishopex.cn/ecshopx/ecshopx-web/compare/v4.8.1...v4.8.2) (2026-07-07)
+
+### [4.8.1](https://ms-git.ishopex.cn/ecshopx/ecshopx-web/compare/v4.8.0...v4.8.1) (2026-07-07)
+
 ## [4.8.0](https://ms-git.ishopex.cn/ecshopx/ecshopx-web/compare/v4.7.0...v4.8.0) (2026-07-03)
 
 ## [4.7.0](https://ms-git.ishopex.cn/ecshopx/ecshopx-web/compare/v4.6.6...v4.7.0) (2026-06-26)

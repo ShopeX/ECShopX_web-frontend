@@ -25,10 +25,8 @@ export default defineNuxtPlugin({
       }
     }
 
-    // 2. 初始化前端通用配置（含默认币种）与购物车 (仅客户端)
+    // 2. 初始化购物车 (仅客户端；币种由 currency-init 插件在 SSR/客户端统一初始化)
     if (import.meta.client) {
-      useCurrency().catch((e) => console.error('Currency init failed:', e))
-      // 异步加载购物车，不阻塞应用渲染
       cartStore.loadCart().catch((e) => console.error('Cart init failed:', e))
     }
   },

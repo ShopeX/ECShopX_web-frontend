@@ -543,8 +543,13 @@ const {
   retry,
 } = usePayment(orderIdRef)
 
+const { currencySymbol, formatFromYuan } = await useCurrency()
+
 const uploadVoucherIconSrc = '/images/payment/upload-voucher.svg'
-const fallbackAmountText = computed(() => (loadingOrder.value ? t('eab46cc2.26b5bd') : '¥ 0.00'))
+const fallbackAmountText = computed(() => {
+  void currencySymbol.value
+  return loadingOrder.value ? t('eab46cc2.26b5bd') : formatFromYuan(0)
+})
 const BANK_TRANSFER_METHOD_KEYWORDS = [
   'unionpay',
   'banktransfer',

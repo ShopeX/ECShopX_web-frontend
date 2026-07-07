@@ -23,6 +23,7 @@ import {
   resolveDistributorIdFromRoute,
   type AiAssistantPublicConfig,
 } from '~/utils/aiAssistantEmbed'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 import { resolveCompanyId } from '~/utils/company'
 
 definePageMeta({
@@ -34,6 +35,7 @@ const route = useRoute()
 const router = useRouter()
 const localePath = useLocalePath()
 const userStore = useUserStore()
+const { locale } = useI18n()
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
 const aiConfig = computed(() => config.public as AiAssistantPublicConfig)
@@ -45,6 +47,7 @@ const payload = computed(() =>
     companyId: resolveCompanyId(),
     tenantId: aiConfig.value.aiTenantId,
     distributorId: resolveDistributorIdFromRoute(route),
+    locale: getApiCountryCodeByLocale(locale.value),
   })
 )
 const iframeSrc = computed(() =>
@@ -100,7 +103,7 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => userStore.token,
+  () => [userStore.token, locale.value],
   () => {
     syncAuthToEmbed()
   }

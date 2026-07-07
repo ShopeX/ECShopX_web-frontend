@@ -12,6 +12,7 @@ export interface AiAssistantAuthPayload {
   companyId: string
   tenantId: string
   distributorId: string
+  locale: string
 }
 
 interface PostMessageTarget {
@@ -89,6 +90,7 @@ export function buildAiAssistantAuthPayload(input: {
   companyId?: string | null
   tenantId?: string | null
   distributorId?: string | null
+  locale?: string | null
 }): AiAssistantAuthPayload {
   return {
     type: 'ECSHOPX_AUTH',
@@ -96,6 +98,7 @@ export function buildAiAssistantAuthPayload(input: {
     companyId: input.companyId ? String(input.companyId) : '',
     tenantId: input.tenantId ? String(input.tenantId) : '',
     distributorId: input.distributorId ? String(input.distributorId) : '',
+    locale: input.locale ? String(input.locale) : '',
   }
 }
 
@@ -111,6 +114,7 @@ export function buildAiAssistantIframeSrc(input: {
   if (input.payload.companyId) query.set('company_id', input.payload.companyId)
   if (input.payload.distributorId) query.set('distributor_id', input.payload.distributorId)
   if (input.payload.tenantId) query.set('tenant_id', input.payload.tenantId)
+  if (input.payload.locale) query.set('locale', input.payload.locale)
   if (input.backend) query.set('backend', input.backend)
   query.set('layout', 'page')
   query.set('page-soft-close', 'true')

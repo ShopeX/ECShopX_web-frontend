@@ -36,6 +36,7 @@ import {
   resolveDistributorIdFromRoute,
   type AiAssistantPublicConfig,
 } from '~/utils/aiAssistantEmbed'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 import { resolveCompanyId } from '~/utils/company'
 
 defineOptions({ name: 'BCAiAssistantDrawer' })
@@ -47,7 +48,7 @@ const route = useRoute()
 const router = useRouter()
 const localePath = useLocalePath()
 const userStore = useUserStore()
-const { t } = useI18n()
+const { locale, t } = useI18n()
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
 const aiConfig = computed(() => config.public as AiAssistantPublicConfig)
@@ -60,6 +61,7 @@ const payload = computed(() =>
     companyId: resolveCompanyId(),
     tenantId: aiConfig.value.aiTenantId,
     distributorId: resolveDistributorIdFromRoute(route),
+    locale: getApiCountryCodeByLocale(locale.value),
   })
 )
 const iframeSrc = computed(() =>
@@ -116,7 +118,7 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => [model.value, userStore.token],
+  () => [model.value, userStore.token, locale.value],
   () => {
     if (model.value) syncAuthToEmbed()
   }

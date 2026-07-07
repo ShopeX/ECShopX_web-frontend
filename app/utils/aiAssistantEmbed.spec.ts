@@ -109,6 +109,7 @@ describe('aiAssistantEmbed', () => {
         companyId: 'company-a',
         tenantId: 'tenant-a',
         distributorId: 'distributor-a',
+        locale: 'en-CN',
       })
     ).toEqual({
       type: 'ECSHOPX_AUTH',
@@ -116,6 +117,7 @@ describe('aiAssistantEmbed', () => {
       companyId: 'company-a',
       tenantId: 'tenant-a',
       distributorId: 'distributor-a',
+      locale: 'en-CN',
     })
     expect(buildAiAssistantAuthPayload({})).toEqual({
       type: 'ECSHOPX_AUTH',
@@ -123,6 +125,7 @@ describe('aiAssistantEmbed', () => {
       companyId: '',
       tenantId: '',
       distributorId: '',
+      locale: '',
     })
   })
 
@@ -132,6 +135,7 @@ describe('aiAssistantEmbed', () => {
       companyId: 'company-a',
       tenantId: 'tenant-a',
       distributorId: 'distributor-a',
+      locale: 'en-CN',
     })
     const iframeSrc = buildAiAssistantIframeSrc({
       embedPageUrl: 'https://ai.example/embed/index.html?x=1',
@@ -145,6 +149,7 @@ describe('aiAssistantEmbed', () => {
     expect(url.searchParams.get('company_id')).toBe('company-a')
     expect(url.searchParams.get('distributor_id')).toBe('distributor-a')
     expect(url.searchParams.get('tenant_id')).toBe('tenant-a')
+    expect(url.searchParams.get('locale')).toBe('en-CN')
     expect(url.searchParams.get('backend')).toBe('https://backend.example')
     expect(url.searchParams.get('layout')).toBe('page')
     expect(url.searchParams.get('page-soft-close')).toBe('true')

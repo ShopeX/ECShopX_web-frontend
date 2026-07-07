@@ -8,8 +8,10 @@ const source = readFileSync(path.resolve(process.cwd(), 'app/pages/ai-assistant.
 test('ai assistant page renders iframe with shared embed context', () => {
   assert.match(source, /<iframe/)
   assert.match(source, /useUserStore\(\)/)
+  assert.match(source, /getApiCountryCodeByLocale/)
   assert.match(source, /resolveCompanyId\(\)/)
   assert.match(source, /resolveDistributorIdFromRoute\(/)
+  assert.match(source, /locale:\s*getApiCountryCodeByLocale\(locale\.value\)/)
   assert.match(source, /buildAiEmbedPageUrl\(/)
   assert.match(source, /resolveAiAssistantBackendUrl\(/)
   assert.match(source, /buildAiAssistantAuthPayload\(/)

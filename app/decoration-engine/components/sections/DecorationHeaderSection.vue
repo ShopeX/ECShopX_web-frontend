@@ -125,6 +125,7 @@ import type {
 } from '~/decoration-engine/types/decoration'
 import { LOCALE_DEFINITIONS, type AppLocaleCode } from '~/shared/localeConfig'
 import { resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
+import { setPreferredLocale } from '~/utils/localePreference'
 
 const props = defineProps<{
   section: DecorationSection
@@ -191,8 +192,9 @@ function toggleLanguageMenu() {
 
 function switchLanguage(localeCode: AppLocaleCode) {
   showLanguageMenu.value = false
+  setPreferredLocale(localeCode)
   const path = switchLocalePath(localeCode)
-  navigateTo(path)
+  navigateTo(path, { replace: true })
 }
 
 function handleClickOutside(event: MouseEvent) {

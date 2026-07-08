@@ -106,7 +106,8 @@
 
 import HeaderUserEntry from '~/components/BCHeaderBar/HeaderUserEntry.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { LOCALE_DEFINITIONS } from '~/shared/localeConfig'
+import { LOCALE_DEFINITIONS, type AppLocaleCode } from '~/shared/localeConfig'
+import { setPreferredLocale } from '~/utils/localePreference'
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -150,12 +151,13 @@ const toggleLanguageMenu = () => {
 /**
  * 切换语言
  */
-const switchLanguage = (localeCode: 'en' | 'zh' | 'ar') => {
+const switchLanguage = (localeCode: AppLocaleCode) => {
   showLanguageMenu.value = false
+  setPreferredLocale(localeCode)
 
   // 使用 switchLocalePath 切换到新语言
   const path = switchLocalePath(localeCode)
-  navigateTo(path)
+  navigateTo(path, { replace: true })
 }
 
 /**

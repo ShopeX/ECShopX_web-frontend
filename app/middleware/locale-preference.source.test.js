@@ -4,11 +4,12 @@ import path from 'node:path'
 import test from 'node:test'
 
 const cwd = process.cwd()
-const middlewarePath = 'app/middleware/locale-preference.client.ts'
+const middlewarePath = 'app/middleware/locale-preference.client.global.ts'
 const absoluteMiddlewarePath = path.resolve(cwd, middlewarePath)
 
-test('locale preference middleware is client only', () => {
-  assert.equal(path.basename(middlewarePath), 'locale-preference.client.ts')
+test('locale preference middleware is global client middleware', () => {
+  assert.equal(path.basename(middlewarePath), 'locale-preference.client.global.ts')
+  assert.match(path.basename(middlewarePath, '.ts'), /\.global$/)
   assert.equal(existsSync(absoluteMiddlewarePath), true)
 
   const source = readFileSync(absoluteMiddlewarePath, 'utf8')

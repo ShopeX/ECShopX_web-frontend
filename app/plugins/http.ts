@@ -153,7 +153,7 @@ export default defineNuxtPlugin({
             if (!(options as any).skipCompanyId && companyId) {
               bodyData.company_id = companyId
             }
-            if (!(options as any).skipCountryCode) {
+            if (!(options as any).skipCountryCode && !bodyData.country_code) {
               bodyData.country_code = getCountryCode()
             }
 
@@ -172,7 +172,7 @@ export default defineNuxtPlugin({
           if (!(options as any).skipCompanyId && companyId) {
             query.company_id = companyId
           }
-          if (!(options as any).skipCountryCode) {
+          if (!(options as any).skipCountryCode && !query.country_code) {
             query.country_code = getCountryCode()
           }
           options.query = query

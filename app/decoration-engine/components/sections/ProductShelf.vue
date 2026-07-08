@@ -4,10 +4,7 @@
     data-section-type="product-shelf"
     @click.capture="handlePreviewCapture"
   >
-    <h2
-      v-if="settings.title"
-      class="mb-4 text-center text-lg font-semibold text-[#191A1D]"
-    >
+    <h2 v-if="settings.title" class="mb-4 text-center text-lg font-semibold text-[#191A1D]">
       {{ settings.title }}
     </h2>
 
@@ -46,6 +43,7 @@ import type {
 } from '~/decoration-engine/types/decoration'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 import { resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 interface ProductShelfSettings {
@@ -69,7 +67,8 @@ const emit = defineEmits<{
   (e: 'click', event: MouseEvent): void
 }>()
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
+const countryCode = computed(() => getApiCountryCodeByLocale(locale.value))
 
 const settings = computed<ProductShelfSettings>(() => {
   const raw = resolveSectionSettings('product-shelf', props.section.settings)
@@ -120,7 +119,7 @@ const gridClass = computed(() => {
 })
 
 const { data: productsData, pending } = await useAsyncData(
-  () => `decoration-product-shelf-${queryKey.value}`,
+  () => `decoration-product-shelf-${countryCode.value}-${queryKey.value}`,
   async (): Promise<IProduct[]> => {
     if (showPlaceholder.value) {
       return []
@@ -158,7 +157,7 @@ const { data: productsData, pending } = await useAsyncData(
   },
   {
     default: () => [],
-    watch: [queryKey],
+    watch: [queryKey, countryCode],
     server: !props.isPreview,
   }
 )

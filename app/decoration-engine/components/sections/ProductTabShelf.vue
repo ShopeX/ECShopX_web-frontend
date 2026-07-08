@@ -51,10 +51,7 @@
           />
         </div>
 
-        <div
-          v-else-if="displayedProducts.length"
-          class="relative"
-        >
+        <div v-else-if="displayedProducts.length" class="relative">
           <div
             class="grid grid-cols-2 transition-opacity duration-200 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
             :class="pending ? 'opacity-70' : 'opacity-100'"
@@ -70,14 +67,9 @@
               disable-appear-animation
             />
           </div>
-
         </div>
 
-        <div
-          v-else-if="pending"
-          class="min-h-[200px]"
-          :style="gridStyle"
-        />
+        <div v-else-if="pending" class="min-h-[200px]" :style="gridStyle" />
 
         <div v-else class="min-h-[200px]" />
       </DecorationBlockHost>
@@ -93,11 +85,15 @@ import { useDecorationEditOptional } from '~/decoration-engine/composables/useDe
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
 } from '~/decoration-engine/utils/sectionAppearance'
-import { resolveBlockSettings, resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
+import {
+  resolveBlockSettings,
+  resolveSectionSettings,
+} from '~/decoration-engine/utils/resolveSettings'
 
 interface ProductTabShelfSettings {
   title: string
@@ -140,7 +136,8 @@ const props = defineProps<{
 
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
-const { t } = useI18n()
+const { locale, t } = useI18n()
+const countryCode = computed(() => getApiCountryCodeByLocale(locale.value))
 const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
 function translateIfGeneratedKey(value: string) {
@@ -299,15 +296,13 @@ async function loadProductsForTab(tab: ProductTabItem): Promise<IProduct[]> {
     : Array.isArray(batchItems?.data)
       ? batchItems.data
       : []
-  const validBatchItems = ProductTransformer.validateProductList(
-    normalizedBatchItems
-  )
+  const validBatchItems = ProductTransformer.validateProductList(normalizedBatchItems)
 
   return sortProductsByTabOrder(ProductTransformer.toModelList(validBatchItems), productIds)
 }
 
 const { data: productsData, pending } = await useAsyncData(
-  () => `product-tab-shelf-${queryKey.value}`,
+  () => `product-tab-shelf-${countryCode.value}-${queryKey.value}`,
   async (): Promise<IProduct[]> => {
     const tab = activeTab.value
     if (!tab || !tab.productIds.length) return []
@@ -320,7 +315,7 @@ const { data: productsData, pending } = await useAsyncData(
   },
   {
     default: () => [],
-    watch: [queryKey],
+    watch: [queryKey, countryCode],
     server: !props.isPreview,
   }
 )

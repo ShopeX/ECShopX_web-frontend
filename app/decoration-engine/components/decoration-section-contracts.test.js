@@ -100,6 +100,8 @@ test('DecorationHeaderSection keeps the locale switcher from the default header'
   assert.match(source, /enable_language_selector/)
   assert.match(source, /LOCALE_DEFINITIONS/)
   assert.match(source, /useSwitchLocalePath/)
+  assert.match(source, /setPreferredLocale\(localeCode\)/)
+  assert.match(source, /navigateTo\(path,\s*\{\s*replace:\s*true\s*\}\)/)
   assert.match(source, /i-heroicons-globe-alt/)
   assert.match(source, /switchLanguage/)
 })

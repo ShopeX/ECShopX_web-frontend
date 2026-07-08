@@ -20,7 +20,7 @@ test('locale config lives under app so Nitro can bundle it from srcDir imports',
 
 test('app runtime imports locale config through srcDir aliases', () => {
   assert.match(httpPluginSource, /from '~\/shared\/localeConfig'/)
-  assert.match(localeRouteSource, /from '~\/shared\/localeConfig'/)
+  assert.match(localeRouteSource, /from '\.\.\/shared\/localeConfig'/)
   assert.match(headerBarSource, /from '~\/shared\/localeConfig'/)
 })
 

@@ -80,11 +80,11 @@ function normalizeRowDsl(
 export async function useDecorationDslFetch(options: UseDecorationDslFetchOptions) {
   const route = useRoute()
   const nuxtApp = useNuxtApp()
+  const { locale } = useI18n()
   const pageType = computed(() => options.pageType)
   const pageId = computed(() => toValue(options.pageId) ?? pageType.value)
-  const shouldFetch = computed(() => !isDecorationPreviewActiveOnRoute(route))
-  const { locale } = useI18n()
   const countryCode = computed(() => getApiCountryCodeByLocale(locale.value))
+  const shouldFetch = computed(() => !isDecorationPreviewActiveOnRoute(route))
 
   const cacheKey = computed(
     () => `decoration-dsl-${countryCode.value}-${pageType.value}-${pageId.value}`

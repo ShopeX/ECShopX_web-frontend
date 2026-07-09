@@ -119,6 +119,29 @@ test('payment page disables keepalive so stale pay state is not restored on re-e
   assert.match(paymentPageSource, /definePageMeta\(\{[\s\S]*keepalive:\s*false,[\s\S]*\}\)/)
 })
 
+test('payment page does not auto-submit payment methods; checkout owns doumen_intl preflight', () => {
+  assert.doesNotMatch(paymentPageSource, /hasAutoSubmittedSinglePayment/)
+  assert.doesNotMatch(paymentPageSource, /tryAutoSubmitSinglePaymentMethod/)
+  assert.doesNotMatch(paymentPageSource, /handlePrimaryAction\(\{ autoSubmit: true \}\)/)
+})
+
+test('manual payment supports current-tab navigation for redirect based payment methods', () => {
+  assert.match(
+    paymentComposableSource,
+    /interface PayNowOptions \{[\s\S]*navigationTarget\?: '_self' \| '_blank'/
+  )
+  assert.match(paymentComposableSource, /async function payNow\(options: PayNowOptions = \{\}\)/)
+  assert.match(
+    paymentComposableSource,
+    /const navigationTarget = options\.navigationTarget \?\? '_blank'/
+  )
+  assert.match(paymentComposableSource, /submitPaymentForm\(paymentForm, navigationTarget\)/)
+  assert.match(
+    paymentComposableSource,
+    /navigationTarget === '_self'[\s\S]*\? openPaymentUrl\(payUrl\)[\s\S]*: openPaymentUrlInNewTab\(payUrl\)/
+  )
+})
+
 test('payment page loads offline bank accounts when offline pay method exists', () => {
   assert.match(paymentClientSource, /async getOfflineBankAccounts\(/)
   assert.match(paymentClientSource, /this\.http\('\/wxapp\/order\/offline\/backaccount'/)

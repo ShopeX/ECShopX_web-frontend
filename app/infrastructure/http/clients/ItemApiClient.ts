@@ -24,7 +24,7 @@ import type { IItemListParams, IItemDetailParams } from '~/types/api/item'
 export class ItemApiClient {
   private $api: any
 
-  constructor() {
+  constructor () {
     // 不在构造函数中初始化，延迟到第一次使用时
   }
 
@@ -42,18 +42,14 @@ export class ItemApiClient {
   /**
    * 获取商品列表
    *
+   * 分类筛选（同一接口，按导航 link_type 传不同参数）：
+   * - 管理分类 `category`      → `main_category`
+   * - 销售分类 `sale_category` → `category_id`（不传 main_category）
+   *
+   * b2c 模式下会将 `main_category` 映射为请求里的 `category_id`。
+   *
    * @param params - 商品列表查询参数
    * @returns 原始 API 响应
-   *
-   * @example
-   * ```typescript
-   * const response = await client.getItemList({
-   *   page: '1',
-   *   pageSize: '20',
-   *   item_type: 'normal',
-   *   main_category: 'electronics'
-   * })
-   * ```
    */
   async getItemList(params: IItemListParams): Promise<any> {
     const businessMode = useRuntimeConfig().public.businessMode || 'b2c'
@@ -61,9 +57,11 @@ export class ItemApiClient {
       page: params.page,
       pageSize: params.pageSize,
       item_type: params.item_type,
-      ...(businessMode === 'b2c'
-        ? { category_id: params.main_category }
-        : { main_category: params.main_category }),
+      ...(params.main_category != null &&
+        params.main_category !== '' &&
+        (businessMode === 'b2c'
+          ? { category_id: params.main_category }
+          : { main_category: params.main_category })),
       is_tdk: params.is_tdk,
       type: params.type,
       // company_id 由 HTTP 插件自动添加，无需手动传递
@@ -73,6 +71,7 @@ export class ItemApiClient {
       ...(params.end_price && { end_price: params.end_price }),
       ...(params.keywords && { keywords: params.keywords }),
       ...(params.distributor_id && { distributor_id: params.distributor_id }),
+      ...(params.category_id && { category_id: String(params.category_id) }),
     }
 
     return this.http('/wxapp/goods/items', {

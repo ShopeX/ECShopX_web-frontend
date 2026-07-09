@@ -37,6 +37,10 @@ export interface PaymentClientRuntime {
   isAlipayBrowser: boolean
 }
 
+interface PayNowOptions {
+  navigationTarget?: '_self' | '_blank'
+}
+
 const POLL_INTERVAL_MS = 5000
 const POLL_TIMEOUT_MS = 60 * 1000
 const COUNTDOWN_DEFAULT_MS = POLL_TIMEOUT_MS
@@ -425,9 +429,10 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     }, POLL_INTERVAL_MS)
   }
 
-  async function payNow() {
+  async function payNow(options: PayNowOptions = {}) {
     const id = orderIdValue.value
     if (!id || !selectedPayType.value) return
+    const navigationTarget = options.navigationTarget ?? '_blank'
     loading.value = true
     error.value = null
     payResult.value = 'pending'
@@ -465,7 +470,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
           startPolling()
           return
         case 'alipay_form':
-          if (submitPaymentForm(paymentForm, '_blank')) {
+          if (submitPaymentForm(paymentForm, navigationTarget)) {
             countdownEndAt.value = Date.now() + COUNTDOWN_DEFAULT_MS
             startPolling()
             return
@@ -501,7 +506,9 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
         }
         case 'external_redirect': {
           const payUrl = data?.pay_url || extractPaymentRedirectUrl(data)
-          if (openPaymentUrlInNewTab(payUrl)) {
+          const didOpen =
+            navigationTarget === '_self' ? openPaymentUrl(payUrl) : openPaymentUrlInNewTab(payUrl)
+          if (didOpen) {
             externalPayUrl.value = payUrl
             isExternalWaiting.value = true
             payResult.value = 'pending'

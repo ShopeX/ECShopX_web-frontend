@@ -619,6 +619,7 @@ import BCCheckoutErrorModal from '~/components/BCCheckoutErrorModal/BCCheckoutEr
 import type { IAddressFormData } from '~/composables/useAddress'
 import { ECCheckbox } from '~/components/ECCheckbox'
 import { ECSelect } from '~/components/ECSelect'
+import { paymentApiClient } from '~/infrastructure/http/clients'
 
 definePageMeta({
   layout: 'default',
@@ -728,6 +729,74 @@ const selectedItems = computed(() => {
 })
 
 const isCheckoutSummaryReady = computed(() => checkoutItems.value.length > 0)
+
+function getPaymentPlatform() {
+  if (import.meta.client && typeof window !== 'undefined') {
+    return window.innerWidth < 1024 ? 'h5' : 'pc'
+  }
+  return 'pc'
+}
+
+function normalizePaymentMethodCode(value: unknown) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '')
+}
+
+function isDoumenIntlPaymentMethod(method: { code?: string; id?: string; pay_type_code?: string }) {
+  return (
+    normalizePaymentMethodCode(method.pay_type_code ?? method.code ?? method.id) === 'doumenintl'
+  )
+}
+
+async function loadCheckoutPaymentMethods() {
+  try {
+    const response = await paymentApiClient.getPaymentMethodList({ platform: getPaymentPlatform() })
+    const list = Array.isArray(response) ? response : (response?.data ?? [])
+    return Array.isArray(list) ? list : []
+  } catch {
+    return []
+  }
+}
+
+function getCheckoutPaymentReturnUrl() {
+  if (import.meta.client && typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin
+  }
+  return ''
+}
+
+function extractPaymentRedirectUrl(data: Record<string, any>) {
+  const candidates = [
+    data?.pay_url,
+    data?.mweb_url,
+    data?.h5_url,
+    data?.redirect_url,
+    data?.code_url,
+  ]
+  return candidates.find((value) => typeof value === 'string' && /^https?:\/\//i.test(value)) || ''
+}
+
+async function redirectToDoumenPayment(orderId: string, payType: string) {
+  try {
+    const response = await paymentApiClient.getOrderPaymentInfo({
+      order_id: orderId,
+      pay_type: payType,
+      return_url: getCheckoutPaymentReturnUrl(),
+      pay_channel: payType,
+    })
+    const data = (response?.data ?? response ?? {}) as Record<string, any>
+    const payUrl = data?.pay_url || extractPaymentRedirectUrl(data)
+
+    if (!payUrl || !import.meta.client || typeof window === 'undefined') return false
+
+    window.location.replace(payUrl)
+    return true
+  } catch {
+    return false
+  }
+}
 
 function formatSpec(specString: string): string[] {
   if (!specString) return []
@@ -843,10 +912,24 @@ async function handleSubmit() {
   form.value.invoiceType = undefined
   form.value.invoiceContent = undefined
 
-  const result = await createOrder('wxpaypc')
+  const paymentMethods = await loadCheckoutPaymentMethods()
+  const onlyPaymentMethod = paymentMethods.length === 1 ? paymentMethods[0] : null
+  const shouldRedirectToDoumen = !!onlyPaymentMethod && isDoumenIntlPaymentMethod(onlyPaymentMethod)
+  const payType = shouldRedirectToDoumen
+    ? (onlyPaymentMethod.pay_type_code ??
+      onlyPaymentMethod.code ??
+      onlyPaymentMethod.id ??
+      'doumen_intl')
+    : 'wxpaypc'
+
+  const result = await createOrder(payType)
 
   if (result.success && result.orderId) {
-    router.push(`/payment?orderId=${result.orderId}`)
+    if (shouldRedirectToDoumen && (await redirectToDoumenPayment(result.orderId, payType))) {
+      return
+    }
+
+    router.replace(localePath({ path: '/payment', query: { orderId: result.orderId } }))
   }
 }
 </script>

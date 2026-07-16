@@ -19,6 +19,13 @@ export const LOCALE_DEFINITIONS = [
     name: 'العربية',
     apiCountryCode: 'ar-SA',
   },
+  {
+    code: 'zhtw',
+    file: 'zh-TW.json',
+    name: '繁體中文',
+    language: 'zh-TW',
+    apiCountryCode: 'zh-TW',
+  },
 ] as const
 
 export type AppLocaleDefinition = (typeof LOCALE_DEFINITIONS)[number]
@@ -39,6 +46,11 @@ export function normalizeLocaleCode(locale?: string | null): string | undefined 
 
   const normalizedLocale = locale.trim().toLowerCase()
   if (!normalizedLocale) return undefined
+
+  // Prefer exact locale codes such as `zhtw` before stripping region tags.
+  if (localeDefinitionMap.has(normalizedLocale as AppLocaleCode)) {
+    return normalizedLocale
+  }
 
   return normalizedLocale.split('-')[0]
 }

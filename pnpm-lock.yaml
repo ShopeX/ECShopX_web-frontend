@@ -66,6 +66,9 @@ importers:
       nuxt:
         specifier: ^4.0.1
         version: 4.2.1(@parcel/watcher@2.5.1)(@types/node@20.19.24)(@vue/compiler-sfc@3.5.23)(db0@0.3.4)(eslint@8.57.1)(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.52.5)(sass@1.93.3)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.1(@types/node@20.19.24)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.1)(yaml@2.8.1))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.8.1)
+      opencc-js:
+        specifier: ^1.4.1
+        version: 1.4.1
       prettier:
         specifier: ^3.2.5
         version: 3.6.2
@@ -4182,6 +4185,9 @@ packages:
   open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
+
+  opencc-js@1.4.1:
+    resolution: {integrity: sha512-2lPLcrg7cnh1ATSduOxhnk/jq6KlR6w+5Ihl4wF7Z5e5Rva4vxTyugV5rZ7EiUCOZl+EDOLetIix+BhgYDCC+A==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -10258,6 +10264,8 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
+
+  opencc-js@1.4.1: {}
 
   optionator@0.9.4:
     dependencies:

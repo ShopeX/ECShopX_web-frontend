@@ -1,5 +1,6 @@
 import type { ILocaleConfig, IMessages } from './types'
 import zhCN from '../../locales/zh-CN.json'
+import zhTW from '../../locales/zh-TW.json'
 import enUS from '../../locales/en-US.json'
 import ar from '../../locales/ar.json'
 
@@ -7,6 +8,12 @@ export const availableLocales: ILocaleConfig[] = [
   {
     code: 'zh-CN',
     name: '简体中文',
+    direction: 'ltr',
+    currencySymbol: '¥',
+  },
+  {
+    code: 'zh-TW',
+    name: '繁體中文',
     direction: 'ltr',
     currencySymbol: '¥',
   },
@@ -28,6 +35,7 @@ export const defaultLocale = availableLocales[0]!
 
 const messagesMap: Record<string, IMessages> = {
   'zh-CN': zhCN,
+  'zh-TW': zhTW,
   'en-US': enUS,
   ar: ar,
 }

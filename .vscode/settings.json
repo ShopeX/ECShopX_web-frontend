@@ -30,7 +30,8 @@
   "i18n-mage.workspace.projectPath": "",
   "i18n-mage.analysis.onSave": true,
   "i18n-mage.translationServices.langAliasCustomMappings": {
-    "zh-CN": ["zh"]
+    "zh-CN": ["zh"],
+    "zh-TW": ["zhtw"]
   },
   "i18n-ally.localesPaths": ["app/locales"],
   "i18n-mage.translationServices.unmatchedLanguageAction": "switch",

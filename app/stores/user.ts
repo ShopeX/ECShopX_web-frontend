@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { authApiClient } from '~/infrastructure/http/clients'
 import { AuthTransformer, type ILoginModel } from '~/infrastructure/transformers'
 import type { IUserInfo, ILoginRequest, IPhoneLoginRequest } from '~/types/api/auth'
+import { useCartStore } from '~/stores/cart'
 
 /**
  * 用户信息接口（扩展 API 类型）
@@ -161,6 +162,9 @@ export const useUserStore = defineStore('user', {
       this.isLoggedIn = false
       this.userInfo = null
       this.setToken(null, null)
+
+      const cartStore = useCartStore()
+      cartStore.resetLocalCart()
 
       return { success: true }
     },

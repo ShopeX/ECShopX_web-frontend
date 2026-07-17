@@ -32,10 +32,16 @@ export function resolveWebMenuRequestValue(menu: unknown): string {
 
 export function resolveWebMenuItemLink(item: WebMenuItem): string {
   switch (item.link_type) {
+    // 管理分类 / 销售分类：同一商品列表页，query.link_type 区分接口传参
+    // - category      → main_category
+    // - sale_category → category_id
     case 'category':
-      return `/category/${item.link_value ?? ''}`
-    case 'sale_category':
-      return `/collections/${item.link_value ?? ''}`
+    case 'sale_category': {
+      const value = String(item.link_value ?? '').trim()
+      const basePath = value ? `/collections/${encodeURIComponent(value)}` : '/collections/all'
+      const separator = basePath.includes('?') ? '&' : '?'
+      return `${basePath}${separator}link_type=${encodeURIComponent(item.link_type)}`
+    }
     case 'custom_page':
       return `/custom/${item.link_value ?? ''}`
     case 'list_page':

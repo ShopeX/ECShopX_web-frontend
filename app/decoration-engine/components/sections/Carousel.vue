@@ -179,6 +179,7 @@ import {
   normalizeDecorationLink,
   type DecorationLinkValue,
 } from '~/decoration-engine/utils/resolveDecorationLink'
+import { resolveBlockSettings, resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 interface CarouselSettings {
   autoplay: boolean
@@ -227,7 +228,7 @@ let resizeObserver: ResizeObserver | null = null
 const isDecorationPreview = computed(() => routeIsPreview.value || props.isPreview === true)
 
 const settings = computed<CarouselSettings>(() => {
-  const raw = props.section.settings as Record<string, unknown>
+  const raw = resolveSectionSettings('main-carousel', props.section.settings)
   const rawHeightValue = raw.height
   const rawHeight =
     rawHeightValue === undefined || rawHeightValue === null || rawHeightValue === ''
@@ -301,7 +302,7 @@ const slides = computed<CarouselSlide[]>(() =>
         return null
       }
 
-      const slideSettings = block.settings as Record<string, unknown>
+      const slideSettings = resolveBlockSettings(block.type, block.settings)
       const kind = block.type === 'video' ? 'video' : 'image'
       return {
         id: blockId,
@@ -323,8 +324,14 @@ const normalizedHeight = computed(() => settings.value.height)
 const sectionThemeClasses = computed(() => {
   return [
     'text-[var(--section-foreground)]',
-    resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
-    resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+    resolveSectionPaddingClass(
+      resolveSectionSettings('main-carousel', props.section.settings).padding_top,
+      'top'
+    ),
+    resolveSectionPaddingClass(
+      resolveSectionSettings('main-carousel', props.section.settings).padding_bottom,
+      'bottom'
+    ),
     'bg-[var(--section-background)]',
   ]
 })
@@ -332,7 +339,9 @@ const carouselInnerClasses = computed(() => [
   settings.value.fullWidth ? 'w-full' : 'mx-auto max-w-[1440px]',
 ])
 const sectionStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const scheme = resolveSectionColorScheme(
+    resolveSectionSettings('main-carousel', props.section.settings).color_scheme
+  )
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,

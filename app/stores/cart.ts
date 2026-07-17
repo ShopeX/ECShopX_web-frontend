@@ -391,6 +391,21 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
+    resetLocalCart() {
+      this.items = []
+      this.invalidItems = []
+      this.cartTotalPrice = 0
+      this.discountFee = 0
+      this.initialized = false
+
+      if (import.meta.client) {
+        localStorage.removeItem('cart_cache')
+      }
+
+      const cartUI = useCartUIStore()
+      cartUI.reset()
+    },
+
     /**
      * 将当前购物车状态同步到本地缓存（包含有效和无效两部分）
      */

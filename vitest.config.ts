@@ -7,6 +7,6 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['app/**/*.spec.ts'],
+    include: ['app/**/*.spec.ts', 'app/**/*.source.test.js'],
   },
 })

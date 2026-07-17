@@ -29,6 +29,7 @@
 <script setup lang="ts">
 import type { DecorationSection } from '~/decoration-engine/types/decoration'
 import { resolveSectionColorScheme, resolveSectionPaddingClass } from '~/decoration-engine/utils/sectionAppearance'
+import { resolveBlockSettings, resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
 
 const props = defineProps<{
   section: DecorationSection
@@ -37,17 +38,20 @@ const props = defineProps<{
 }>()
 
 const settings = computed(() => {
-  const raw = props.section.settings as Record<string, unknown>
+  const raw = resolveSectionSettings('announcement-bar', props.section.settings)
   return {
     color_mode: String(raw.color_mode || 'light'),
+    color_scheme: raw.color_scheme,
+    padding_top: raw.padding_top,
+    padding_bottom: raw.padding_bottom,
   }
 })
 const sectionClasses = computed(() => [
-  resolveSectionPaddingClass(props.section.settings?.padding_top || 'none', 'top'),
-  resolveSectionPaddingClass(props.section.settings?.padding_bottom || 'none', 'bottom'),
+  resolveSectionPaddingClass(settings.value.padding_top || 'none', 'top'),
+  resolveSectionPaddingClass(settings.value.padding_bottom || 'none', 'bottom'),
 ])
 const sectionStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const scheme = resolveSectionColorScheme(settings.value.color_scheme)
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,
@@ -62,7 +66,7 @@ const orderedBlocks = computed(() =>
       if (!block || block.disabled) {
         return null
       }
-      const settings = (block.settings || {}) as Record<string, unknown>
+      const settings = resolveBlockSettings(block.type, block.settings)
       return {
         blockId,
         text: String(settings.text || '--'),

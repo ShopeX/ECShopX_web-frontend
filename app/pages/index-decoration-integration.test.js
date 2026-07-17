@@ -78,6 +78,49 @@ test('decoration route + DSL fetch composables exist for page and layout reuse',
   assert.match(dslFetch, /useDecorationDslFetch/)
 })
 
+test('decoration DSL async data is scoped by current API country code', () => {
+  const source = read('app/decoration-engine/composables/useDecorationDslFetch.ts')
+
+  assert.match(source, /getApiCountryCodeByLocale/)
+  assert.match(source, /const \{ locale \} = useI18n\(\)/)
+  assert.match(
+    source,
+    /const countryCode = computed\(\(\) => getApiCountryCodeByLocale\(locale\.value\)\)/
+  )
+  assert.match(
+    source,
+    /`decoration-dsl-\$\{countryCode\.value\}-\$\{pageType\.value\}-\$\{pageId\.value\}`/
+  )
+  assert.match(source, /country_code:\s*countryCode\.value/)
+  assert.match(source, /watch:\s*\[pageType,\s*pageId,\s*shouldFetch,\s*countryCode\]/)
+})
+
+test('ProductTabShelf async data is scoped by current API country code', () => {
+  const source = read('app/decoration-engine/components/sections/ProductTabShelf.vue')
+
+  assert.match(source, /getApiCountryCodeByLocale/)
+  assert.match(source, /const \{ locale,\s*t \} = useI18n\(\)/)
+  assert.match(
+    source,
+    /const countryCode = computed\(\(\) => getApiCountryCodeByLocale\(locale\.value\)\)/
+  )
+  assert.match(source, /`product-tab-shelf-\$\{countryCode\.value\}-\$\{queryKey\.value\}`/)
+  assert.match(source, /watch:\s*\[queryKey,\s*countryCode\]/)
+})
+
+test('ProductShelf async data is scoped by current API country code', () => {
+  const source = read('app/decoration-engine/components/sections/ProductShelf.vue')
+
+  assert.match(source, /getApiCountryCodeByLocale/)
+  assert.match(source, /const \{ locale,\s*t \} = useI18n\(\)/)
+  assert.match(
+    source,
+    /const countryCode = computed\(\(\) => getApiCountryCodeByLocale\(locale\.value\)\)/
+  )
+  assert.match(source, /`decoration-product-shelf-\$\{countryCode\.value\}-\$\{queryKey\.value\}`/)
+  assert.match(source, /watch:\s*\[queryKey,\s*countryCode\]/)
+})
+
 test('nuxt config exposes decoration env and decoration preview route rules', () => {
   const source = read('nuxt.config.ts')
 

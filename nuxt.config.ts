@@ -121,8 +121,6 @@ export default defineNuxtConfig({
 
   // 运行时配置
   runtimeConfig: {
-    // 仅 SSR 使用，通过 NUXT_API_BASE 注入（Docker 内网地址）
-    apiBase: process.env.NUXT_API_BASE || '',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
       companyId: process.env.NUXT_PUBLIC_COMPANY_ID,
@@ -132,6 +130,12 @@ export default defineNuxtConfig({
       businessMode: process.env.NUXT_PUBLIC_BUSINESS_MODE || 'b2c', // bbc 或 b2c
       decorationAdminOrigins:
         process.env.NUXT_PUBLIC_DECORATION_ADMIN_ORIGINS || '',
+      aiAssistant: process.env.NUXT_PUBLIC_AI_ASSISTANT || '',
+      aiBaseUrl: process.env.NUXT_PUBLIC_AI_BASE_URL || '',
+      aiAssistantBackendUrl:
+        process.env.NUXT_PUBLIC_AI_ASSISTANT_BACKEND_URL || '',
+      aiEmbedPageUrl: process.env.NUXT_PUBLIC_AI_EMBED_PAGE_URL || '',
+      aiTenantId: process.env.NUXT_PUBLIC_AI_TENANT_ID || '',
     },
   },
 

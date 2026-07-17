@@ -71,7 +71,8 @@ export interface IItemListParams {
   page: string
   pageSize: string
   item_type: string
-  main_category: string
+  /** 管理分类 ID（link_type=category 时使用，与 sale_category 的 category_id 二选一） */
+  main_category?: string
   is_tdk: string
   type: string
 
@@ -83,6 +84,8 @@ export interface IItemListParams {
   end_price?: number
   keywords?: string
   distributor_id?: string
+  /** 销售分类 ID（link_type=sale_category 时使用，不传 main_category） */
+  category_id?: string | number
 }
 
 // 原始 API 响应结构
@@ -165,7 +168,7 @@ export interface ItemEvaluationListResponse
     rate_photos?: string[]
     rate_type: 'good' | 'neutral' | 'bad'
     created_time: string
-  }> {}
+  }> { }
 
 // 商品推荐请求参数
 export interface ItemRecommendParams extends PaginationParams {
@@ -174,7 +177,7 @@ export interface ItemRecommendParams extends PaginationParams {
 }
 
 // 商品推荐响应
-export interface ItemRecommendResponse extends PaginationResponse<IItem> {}
+export interface ItemRecommendResponse extends PaginationResponse<IItem> { }
 
 // 商品收藏相关类型
 export interface ItemFavParams {
@@ -192,7 +195,7 @@ export interface ItemGetReplyRateListResponse
     rate_id: string
     reply_content: string
     created_time: string
-  }> {}
+  }> { }
 
 // 附近店铺请求参数
 export interface ItemGetNearbyShopParams extends PaginationParams {
@@ -211,4 +214,4 @@ export interface ItemGetNearbyShopResponse
     distance: number // 单位：米
     latitude: number
     longitude: number
-  }> {}
+  }> { }

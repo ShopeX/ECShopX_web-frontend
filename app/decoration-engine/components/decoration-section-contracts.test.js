@@ -75,6 +75,16 @@ test('ProductTabShelf section follows decoration plan contract', () => {
   assert.match(registry, /'product-tab-shelf'/)
 })
 
+test('ProductTabShelf keeps products in decoration product_ids order', () => {
+  const source = read('app/decoration-engine/components/sections/ProductTabShelf.vue')
+
+  assert.match(source, /sortProductsByTabOrder/)
+  assert.match(source, /productOrderMap/)
+  assert.match(source, /String\(product\.itemId\)/)
+  assert.match(source, /tab\.productIds/)
+  assert.match(source, /sortProductsByTabOrder\(ProductTransformer\.toModelList\(validBatchItems\),\s*productIds\)/)
+})
+
 test('DecorationFooterSection uses single-column mobile layout and desktop spans', () => {
   const source = read('app/decoration-engine/components/sections/DecorationFooterSection.vue')
 
@@ -90,6 +100,8 @@ test('DecorationHeaderSection keeps the locale switcher from the default header'
   assert.match(source, /enable_language_selector/)
   assert.match(source, /LOCALE_DEFINITIONS/)
   assert.match(source, /useSwitchLocalePath/)
+  assert.match(source, /setPreferredLocale\(localeCode\)/)
+  assert.match(source, /navigateTo\(path,\s*\{\s*replace:\s*true\s*\}\)/)
   assert.match(source, /i-heroicons-globe-alt/)
   assert.match(source, /switchLanguage/)
 })

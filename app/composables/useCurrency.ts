@@ -34,7 +34,6 @@ export async function useCurrency() {
     },
     {
       default: () => setting.value,
-      server: false,
     }
   )
 

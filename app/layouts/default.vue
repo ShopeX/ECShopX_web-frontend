@@ -59,6 +59,8 @@
         <BCFooter />
       </div>
 
+      <BCAiAssistantFab v-if="shouldRenderAiAssistantFab" @open="handleOpenAiAssistant" />
+
       <USlideover v-model:open="showSearchDrawer" side="left">
         <template #content>
           <BCSearchDrawer
@@ -103,6 +105,22 @@
           <BCMiniCart v-model="showMiniCart" @close="showMiniCart = false" />
         </template>
       </USlideover>
+
+      <USlideover
+        v-model:open="showAiAssistantDrawer"
+        :title="aiAssistantTitle"
+        :description="aiAssistantDescription"
+        side="right"
+        :content="{ style: { width: 'min(100vw, 560px)', maxWidth: '560px' } }"
+        :ui="{
+          content:
+            'right-0 inset-y-0 !w-screen md:!w-[560px] !max-w-[560px] bg-default sm:ring ring-default sm:shadow-lg flex flex-col focus:outline-none',
+        }"
+      >
+        <template #content>
+          <BCAiAssistantDrawer v-model="showAiAssistantDrawer" />
+        </template>
+      </USlideover>
     </template>
 
     <!-- designMode=1：区块选中 overlay -->
@@ -145,6 +163,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import BCFooter from '~/components/BCFooter/BCFooter.vue'
+import BCAiAssistantDrawer from '~/components/BCAiAssistantDrawer/BCAiAssistantDrawer.vue'
+import BCAiAssistantFab from '~/components/BCAiAssistantFab/BCAiAssistantFab.vue'
 import BCCategoryNav from '~/components/BCCategoryNav/BCCategoryNav.vue'
 import BCMiniCart from '~/components/BCMiniCart/BCMiniCart.vue'
 import BCSearchDrawer from '~/components/BCSearchDrawer/BCSearchDrawer.vue'
@@ -255,6 +275,17 @@ const headerMenuId = computed(() => {
 const showCategoryNav = ref(false)
 const showMiniCart = ref(false)
 const showSearchDrawer = ref(false)
+const showAiAssistantDrawer = ref(false)
+const isAiAssistantRoute = computed(
+  () => route.path.includes('/ai-assistant') || String(route.name || '').includes('ai-assistant')
+)
+const shouldRenderAiAssistantFab = computed(
+  () =>
+    !isDecorationPreview.value &&
+    !isDecorationRouteDesignMode.value &&
+    String(route.query.designMode || '') !== '1' &&
+    !isAiAssistantRoute.value
+)
 const hotKeywords = computed(() => [
   t('de7d1d34.6e4493'),
   t('de7d1d34.9f351b'),
@@ -264,6 +295,8 @@ const hotKeywords = computed(() => [
   t('de7d1d34.247d42'),
   t('de7d1d34.89d075'),
 ])
+const aiAssistantTitle = computed(() => t('b4039f35.354274'))
+const aiAssistantDescription = computed(() => t('b4039f35.4aaf06'))
 
 const router = useRouter()
 const localePath = useLocalePath()
@@ -275,6 +308,10 @@ const handleOpenCategoryNav = () => {
 
 const handleOpenMiniCart = () => {
   showMiniCart.value = true
+}
+
+const handleOpenAiAssistant = () => {
+  showAiAssistantDrawer.value = true
 }
 
 const handleOpenSearch = () => {

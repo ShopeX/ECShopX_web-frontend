@@ -56,11 +56,16 @@ export function createDecorationLinkResolver(localePath: LocalePath) {
       case 'goods':
       case 'product':
         return rawId ? localePath(`/products/${rawId}`) : undefined
+      // 销售分类 sale_category → category_id；管理分类 category → main_category
       case 'sale_category':
       case 'collection':
-        return rawId ? localePath(`/collections/${rawId}`) : undefined
+        return rawId
+          ? localePath(`/collections/${rawId}?link_type=sale_category`)
+          : localePath('/collections/all?link_type=sale_category')
       case 'category':
-        return rawId ? localePath(`/category/${rawId}`) : undefined
+        return rawId
+          ? localePath(`/collections/${rawId}?link_type=category`)
+          : localePath('/collections/all?link_type=category')
       case 'shop':
         return rawId ? localePath(`/shop/${rawId}`) : undefined
       default:

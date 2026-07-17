@@ -51,10 +51,7 @@
           />
         </div>
 
-        <div
-          v-else-if="displayedProducts.length"
-          class="relative"
-        >
+        <div v-else-if="displayedProducts.length" class="relative">
           <div
             class="grid grid-cols-2 transition-opacity duration-200 md:grid-cols-[repeat(var(--product-tab-columns),minmax(0,1fr))]"
             :class="pending ? 'opacity-70' : 'opacity-100'"
@@ -70,14 +67,9 @@
               disable-appear-animation
             />
           </div>
-
         </div>
 
-        <div
-          v-else-if="pending"
-          class="min-h-[200px]"
-          :style="gridStyle"
-        />
+        <div v-else-if="pending" class="min-h-[200px]" :style="gridStyle" />
 
         <div v-else class="min-h-[200px]" />
       </DecorationBlockHost>
@@ -93,10 +85,15 @@ import { useDecorationEditOptional } from '~/decoration-engine/composables/useDe
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 import {
   resolveSectionColorScheme,
   resolveSectionPaddingClass,
 } from '~/decoration-engine/utils/sectionAppearance'
+import {
+  resolveBlockSettings,
+  resolveSectionSettings,
+} from '~/decoration-engine/utils/resolveSettings'
 
 interface ProductTabShelfSettings {
   title: string
@@ -139,7 +136,8 @@ const props = defineProps<{
 
 const { focusBlock } = useDecorationPreview()
 const editCtx = useDecorationEditOptional()
-const { t } = useI18n()
+const { locale, t } = useI18n()
+const countryCode = computed(() => getApiCountryCodeByLocale(locale.value))
 const generatedKeyPattern = /^[a-f0-9]{8}\.[a-f0-9]{6}$/
 
 function translateIfGeneratedKey(value: string) {
@@ -147,8 +145,15 @@ function translateIfGeneratedKey(value: string) {
 }
 const isDecorationPreview = computed(() => Boolean(props.isPreview))
 
+function sortProductsByTabOrder(products: IProduct[], productIds: string[]) {
+  const productOrderMap = new Map(products.map((product) => [String(product.itemId), product]))
+  return productIds
+    .map((itemId) => productOrderMap.get(String(itemId)))
+    .filter((product): product is IProduct => Boolean(product))
+}
+
 const settings = computed<ProductTabShelfSettings>(() => {
-  const raw = props.section.settings as Record<string, unknown>
+  const raw = resolveSectionSettings('product-tab-shelf', props.section.settings)
   const rawColumns = Number(raw.columns ?? 4)
   const paddingTop = ['none', 'xxs', 'xs', 's', 'm', 'l', 'xl'].includes(String(raw.padding_top))
     ? String(raw.padding_top)
@@ -197,7 +202,7 @@ const tabs = computed<ProductTabItem[]>(() =>
       const block = props.section.blocks?.[blockId]
       if (!block || block.disabled || block.type !== 'product-tab') return null
 
-      const blockSettings = block.settings as Record<string, unknown>
+      const blockSettings = resolveBlockSettings(block.type, block.settings)
       const rawProductIds = Array.isArray(blockSettings.product_ids)
         ? blockSettings.product_ids
         : []
@@ -291,15 +296,13 @@ async function loadProductsForTab(tab: ProductTabItem): Promise<IProduct[]> {
     : Array.isArray(batchItems?.data)
       ? batchItems.data
       : []
-  const validBatchItems = ProductTransformer.validateProductList(
-    normalizedBatchItems
-  )
+  const validBatchItems = ProductTransformer.validateProductList(normalizedBatchItems)
 
-  return ProductTransformer.toModelList(validBatchItems)
+  return sortProductsByTabOrder(ProductTransformer.toModelList(validBatchItems), productIds)
 }
 
 const { data: productsData, pending } = await useAsyncData(
-  () => `product-tab-shelf-${queryKey.value}`,
+  () => `product-tab-shelf-${countryCode.value}-${queryKey.value}`,
   async (): Promise<IProduct[]> => {
     const tab = activeTab.value
     if (!tab || !tab.productIds.length) return []
@@ -312,7 +315,7 @@ const { data: productsData, pending } = await useAsyncData(
   },
   {
     default: () => [],
-    watch: [queryKey],
+    watch: [queryKey, countryCode],
     server: !props.isPreview,
   }
 )
@@ -329,8 +332,8 @@ watch(
 
 const sectionOuterClasses = computed(() => [
   'w-full',
-  resolveSectionPaddingClass(props.section.settings?.padding_top, 'top'),
-  resolveSectionPaddingClass(props.section.settings?.padding_bottom, 'bottom'),
+  resolveSectionPaddingClass(settings.value.paddingTop, 'top'),
+  resolveSectionPaddingClass(settings.value.paddingBottom, 'bottom'),
   'bg-[var(--section-background)] text-[var(--section-foreground)]',
 ])
 const sectionInnerClasses = computed(() => [
@@ -339,7 +342,8 @@ const sectionInnerClasses = computed(() => [
     : 'mx-auto max-w-[1440px] px-4 md:px-[64px] lg:px-[128px]',
 ])
 const sectionThemeStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const raw = resolveSectionSettings('product-tab-shelf', props.section.settings)
+  const scheme = resolveSectionColorScheme(raw.color_scheme)
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,

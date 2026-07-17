@@ -174,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onActivated, onMounted } from 'vue'
 import BCProductFilter from '~/components/BCProductFilter/BCProductFilter.vue'
 import BCProductCard from '~/components/BCProductCard/BCProductCard.vue'
 import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
@@ -187,6 +187,7 @@ import type { IProductFilterValue, IFilterGroup } from '~/components/BCProductFi
 import { ESortOption } from '~/components/BCProductFilter/types'
 import { itemApiClient } from '~/infrastructure/http/clients/ItemApiClient'
 import { ProductTransformer } from '~/infrastructure/transformers/productTransformer'
+import { resolveItemListCategoryParams } from '~/utils/resolveItemListCategoryParams'
 import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 import { useDecorationPreview } from '~/decoration-engine/composables/useDecorationPreview'
 import { useDecorationPageDslFetch } from '~/decoration-engine/composables/useDecorationPageDslFetch'
@@ -277,6 +278,20 @@ const mainCategory = computed(() => {
   return Array.isArray(routeId) ? String(routeId[0] || '') : String(routeId || '')
 })
 
+function resolveRouteCategoryId() {
+  const slug = mainCategory.value
+  const legacyCategory = route.query.category ? String(route.query.category) : ''
+  if (slug && slug !== 'all') return slug
+  return legacyCategory
+}
+
+// query.link_type 来自导航菜单：category=管理分类，sale_category=销售分类
+function resolveRouteLinkType() {
+  if (route.query.link_type) return String(route.query.link_type)
+  if (route.query.category) return 'category'
+  return 'sale_category'
+}
+
 // 启用页面缓存
 definePageMeta({
   keepalive: true,
@@ -320,6 +335,7 @@ const brands = ref<IBrand[]>([])
 
 // 原筛选参数状态 (保留用于 API 调用)
 const filterParams = ref({
+  linkType: undefined as string | undefined,
   categoryId: undefined as string | number | undefined,
   brandId: '',
   sort: 'default',
@@ -344,6 +360,9 @@ const showFilterPanel = ref(false)
 
 // 首屏客户端加载完成标记
 const hasInitialLoadCompleted = ref(false)
+
+// 滚动加载触发器
+const loadMoreTrigger = ref<HTMLElement | null>(null)
 
 const productSkeletonCount = 10
 
@@ -436,21 +455,25 @@ watch(
   { deep: true }
 )
 
-// 构建 API 参数
+// 按 link_type 映射列表接口参数：管理分类 main_category / 销售分类 category_id
 const buildApiParams = (
   page: number,
   pageSize: number,
   sourceFilters: typeof filterParams.value = filterParams.value
 ): IItemListParams => {
+  const categoryParams = resolveItemListCategoryParams(
+    resolveRouteCategoryId(),
+    sourceFilters.linkType || resolveRouteLinkType()
+  )
+
   return {
     page: page.toString(),
     pageSize: pageSize.toString(),
     item_type: 'normal',
-    main_category: mainCategory.value,
     is_tdk: '1',
     type: '0',
     company_id: '1',
-    ...(sourceFilters.categoryId && { category_id: sourceFilters.categoryId }),
+    ...categoryParams,
     ...(sourceFilters.brandId && { brand_id: sourceFilters.brandId }),
     ...(sourceFilters.sort !== 'default' && { sort: sourceFilters.sort }),
     ...(sourceFilters.startPrice && { start_price: sourceFilters.startPrice }),
@@ -569,6 +592,10 @@ const handleFilterChange = () => {
 const updateUrlParams = () => {
   const query: Record<string, string> = {}
 
+  if (filterParams.value.linkType) {
+    query.link_type = filterParams.value.linkType
+  }
+
   if (filterParams.value.categoryId) {
     query.category = filterParams.value.categoryId.toString()
   }
@@ -600,33 +627,41 @@ const updateUrlParams = () => {
 const restoreFromUrl = () => {
   const query = route.query
 
-  if (query.category) {
-    filterParams.value.categoryId = query.category as string
-  }
+  filterParams.value.linkType = query.link_type ? String(query.link_type) : undefined
+  filterParams.value.categoryId = query.category ? String(query.category) : undefined
 
   if (query.brand) {
     filterParams.value.brandId = query.brand as string
+  } else {
+    filterParams.value.brandId = ''
   }
 
   if (query.sort) {
     filterParams.value.sort = query.sort as string
+  } else {
+    filterParams.value.sort = 'default'
   }
 
   if (query.min_price) {
     filterParams.value.startPrice = Number(query.min_price)
+  } else {
+    filterParams.value.startPrice = undefined
   }
 
   if (query.max_price) {
     filterParams.value.endPrice = Number(query.max_price)
+  } else {
+    filterParams.value.endPrice = undefined
   }
 
   if (query.keyword) {
     filterParams.value.keyword = query.keyword as string
+  } else {
+    filterParams.value.keyword = ''
   }
 }
 
-// 滚动加载触发器
-const loadMoreTrigger = ref<HTMLElement | null>(null)
+restoreFromUrl()
 
 // 初始化数据和无限滚动
 onMounted(async () => {
@@ -647,15 +682,10 @@ onMounted(async () => {
     )
   }
 
-  // 客户端首屏加载
-  if (!products.value.length && !error.value) {
-    try {
-      restoreFromUrl()
-      await loadPage(1)
-    } finally {
-      hasInitialLoadCompleted.value = true
-    }
-  } else {
+  try {
+    restoreFromUrl()
+    await loadPage(1)
+  } finally {
     hasInitialLoadCompleted.value = true
   }
 
@@ -734,10 +764,20 @@ onMounted(async () => {
   }
 })
 
-// 监听路由变化
+// keepalive 下从其他分类页切回时重新拉取
+onActivated(async () => {
+  if (!hasInitialLoadCompleted.value) return
+
+  restoreFromUrl()
+  await refresh()
+})
+
+// 监听路由变化（销售分类 id 与管理分类 query 均需响应）
 watch(
-  () => route.query,
-  () => {
+  () => [route.params.id, route.query] as const,
+  async (_, oldRoute) => {
+    if (!oldRoute) return
+
     // 如果是内部更新URL，跳过处理避免重复请求
     if (isInternalUrlUpdate.value) {
       isInternalUrlUpdate.value = false
@@ -745,7 +785,7 @@ watch(
     }
 
     restoreFromUrl()
-    refresh()
+    await refresh()
   },
   { deep: true }
 )

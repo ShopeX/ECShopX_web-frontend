@@ -13,6 +13,12 @@ import QRCode from 'qrcode'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { paymentApiClient } from '~/infrastructure/http/clients'
 import type { IPaymentMethodItem } from '~/infrastructure/http/clients/PaymentApiClient'
+import type { IFrontendCommonSetting } from '~/types/api/common'
+import {
+  applyCurrencyFromSetting,
+  formatMoneyYuan,
+  formatOrderAmountDisplay,
+} from '~/utils/currencyFormat'
 
 /** 支付方式项在页面中的展示形态（code/name 兼容模板） */
 export type PaymentMethodView = IPaymentMethodItem & { code: string; name: string }
@@ -29,6 +35,10 @@ export interface PaymentClientRuntime {
   platform: PaymentClientPlatform
   isWechatBrowser: boolean
   isAlipayBrowser: boolean
+}
+
+interface PayNowOptions {
+  navigationTarget?: '_self' | '_blank'
 }
 
 const POLL_INTERVAL_MS = 5000
@@ -297,12 +307,21 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     return (num / 100).toFixed(2)
   })
 
-  /** 订单金额带千分位与货币符号，如 ¥ 10,500.00 */
+  const currencySetting = useState<IFrontendCommonSetting>('frontend-currency-setting', () => ({}))
+  watch(
+    currencySetting,
+    (val) => {
+      if (val) applyCurrencyFromSetting(val)
+    },
+    { immediate: true, deep: true }
+  )
+
+  /** 订单金额带千分位与动态货币符号 */
   const orderAmountFormatted = computed(() => {
+    void currencySetting.value?.currency?.symbol
     const raw = orderAmountDisplay.value
-    if (!raw) return '¥ 0.00'
-    const num = parseFloat(raw)
-    return `¥ ${num.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`
+    if (!raw) return formatMoneyYuan(0)
+    return formatOrderAmountDisplay(raw)
   })
 
   /** 剩余支付时间文案，设计稿格式 00 : 28 : 42（依赖 countdownTick 每秒更新） */
@@ -410,9 +429,10 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
     }, POLL_INTERVAL_MS)
   }
 
-  async function payNow() {
+  async function payNow(options: PayNowOptions = {}) {
     const id = orderIdValue.value
     if (!id || !selectedPayType.value) return
+    const navigationTarget = options.navigationTarget ?? '_blank'
     loading.value = true
     error.value = null
     payResult.value = 'pending'
@@ -450,7 +470,7 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
           startPolling()
           return
         case 'alipay_form':
-          if (submitPaymentForm(paymentForm, '_blank')) {
+          if (submitPaymentForm(paymentForm, navigationTarget)) {
             countdownEndAt.value = Date.now() + COUNTDOWN_DEFAULT_MS
             startPolling()
             return
@@ -486,7 +506,9 @@ export function usePayment(orderIdRef: Ref<string | undefined>) {
         }
         case 'external_redirect': {
           const payUrl = data?.pay_url || extractPaymentRedirectUrl(data)
-          if (openPaymentUrlInNewTab(payUrl)) {
+          const didOpen =
+            navigationTarget === '_self' ? openPaymentUrl(payUrl) : openPaymentUrlInNewTab(payUrl)
+          if (didOpen) {
             externalPayUrl.value = payUrl
             isExternalWaiting.value = true
             payResult.value = 'pending'

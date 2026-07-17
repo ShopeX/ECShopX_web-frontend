@@ -2,6 +2,10 @@ const DEFAULT_CURRENCY_SYMBOL = '¥'
 
 let currencySymbol = DEFAULT_CURRENCY_SYMBOL
 
+export function resetCurrencySymbol(): void {
+  currencySymbol = DEFAULT_CURRENCY_SYMBOL
+}
+
 export function setCurrencySymbol(symbol: string): void {
   currencySymbol = symbol?.trim() || DEFAULT_CURRENCY_SYMBOL
 }

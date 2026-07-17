@@ -118,9 +118,7 @@ export default defineNuxtPlugin({
     // ============ 创建 $fetch 实例 ============
 
     const $api = $fetch.create({
-      baseURL: import.meta.server
-        ? (config.apiBase || config.public.apiBase || '/api')
-        : (config.public.apiBase || '/api'),
+      baseURL: config.public.apiBase || '/api',
       timeout: (config.public.apiTimeout as number) || 10000,
 
       // ✅ 自动重试配置（ofetch 内置）
@@ -155,7 +153,7 @@ export default defineNuxtPlugin({
             if (!(options as any).skipCompanyId && companyId) {
               bodyData.company_id = companyId
             }
-            if (!(options as any).skipCountryCode) {
+            if (!(options as any).skipCountryCode && !bodyData.country_code) {
               bodyData.country_code = getCountryCode()
             }
 
@@ -174,7 +172,7 @@ export default defineNuxtPlugin({
           if (!(options as any).skipCompanyId && companyId) {
             query.company_id = companyId
           }
-          if (!(options as any).skipCountryCode) {
+          if (!(options as any).skipCountryCode && !query.country_code) {
             query.country_code = getCountryCode()
           }
           options.query = query

@@ -5,6 +5,7 @@ import {
   type DecorationDSL,
   type PageType,
 } from '~/decoration-engine/types/decoration'
+import { getApiCountryCodeByLocale } from '~/shared/localeConfig'
 
 export interface UseDecorationDslFetchOptions {
   pageType: PageType
@@ -79,11 +80,15 @@ function normalizeRowDsl(
 export async function useDecorationDslFetch(options: UseDecorationDslFetchOptions) {
   const route = useRoute()
   const nuxtApp = useNuxtApp()
+  const { locale } = useI18n()
   const pageType = computed(() => options.pageType)
   const pageId = computed(() => toValue(options.pageId) ?? pageType.value)
+  const countryCode = computed(() => getApiCountryCodeByLocale(locale.value))
   const shouldFetch = computed(() => !isDecorationPreviewActiveOnRoute(route))
 
-  const cacheKey = computed(() => `decoration-dsl-${pageType.value}-${pageId.value}`)
+  const cacheKey = computed(
+    () => `decoration-dsl-${countryCode.value}-${pageType.value}-${pageId.value}`
+  )
 
   const { data: dsl } = await useAsyncData(
     () => cacheKey.value,
@@ -97,6 +102,7 @@ export async function useDecorationDslFetch(options: UseDecorationDslFetchOption
         skipAuth: true,
         query: {
           page_type: pageType.value,
+          country_code: countryCode.value,
           ...(pageType.value === 'custom' ? { page_id: pageId.value } : {}),
         },
       })
@@ -104,7 +110,7 @@ export async function useDecorationDslFetch(options: UseDecorationDslFetchOption
       return normalizeRowDsl(response, pageType.value, pageId.value)
     },
     {
-      watch: [pageType, pageId, shouldFetch],
+      watch: [pageType, pageId, shouldFetch, countryCode],
       default: () => null,
     }
   )

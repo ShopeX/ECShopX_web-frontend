@@ -124,6 +124,8 @@ import type {
   DecorationSection,
 } from '~/decoration-engine/types/decoration'
 import { LOCALE_DEFINITIONS, type AppLocaleCode } from '~/shared/localeConfig'
+import { resolveSectionSettings } from '~/decoration-engine/utils/resolveSettings'
+import { setPreferredLocale } from '~/utils/localePreference'
 
 const props = defineProps<{
   section: DecorationSection
@@ -146,30 +148,31 @@ const cartAriaLabel = computed(() => {
   const label = t('48ec697b.53754b')
   return cartItemCount.value > 0 ? `${label} (${cartItemCount.value})` : label
 })
+const settings = computed(() => resolveSectionSettings('header', props.section.settings))
 
-const logoUrl = computed(() => String(props.section.settings.logoUrl || mallLogoDarkUrl.value))
-const logoLink = computed(() => String(props.section.settings.logoLink || '/'))
+const logoUrl = computed(() => String(settings.value.logoUrl || mallLogoDarkUrl.value))
+const logoLink = computed(() => String(settings.value.logoLink || '/'))
 const isExternalLogoLink = computed(() => /^https?:\/\//i.test(logoLink.value))
 const resolvedLogoLink = computed(() => localePath(logoLink.value as any))
 const logoPosition = computed(() =>
-  props.section.settings?.logo_position === 'left' ? 'left' : 'center'
+  settings.value.logo_position === 'left' ? 'left' : 'center'
 )
 const isLogoLeft = computed(() => logoPosition.value === 'left')
-const isFullWidth = computed(() => props.section.settings?.full_width === true)
+const isFullWidth = computed(() => settings.value.full_width === true)
 const showLanguageSelector = computed(
-  () => props.section.settings?.enable_language_selector !== false
+  () => settings.value.enable_language_selector !== false
 )
 const sectionClasses = computed(() => [
   'w-full',
-  resolveSectionPaddingClass(props.section.settings?.padding_top || 'xs', 'top'),
-  resolveSectionPaddingClass(props.section.settings?.padding_bottom || 'xs', 'bottom'),
+  resolveSectionPaddingClass(settings.value.padding_top || 'xs', 'top'),
+  resolveSectionPaddingClass(settings.value.padding_bottom || 'xs', 'bottom'),
 ])
 const innerClasses = computed(() => [
   'mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-8 px-6',
   isFullWidth.value ? 'w-full max-w-none' : 'max-w-[1440px]',
 ])
 const sectionStyle = computed(() => {
-  const scheme = resolveSectionColorScheme(props.section.settings?.color_scheme)
+  const scheme = resolveSectionColorScheme(settings.value.color_scheme)
   return {
     '--section-background': scheme.background,
     '--section-foreground': scheme.foreground,
@@ -189,8 +192,9 @@ function toggleLanguageMenu() {
 
 function switchLanguage(localeCode: AppLocaleCode) {
   showLanguageMenu.value = false
+  setPreferredLocale(localeCode)
   const path = switchLocalePath(localeCode)
-  navigateTo(path)
+  navigateTo(path, { replace: true })
 }
 
 function handleClickOutside(event: MouseEvent) {

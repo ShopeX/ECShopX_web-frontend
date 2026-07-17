@@ -17,7 +17,18 @@ test('web menu composable requests h5 menu endpoint by menu id', () => {
   assert.match(source, /resolveWebMenuRequestValue/)
   assert.match(source, /resolveWebMenuItemLink/)
   assert.match(source, /case 'sale_category':/)
+  assert.match(source, /case 'category':/)
+  assert.match(source, /link_type=/)
+  assert.match(source, /\/collections\//)
   assert.match(source, /case 'goods':/)
+})
+
+test('resolveWebMenuItemLink routes both category types to collections page with link_type', () => {
+  const source = read('app/composables/useWebMenu.ts')
+
+  assert.doesNotMatch(source, /\/category\//)
+  assert.match(source, /encodeURIComponent\(item\.link_type\)/)
+  assert.match(source, /encodeURIComponent\(value\)/)
 })
 
 test('layout passes header menu id into category drawer', () => {

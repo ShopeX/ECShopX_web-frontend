@@ -83,4 +83,26 @@ describe('ItemApiClient.getItemList', () => {
     const query = httpMock.mock.calls[0]?.[1]?.query
     expect(query.category_id).toBeUndefined()
   })
+
+  it('forwards sale category_id in bbc mode without main_category', async () => {
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      public: {
+        businessMode: 'bbc',
+      },
+    }))
+
+    const client = new ItemApiClient()
+    await client.getItemList({
+      page: '1',
+      pageSize: '20',
+      item_type: 'normal',
+      is_tdk: '1',
+      type: '0',
+      category_id: '6539',
+    })
+
+    const query = httpMock.mock.calls[0]?.[1]?.query
+    expect(query.main_category).toBeUndefined()
+    expect(query.category_id).toBe('6539')
+  })
 })

@@ -4,8 +4,8 @@ export interface WebMenuItem {
   name: string
   image_url?: string | null
   link_type:
-    | 'category'
-    | 'sale_category'
+    | 'category' // 管理分类（后台商品 taxonomy，CMS 显示「管理分类: xxx」）
+    | 'sale_category' // 销售分类（前台营销/导航分类，CMS 显示「销售分类: xxx」）
     | 'goods'
     | 'custom_page'
     | 'list_page'

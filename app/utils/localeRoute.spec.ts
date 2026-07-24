@@ -20,6 +20,13 @@ describe('localeRoute', () => {
   it('builds non-default locale paths from default paths', () => {
     expect(withLocalePrefix('/account/orders', 'en')).toBe('/en/account/orders')
     expect(withLocalePrefix('/account/orders', 'ar')).toBe('/ar/account/orders')
+    expect(withLocalePrefix('/account/orders', 'zhtw')).toBe('/zhtw/account/orders')
+  })
+
+  it('parses zhtw locale paths and strips the prefix', () => {
+    expect(getPathLocale('/zhtw/cart')).toBe('zhtw')
+    expect(stripLocalePrefix('/zhtw/cart')).toBe('/cart')
+    expect(isSupportedLocale('zhtw')).toBe(true)
   })
 
   it('builds default locale paths from non-default base paths', () => {

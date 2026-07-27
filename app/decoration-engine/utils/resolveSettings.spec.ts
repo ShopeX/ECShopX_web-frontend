@@ -59,6 +59,22 @@ describe('decoration schema resolver', () => {
     expect(settings.imageUrl).toBeUndefined()
   })
 
+  it('keeps carousel image CompPickerLink settings instead of stripping link', () => {
+    const link = {
+      linkType: 0,
+      linkUrl: '',
+      linkPage: 'goods',
+      id: '100234',
+      title: '示例商品',
+    }
+    const settings = resolveBlockSettings('image', {
+      pc_image: 'https://cdn.example.test/banner.jpg',
+      link,
+    })
+
+    expect(settings.link).toEqual(link)
+  })
+
   it('keeps footer menu selection and static menu_items as separate settings', () => {
     const settings = resolveBlockSettings('footer-menu', {
       menu: null,

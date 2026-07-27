@@ -37,6 +37,27 @@ test('resolveHref supports admin CompPickerLink internal pages', () => {
   assert.equal(href, '/zh-CN/products/1001')
 })
 
+test('resolveHref maps admin goods linkPage to product detail', () => {
+  const href = resolver.resolveHref({
+    linkType: 0,
+    linkPage: 'goods',
+    id: '100234',
+    title: '示例商品',
+  })
+
+  assert.equal(href, '/zh-CN/products/100234')
+})
+
+test('resolveHref maps store linkPage to shop page like vshop', () => {
+  const href = resolver.resolveHref({
+    linkType: 0,
+    linkPage: 'store',
+    id: '88',
+  })
+
+  assert.equal(href, '/zh-CN/shop/88')
+})
+
 test('resolveHref supports external links', () => {
   const href = resolver.resolveHref({
     linkType: 1,

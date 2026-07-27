@@ -651,6 +651,16 @@
           "imageUrl"
         ]
       },
+      "link": {
+        "type": "object",
+        "default": {
+          "linkType": 0,
+          "linkUrl": "",
+          "linkPage": "",
+          "id": "",
+          "title": ""
+        }
+      },
       "introduction": {
         "type": "string",
         "default": "提供背景或介绍，吸引用户注意"
@@ -816,8 +826,14 @@
         "default": 0
       },
       "link": {
-        "type": "string",
-        "default": ""
+        "type": "object",
+        "default": {
+          "linkType": 0,
+          "linkUrl": "",
+          "linkPage": "",
+          "id": "",
+          "title": ""
+        }
       },
       "shape": {
         "type": "enum",

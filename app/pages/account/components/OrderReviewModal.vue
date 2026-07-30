@@ -56,6 +56,7 @@
                   <div v-else class="size-[96px] bg-[#f9fafb]" data-testid="review-item-image" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col gap-[4px]">
+                  <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
                   <p
                     data-testid="review-item-name"
                     class="text-[14px] font-medium leading-5 text-[#101828]"
@@ -234,6 +235,8 @@
 import { ref } from 'vue'
 import { rateApiClient } from '~/infrastructure/http/clients/RateApiClient'
 import ReviewStarRating from './ReviewStarRating.vue'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
+import type { IMarketingTag } from '~/utils/promotionTags'
 
 interface ReviewItem {
   itemId: string
@@ -243,6 +246,7 @@ interface ReviewItem {
   style?: string
   size?: string
   specName?: string
+  marketingTags?: IMarketingTag[]
 }
 
 interface Props {

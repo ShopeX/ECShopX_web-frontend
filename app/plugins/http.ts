@@ -141,9 +141,18 @@ export default defineNuxtPlugin({
         // ✅ 统一处理 Content-Type：默认 form-urlencoded，可通过 useJson: true 覆盖
         // 这符合项目后端的统一规范（所有 POST/PUT/PATCH 都使用 form-urlencoded）
         if (options.body && !(options as any).useJson) {
-          // 排除已经是特殊格式的情况（FormData 用于文件上传，URLSearchParams 已处理，Blob 用于二进制数据）
-          if (
-            !(options.body instanceof FormData) &&
+          // FormData（文件上传）：补全局参数，勿改 Content-Type，由浏览器带 multipart boundary
+          if (options.body instanceof FormData) {
+            if (!(options as any).skipCompanyId && companyId && !options.body.has('company_id')) {
+              options.body.append('company_id', companyId)
+            }
+            if (
+              !(options as any).skipCountryCode &&
+              !options.body.has('country_code')
+            ) {
+              options.body.append('country_code', getCountryCode())
+            }
+          } else if (
             !(options.body instanceof URLSearchParams) &&
             !(options.body instanceof Blob)
           ) {

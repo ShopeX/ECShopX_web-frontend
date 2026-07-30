@@ -254,15 +254,6 @@ function triggerUpload() {
   fileInputRef.value?.click()
 }
 
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result || ''))
-    reader.onerror = () => reject(new Error('READ_FILE_FAILED'))
-    reader.readAsDataURL(file)
-  })
-}
-
 function extractUploadedImageUrl(response: any) {
   const payload = response?.data ?? response ?? []
   if (Array.isArray(payload)) {
@@ -284,10 +275,9 @@ async function uploadImage(file: File, preview: string) {
   uploadedImages.value.push(imageItem)
 
   try {
-    const imageData = await readFileAsDataUrl(file)
     const response = await aftersalesApiClient.uploadLocalImage({
-      images: imageData,
-      filetype: file.type || 'image/jpeg',
+      file,
+      filetype: 'image',
       group: 'aftersales',
       newfilename: file.name,
     })

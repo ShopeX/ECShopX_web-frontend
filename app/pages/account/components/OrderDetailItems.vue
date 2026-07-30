@@ -17,6 +17,7 @@
       <div class="flex flex-[1_0_0] min-w-0 gap-[16px] lg:gap-[32px] items-start">
         <!-- 名称 + 规格 -->
         <div class="flex-[1_0_0] min-w-0 flex flex-col gap-[4px]">
+          <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
           <h3 data-testid="item-name" class="text-[14px] font-medium leading-5 text-[#101828]">
             {{ item.itemName }}
           </h3>
@@ -70,6 +71,7 @@
 
 <script setup lang="ts">
 import { formatMoneyYuan } from '~/utils/currencyFormat'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 
 const { t } = useI18n()
 

@@ -461,9 +461,30 @@ export function useCheckout() {
 
   /**
    * 结算商品列表
+   * 若 getFreightFee 商品行未带营销字段，回退购物车已映射的 marketingTags（对齐购物袋展示）
    */
   const checkoutItems = computed(() => {
-    return calculateResult.value?.items || []
+    const calcItems = calculateResult.value?.items || []
+    const cartItems = cartUI.value?.items || []
+
+    return calcItems.map((item) => {
+      if (item.marketingTags && item.marketingTags.length > 0) {
+        return item
+      }
+
+      const cartItem = cartItems.find(
+        (cart) => String(cart.productId) === String(item.productId) || String(cart.id) === String(item.id)
+      )
+
+      if (!cartItem?.marketingTags?.length) {
+        return item
+      }
+
+      return {
+        ...item,
+        marketingTags: cartItem.marketingTags,
+      }
+    })
   })
 
   return {

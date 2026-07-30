@@ -285,7 +285,7 @@
               :disabled="primaryActionDisabled"
               @click="handlePrimaryAction"
             >
-              {{ loading ? $t('eab46cc2.2fb90b') : primaryActionText }}
+              {{ primaryActionLoading ? $t('eab46cc2.2fb90b') : primaryActionText }}
             </button>
           </div>
         </div>
@@ -308,7 +308,7 @@
               :disabled="primaryActionDisabled"
               @click="handlePrimaryAction"
             >
-              {{ loading ? $t('eab46cc2.2fb90b') : primaryActionText }}
+              {{ primaryActionLoading ? $t('eab46cc2.2fb90b') : primaryActionText }}
             </button>
           </div>
         </div>
@@ -488,7 +488,7 @@
 </template>
 
 <script setup lang="ts">
-import { paymentApiClient } from '~/infrastructure/http/clients'
+import { paymentApiClient, aftersalesApiClient } from '~/infrastructure/http/clients'
 import { resolvePaymentMethodIcon } from './paymentMethodIcons'
 
 interface BankAccountOption {
@@ -503,6 +503,8 @@ interface BankAccountOption {
 interface VoucherFileItem {
   file: File
   preview: string
+  uploadedUrl?: string
+  uploading?: boolean
 }
 
 definePageMeta({
@@ -517,10 +519,15 @@ const localePath = useLocalePath()
 const toast = useToastMessage()
 const { t } = useI18n()
 const orderIdRef = computed(() => (route.query.orderId as string) ?? '')
+const hasCheck = computed(() => {
+  const value = route.query.has_check
+  return value === 'true' || value === '1'
+})
 const {
   orderIdValue,
   paymentMethods,
   selectedPayType,
+  orderInfo,
   paymentCode,
   paymentCodeImage,
   loading,
@@ -606,16 +613,25 @@ const voucherFiles = ref<VoucherFileItem[]>([])
 const voucherInputRef = ref<HTMLInputElement | null>(null)
 const preferredMethodInitialized = ref(false)
 const hasLoadedOfflineBankAccounts = ref(false)
+const submittingOffline = ref(false)
 
 const getPaymentMethodIcon = (method: { code?: string; id?: string }) =>
   resolvePaymentMethodIcon(method.code ?? method.id ?? '')
 
 const selectedPaymentIcon = computed(() => resolvePaymentMethodIcon(selectedPayType.value))
 const canSubmitVoucher = computed(
-  () => Boolean(selectedBankAccountId.value) && voucherFiles.value.length > 0
+  () =>
+    Boolean(selectedBankAccountId.value) &&
+    voucherFiles.value.length > 0 &&
+    !voucherFiles.value.some((item) => item.uploading)
 )
 const primaryActionDisabled = computed(() =>
-  isBankTransferSelected.value ? !canSubmitVoucher.value : !canPay.value || loading.value
+  isBankTransferSelected.value
+    ? !canSubmitVoucher.value || submittingOffline.value
+    : !canPay.value || loading.value
+)
+const primaryActionLoading = computed(() =>
+  isBankTransferSelected.value ? submittingOffline.value : loading.value
 )
 
 function mapOfflineBankAccounts(response: any): BankAccountOption[] {
@@ -734,6 +750,54 @@ function triggerVoucherUpload() {
   voucherInputRef.value?.click()
 }
 
+function extractUploadedImageUrl(response: any): string {
+  const payload = response?.data ?? response
+  if (typeof payload === 'string') return payload
+  if (Array.isArray(payload)) {
+    const first = payload[0]
+    if (typeof first === 'string') return first
+    if (first && typeof first === 'object') {
+      return String(first.image_url || first.url || first.src || '')
+    }
+  }
+  if (payload && typeof payload === 'object') {
+    return String(payload.image_url || payload.url || payload.src || '')
+  }
+  return ''
+}
+
+function resolveOrderPayFeeFen(): number {
+  const raw =
+    orderInfo.value?.total_fee ??
+    orderInfo.value?.total_amount ??
+    orderInfo.value?.orderInfo?.total_fee ??
+    orderInfo.value?.orderInfo?.total_amount ??
+    0
+  const amount = Number(raw)
+  return Number.isFinite(amount) ? amount : 0
+}
+
+async function uploadVoucherImage(item: VoucherFileItem) {
+  if (item.uploadedUrl) return item.uploadedUrl
+  item.uploading = true
+  try {
+    const response = await aftersalesApiClient.uploadLocalImage({
+      file: item.file,
+      filetype: 'image',
+      group: 'offline',
+      newfilename: item.file.name,
+    })
+    const url = extractUploadedImageUrl(response)
+    if (!url) {
+      throw new Error(t('eab46cc2.voucherUploadFailed'))
+    }
+    item.uploadedUrl = url
+    return url
+  } finally {
+    item.uploading = false
+  }
+}
+
 function handleVoucherFileChange(event: Event) {
   const input = event.target as HTMLInputElement
   const files = Array.from(input.files ?? [])
@@ -759,10 +823,77 @@ function removeVoucher(index: number) {
   }
 }
 
+/**
+ * 对齐 vshop offlinePay + offline-transfer 提交：
+ * 1) POST /payment 登记 offline_pay
+ * 2) 上传凭证图
+ * 3) POST /order/offline/upload/voucher
+ */
+async function submitOfflineTransfer() {
+  if (!canSubmitVoucher.value || submittingOffline.value) return
+
+  if (!selectedBankAccountId.value) {
+    toast.show(t('eab46cc2.selectBankAccount'))
+    return
+  }
+  if (voucherFiles.value.length === 0) {
+    toast.show(t('eab46cc2.uploadVoucherRequired'))
+    return
+  }
+
+  const orderId = orderIdValue.value
+  const payType = selectedPayType.value
+  if (!orderId || !payType) return
+
+  submittingOffline.value = true
+  try {
+    // vshop：先 getPayment 再填凭证
+    await paymentApiClient.getOrderPaymentInfo({
+      order_id: orderId,
+      pay_type: payType,
+      pay_channel: payType,
+      return_url: typeof window !== 'undefined' ? `${window.location.origin}${localePath(`/payment?orderId=${orderId}` as any)}` : '',
+    })
+
+    const voucherUrls: string[] = []
+    for (const item of voucherFiles.value) {
+      voucherUrls.push(await uploadVoucherImage(item))
+    }
+
+    const selectedBank = bankAccounts.value.find((bank) => bank.id === selectedBankAccountId.value)
+
+    const voucherPayload = {
+      order_id: orderId,
+      bank_account_id: selectedBankAccountId.value,
+      pay_fee: resolveOrderPayFeeFen(),
+      voucher_pic: voucherUrls,
+      pay_sn: transactionReference.value.trim(),
+      transfer_remark: transferNote.value.trim(),
+      bank_account_name: selectedBank?.accountName,
+      bank_account_no: selectedBank?.accountNumber,
+      bank_name: selectedBank?.bankName,
+      china_ums_no: selectedBank?.unionNumber,
+    }
+
+    // 对齐 vshop：has_check=true 走 update，否则 upload
+    if (hasCheck.value) {
+      await paymentApiClient.updateOfflineVoucher(voucherPayload)
+    } else {
+      await paymentApiClient.uploadOfflineVoucher(voucherPayload)
+    }
+
+    toast.show(t('eab46cc2.voucherSubmitSuccess'))
+    await navigateTo(localePath(`/account/orders/${orderId}` as any))
+  } catch (error: any) {
+    toast.show(error?.message || t('eab46cc2.voucherSubmitFailed'))
+  } finally {
+    submittingOffline.value = false
+  }
+}
+
 async function handlePrimaryAction() {
   if (isBankTransferSelected.value) {
-    if (!canSubmitVoucher.value) return
-    toast.show(t('eab46cc2.1f6514'))
+    await submitOfflineTransfer()
     return
   }
 

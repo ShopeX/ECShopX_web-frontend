@@ -6,6 +6,7 @@ import {
   resolveCartEffectivePriceCents,
   type CartItemPriceRaw,
 } from '~/utils/cartItemPrice'
+import { mapPromotionTags } from '~/utils/promotionTags'
 
 /**
  * 购物车数据转换器（轻量级 DDD）
@@ -81,6 +82,8 @@ export class CartTransformer {
       quantity,
       stock: apiItem.store || 0,
       selected: apiItem.is_checked ?? false,
+      // 对齐 vshop cart：promotions / activity_info → marketingTags
+      marketingTags: mapPromotionTags(apiItem),
     }
   }
 

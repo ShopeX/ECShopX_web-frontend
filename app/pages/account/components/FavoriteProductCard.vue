@@ -12,6 +12,7 @@
         :alt="product.name"
         class="absolute inset-0 h-full w-full object-cover"
       />
+      <BCProductMarketingTags :tags="product.marketingTags" placement="overlay" />
     </button>
 
     <!-- 商品信息 -->
@@ -46,11 +47,15 @@
 </template>
 
 <script setup lang="ts">
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
+import type { IMarketingTag } from '~/utils/promotionTags'
+
 interface Product {
   id: string | number
   name: string
   price: number
   image: string
+  marketingTags?: IMarketingTag[]
 }
 
 interface Props {

@@ -1,3 +1,5 @@
+import type { IMarketingTag } from '~/utils/promotionTags'
+
 /**
  * 商品卡片数据接口
  */
@@ -28,4 +30,6 @@ export interface IProduct {
   stock?: number
   /** 店铺名称（BBC 模式下展示） */
   storeName?: string
+  /** 营销标签（对齐 vshop promotion_activity） */
+  marketingTags?: IMarketingTag[]
 }

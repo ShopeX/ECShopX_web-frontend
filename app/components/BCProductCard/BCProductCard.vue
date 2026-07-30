@@ -18,6 +18,7 @@
           loading="lazy"
           @error="handleImageError"
         />
+        <BCProductMarketingTags :tags="product.marketingTags" placement="overlay" />
       </div>
 
       <!-- 商品信息区域 - 带灰色背景 -->
@@ -61,6 +62,7 @@
 <script setup lang="ts">
 import type { IProduct } from './types'
 import BCProductPrice from '../BCProductPrice/BCProductPrice.vue'
+import BCProductMarketingTags from '../BCProductMarketingTags/BCProductMarketingTags.vue'
 import { useToastMessage } from '~/composables/useToastMessage'
 import { useCart } from '~/composables/useCart'
 import { useIntersectionObserver } from '@vueuse/core'

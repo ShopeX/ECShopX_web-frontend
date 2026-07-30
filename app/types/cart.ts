@@ -1,4 +1,5 @@
 import { MoneyValueObject, QuantityValueObject } from '~/shared/value-objects'
+import type { IMarketingTag } from '~/utils/promotionTags'
 
 /**
  * 购物车商品模型（领域模型/轻量级）
@@ -25,6 +26,8 @@ export interface ICartItemModel {
   quantity: QuantityValueObject
   stock: number
   selected: boolean
+  /** 营销标签（对齐 vshop promotions / activity_info） */
+  marketingTags?: IMarketingTag[]
 }
 
 /**

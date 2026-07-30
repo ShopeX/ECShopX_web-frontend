@@ -70,6 +70,13 @@ export function useOrderDetail() {
     }
   }
 
+  function resolveOrderDetailStatusText(detailModel: any) {
+    if (detailModel?.isOfflinePendingReview || String(detailModel?.offlinePayCheckStatus) === '0') {
+      return t('eab46cc2.awaitingMerchantConfirm')
+    }
+    return getOrderStatusText(detailModel.status)
+  }
+
   async function fetchOrderDetail(orderId: string) {
     loading.value = true
     error.value = null
@@ -79,7 +86,7 @@ export function useOrderDetail() {
       const detailModel = OrderTransformer.toOrderDetailModel(orderInfo)
       order.value = {
         ...detailModel,
-        statusText: getOrderStatusText(detailModel.status),
+        statusText: resolveOrderDetailStatusText(detailModel),
         shippingMethod: translateIfGeneratedKey(detailModel.shippingMethod || ''),
         invoiceInfo: translateIfGeneratedKey(detailModel.invoiceInfo || ''),
       }
@@ -94,6 +101,7 @@ export function useOrderDetail() {
   const availableActions = computed<string[]>(() => {
     if (!order.value) return []
     const actions: string[] = []
+    if (order.value.canChangeOfflineVoucher) actions.push('change_offline')
     if (order.value.canCancel) actions.push('cancel')
     if (order.value.canPay) actions.push('pay')
     if (order.value.canConfirmReceipt) actions.push('confirm_receipt')
@@ -148,6 +156,11 @@ export function useOrderDetail() {
   function payNow() {
     if (!order.value) return
     navigateTo(`/payment?orderId=${order.value.orderId}`)
+  }
+
+  function changeOfflineVoucher() {
+    if (!order.value) return
+    navigateTo(`/payment?orderId=${order.value.orderId}&has_check=true`)
   }
 
   async function viewLogistics() {
@@ -224,6 +237,7 @@ export function useOrderDetail() {
     submitOrderInvoice,
     closeInvoiceDialog,
     payNow,
+    changeOfflineVoucher,
     viewLogistics,
     closeLogisticsDialog,
     retryLogistics,

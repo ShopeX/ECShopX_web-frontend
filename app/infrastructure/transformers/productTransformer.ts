@@ -1,6 +1,7 @@
 import type { IProductListItem } from '~/types/api/item'
 import type { IProduct } from '~/components/BCProductCard/types'
 import { MoneyValueObject, DiscountValueObject } from '~/shared/value-objects'
+import { mapPromotionTags } from '~/utils/promotionTags'
 
 type ProductLike = Partial<IProductListItem> & {
   item_name?: string
@@ -104,6 +105,7 @@ export class ProductTransformer {
         specId: undefined,
         specName: undefined,
         stock: undefined,
+        marketingTags: [],
       }
     }
 
@@ -122,6 +124,8 @@ export class ProductTransformer {
       specId: undefined,
       specName: undefined,
       stock: undefined,
+      // 对齐 vshop：promotion_activity → marketingTags
+      marketingTags: mapPromotionTags(apiProduct),
     }
   }
 

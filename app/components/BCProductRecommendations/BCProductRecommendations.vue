@@ -62,6 +62,7 @@
                   class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
                   loading="lazy"
                 />
+                <BCProductMarketingTags :tags="product.marketingTags" placement="overlay" />
               </div>
 
               <!-- 商品信息 -->
@@ -98,6 +99,7 @@
                 class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
                 loading="lazy"
               />
+              <BCProductMarketingTags :tags="product.marketingTags" placement="overlay" />
             </div>
 
             <!-- 商品信息 -->
@@ -120,6 +122,7 @@
 
 <script setup lang="ts">
 import type { ProductRecommendation } from './types'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 
 const { t } = useI18n()
 

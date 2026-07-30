@@ -1,3 +1,5 @@
+import { mapPromotionTags, type IMarketingTag } from '~/utils/promotionTags'
+
 /**
  * 收藏商品列表 API 响应 -> 前端卡片模型
  * 接口 GET /wxapp/member/collect/item 响应体以 Apifox 为准，以下字段名为常见约定，实际对接时按后端字段调整。
@@ -7,6 +9,7 @@ export interface IFavoriteProduct {
   name: string
   price: number
   image: string
+  marketingTags?: IMarketingTag[]
 }
 
 export class CollectItemTransformer {
@@ -55,6 +58,7 @@ export class CollectItemTransformer {
         name: String(name),
         price,
         image: String(image),
+        marketingTags: mapPromotionTags(item),
       }
     })
   }

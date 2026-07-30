@@ -107,6 +107,7 @@
       </USlideover>
 
       <USlideover
+        v-if="isAiAssistantFeatureEnabled"
         v-model:open="showAiAssistantDrawer"
         :title="aiAssistantTitle"
         :description="aiAssistantDescription"
@@ -182,6 +183,10 @@ import {
   createDefaultHeaderDecorationDsl,
 } from '~/decoration-engine/defaults/defaultDecorationDsl'
 import schemaMap from '~/templateEngines/schema'
+import {
+  isAiAssistantEnabled,
+  type AiAssistantPublicConfig,
+} from '~/utils/aiAssistantEmbed'
 
 interface SelectedWidget {
   el: HTMLElement
@@ -276,11 +281,16 @@ const showCategoryNav = ref(false)
 const showMiniCart = ref(false)
 const showSearchDrawer = ref(false)
 const showAiAssistantDrawer = ref(false)
+const runtimeConfig = useRuntimeConfig()
+const isAiAssistantFeatureEnabled = computed(() =>
+  isAiAssistantEnabled((runtimeConfig.public as AiAssistantPublicConfig).aiAssistant)
+)
 const isAiAssistantRoute = computed(
   () => route.path.includes('/ai-assistant') || String(route.name || '').includes('ai-assistant')
 )
 const shouldRenderAiAssistantFab = computed(
   () =>
+    isAiAssistantFeatureEnabled.value &&
     !isDecorationPreview.value &&
     !isDecorationRouteDesignMode.value &&
     String(route.query.designMode || '') !== '1' &&

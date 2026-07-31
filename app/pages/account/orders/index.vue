@@ -136,6 +136,7 @@
                       />
                       <div class="flex flex-1 min-w-0 gap-[16px] lg:gap-[32px] items-start">
                         <div class="flex-[1_0_0] min-w-0 flex flex-col gap-[4px]">
+                          <!-- 对齐 vshop SpTradeItem：订单列表不展示营销标签 -->
                           <h3 class="text-[14px] font-medium leading-5 text-[#101828]">
                             {{ item.itemName }}
                           </h3>
@@ -282,6 +283,14 @@
                           @click.stop="cancelOrder(order)"
                         >
                           {{ t('de8076e6.b21b5e') }}
+                        </button>
+                        <button
+                          v-if="order.canChangeOfflineVoucher"
+                          type="button"
+                          class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
+                          @click.stop="changeOfflineVoucher(order.orderId)"
+                        >
+                          {{ t('eab46cc2.changeOfflineVoucher') }}
                         </button>
                         <button
                           v-if="order.canPay"
@@ -450,6 +459,7 @@ const {
   confirmReceipt,
   deleteOrder,
   payNow,
+  changeOfflineVoucher,
   viewLogistics,
   retryLogistics,
 } = useOrders()
@@ -500,6 +510,7 @@ const menuItems = computed(() => {
 
 type MobileOrderAction =
   | 'pay'
+  | 'changeOffline'
   | 'confirmReceipt'
   | 'review'
   | 'cancel'
@@ -512,18 +523,26 @@ const openingAftersalesOrderIds = ref<Record<string, boolean>>({})
 
 function getMobilePrimaryAction(order: any): MobileOrderAction | null {
   if (order.canPay) return 'pay'
+  if (order.canChangeOfflineVoucher) return 'changeOffline'
   if (order.canConfirmReceipt) return 'confirmReceipt'
   if (order.canReview) return 'review'
   return null
 }
 
 function isMobilePrimaryAction(action: MobileOrderAction): boolean {
-  return action === 'pay' || action === 'confirmReceipt' || action === 'review'
+  return (
+    action === 'pay' ||
+    action === 'changeOffline' ||
+    action === 'confirmReceipt' ||
+    action === 'review'
+  )
 }
 
 function getMobileSecondaryActions(order: any): MobileOrderAction[] {
   const actions: MobileOrderAction[] = []
   if (order.canCancel) actions.push('cancel')
+  // canPay 为主按钮时，修改凭证放次要操作
+  if (order.canChangeOfflineVoucher && order.canPay) actions.push('changeOffline')
   if (order.canApplyAftersales) actions.push('aftersales')
   if (order.canViewLogistics) actions.push('logistics')
   if (order.canDelete) actions.push('delete')
@@ -551,6 +570,8 @@ function getMobileActionLabel(action: MobileOrderAction): string {
   switch (action) {
     case 'pay':
       return t('de8076e6.747349')
+    case 'changeOffline':
+      return t('eab46cc2.changeOfflineVoucher')
     case 'confirmReceipt':
       return t('de8076e6.775b01')
     case 'review':
@@ -574,6 +595,9 @@ function handleMobileAction(action: MobileOrderAction, order: any) {
   switch (action) {
     case 'pay':
       payNow(order.orderId)
+      break
+    case 'changeOffline':
+      changeOfflineVoucher(order.orderId)
       break
     case 'confirmReceipt':
       confirmReceipt(order.orderId)

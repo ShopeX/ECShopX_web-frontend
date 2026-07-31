@@ -392,6 +392,7 @@
               />
             </div>
             <div class="flex-1 flex flex-col gap-1 min-w-0">
+              <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
               <h4 class="text-sm font-medium text-[#101828] leading-5 truncate">
                 {{ item.productName }}
               </h4>
@@ -495,6 +496,7 @@
               />
             </div>
             <div class="flex-1 flex flex-col gap-1 min-w-0">
+              <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
               <h4 class="text-sm font-medium text-[#101828] leading-5 truncate">
                 {{ item.productName }}
               </h4>
@@ -616,6 +618,7 @@ import { useRegion } from '~/composables/useRegion'
 import BCAddressModal from '~/components/BCAddressModal/BCAddressModal.vue'
 import BCCouponSelector from '~/components/BCCouponSelector/BCCouponSelector.vue'
 import BCCheckoutErrorModal from '~/components/BCCheckoutErrorModal/BCCheckoutErrorModal.vue'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 import type { IAddressFormData } from '~/composables/useAddress'
 import { ECCheckbox } from '~/components/ECCheckbox'
 import { ECSelect } from '~/components/ECSelect'

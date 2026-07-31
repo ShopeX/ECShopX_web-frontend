@@ -32,6 +32,7 @@
 
         <div class="flex min-w-0 flex-1 items-start gap-[16px] lg:gap-[32px]">
           <div class="flex min-w-0 flex-[1_0_0] flex-col gap-[4px]">
+            <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
             <p class="text-[14px] font-medium leading-5 text-[#191a1d]">
               {{ item.itemName }}
             </p>
@@ -100,6 +101,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 
 interface ItemModel {
   detailId?: string

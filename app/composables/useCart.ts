@@ -271,6 +271,7 @@ export function useCart() {
       canBePurchased: canItemBePurchased(item),
       hasDiscount: hasMemberPriceLayout || hasMarketDiscount,
       discountPercent: discount.percent,
+      marketingTags: item.marketingTags || [],
     }
   }
 

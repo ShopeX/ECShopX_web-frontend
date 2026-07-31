@@ -104,6 +104,15 @@
         {{ t('de8076e6.606120') }}
       </button>
       <button
+        v-if="actions.includes('change_offline')"
+        data-testid="btn-change-offline"
+        type="button"
+        class="flex h-[50px] w-auto items-center justify-center border border-[#0f0f10] px-[33px] text-[12px] font-medium leading-4 text-[#191a1d] transition-colors hover:bg-gray-50"
+        @click="emit('changeOffline')"
+      >
+        {{ t('eab46cc2.changeOfflineVoucher') }}
+      </button>
+      <button
         v-if="actions.includes('pay')"
         data-testid="btn-pay-now"
         type="button"
@@ -123,6 +132,7 @@ const { t } = useI18n()
 
 type OrderDetailAction =
   | 'pay'
+  | 'change_offline'
   | 'confirm_receipt'
   | 'review'
   | 'cancel'
@@ -139,6 +149,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   cancel: []
   pay: []
+  changeOffline: []
   confirmReceipt: []
   invoice: []
   aftersales: []
@@ -165,18 +176,31 @@ const mobileMoreActions = computed(() => {
 
 function getMobilePrimaryAction(): OrderDetailAction | null {
   if (normalizedActions.value.includes('pay')) return 'pay'
+  if (normalizedActions.value.includes('change_offline')) return 'change_offline'
   if (normalizedActions.value.includes('confirm_receipt')) return 'confirm_receipt'
   if (normalizedActions.value.includes('review')) return 'review'
   return null
 }
 
 function isMobilePrimaryAction(action: OrderDetailAction): boolean {
-  return action === 'pay' || action === 'confirm_receipt' || action === 'review'
+  return (
+    action === 'pay' ||
+    action === 'change_offline' ||
+    action === 'confirm_receipt' ||
+    action === 'review'
+  )
 }
 
 function getMobileSecondaryActions(): OrderDetailAction[] {
+  const primary = getMobilePrimaryAction()
   const actions: OrderDetailAction[] = []
   if (normalizedActions.value.includes('cancel')) actions.push('cancel')
+  if (
+    normalizedActions.value.includes('change_offline') &&
+    primary !== 'change_offline'
+  ) {
+    actions.push('change_offline')
+  }
   if (normalizedActions.value.includes('aftersales')) actions.push('aftersales')
   if (normalizedActions.value.includes('logistics')) actions.push('logistics')
   if (normalizedActions.value.includes('invoice')) actions.push('invoice')
@@ -187,6 +211,8 @@ function getActionLabel(action: OrderDetailAction): string {
   switch (action) {
     case 'pay':
       return t('de8076e6.747349')
+    case 'change_offline':
+      return t('eab46cc2.changeOfflineVoucher')
     case 'confirm_receipt':
       return t('de8076e6.775b01')
     case 'review':
@@ -206,6 +232,8 @@ function getActionTestId(action: OrderDetailAction): string {
   switch (action) {
     case 'pay':
       return 'btn-pay-now'
+    case 'change_offline':
+      return 'btn-change-offline'
     case 'confirm_receipt':
       return 'btn-confirm-receipt'
     case 'review':
@@ -225,6 +253,9 @@ function emitAction(action: OrderDetailAction) {
   switch (action) {
     case 'pay':
       emit('pay')
+      break
+    case 'change_offline':
+      emit('changeOffline')
       break
     case 'confirm_receipt':
       emit('confirmReceipt')

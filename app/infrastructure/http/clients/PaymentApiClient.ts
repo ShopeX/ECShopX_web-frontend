@@ -103,8 +103,25 @@ export type IOfflineBankAccountsResponse =
   | {
       data?: IOfflineBankAccountItem[] | IOfflineBankAccountItem | Record<string, any>
       list?: IOfflineBankAccountItem[]
+      setting?: Record<string, any>
       [key: string]: any
     }
+
+/** 上传/更新线下转账凭证请求（对齐 vshop uploadVoucher） */
+export interface IOfflineUploadVoucherRequest {
+  order_id: string
+  bank_account_id: string | number
+  pay_fee: number | string
+  voucher_pic: string[]
+  pay_sn?: string
+  transfer_remark?: string
+  bank_account_name?: string
+  bank_account_no?: string
+  bank_name?: string
+  china_ums_no?: string
+  id?: string | number
+  [key: string]: any
+}
 
 export class PaymentApiClient {
   private $api: any
@@ -180,6 +197,42 @@ export class PaymentApiClient {
   async getOfflineBankAccounts(options?: any): Promise<IOfflineBankAccountsResponse> {
     return this.http('/wxapp/order/offline/backaccount', {
       method: 'GET',
+      ...options,
+    } as any)
+  }
+
+  /**
+   * 上传线下转账凭证
+   * POST /order/offline/upload/voucher
+   */
+  async uploadOfflineVoucher(data: IOfflineUploadVoucherRequest, options?: any): Promise<any> {
+    return this.http('/wxapp/order/offline/upload/voucher', {
+      method: 'POST',
+      body: data,
+      ...options,
+    } as any)
+  }
+
+  /**
+   * 更新线下转账凭证
+   * POST /order/offline/update/voucher
+   */
+  async updateOfflineVoucher(data: IOfflineUploadVoucherRequest, options?: any): Promise<any> {
+    return this.http('/wxapp/order/offline/update/voucher', {
+      method: 'POST',
+      body: data,
+      ...options,
+    } as any)
+  }
+
+  /**
+   * 查询线下转账凭证
+   * GET /order/offline/get/voucher
+   */
+  async getOfflineVoucher(orderId: string, options?: any): Promise<any> {
+    return this.http('/wxapp/order/offline/get/voucher', {
+      method: 'GET',
+      query: { order_id: orderId },
       ...options,
     } as any)
   }

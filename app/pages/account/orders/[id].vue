@@ -205,6 +205,7 @@
             :actions="availableActions"
             @cancel="cancelOrder"
             @pay="payNow"
+            @change-offline="changeOfflineVoucher"
             @confirm-receipt="confirmReceipt"
             @aftersales="openAftersales"
             @logistics="handleViewLogistics"
@@ -375,6 +376,7 @@
         :actions="availableActions"
         @cancel="cancelOrder"
         @pay="payNow"
+        @change-offline="changeOfflineVoucher"
         @confirm-receipt="confirmReceipt"
         @aftersales="openAftersales"
         @logistics="handleViewLogistics"
@@ -472,6 +474,7 @@ const {
   closeReasonModal,
   confirmReceipt,
   payNow,
+  changeOfflineVoucher,
   viewLogistics,
   retryLogistics,
 } = useOrderDetail()

@@ -147,7 +147,8 @@
         >
           <!-- Title and Price -->
           <div class="flex items-start justify-between w-full gap-4">
-            <div class="flex flex-col gap-2 flex-1 min-w-0">
+          <div class="flex flex-col gap-2 flex-1 min-w-0">
+              <BCProductMarketingTags :tags="product.marketingTags" placement="inline" />
               <h1
                 class="text-xl lg:text-2xl font-normal text-[#191a1d] leading-[1.2] tracking-[-0.48px]"
               >
@@ -338,6 +339,7 @@
 <script setup lang="ts">
 import BCProductRecommendations from '~/components/BCProductRecommendations/BCProductRecommendations.vue'
 import BCProductPrice from '~/components/BCProductPrice/BCProductPrice.vue'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 import BCShopHeader from '~/components/BCShopHeader/BCShopHeader.vue'
 import QuantityStepper from '~/components/BCMiniCartItem/QuantityStepper.vue'
 import type { ProductRecommendation } from '~/components/BCProductRecommendations/types'
@@ -347,6 +349,7 @@ import { RecommendLikeTransformer } from '~/infrastructure/transformers/recommen
 import type { IItem } from '~/types/api/item'
 import { logger } from '~/utils/log'
 import { resolveItemDescription } from '~/utils/productDescription'
+import { mapPromotionTags } from '~/utils/promotionTags'
 
 const route = useRoute()
 const router = useRouter()
@@ -445,6 +448,7 @@ const product = computed(() => {
       description: '',
       images: [],
       specs: [] as ISpec[],
+      marketingTags: [],
     }
   }
 
@@ -478,6 +482,7 @@ const product = computed(() => {
     description: resolveItemDescription(data, t('464b6330.415547')),
     images: data.pics || [],
     specs,
+    marketingTags: mapPromotionTags(data),
   }
 })
 

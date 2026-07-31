@@ -1,6 +1,7 @@
 import { MoneyValueObject } from '~/shared/value-objects'
 import type { IApiTrackerPullTrace } from '~/types/api/order'
 import { isPaidOrder } from '~/utils/orderCancel'
+import { mapPromotionTags, type IMarketingTag } from '~/utils/promotionTags'
 import { CouponDisplayTransformer, type ICouponModel } from './couponDisplayTransformer'
 
 /**
@@ -25,6 +26,7 @@ export interface ICheckoutItem {
   price: number
   subtotal: number
   subtotalDisplay: string
+  marketingTags?: IMarketingTag[]
 }
 
 export interface IOrderCalculateModel {
@@ -180,15 +182,42 @@ export class OrderTransformer {
       price,
       subtotal,
       subtotalDisplay: MoneyValueObject.of(subtotal).display,
+      marketingTags: mapPromotionTags(apiItem),
     }
   }
 
   /**
    * 计算订单金额响应 → 应用模型
+   * 对齐 vshop espier-checkout：把 items_promotion 限购挂到对应商品行
    */
   static toCalculateModel(response: any): IOrderCalculateModel {
+    const rawItems = Array.isArray(response.items) ? response.items : []
+    const itemsPromotion = Array.isArray(response.items_promotion) ? response.items_promotion : []
+
+    const enrichedItems = rawItems.map((apiItem: any) => {
+      const itemId = String(apiItem.item_id || '')
+      const matchedPromotions = itemsPromotion.filter(
+        (promo: any) => String(promo.item_id || '') === itemId
+      )
+      const cusActivity = matchedPromotions
+        .filter((promo: any) => promo.activity_type === 'limited_buy')
+        .map((promo: any) => ({
+          activity_tag: promo.activity_tag,
+          activity_name: promo.activity_name,
+          activity_id: promo.activity_id,
+          activity_type: promo.activity_type,
+          ...(promo.activity_rule || {}),
+        }))
+
+      return {
+        ...apiItem,
+        items_promotion: matchedPromotions,
+        cusActivity,
+      }
+    })
+
     return {
-      items: (response.items || []).map(OrderTransformer.toCheckoutItemModel),
+      items: enrichedItems.map(OrderTransformer.toCheckoutItemModel),
       itemFee: Number(response.item_fee || 0) / 100, // 分转元
       itemFeeNew: Number(response.item_fee_new || 0) / 100,
       marketFee: Number(response.market_fee || 0) / 100,
@@ -302,6 +331,7 @@ export class OrderTransformer {
       displayPrice,
       subtotal: displayPrice * quantity,
       subtotalDisplay: OrderTransformer.formatMoney(displayPrice * quantity),
+      marketingTags: mapPromotionTags(apiItem),
     }
   }
 
@@ -370,6 +400,19 @@ export class OrderTransformer {
       ? orderLeftAftersalesNum > 0
       : items.some((item: any) => item.leftAftersalesNum > 0)
 
+    // 对齐 vshop getTradeAction：
+    // offline_pay_check_status: 0 待审核; 1 已通过; 2 已拒绝; 9 已取消
+    // 凭证待审时订单仍是 NOTPAY，但应隐藏「立即支付/取消」
+    const offlinePayCheckStatus =
+      apiOrder.offline_pay_check_status != null && apiOrder.offline_pay_check_status !== ''
+        ? String(apiOrder.offline_pay_check_status)
+        : ''
+    const payType = String(apiOrder.pay_type || apiOrder.payType || '')
+    const orderStatusMsg = String(apiOrder.order_status_msg || apiOrder.orderStatusMsg || '')
+    const isOfflinePendingReview =
+      status === 'pending_payment' && offlinePayCheckStatus === '0'
+    const isOfflineRejected = status === 'pending_payment' && offlinePayCheckStatus === '2'
+
     return {
       orderId,
       orderTime,
@@ -378,12 +421,19 @@ export class OrderTransformer {
       isPaid,
       status,
       statusText: OrderTransformer.getOrderStatusText(status),
+      orderStatusMsg,
+      payType,
+      offlinePayCheckStatus,
+      isOfflinePendingReview,
       items,
       totalAmount,
       shippingAddress: apiOrder.shipping_address,
       // 根据订单状态判断可执行的操作
-      canCancel: ['pending_payment', 'pending_shipment', 'shipped'].includes(status),
-      canPay: status === 'pending_payment',
+      canCancel:
+        (status === 'pending_payment' && !isOfflinePendingReview) ||
+        ['pending_shipment', 'shipped'].includes(status),
+      canPay: status === 'pending_payment' && !isOfflinePendingReview,
+      canChangeOfflineVoucher: isOfflineRejected,
       canConfirmReceipt: status === 'shipped',
       canInvoice: ['pending_shipment', 'shipped'].includes(status),
       canViewLogistics: ['shipped', 'completed'].includes(status),

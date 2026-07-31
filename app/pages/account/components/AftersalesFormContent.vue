@@ -37,6 +37,7 @@
           <div class="flex flex-1 flex-col gap-[8px] min-w-0">
             <div class="flex items-start justify-between gap-[16px]">
               <div class="flex flex-1 flex-col gap-[4px] min-w-0">
+                <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
                 <p class="text-[14px] font-medium leading-5 text-[#191a1d]">
                   {{ item.itemName }}
                 </p>
@@ -249,6 +250,9 @@
 </template>
 
 <script setup lang="ts">
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
+import type { IMarketingTag } from '~/utils/promotionTags'
+
 export interface AftersalesPanelItem {
   detailId: string
   itemId: string
@@ -261,6 +265,7 @@ export interface AftersalesPanelItem {
   quantity: number
   leftAftersalesNum: number
   price: number
+  marketingTags?: IMarketingTag[]
 }
 
 interface ReasonOption {

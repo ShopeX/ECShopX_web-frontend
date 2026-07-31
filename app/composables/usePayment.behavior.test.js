@@ -145,10 +145,12 @@ test('manual payment supports current-tab navigation for redirect based payment 
 test('payment page loads offline bank accounts when offline pay method exists', () => {
   assert.match(paymentClientSource, /async getOfflineBankAccounts\(/)
   assert.match(paymentClientSource, /this\.http\('\/wxapp\/order\/offline\/backaccount'/)
+  assert.match(paymentClientSource, /async uploadOfflineVoucher\(/)
+  assert.match(paymentClientSource, /this\.http\('\/wxapp\/order\/offline\/upload\/voucher'/)
 
   assert.match(
     paymentPageSource,
-    /import \{ paymentApiClient \} from '~\/infrastructure\/http\/clients'/
+    /import \{ paymentApiClient, aftersalesApiClient \} from '~\/infrastructure\/http\/clients'/
   )
   assert.match(paymentPageSource, /const bankAccounts = ref<BankAccountOption\[]>\(\[\]\)/)
   assert.match(paymentPageSource, /async function loadOfflineBankAccounts\(\)/)
@@ -168,4 +170,18 @@ test('payment page loads offline bank accounts when offline pay method exists', 
   )
   assert.match(paymentPageSource, /await loadOfflineBankAccounts\(\)/)
   assert.doesNotMatch(paymentPageSource, /const bankAccounts: BankAccountOption\[] = \[/)
+})
+
+test('payment page submits offline voucher aligned with vshop offline-transfer', () => {
+  assert.match(paymentPageSource, /async function submitOfflineTransfer\(\)/)
+  assert.match(paymentPageSource, /await paymentApiClient\.getOrderPaymentInfo\(/)
+  assert.match(paymentPageSource, /await aftersalesApiClient\.uploadLocalImage\(/)
+  assert.match(paymentPageSource, /await paymentApiClient\.uploadOfflineVoucher\(/)
+  assert.match(paymentPageSource, /await paymentApiClient\.updateOfflineVoucher\(/)
+  assert.match(paymentPageSource, /hasCheck\.value/)
+  assert.match(paymentPageSource, /voucher_pic:\s*voucherUrls/)
+  assert.match(paymentPageSource, /bank_account_id:\s*selectedBankAccountId\.value/)
+  assert.match(paymentPageSource, /pay_fee:\s*resolveOrderPayFeeFen\(\)/)
+  assert.match(paymentPageSource, /if \(isBankTransferSelected\.value\) \{\s*await submitOfflineTransfer\(\)/)
+  assert.doesNotMatch(paymentPageSource, /eab46cc2\.1f6514/)
 })

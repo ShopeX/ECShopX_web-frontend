@@ -39,6 +39,7 @@
 
     <div class="flex min-w-0 flex-1 flex-col gap-4 self-stretch">
       <div class="flex flex-col gap-1">
+        <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
         <p
           class="line-clamp-2 font-['Noto_Sans_SC'] text-base font-medium leading-6 text-[#191a1d]"
         >
@@ -132,6 +133,7 @@
     </div>
 
     <div class="flex min-w-0 flex-1 flex-col gap-1">
+      <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
       <p class="font-['Noto_Sans_SC'] text-base font-medium leading-6 text-[#191a1d]">
         {{ item.productName }}
       </p>
@@ -202,6 +204,7 @@
 <script setup lang="ts">
 import QuantityStepper from './QuantityStepper.vue'
 import { BCCartLinePrice } from '~/components/BCCartLinePrice'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 import type { ICartUI } from '~/composables/useCart'
 
 interface Props {

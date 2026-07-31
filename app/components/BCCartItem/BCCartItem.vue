@@ -24,6 +24,7 @@
             class="bg-clip-padding border-0 border-transparent border-solid content-stretch flex flex-col gap-[4px] items-start relative w-full"
           >
             <div class="relative shrink-0 w-full mb-1">
+              <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
               <p
                 class="font-['Noto_Sans_SC'] font-medium leading-[20px] text-[16px] text-[#191a1d]"
               >
@@ -169,6 +170,7 @@
 <script setup lang="ts">
 import { ECCheckbox } from '~/components/ECCheckbox'
 import { BCCartLinePrice } from '~/components/BCCartLinePrice'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 import type { ICartUI } from '~/composables/useCart'
 
 interface Props {

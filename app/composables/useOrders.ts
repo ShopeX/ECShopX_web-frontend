@@ -74,6 +74,14 @@ export function useOrders() {
     }
   }
 
+  /** 对齐 vshop：线下凭证待审显示「待商家确认」 */
+  function resolveOrderListStatusText(order: any) {
+    if (order?.isOfflinePendingReview || String(order?.offlinePayCheckStatus) === '0') {
+      return t('eab46cc2.awaitingMerchantConfirm')
+    }
+    return getOrderStatusText(order.status)
+  }
+
   /**
    * 加载订单列表
    */
@@ -119,7 +127,7 @@ export function useOrders() {
 
       const localizedOrders = result.orders.map((order) => ({
         ...order,
-        statusText: getOrderStatusText(order.status),
+        statusText: resolveOrderListStatusText(order),
       }))
 
       if (page === 1) {
@@ -226,8 +234,12 @@ export function useOrders() {
    * 立即支付
    */
   function payNow(orderId: string) {
-    // 跳转到支付页面
     navigateTo(`/payment?orderId=${orderId}`)
+  }
+
+  /** 对齐 vshop CHANGE_OFFLINE：拒绝后修改凭证，带 has_check=true */
+  function changeOfflineVoucher(orderId: string) {
+    navigateTo(`/payment?orderId=${orderId}&has_check=true`)
   }
 
   /**
@@ -335,6 +347,7 @@ export function useOrders() {
     confirmReceipt,
     deleteOrder,
     payNow,
+    changeOfflineVoucher,
     buyAgain,
     viewLogistics,
     closeLogisticsDialog,

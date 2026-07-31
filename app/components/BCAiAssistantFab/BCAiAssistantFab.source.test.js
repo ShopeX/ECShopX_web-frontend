@@ -17,6 +17,8 @@ test('AI assistant FAB follows enabled, client-only, and drawer-open contracts',
   expect(source).toMatch(/data-testid="ai-assistant-fab"/)
   expect(source).toMatch(/<ClientOnly>/)
   expect(source).toMatch(/mounted\.value/)
+  expect(source).toMatch(/if \(!enabled\.value \|\| !backend\.value\) return/)
+  expect(source).toMatch(/if \(enabled\.value\) \{\s*void loadFabConfig\(\)/)
   expect(source).toMatch(/emit\('open'\)/)
   expect(source).not.toMatch(/router\.push\(localePath\('\/ai-assistant'\)\)/)
   expect(source).not.toMatch(/openAiAssistantInNewWindow/)

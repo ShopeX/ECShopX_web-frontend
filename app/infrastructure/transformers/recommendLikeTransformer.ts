@@ -1,4 +1,5 @@
 import type { ProductRecommendation } from '~/components/BCProductRecommendations/types'
+import { mapPromotionTags } from '~/utils/promotionTags'
 
 export class RecommendLikeTransformer {
   private static pickImage(item: Record<string, any>): string {
@@ -24,6 +25,7 @@ export class RecommendLikeTransformer {
       name: String(item.item_name ?? item.itemName ?? ''),
       price: Number(item.price ?? 0) / 100,
       image: this.pickImage(item),
+      marketingTags: mapPromotionTags(item),
     }))
   }
 }

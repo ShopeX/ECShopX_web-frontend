@@ -63,7 +63,7 @@ function applyAvatarConfig(value: unknown) {
 }
 
 async function loadFabConfig() {
-  if (!backend.value) return
+  if (!enabled.value || !backend.value) return
 
   try {
     const tenantId = String(aiConfig.value.aiTenantId || '').trim()
@@ -85,6 +85,8 @@ function openAssistant() {
 
 onMounted(() => {
   mounted.value = true
-  void loadFabConfig()
+  if (enabled.value) {
+    void loadFabConfig()
+  }
 })
 </script>

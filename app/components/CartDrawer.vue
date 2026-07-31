@@ -42,6 +42,7 @@
 
             <div class="ml-4 flex flex-1 flex-col">
               <div>
+                <BCProductMarketingTags :tags="item.marketingTags" placement="inline" />
                 <div class="flex justify-between text-base font-medium text-gray-900">
                   <h3>
                     <NuxtLink :to="`/products/${item.productId}`" @click="closeCart">{{
@@ -126,6 +127,7 @@
 </template>
 
 <script setup lang="ts">
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
 const cartUIStore = useCartUIStore()
 const cartStore = useCartStore()
 

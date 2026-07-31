@@ -10,6 +10,7 @@
         :alt="info.title"
         class="absolute inset-0 w-full h-full object-cover"
       />
+      <BCProductMarketingTags :tags="marketingTags" placement="overlay" />
     </div>
 
     <!-- 商品信息 -->
@@ -39,6 +40,8 @@
 
 <script setup>
 import { formatMoneyFen } from '~/utils/currencyFormat'
+import BCProductMarketingTags from '~/components/BCProductMarketingTags/BCProductMarketingTags.vue'
+import { mapPromotionTags } from '~/utils/promotionTags'
 
 const { t, localePath } = useI18n()
 
@@ -48,6 +51,8 @@ const props = defineProps({
     required: true,
   },
 })
+
+const marketingTags = computed(() => mapPromotionTags(props.info))
 
 // 跳转到详情页 - 使用 navigateTo 替代 useRouter（SSR 安全）
 const navigateToDetail = () => {

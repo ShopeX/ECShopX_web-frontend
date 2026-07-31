@@ -63,9 +63,16 @@ export function createDecorationLinkResolver(localePath: LocalePath) {
           ? localePath(`/collections/${rawId}?link_type=sale_category`)
           : localePath('/collections/all?link_type=sale_category')
       case 'category':
+      case 'management_category':
         return rawId
           ? localePath(`/collections/${rawId}?link_type=category`)
           : localePath('/collections/all?link_type=category')
+      case 'tag':
+        return rawId
+          ? localePath(`/collections/all?tag_id=${encodeURIComponent(rawId)}`)
+          : localePath('/collections/all')
+      // admin / vshop 用 store；历史 web 配置可能用 shop
+      case 'store':
       case 'shop':
         return rawId ? localePath(`/shop/${rawId}`) : undefined
       default:

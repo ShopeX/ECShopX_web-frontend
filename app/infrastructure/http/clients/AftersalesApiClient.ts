@@ -7,6 +7,8 @@
  * - 返回原始 API 响应
  */
 
+import { uploadApiClient } from './UploadApiClient'
+
 export interface ICreateAftersalesDetailItem {
   id: string
   num: number
@@ -38,9 +40,12 @@ export interface IAftersalesDetailParams {
 }
 
 export interface IUploadLocalImageParams {
-  images: string
-  filetype: string
+  /** 真实 File，按 disk driver 分流上传（对齐 vshop） */
+  file: File | Blob
+  /** 存储类型：image / videos（非 MIME，如 image/jpeg） */
+  filetype?: 'image' | 'videos' | string
   group?: string
+  /** 原始文件名 */
   newfilename?: string
 }
 
@@ -98,19 +103,23 @@ export class AftersalesApiClient {
   }
 
   /**
-   * 上传本地图片
-   * POST /wxapp/espier/uploadlocal
+   * 上传图片（按 image_upload_token.driver 分流，对齐 vshop upload.js）
+   * OSS 环境禁止直调 uploadlocal
+   * 返回形态兼容 extractUploadedImageUrl：{ data: { image_url } }
    */
   async uploadLocalImage(params: IUploadLocalImageParams): Promise<any> {
-    return this.http('/wxapp/espier/uploadlocal', {
-      method: 'POST',
-      body: {
-        images: params.images,
-        filetype: params.filetype,
-        group: params.group ?? 'aftersales',
-        newfilename: params.newfilename ?? '',
-      },
+    const result = await uploadApiClient.uploadImage({
+      file: params.file,
+      filetype: params.filetype,
+      group: params.group,
+      newfilename: params.newfilename,
     })
+    return {
+      data: {
+        image_url: result.url,
+        url: result.url,
+      },
+    }
   }
 
   /**

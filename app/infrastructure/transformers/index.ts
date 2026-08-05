@@ -30,3 +30,14 @@ export {
   type CouponCardType,
 } from './couponDisplayTransformer'
 export type { IOrderCalculateModel, IAddressModel } from './orderTransformer'
+export {
+  RegistrationTransformer,
+  type IRegistrationActivityListItem,
+  type IRegistrationRecordListItem,
+  type IRegistrationRecordDetail,
+  type IRegistrationActivityDetail,
+  type IRegistrationFormTemplate,
+  type IRegistrationField,
+  type IRegistrationSection,
+  type ActivityLifecycleStatus,
+} from './registrationTransformer'

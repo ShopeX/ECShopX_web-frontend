@@ -168,6 +168,18 @@ const defaultMenuItems = computed<FilterMenuItem[]>(() => {
       nodeId: '2910:6324',
     },
     {
+      key: 'activityBooking',
+      label: t('registration.activityBooking'),
+      path: localePath('/account/activity-booking'),
+      nodeId: '3954:5064',
+    },
+    {
+      key: 'registrations',
+      label: t('registration.myRegistrations'),
+      path: localePath('/account/registrations'),
+      nodeId: '4054:7090',
+    },
+    {
       key: 'reviews',
       label: t('d53094c8.b3bf09'),
       path: localePath('/account/reviews'),

@@ -1,10 +1,11 @@
 <template>
-  <div ref="selectRef" :class="wrapperClasses" @click="handleToggle">
-    <!-- 选择器按钮 -->
+  <div ref="selectRef" :class="wrapperClasses">
+    <!-- 选择器按钮：仅按钮切换开合，避免选项点击冒泡再次 toggle -->
     <button
       type="button"
       :disabled="disabled"
       :class="selectClasses"
+      @click="handleToggle"
       @blur="handleBlur"
       @focus="handleFocus"
       @keydown="handleKeydown"
@@ -36,7 +37,7 @@
 
     <!-- 下拉选项面板 -->
     <Transition name="dropdown">
-      <div v-if="isOpen" :class="dropdownClasses">
+      <div v-if="isOpen" :class="dropdownClasses" @click.stop>
         <div :class="optionsClasses">
           <div
             v-for="(option, index) in displayOptions"
@@ -206,27 +207,23 @@ function handleToggle(event: Event) {
 }
 
 /**
- * 选择选项
+ * 选择选项：立即收起，避免后续 click 再打开
  */
 function handleSelect(option: ISelectOption) {
   if (props.disabled || option.disabled) return
 
   isSelecting.value = true
+  isOpen.value = false
 
-  // 更新值并返回完整的选项对象
   emit('update:modelValue', option.value)
   emit('change', option.value, option)
   emit('select', option)
+  emit('blur')
 
-  // 延迟关闭，让动画流畅执行
+  // 短延迟后复位，避免紧随其后的 blur/click-outside 干扰
   setTimeout(() => {
-    isOpen.value = false
-    emit('blur')
-    // 重置选择标记
-    setTimeout(() => {
-      isSelecting.value = false
-    }, 100)
-  }, 50)
+    isSelecting.value = false
+  }, 100)
 }
 
 /**

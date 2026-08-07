@@ -38,3 +38,7 @@ export { InvoiceApiClient, invoiceApiClient } from './InvoiceApiClient'
 export { StoreApiClient, storeApiClient } from './StoreApiClient'
 export { CommonApiClient, commonApiClient } from './CommonApiClient'
 export { UploadApiClient, uploadApiClient } from './UploadApiClient'
+export {
+  RegistrationApiClient,
+  registrationApiClient,
+} from './RegistrationApiClient'

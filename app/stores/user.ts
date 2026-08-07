@@ -106,6 +106,10 @@ export const useUserStore = defineStore('user', {
         return profileResult
       }
 
+      // 登录后重新同步购物车，确保已挂载的头部立即显示最新商品数量
+      const cartStore = useCartStore()
+      await cartStore.loadCart({ silent: true })
+
       return { success: true as const, data: loginData }
     },
 

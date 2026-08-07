@@ -128,6 +128,16 @@ const menuItems = computed(() => {
 
   items.push(
     { key: 'address', label: t('ee3264ed.748ea9'), path: localePath('/account/address') },
+    {
+      key: 'activityBooking',
+      label: t('registration.activityBooking'),
+      path: localePath('/account/activity-booking'),
+    },
+    {
+      key: 'registrations',
+      label: t('registration.myRegistrations'),
+      path: localePath('/account/registrations'),
+    },
     { key: 'reviews', label: t('8b2de97c.b3bf09'), path: localePath('/account/reviews') }
   )
 

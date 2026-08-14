@@ -117,8 +117,13 @@ export default defineNuxtPlugin({
 
     // ============ 创建 $fetch 实例 ============
 
+    const serverApiBase = (config.apiBaseInternal as string) || ''
+    const publicApiBase = (config.public.apiBase as string) || '/api'
+    const apiBase =
+      import.meta.server && serverApiBase ? serverApiBase : publicApiBase
+
     const $api = $fetch.create({
-      baseURL: config.public.apiBase || '/api',
+      baseURL: apiBase,
       timeout: (config.public.apiTimeout as number) || 10000,
 
       // ✅ 自动重试配置（ofetch 内置）

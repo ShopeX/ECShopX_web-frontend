@@ -1,8 +1,22 @@
 import { templateApiClient } from '~/infrastructure/http/clients'
 import type { IMallGlobalSetting } from '~/types/api/template'
+import defaultLoginBackgroundUrl from '~/assets/images/login-bg.png'
 
 const DEFAULT_LOGO_URL = '/images/logo/logo.png'
-const DEFAULT_LOGIN_BACKGROUND_URL = '/assets/images/login-bg.png'
+
+/** 相对站点根路径补上 Nuxt baseURL（宝塔为 /web/）；绝对 URL 原样返回 */
+function withAppBase(path: string): string {
+  if (!path || /^(https?:)?\/\//i.test(path) || path.startsWith('data:')) {
+    return path
+  }
+  const base = useRuntimeConfig().app.baseURL || '/'
+  const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  if (!normalizedBase || normalizedPath === normalizedBase || normalizedPath.startsWith(`${normalizedBase}/`)) {
+    return normalizedPath
+  }
+  return `${normalizedBase}${normalizedPath}`
+}
 
 export async function useMallGlobalSetting() {
   const settingCache = useCookie<IMallGlobalSetting>('mall-global-setting-cache', {
@@ -37,14 +51,17 @@ export async function useMallGlobalSetting() {
     { immediate: true }
   )
 
-  const mallLogoLightUrl = computed(
-    () => setting.value.logo_light || setting.value.logo || DEFAULT_LOGO_URL
+  const mallLogoLightUrl = computed(() =>
+    withAppBase(setting.value.logo_light || setting.value.logo || DEFAULT_LOGO_URL)
   )
-  const mallLogoDarkUrl = computed(
-    () => setting.value.logo_dark || setting.value.logo || mallLogoLightUrl.value
+  const mallLogoDarkUrl = computed(() =>
+    withAppBase(setting.value.logo_dark || setting.value.logo || mallLogoLightUrl.value)
   )
-  const loginBackgroundUrl = computed(
-    () => setting.value.background || DEFAULT_LOGIN_BACKGROUND_URL
+  // 默认背景用 import，Vite 会带上 baseURL；接口返回的相对路径再补 base
+  const loginBackgroundUrl = computed(() =>
+    setting.value.background
+      ? withAppBase(setting.value.background)
+      : defaultLoginBackgroundUrl
   )
 
   return {

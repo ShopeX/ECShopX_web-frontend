@@ -122,6 +122,11 @@ export default defineNuxtConfig({
 
   // 运行时配置
   runtimeConfig: {
+    // 服务端 SSR 请求用（避免经 8080 回环 Nginx 导致死锁）
+    apiBaseInternal:
+      process.env.NUXT_INTERNAL_API_BASE ||
+      process.env.NUXT_API_BASE ||
+      '',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
       companyId: process.env.NUXT_PUBLIC_COMPANY_ID,

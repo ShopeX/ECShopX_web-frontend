@@ -1,5 +1,5 @@
 <template>
-  <div class="box-border flex h-10 w-[120px] items-center border border-[#e5e7eb] bg-white">
+  <div class="box-border flex h-10 w-[120px] items-center border border-[#e7e8ea] bg-white">
     <button
       type="button"
       class="flex h-[38px] min-w-0 flex-1 items-center justify-center hover:bg-gray-50 disabled:opacity-30"

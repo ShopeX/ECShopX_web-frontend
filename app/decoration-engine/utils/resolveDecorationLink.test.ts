@@ -58,6 +58,17 @@ test('resolveHref maps store linkPage to shop page like vshop', () => {
   assert.equal(href, '/zh-CN/shop/88')
 })
 
+test('resolveHref maps regactivity linkPage to registration page', () => {
+  const href = resolver.resolveHref({
+    linkType: 0,
+    linkPage: 'regactivity',
+    id: '56',
+    title: '示例活动',
+  })
+
+  assert.equal(href, '/zh-CN/registration/56')
+})
+
 test('resolveHref supports external links', () => {
   const href = resolver.resolveHref({
     linkType: 1,

@@ -225,18 +225,24 @@
               </template>
             </div>
 
-            <!-- 数量选择器：Figma 4003:5246 -->
+            <!-- 数量选择器：Figma 4003:5246；起订量逻辑对齐 mobile sp-sku-select -->
             <div class="flex w-full items-center gap-6 self-stretch py-6">
               <p
                 class="min-w-0 flex-1 font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#4a5565]"
               >
-                {{ t('ee3264ed.0bf60b') }}
+                <span class="leading-5">{{ t('ee3264ed.0bf60b') }}</span>
+                <span
+                  v-if="showStartNum"
+                  class="text-xs font-normal leading-4 text-[#8f99aa]"
+                >
+                  {{ t('2043bbcc.989408', { count: quantityMin }) }}
+                </span>
               </p>
               <QuantityStepper
                 class="shrink-0"
                 full-width
                 :quantity="quantity"
-                :min="1"
+                :min="quantityMin"
                 :max="quantityMax"
                 :loading="isAddingToCart"
                 @decrease="decreaseQuantity"
@@ -679,13 +685,46 @@ const currentStock = computed(() => {
   return matchedSpecItem ? matchedSpecItem.store : data.store || 0
 })
 
+/** 商品级起订量（>0 才展示与启用下限，对齐 mobile info.startNum） */
+const productStartNum = computed(() => {
+  const data = rawProductData.value as any
+  return Number(data?.start_num) || 0
+})
+
+const showStartNum = computed(() => productStartNum.value > 0)
+
+/**
+ * 当前可购最小数量：
+ * - 无起订量 → 1
+ * - 多规格 → 当前 SKU 的 start_num
+ * - 单规格 / 未匹配 → 商品 start_num
+ */
+const quantityMin = computed(() => {
+  if (!showStartNum.value || !rawProductData.value) return 1
+
+  const data = rawProductData.value as any
+
+  if (data.nospec !== 1 && data.spec_items?.length > 0) {
+    const matchedSpecItem = data.spec_items.find(
+      (item: any) => item.custom_spec_id === currentSpecIdString.value
+    )
+    if (matchedSpecItem) {
+      const skuStart = Number(matchedSpecItem.start_num)
+      return skuStart > 0 ? skuStart : productStartNum.value
+    }
+  }
+
+  return productStartNum.value
+})
+
 const quantityMax = computed(() => {
   const stock = currentStock.value
-  return stock > 0 ? stock : 1
+  const max = stock > 0 ? stock : quantityMin.value
+  return Math.max(max, quantityMin.value)
 })
 
 function decreaseQuantity() {
-  if (quantity.value > 1) {
+  if (quantity.value > quantityMin.value) {
     quantity.value -= 1
   }
 }
@@ -696,13 +735,23 @@ function increaseQuantity() {
   }
 }
 
+watch(
+  quantityMin,
+  (min) => {
+    if (quantity.value < min) {
+      quantity.value = min
+    }
+  },
+  { immediate: true }
+)
+
 watch(currentSpecIdString, () => {
-  quantity.value = 1
+  quantity.value = quantityMin.value
 })
 
 watch(currentStock, (stock) => {
   if (stock > 0 && quantity.value > stock) {
-    quantity.value = stock
+    quantity.value = Math.max(stock, quantityMin.value)
   }
 })
 

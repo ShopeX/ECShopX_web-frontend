@@ -29,7 +29,8 @@ test('mall global setting composable fetches once and exposes logo/background fa
   assert.match(source, /logo_dark/)
   assert.match(source, /background/)
   assert.match(source, /\/images\/logo\/logo\.png/)
-  assert.match(source, /\/assets\/images\/login-bg\.png/)
+  assert.match(source, /import\s+defaultLoginBackgroundUrl\s+from\s+['"]~\/assets\/images\/login-bg\.png['"]/)
+  assert.doesNotMatch(source, /DEFAULT_LOGIN_BACKGROUND_URL\s*=\s*['"]\/assets\/images\/login-bg\.png['"]/)
 })
 
 test('login page consumes cached login background setting', () => {

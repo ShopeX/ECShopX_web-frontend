@@ -75,6 +75,8 @@ export function createDecorationLinkResolver(localePath: LocalePath) {
       case 'store':
       case 'shop':
         return rawId ? localePath(`/shop/${rawId}`) : undefined
+      case 'regactivity':
+        return rawId ? localePath(`/registration/${rawId}`) : undefined
       default:
         return rawId ? normalizeLinkPath(rawId) : undefined
     }

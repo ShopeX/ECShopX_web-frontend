@@ -75,6 +75,17 @@ describe('resolveDecorationLink', () => {
     ).toBe('/zh-CN/collections/34?link_type=category')
   })
 
+  it('maps regactivity linkPage to registration page', () => {
+    expect(
+      resolver.resolveHref({
+        linkType: 0,
+        linkPage: 'regactivity',
+        id: '56',
+        title: '示例活动',
+      })
+    ).toBe('/zh-CN/registration/56')
+  })
+
   it('supports external links', () => {
     expect(
       resolver.resolveHref({

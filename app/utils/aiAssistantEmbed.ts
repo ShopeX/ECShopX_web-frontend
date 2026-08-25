@@ -31,15 +31,15 @@ export function isAiAssistantEnabled(value: unknown): boolean {
 }
 
 export function trimTrailingSlash(value: string): string {
-  return String(value || '').trim().replace(/\/+$/, '')
+  return String(value || '')
+    .trim()
+    .replace(/\/+$/, '')
 }
 
 export function buildAiEmbedPageUrl(config: AiAssistantPublicConfig): string {
   const explicit = String(config.aiEmbedPageUrl || '').trim()
   if (explicit) {
-    return /\.html(\?|$)/i.test(explicit)
-      ? explicit
-      : `${explicit.replace(/\/?$/, '/')}index.html`
+    return /\.html(\?|$)/i.test(explicit) ? explicit : `${explicit.replace(/\/?$/, '/')}index.html`
   }
 
   const aiBase = trimTrailingSlash(String(config.aiBaseUrl || ''))
@@ -113,7 +113,7 @@ export function buildAiAssistantIframeSrc(input: {
   if (input.payload.token) query.set('token', input.payload.token)
   if (input.payload.companyId) query.set('company_id', input.payload.companyId)
   if (input.payload.distributorId) query.set('distributor_id', input.payload.distributorId)
-  if (input.payload.tenantId) query.set('tenant_id', input.payload.tenantId)
+  if (input.payload.tenantId) query.set('tenant_app_id', input.payload.tenantId)
   if (input.payload.locale) query.set('locale', input.payload.locale)
   if (input.backend) query.set('backend', input.backend)
   query.set('layout', 'page')

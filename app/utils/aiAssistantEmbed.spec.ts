@@ -34,9 +34,9 @@ describe('aiAssistantEmbed', () => {
     expect(buildAiEmbedPageUrl({ aiEmbedPageUrl: 'https://ai.example/embed' })).toBe(
       'https://ai.example/embed/index.html'
     )
-    expect(
-      buildAiEmbedPageUrl({ aiEmbedPageUrl: 'https://ai.example/embed/index.html?x=1' })
-    ).toBe('https://ai.example/embed/index.html?x=1')
+    expect(buildAiEmbedPageUrl({ aiEmbedPageUrl: 'https://ai.example/embed/index.html?x=1' })).toBe(
+      'https://ai.example/embed/index.html?x=1'
+    )
     expect(buildAiEmbedPageUrl({ aiBaseUrl: 'https://ai.example/' })).toBe(
       'https://ai.example/ai-assistant-embed/index.html'
     )
@@ -148,7 +148,7 @@ describe('aiAssistantEmbed', () => {
     expect(url.searchParams.get('token')).toBe('token-a')
     expect(url.searchParams.get('company_id')).toBe('company-a')
     expect(url.searchParams.get('distributor_id')).toBe('distributor-a')
-    expect(url.searchParams.get('tenant_id')).toBe('tenant-a')
+    expect(url.searchParams.get('tenant_app_id')).toBe('tenant-a')
     expect(url.searchParams.get('locale')).toBe('en-CN')
     expect(url.searchParams.get('backend')).toBe('https://backend.example')
     expect(url.searchParams.get('layout')).toBe('page')

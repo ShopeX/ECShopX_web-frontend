@@ -51,7 +51,7 @@ const shouldShow = computed(() => mounted.value && enabled.value && !isAiAssista
 function buildAvatarAssetUrl(avatar: string): string {
   const tenantId = String(aiConfig.value.aiTenantId || '').trim()
   const params = new URLSearchParams()
-  if (tenantId) params.set('tenant_id', tenantId)
+  if (tenantId) params.set('tenant_app_id', tenantId)
   params.set('avatar', avatar)
   return `${backend.value}/api/widget/avatar-asset?${params.toString()}`
 }
@@ -68,7 +68,7 @@ async function loadFabConfig() {
   try {
     const tenantId = String(aiConfig.value.aiTenantId || '').trim()
     const query = new URLSearchParams()
-    if (tenantId) query.set('tenant_id', tenantId)
+    if (tenantId) query.set('tenant_app_id', tenantId)
     const suffix = query.toString() ? `?${query.toString()}` : ''
     const response = await fetch(`${backend.value}/api/widget/embed-config${suffix}`)
     if (!response.ok) return

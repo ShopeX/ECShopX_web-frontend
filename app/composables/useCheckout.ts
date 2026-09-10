@@ -20,6 +20,7 @@ import {
   type ICouponModel,
 } from '~/infrastructure/transformers'
 import { useCart } from './useCart'
+import { useRegion } from './useRegion'
 import { MoneyValueObject } from '~/shared/value-objects'
 import type { ICreateOrderRequest } from '~/infrastructure/http/clients/OrderApiClient'
 import type { IStoreItem } from '~/infrastructure/http/clients/StoreApiClient'
@@ -180,13 +181,24 @@ export function useCheckout() {
 
   /**
    * 查询门店列表
+   * 接口按省/市名称筛选（与小程序自提列表一致），表单存的是区域 id，需先转成 label
    */
   const searchStores = async () => {
     try {
       storesLoading.value = true
+      const { regionData, loadRegionData } = useRegion()
+      await loadRegionData()
+
+      const provinceItem = regionData.value.find(
+        (item) => String(item.id) === String(form.value.pickupProvince)
+      )
+      const cityItem = provinceItem?.children?.find(
+        (item) => String(item.id) === String(form.value.pickupCity)
+      )
+
       const response = await storeApiClient.getStoreList({
-        province: form.value.pickupProvince || undefined,
-        city: form.value.pickupCity || undefined,
+        province: provinceItem?.label || undefined,
+        city: cityItem?.label || undefined,
       })
 
       const rawList = Array.isArray(response) ? response : (response?.list || response?.data || [])

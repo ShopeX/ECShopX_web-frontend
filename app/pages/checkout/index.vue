@@ -162,13 +162,13 @@
                       :model-value="form.pickupProvince"
                       :options="pickupProvinces"
                       :placeholder="$t('ee3264ed.3d14d1')"
-                      @update:model-value="handlePickupProvinceChange(String($event))"
+                      @update:model-value="handlePickupProvinceChange($event)"
                     />
                     <ECSelect
                       :model-value="form.pickupCity"
                       :options="pickupCities"
                       :placeholder="$t('ee3264ed.371528')"
-                      @update:model-value="form.pickupCity = String($event)"
+                      @update:model-value="form.pickupCity = String($event ?? '')"
                     />
                   </div>
                   <button
@@ -687,17 +687,21 @@ const {
 const { regionData, loadRegionData } = useRegion()
 
 const pickupProvinces = computed(() =>
-  regionData.value.map((item) => ({ value: item.id, label: item.label }))
+  regionData.value.map((item) => ({ value: String(item.id), label: item.label }))
 )
 
 const pickupCities = computed(() => {
   if (!form.value.pickupProvince) return []
-  const province = regionData.value.find((item) => item.id === form.value.pickupProvince)
-  return province?.children?.map((item) => ({ value: item.id, label: item.label })) || []
+  const province = regionData.value.find(
+    (item) => String(item.id) === String(form.value.pickupProvince)
+  )
+  return (
+    province?.children?.map((item) => ({ value: String(item.id), label: item.label })) || []
+  )
 })
 
-function handlePickupProvinceChange(value: string) {
-  form.value.pickupProvince = value
+function handlePickupProvinceChange(value: string | number) {
+  form.value.pickupProvince = String(value ?? '')
   form.value.pickupCity = ''
 }
 

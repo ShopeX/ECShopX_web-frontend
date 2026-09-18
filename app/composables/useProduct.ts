@@ -238,7 +238,7 @@ export function useProduct() {
    */
   const loadProductWithSSR = (params: IItemDetailParams) => {
     return useAsyncData(
-      `product-detail-${params.id}`,
+      `product-detail-${params.id}-${resolveDistributorId()}`,
       async () => {
         try {
           const data = await itemApiClient.getItemDetail(params)

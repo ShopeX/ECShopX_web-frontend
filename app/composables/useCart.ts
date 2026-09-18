@@ -38,6 +38,7 @@ import type { IAddCartRequest, IUpdateCartRequest } from '~/types/api/cart'
 import type { ICartItemModel, ICartModel } from '~/types/cart'
 import { useToastMessage } from '~/composables/useToastMessage'
 import { logger } from '~/utils/log'
+import { resolveDistributorId } from '~/utils/resolveDistributorId'
 
 /**
  * 购物车 UI 数据接口
@@ -353,7 +354,7 @@ export function useCart() {
       await cartStore.addItem({
         item_id: params.item_id,
         num: params.num,
-        distributor_id: String(params.distributor_id ?? 0),
+        distributor_id: resolveDistributorId(params.distributor_id),
         shop_type: params.shop_type ?? 'distributor',
         cart_type: params.cart_type ?? 'cart',
       })

@@ -125,6 +125,8 @@ export interface IItemListResponse {
 // 商品详情请求参数接口
 export interface IItemDetailParams {
   id: string | number
+  /** BBC/B2C 模式下影响会员价/活动价计算 */
+  distributor_id?: string | number
 }
 
 // 商品详情响应接口

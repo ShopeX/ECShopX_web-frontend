@@ -147,7 +147,7 @@
         >
           <!-- Title and Price -->
           <div class="flex items-start justify-between w-full gap-4">
-          <div class="flex flex-col gap-2 flex-1 min-w-0">
+            <div class="flex flex-col gap-2 flex-1 min-w-0">
               <BCProductMarketingTags :tags="product.marketingTags" placement="inline" />
               <h1
                 class="text-xl lg:text-2xl font-normal text-[#191a1d] leading-[1.2] tracking-[-0.48px]"
@@ -231,10 +231,7 @@
                 class="min-w-0 flex-1 font-['Noto_Sans_SC'] text-sm font-normal leading-5 text-[#4a5565]"
               >
                 <span class="leading-5">{{ t('ee3264ed.0bf60b') }}</span>
-                <span
-                  v-if="showStartNum"
-                  class="text-xs font-normal leading-4 text-[#8f99aa]"
-                >
+                <span v-if="showStartNum" class="text-xs font-normal leading-4 text-[#8f99aa]">
                   {{ t('2043bbcc.989408', { count: quantityMin }) }}
                 </span>
               </p>
@@ -272,7 +269,6 @@
               {{ $t('464b6330.5fd2f9') }}
             </button>
           </div>
-
         </div>
       </div>
     </div>
@@ -356,6 +352,9 @@ import type { IItem } from '~/types/api/item'
 import { logger } from '~/utils/log'
 import { resolveItemDescription } from '~/utils/productDescription'
 import { mapPromotionTags } from '~/utils/promotionTags'
+import { getBusinessMode } from '~/composables/useTemplate'
+import { useDistributorStore } from '~/stores/distributor'
+import { resolveDistributorId } from '~/utils/resolveDistributorId'
 
 const route = useRoute()
 const router = useRouter()
@@ -370,12 +369,26 @@ const toast = useToastMessage()
 // 使用 useProduct composable（符合架构规范：UI → Composable → API Client）
 const { loadProductWithSSR } = useProduct()
 
+const routeShopId = route.query.shopid as string | undefined
+
+if (getBusinessMode() === 'b2c') {
+  const distributorStore = useDistributorStore()
+  if (!distributorStore.isReady || distributorStore.distributorId === '0') {
+    await distributorStore.fetchDefaultDistributor()
+  }
+}
+
+const detailDistributorId = resolveDistributorId(routeShopId)
+
 // SSR 支持：通过 Composable 的 loadProductWithSSR 方法获取数据
 const {
   data: rawProductData,
   pending: detailLoading,
   error: fetchError,
-} = await loadProductWithSSR({ id })
+} = await loadProductWithSSR({
+  id,
+  distributor_id: detailDistributorId,
+})
 
 // 错误处理
 const detailError = computed(() => {
@@ -795,7 +808,7 @@ const addToCart = async () => {
         await addToCartAction({
           item_id: realItemId.value,
           num: quantity.value,
-          distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
+          distributor_id: resolveDistributorId((rawProductData.value as any)?.distributor_id),
           cart_type: 'cart',
         })
         // useCart 内部已经处理了:
@@ -827,7 +840,7 @@ const buyNow = async () => {
         const result = await addToCartAction({
           cart_type: 'fastbuy', // 立即购买,
           num: quantity.value,
-          distributor_id: String((rawProductData.value as any)?.distributor_id || '0'),
+          distributor_id: resolveDistributorId((rawProductData.value as any)?.distributor_id),
           item_id: realItemId.value,
           shop_type: 'distributor',
         })

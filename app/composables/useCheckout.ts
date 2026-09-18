@@ -25,6 +25,7 @@ import { MoneyValueObject } from '~/shared/value-objects'
 import type { ICreateOrderRequest } from '~/infrastructure/http/clients/OrderApiClient'
 import type { IStoreItem } from '~/infrastructure/http/clients/StoreApiClient'
 import { HttpStatus } from '~/types/http'
+import { resolveDistributorId } from '~/utils/resolveDistributorId'
 
 export interface IPickupStore {
   id: string
@@ -270,7 +271,7 @@ export function useCheckout() {
       // 构建计算参数
       const mode = (route.query.mode as string) || 'cart'
       const params: any = {
-        distributor_id: '0', // TODO: 从配置或用户信息获取
+        distributor_id: resolveDistributorId(),
         cart_type: mode,
         order_type: 'normal',
         receipt_type: form.value.receiptType,
@@ -347,7 +348,7 @@ export function useCheckout() {
       // 构建创建订单参数
       const mode = (route.query.mode as string) || 'cart'
       const params: ICreateOrderRequest = {
-        distributor_id: '0', // TODO: 从配置或用户信息获取
+        distributor_id: resolveDistributorId(),
         cart_type: mode as any,
         order_type: 'normal',
         receipt_type: form.value.receiptType,

@@ -95,6 +95,10 @@ export class ItemApiClient {
   async getItemDetail(params: IItemDetailParams): Promise<any> {
     return this.http(`/wxapp/goods/items/${params.id}`, {
       method: 'GET',
+      ...(params.distributor_id != null &&
+        params.distributor_id !== '' && {
+          query: { distributor_id: params.distributor_id },
+        }),
       cache: 'default',
     })
   }

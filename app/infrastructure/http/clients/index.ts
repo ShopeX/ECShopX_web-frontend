@@ -42,3 +42,4 @@ export {
   RegistrationApiClient,
   registrationApiClient,
 } from './RegistrationApiClient'
+export { DistributorApiClient, distributorApiClient } from './DistributorApiClient'
